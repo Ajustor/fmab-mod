@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,6 +21,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -57,6 +60,10 @@ public final class Tolls {
 	private static final int COUGH_CHANCE = 2400;
 	/** Usure de chaque pièce d'une armure d'âme, par point de dégât encaissé. */
 	private static final int SOUL_WEAR_PER_DAMAGE = 2;
+	/** Une unité de matériau transmutée dans l'armure en répare un quart, comme à l'enclume. */
+	private static final int REPAIR_STEPS = 4;
+	/** L'invisibilité d'une âme en armure : on ne voit que l'armure, qui flotte, vide. */
+	private static final int HOLLOW_DURATION = 220;
 
 	private Tolls() {
 	}
@@ -74,6 +81,9 @@ public final class Tolls {
 		UseItemCallback.EVENT.register((player, level, hand) -> {
 			if (disabled(player, armOf(hand))) {
 				return InteractionResult.FAIL;
+			}
+			if (player.isShiftKeyDown() && player instanceof ServerPlayer server && mendWith(server, player.getItemInHand(hand))) {
+				return InteractionResult.SUCCESS;
 			}
 			if (soulBound(player) && player.getItemInHand(hand).has(DataComponents.FOOD)) {
 				// Une armure ne mange pas.
@@ -151,6 +161,8 @@ public final class Tolls {
 		soulLimbs(player, gate);
 		if (gate.soulBound()) {
 			soul(player, gate);
+		} else {
+			hollow(player, false);
 		}
 	}
 
@@ -221,9 +233,62 @@ public final class Tolls {
 		player.getFoodData().setFoodLevel(20);
 		player.getFoodData().setSaturation(5);
 		player.setAirSupply(player.getMaxAirSupply());
+		hollow(player, gate.inArmor());
 		if (gate.inArmor() && gate.visit().isEmpty() && !SoulArmor.sealIntact(player)) {
 			sealErased(player);
 		}
+	}
+
+	/**
+	 * L'armure d'une âme est vide : le corps du joueur est invisible, seule l'armure se voit. On
+	 * reconnaît cette invisibilité-là à ce qu'elle n'a ni particules ni icône.
+	 */
+	private static void hollow(ServerPlayer player, boolean armored) {
+		MobEffectInstance current = player.getEffect(MobEffects.INVISIBILITY);
+		boolean ours = current != null && current.isAmbient() && !current.isVisible();
+		if (armored && (current == null || ours && current.getDuration() < HOLLOW_DURATION / 2)) {
+			player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, HOLLOW_DURATION, 0, true, false, false));
+		} else if (!armored && ours) {
+			player.removeEffect(MobEffects.INVISIBILITY);
+		}
+	}
+
+	/**
+	 * L'âme transmute le matériau qu'elle tient dans son armure : un lingot de fer répare un quart
+	 * d'une pièce de fer. Le plastron (le sceau) d'abord, puis la pièce la plus abîmée.
+	 *
+	 * @return vrai si une pièce a été réparée
+	 */
+	public static boolean mendWith(ServerPlayer player, ItemStack material) {
+		GateState gate = player.getAttached(FmabAttachments.GATE);
+		if (gate == null || !gate.inArmor() || material.isEmpty()) {
+			return false;
+		}
+		ItemStack target = ItemStack.EMPTY;
+		for (EquipmentSlot slot : SoulArmor.SLOTS) {
+			ItemStack piece = player.getItemBySlot(slot);
+			if (!piece.isDamaged() || !piece.isValidRepairItem(material)) {
+				continue;
+			}
+			if (slot == EquipmentSlot.CHEST) {
+				target = piece;
+				break;
+			}
+			if (target.isEmpty() || piece.getDamageValue() * target.getMaxDamage() > target.getDamageValue() * piece.getMaxDamage()) {
+				target = piece;
+			}
+		}
+		if (target.isEmpty()) {
+			return false;
+		}
+		target.setDamageValue(Math.max(0, target.getDamageValue() - Math.max(1, target.getMaxDamage() / REPAIR_STEPS)));
+		if (!player.isCreative()) {
+			material.shrink(1);
+		}
+		player.level().sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY(1), player.getZ(), 16,
+				0.3, 0.4, 0.3, 0.05);
+		player.level().playSound(null, player.blockPosition(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.5f, 1.6f);
+		return true;
 	}
 
 	/**

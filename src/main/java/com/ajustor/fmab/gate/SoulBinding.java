@@ -28,6 +28,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -116,17 +118,28 @@ public final class SoulBinding {
 		return Effects.Result.DONE;
 	}
 
-	/** L'âme qu'appelle ce plastron : son propriétaire s'il est scellé, sinon la plus ancienne en attente. */
+	/**
+	 * L'âme qu'appelle ce plastron : son propriétaire s'il est scellé ; nu, l'âme en armure qui active
+	 * le cercle (elle change d'armure), sinon l'âme errante qui attend depuis le plus longtemps.
+	 */
 	private static Optional<ServerPlayer> soulFor(MinecraftServer server, ItemStack chest, ServerPlayer caster) {
 		Optional<UUID> seal = SoulArmor.sealOf(chest);
 		if (seal.isPresent()) {
 			ServerPlayer owner = server.getPlayerList().getPlayer(seal.get());
-			return Optional.ofNullable(owner).filter(SoulBinding::adrift);
+			return Optional.ofNullable(owner).filter(p -> adrift(p) || p == caster && inArmor(p));
+		}
+		if (inArmor(caster)) {
+			return Optional.of(caster);
 		}
 		return server.getPlayerList().getPlayers().stream()
 				.filter(SoulBinding::adrift)
 				.min((a, b) -> Long.compare(ADRIFT_SINCE.getOrDefault(a.getUUID(), Long.MAX_VALUE),
 						ADRIFT_SINCE.getOrDefault(b.getUUID(), Long.MAX_VALUE)));
+	}
+
+	private static boolean inArmor(ServerPlayer player) {
+		GateState gate = player.getAttached(FmabAttachments.GATE);
+		return gate != null && gate.inArmor();
 	}
 
 	private static boolean adrift(ServerPlayer player) {
@@ -139,6 +152,9 @@ public final class SoulBinding {
 	 * pièces du porte-armure lui font un corps. Le porte-armure (ou le plastron posé) disparaît.
 	 */
 	private static void summon(ServerPlayer soul, ServerLevel level, Vec3 at, ArmorStand stand, ItemEntity loose) {
+		if (inArmor(soul)) {
+			leaveShell(soul);
+		}
 		Map<EquipmentSlot, ItemStack> pieces = new EnumMap<>(EquipmentSlot.class);
 		if (stand != null) {
 			for (EquipmentSlot slot : SoulArmor.SLOTS) {
@@ -170,6 +186,34 @@ public final class SoulBinding {
 		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y + 1, at.z, 40, 0.5, 0.8, 0.5, 0.05);
 		level.playSound(null, BlockPos.containing(at), SoundEvents.ARMOR_EQUIP_IRON.value(), SoundSource.PLAYERS, 1, 0.6f);
 		soul.sendSystemMessage(Component.translatable("gate.fmab.soul.summoned"));
+	}
+
+	/**
+	 * L'âme quitte son armure pour une autre : l'ancienne reste debout, vide, sur un porte-armure. Son
+	 * plastron garde le sceau : c'est un sceau de rechange de plus.
+	 */
+	private static void leaveShell(ServerPlayer soul) {
+		ServerLevel level = soul.level();
+		ArmorStand shell = EntityTypes.ARMOR_STAND.create(level, EntitySpawnReason.TRIGGERED);
+		for (EquipmentSlot slot : SoulArmor.SLOTS) {
+			ItemStack piece = soul.getItemBySlot(slot);
+			soul.setItemSlot(slot, ItemStack.EMPTY);
+			if (piece.isEmpty()) {
+				continue;
+			}
+			if (shell != null) {
+				shell.setItemSlot(slot, piece.copy());
+			} else {
+				soul.drop(piece.copy(), false);
+			}
+		}
+		if (shell == null) {
+			return;
+		}
+		shell.snapTo(soul.getX(), soul.getY(), soul.getZ(), soul.getYRot(), 0);
+		level.addFreshEntity(shell);
+		Anchors.get(level.getServer()).add(soul.getUUID(), new Anchors.Anchor(level.dimension().identifier().toString(),
+				shell.getUUID(), shell.blockPosition()));
 	}
 
 	/** L'âme demande à la Vérité de la rappeler dans un de ses sceaux préparés. */

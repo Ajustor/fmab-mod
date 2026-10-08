@@ -12,6 +12,7 @@ import com.ajustor.fmab.registry.FmabTags;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -35,6 +36,8 @@ public class AlchemistTableBlock extends Block {
 	private static final int CHISEL_WEAR = 4;
 	/** Un vêtement ne porte qu'un cercle à un étage. */
 	private static final int CLOTHES_STAGES = 1;
+	/** Le sang qu'on donne pour tracer son sceau sans encre. */
+	private static final float SEAL_BLOOD = 4;
 
 	public AlchemistTableBlock(Properties properties) {
 		super(properties);
@@ -43,8 +46,7 @@ public class AlchemistTableBlock extends Block {
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
-		if (stack.is(ItemTags.CHEST_ARMOR) && !stack.is(FmabItems.SOUL_CHESTPLATE)
-				&& player.getAttachedOrCreate(FmabAttachments.GATE).inArmor()) {
+		if (stack.is(ItemTags.CHEST_ARMOR) && !stack.is(FmabItems.SOUL_CHESTPLATE) && player.isShiftKeyDown()) {
 			return seal(stack, level, pos, player);
 		}
 		if (stack.is(FmabTags.EMBROIDERABLE)) {
@@ -106,9 +108,9 @@ public class AlchemistTableBlock extends Block {
 	}
 
 	/**
-	 * Une âme fixée dans une armure trace son sceau de sang dans un plastron de rechange, à l'encre
-	 * alchimique : posé sur un porte-armure, au-dessus d'un cercle d'âme, il pourra l'accueillir si
-	 * son armure cède.
+	 * Accroupi, on trace son propre sceau dans un plastron, à l'encre alchimique ou de son sang (une
+	 * âme n'en a plus : il lui faut de l'encre). Posé sur un porte-armure, au-dessus d'un cercle
+	 * d'âme, il pourra accueillir son âme le jour où elle n'aura plus d'armure.
 	 */
 	private static InteractionResult seal(ItemStack stack, Level level, BlockPos pos, Player player) {
 		if (level.isClientSide()) {
@@ -121,12 +123,16 @@ public class AlchemistTableBlock extends Block {
 				break;
 			}
 		}
-		if (ink.isEmpty() && !player.isCreative()) {
+		boolean soul = player.getAttachedOrCreate(FmabAttachments.GATE).soulBound();
+		if (player.isCreative()) {
+			// Rien à payer.
+		} else if (!ink.isEmpty()) {
+			ink.shrink(1);
+		} else if (!soul) {
+			player.hurtServer((ServerLevel) level, level.damageSources().magic(), SEAL_BLOOD);
+		} else {
 			player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.needs_ink"));
 			return InteractionResult.FAIL;
-		}
-		if (!player.isCreative()) {
-			ink.shrink(1);
 		}
 		ItemStack sealed = SoulArmor.sealed(level.registryAccess(), player.getUUID(), stack);
 		stack.shrink(1);
