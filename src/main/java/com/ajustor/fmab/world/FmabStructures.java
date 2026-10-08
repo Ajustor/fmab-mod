@@ -19,6 +19,8 @@ public final class FmabStructures {
 	public static final StructureType<CentralStructure> CENTRAL = type("central", CentralStructure.CODEC);
 	public static final StructureType<ResemboolStructure> RESEMBOOL = type("resembool", ResemboolStructure.CODEC);
 	public static final StructureType<RushValleyStructure> RUSH_VALLEY = type("rush_valley", RushValleyStructure.CODEC);
+	public static final StructureType<Laboratory5Structure> LABORATORY_5 = type("laboratory_5",
+			Laboratory5Structure.CODEC);
 
 	private FmabStructures() {
 	}

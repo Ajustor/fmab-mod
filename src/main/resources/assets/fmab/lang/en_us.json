@@ -467,5 +467,24 @@
   "automail.fmab.no_lost_leg": "You are not missing a leg.",
   "automail.fmab.fitted": "The nerves connect in a flash of pain: the automail replaces %s.",
   "automail.fmab.repair_cost": "This repair takes %s iron ingots.",
-  "automail.fmab.broke": "The automail replacing %s stopped working: have Winry repair it."
+  "automail.fmab.broke": "The automail replacing %s stopped working: have Winry repair it.",
+
+  "entity.fmab.lust": "Lust",
+  "entity.fmab.gluttony": "Gluttony",
+  "entity.fmab.devoured_remains": "Devoured remains",
+  "item.fmab.lust_spawn_egg": "Lust spawn egg",
+  "item.fmab.gluttony_spawn_egg": "Gluttony spawn egg",
+  "item.fmab.philosopher_stone_core": "Philosopher's Stone core",
+  "item.fmab.crystallized_blood": "Crystallized blood",
+  "block.fmab.crystallized_blood": "Crystallized blood",
+  "block.fmab.belly_flesh": "Belly flesh",
+  "biome.fmab.gluttony_belly": "Gluttony's Belly",
+  "death.attack.fmab.lust_lance": "%1$s was pierced by Lust's fingers",
+  "death.attack.fmab.lust_lance.player": "%1$s was pierced by %2$s",
+  "homunculus.fmab.reconstitutes": "%s reconstitutes: their Philosopher's Stone pays the price.",
+  "homunculus.fmab.destroyed": "%s's Stone is empty: only a core remains.",
+  "homunculus.fmab.swallowed": "Gluttony swallows you. It is dark, and it smells of blood…",
+  "homunculus.fmab.belly_gate": "Your transmutation tears the Belly open: you get out.",
+  "homunculus.fmab.belly_cleared": "Nothing moves in the Belly anymore. Gluttony spits you out.",
+  "homunculus.fmab.spat_out": "Gluttony has a stomachache: he spits you out."
 }

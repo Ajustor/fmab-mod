@@ -8,6 +8,7 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.data.Training;
+import com.ajustor.fmab.homunculus.Belly;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
@@ -67,6 +68,11 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.syncWith(Automail.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("automail"));
+
+	/** Le joueur est dans le Ventre de Gluttony : perdu à la mort, inutile au client. */
+	public static final AttachmentType<Belly.Swallowed> SWALLOWED = AttachmentRegistry.<Belly.Swallowed>builder()
+			.persistent(Belly.Swallowed.CODEC)
+			.buildAndRegister(Fmab.id("swallowed"));
 
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()

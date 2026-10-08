@@ -10,6 +10,7 @@ import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.homunculus.Belly;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.training.Trainings;
 import net.minecraft.core.BlockPos;
@@ -158,6 +159,7 @@ public final class Transmutation {
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 1.4f);
 			practice(caster, rules, knowledge, practiced);
 			Trainings.onTransmutation(caster, analysis, frame, inscribed, done);
+			Belly.transmuted(caster);
 			return Result.DONE;
 		}
 		caster.sendOverlayMessage(Component.translatable(last == Effects.Result.NO_MATERIAL

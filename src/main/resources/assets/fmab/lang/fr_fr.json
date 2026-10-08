@@ -467,5 +467,24 @@
   "automail.fmab.no_lost_leg": "Il ne vous manque aucune jambe.",
   "automail.fmab.fitted": "Les nerfs se branchent dans un éclair de douleur : l'automail remplace %s.",
   "automail.fmab.repair_cost": "Il faut %s lingots de fer pour cette réparation.",
-  "automail.fmab.broke": "L'automail qui remplaçait %s ne répond plus : faites-le réparer chez Winry."
+  "automail.fmab.broke": "L'automail qui remplaçait %s ne répond plus : faites-le réparer chez Winry.",
+
+  "entity.fmab.lust": "Lust",
+  "entity.fmab.gluttony": "Gluttony",
+  "entity.fmab.devoured_remains": "Restes dévorés",
+  "item.fmab.lust_spawn_egg": "Œuf d'apparition de Lust",
+  "item.fmab.gluttony_spawn_egg": "Œuf d'apparition de Gluttony",
+  "item.fmab.philosopher_stone_core": "Noyau de Pierre philosophale",
+  "item.fmab.crystallized_blood": "Sang cristallisé",
+  "block.fmab.crystallized_blood": "Sang cristallisé",
+  "block.fmab.belly_flesh": "Chair du Ventre",
+  "biome.fmab.gluttony_belly": "Ventre de Gluttony",
+  "death.attack.fmab.lust_lance": "%1$s a été transpercé par les doigts de Lust",
+  "death.attack.fmab.lust_lance.player": "%1$s a été transpercé par %2$s",
+  "homunculus.fmab.reconstitutes": "%s se reconstitue : sa Pierre philosophale paie le prix.",
+  "homunculus.fmab.destroyed": "La Pierre de %s est vide : il n'en reste qu'un noyau.",
+  "homunculus.fmab.swallowed": "Gluttony vous avale. Il fait noir, et ça sent le sang…",
+  "homunculus.fmab.belly_gate": "Votre transmutation déchire le Ventre : vous en sortez.",
+  "homunculus.fmab.belly_cleared": "Plus rien ne bouge dans le Ventre. Gluttony vous recrache.",
+  "homunculus.fmab.spat_out": "Gluttony a mal au ventre : il vous recrache."
 }
