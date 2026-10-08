@@ -178,6 +178,8 @@
   "editor.fmab.rank": "Rank",
   "editor.fmab.analysis": "Analysis",
   "editor.fmab.palette": "Glyphs",
+  "editor.fmab.examples": "Example circles",
+  "editor.fmab.examples_hint": "The circles from the Alchemy Treatise, which work as they are. Open one to see how it is built, then change it.",
   "editor.fmab.sheet_hint": "Hover a glyph for its sheet; click it to stamp it.",
   "editor.fmab.combinations": "Known combinations:",
   "editor.fmab.concentration": "Concentration: %s",

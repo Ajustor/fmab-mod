@@ -41,6 +41,25 @@ describe("cercles de test partagés avec le mod", () => {
   }
 });
 
+describe("cercles d'exemple de l'éditeur (ceux du Traité)", () => {
+  const treatise = readJson(join(root, "src", "main", "resources", "assets", "fmab", "treatise", "treatise.json")) as {
+    chapters: { pages: { text: string; example?: Record<string, unknown>[] }[] }[];
+  };
+  const examples = treatise.chapters.flatMap((c) => c.pages).filter((p) => p.example);
+
+  it("il y en a au moins un par combinaison de départ", () => {
+    expect(examples.length).toBeGreaterThanOrEqual(6);
+  });
+
+  for (const example of examples) {
+    it(`${example.text} fonctionne au rang qu'il demande`, () => {
+      const drawing = example.example!.map(primitiveFromJson);
+      const rank = analyzer.analyze(parser.parse(drawing), "gate", null).requiredRank;
+      expect(analyzer.analyze(parser.parse(drawing), rank, null).outcome).toBe("works");
+    });
+  }
+});
+
 describe("codes de tracé", () => {
   it("un code redonne le même tracé", () => {
     const drawing = (readJson(join(fixtures, "series.json")).primitives as Record<string, unknown>[]).map(

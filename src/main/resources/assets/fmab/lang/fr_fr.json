@@ -178,6 +178,8 @@
   "editor.fmab.rank": "Rang",
   "editor.fmab.analysis": "Analyse",
   "editor.fmab.palette": "Glyphes",
+  "editor.fmab.examples": "Cercles d'exemple",
+  "editor.fmab.examples_hint": "Les cercles du Traité d'alchimie, qui fonctionnent tels quels. Ouvrez-en un pour voir comment il est construit, puis modifiez-le.",
   "editor.fmab.sheet_hint": "Survolez un glyphe pour sa fiche ; cliquez pour le poser au tampon.",
   "editor.fmab.combinations": "Combinaisons connues :",
   "editor.fmab.concentration": "Concentration : %s",

@@ -173,6 +173,74 @@ export function renderPalette(root: HTMLElement, sheet: HTMLElement, ctx: PanelC
   }
 }
 
+// ---- Cercles d'exemple ----------------------------------------------------------------------------
+
+export interface Example {
+  readonly textKey: string;
+  readonly primitives: Primitive[];
+}
+
+/** Vignette d'un tracé entier, à l'échelle du carnet. */
+export function drawingThumbnail(primitives: Primitive[], size = 64): HTMLCanvasElement {
+  const c = el("canvas", { width: String(size * 2), height: String(size * 2), class: "thumb" });
+  c.style.width = `${size}px`;
+  c.style.height = `${size}px`;
+  const ctx = c.getContext("2d")!;
+  const k = (size * 2) / GRID;
+  ctx.strokeStyle = "#2b2b40";
+  ctx.fillStyle = "#2b2b40";
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  for (const p of primitives) {
+    if (p.type === "dot") {
+      ctx.beginPath();
+      ctx.arc(p.at.x * k, p.at.y * k, 3, 0, Math.PI * 2);
+      ctx.fill();
+      continue;
+    }
+    const pts = sample(p, 0.2);
+    ctx.beginPath();
+    pts.forEach((v, i) => (i === 0 ? ctx.moveTo(v.x * k, v.y * k) : ctx.lineTo(v.x * k, v.y * k)));
+    if (p.type === "polygon" || p.type === "circle") ctx.closePath();
+    ctx.stroke();
+  }
+  return c;
+}
+
+/**
+ * Le titre d'un exemple est le début de son texte, jusqu'aux deux-points ou à la parenthèse :
+ * « Lance de pierre (Alchimiste, …) : Terre et Recomposer… » donne « Lance de pierre ».
+ */
+export function exampleTitle(text: string): string {
+  const end = text.search(/\s?[:(]/);
+  return end > 0 ? text.slice(0, end) : text.split("\n")[0];
+}
+
+/**
+ * Les cercles du Traité : un clic les ouvre dans le canevas, avec leur explication.
+ *
+ * @param rankOf rang que demande chaque exemple
+ */
+export function renderExamples(
+  root: HTMLElement,
+  examples: readonly Example[],
+  rankOf: (e: Example) => string,
+  onOpen: (e: Example) => void,
+): void {
+  root.replaceChildren();
+  for (const example of examples) {
+    const text = t(example.textKey);
+    const card = el("button", { class: "example", type: "button", title: text });
+    card.append(
+      drawingThumbnail(example.primitives),
+      el("span", {}, exampleTitle(text)),
+      el("small", { class: "muted" }, rankName(rankOf(example))),
+    );
+    card.addEventListener("click", () => onOpen(example));
+    root.append(card);
+  }
+}
+
 // ---- Export et import ------------------------------------------------------------------------------
 
 function download(name: string, href: string): void {

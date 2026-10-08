@@ -84,7 +84,7 @@ export class CircleCanvas {
   private inside = false;
 
   constructor(
-    private readonly canvas: HTMLCanvasElement,
+    readonly canvas: HTMLCanvasElement,
     private readonly onChange: () => void,
   ) {
     this.ctx = canvas.getContext("2d")!;

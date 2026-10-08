@@ -1,11 +1,13 @@
 import { CircleAnalyzer } from "./alchemy/analyzer";
 import { decodeDrawing } from "./alchemy/code";
+import { primitiveFromJson } from "./alchemy/geometry";
 import { type Combination, CombinationTable, type Glyph, RANKS, parseCombination, parseGlyph } from "./alchemy/glyph";
 import { CircleParser } from "./alchemy/parser";
 import { GlyphRecognizer } from "./alchemy/recognizer";
 import { CircleCanvas, type Tool } from "./editor/canvas";
 import { type Lang, detectLang, loadLang, rememberLang, t } from "./editor/i18n";
 import {
+  type Example,
   type PanelContext,
   SUPPORTS,
   copyCode,
@@ -14,6 +16,7 @@ import {
   downloadPng,
   importCode,
   renderAnalysis,
+  renderExamples,
   renderPalette,
   starterDrawing,
 } from "./editor/panel";
@@ -26,11 +29,13 @@ async function json<T>(path: string): Promise<T> {
 }
 
 async function main(): Promise<void> {
-  const [rawGlyphs, rawCombinations, meta] = await Promise.all([
+  const [rawGlyphs, rawCombinations, meta, rawExamples] = await Promise.all([
     json<Record<string, unknown>[]>("data/glyphs.json"),
     json<(Record<string, unknown> & { id: string })[]>("data/combinations.json"),
     json<{ modVersion: string; minecraftVersion: string }>("data/meta.json"),
+    json<{ textKey: string; primitives: Record<string, unknown>[] }[]>("data/examples.json"),
   ]);
+  const examples: Example[] = rawExamples.map((e) => ({ textKey: e.textKey, primitives: e.primitives.map(primitiveFromJson) }));
   const glyphs: Glyph[] = rawGlyphs.map(parseGlyph);
   const combinations: Combination[] = rawCombinations.map((c) => parseCombination(c.id, c));
   const parser = new CircleParser(new GlyphRecognizer(glyphs));
@@ -41,6 +46,7 @@ async function main(): Promise<void> {
   const supportSelect = $<HTMLSelectElement>("support");
   const rankSelect = $<HTMLSelectElement>("rank");
   const status = $<HTMLElement>("status");
+  const note = $<HTMLElement>("example-note");
   let statusTimer = 0;
 
   const canvas = new CircleCanvas($<HTMLCanvasElement>("canvas"), () => refresh());
@@ -71,6 +77,19 @@ async function main(): Promise<void> {
     canvas.draw();
   }
 
+  const requiredRank = (example: Example): string =>
+    analyzer.analyze(parser.parse(example.primitives), "gate", null).requiredRank;
+
+  /** Ouvre un exemple : son tracé, le rang qu'il demande, et son explication sous le canevas. */
+  function openExample(example: Example): void {
+    canvas.set(example.primitives);
+    rankSelect.value = requiredRank(example);
+    note.textContent = t(example.textKey);
+    note.hidden = false;
+    refresh();
+    canvas.canvas.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
   function translate(): void {
     document.querySelectorAll<HTMLElement>("[data-i18n]").forEach((e) => (e.textContent = t(e.dataset.i18n!)));
     document.querySelectorAll<HTMLElement>("[data-i18n-title]").forEach((e) => (e.title = t(e.dataset.i18nTitle!)));
@@ -83,6 +102,8 @@ async function main(): Promise<void> {
     rankSelect.value = rank;
     $<HTMLButtonElement>("sides").textContent = t("notebook.fmab.sides", canvas.sides);
     $<HTMLButtonElement>("symmetry").textContent = t(canvas.symmetry ? "notebook.fmab.symmetry.on" : "notebook.fmab.symmetry.off");
+    renderExamples($("examples"), examples, requiredRank, openExample);
+    note.hidden = true;
     renderPalette($("palette"), $("sheet"), ctx, (g) => {
       canvas.stampGlyph = g;
       $("stamp-name").textContent = t(g.nameKey);
@@ -110,7 +131,10 @@ async function main(): Promise<void> {
   });
   $("undo").addEventListener("click", () => canvas.undo());
   $("redo").addEventListener("click", () => canvas.redo());
-  $("clear").addEventListener("click", () => canvas.set([]));
+  $("clear").addEventListener("click", () => {
+    note.hidden = true;
+    canvas.set([]);
+  });
   supportSelect.addEventListener("change", refresh);
   rankSelect.addEventListener("change", translate);
 

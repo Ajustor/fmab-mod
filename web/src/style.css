@@ -241,3 +241,32 @@ footer {
   font-size: 0.85em;
   max-width: 90ch;
 }
+
+.examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+}
+
+button.example {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+button.example .thumb {
+  background: var(--paper);
+  border-radius: 4px;
+}
+
+.note {
+  white-space: pre-line;
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--panel);
+}
