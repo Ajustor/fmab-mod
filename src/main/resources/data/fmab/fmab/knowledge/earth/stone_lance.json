@@ -1,0 +1,12 @@
+{
+  "school": "earth",
+  "mastery": 45,
+  "parent": "fmab:earth/docile_stone",
+  "perks": [
+    {
+      "type": "unlock"
+    }
+  ],
+  "name_key": "knowledge.fmab.earth.stone_lance",
+  "description_key": "knowledge.fmab.earth.stone_lance.desc"
+}

@@ -4,6 +4,7 @@ import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.Primitive;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.GlyphJson;
+import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Combination;
 import com.ajustor.fmab.alchemy.rules.CombinationTable;
 import com.google.gson.JsonElement;
@@ -37,6 +38,11 @@ public final class FmabCodecs {
 	public static final Codec<Combination> COMBINATION = viaJson(
 			json -> CombinationTable.parse("", json.getAsJsonObject()),
 			CombinationTable::toJson);
+
+	/** L'identifiant d'un nœud est sa clé de registre ; il est recollé à la lecture. */
+	public static final Codec<KnowledgeNode> KNOWLEDGE_NODE = viaJson(
+			json -> KnowledgeNode.parse("", json.getAsJsonObject()),
+			KnowledgeNode::toJson);
 
 	private static <T> Codec<T> viaJson(Function<JsonElement, T> read, Function<T, JsonElement> write) {
 		return Codec.PASSTHROUGH.comapFlatMap(

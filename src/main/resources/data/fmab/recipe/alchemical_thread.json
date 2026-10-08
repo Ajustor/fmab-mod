@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:string",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "fmab:alchemical_thread",
+    "count": 2
+  }
+}

@@ -27,3 +27,25 @@ jobs:
         with:
           name: Artifacts
           path: build/libs/
+
+  # L'éditeur web rejoue les mêmes cercles de test (testdata/circles) avec son portage TypeScript.
+  editor:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: setup node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: install
+        run: npm ci
+      - name: test
+        run: npm test
+      - name: build
+        run: npm run build

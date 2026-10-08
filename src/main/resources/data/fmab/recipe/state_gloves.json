@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "fmab:leather_gloves",
+    "minecraft:gold_ingot",
+    "minecraft:lapis_lazuli",
+    "fmab:alchemical_thread"
+  ],
+  "result": {
+    "id": "fmab:state_gloves",
+    "count": 1
+  }
+}

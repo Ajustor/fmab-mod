@@ -9,12 +9,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,8 +20,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Matière disponible pour l'étape de décomposition : les objets posés sur le cercle d'abord, puis
- * l'inventaire de l'alchimiste.
+ * Matière disponible pour l'étape de décomposition : ce qu'a produit l'étage précédent, puis les
+ * objets posés sur le cercle, puis l'inventaire de l'alchimiste.
  */
 public final class MaterialPool {
 	private record Source(ItemStack stack, int unitMass) {
@@ -38,28 +36,37 @@ public final class MaterialPool {
 	/**
 	 * Les objets de l'élément donné (tag {@code fmab:element/<element>}), triés du plus léger au
 	 * plus lourd pour gaspiller le moins de masse possible.
+	 *
+	 * @param family famille exigée ; {@code null} pour un combustible, qui brûle sans être
+	 *               transmuté (il compte alors pour sa valeur d'échange, ou 1)
 	 */
-	public static MaterialPool collect(ServerLevel level, AABB onCircle, ServerPlayer caster, String element,
-			Family family) {
+	public static MaterialPool collect(EffectContext ctx, String element, Family family) {
+		ServerLevel level = ctx.level();
 		TagKey<Item> tag = FmabTags.elementItems(element);
 		List<Source> sources = new ArrayList<>();
-		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, onCircle)) {
+		for (ItemStack stack : ctx.flow()) {
+			add(level, stack, tag, family, sources);
+		}
+		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, ctx.onCircle())) {
 			add(level, entity.getItem(), tag, family, sources);
 		}
-		for (ItemStack stack : caster.getInventory()) {
+		for (ItemStack stack : ctx.caster().getInventory()) {
 			add(level, stack, tag, family, sources);
 		}
 		sources.sort(Comparator.comparingInt(Source::unitMass));
 		return new MaterialPool(sources);
 	}
 
-	private static void add(ServerLevel level, ItemStack stack, TagKey<Item> tag,
-			Family family, List<Source> out) {
+	private static void add(ServerLevel level, ItemStack stack, TagKey<Item> tag, Family family, List<Source> out) {
 		if (stack.isEmpty() || !stack.is(tag)) {
 			return;
 		}
-		valueOf(level, stack).filter(v -> v.family() == family)
-				.ifPresent(v -> out.add(new Source(stack, v.mass())));
+		Optional<ExchangeValue> value = valueOf(level, stack);
+		if (family == null) {
+			out.add(new Source(stack, value.map(ExchangeValue::mass).orElse(1)));
+		} else {
+			value.filter(v -> v.family() == family).ifPresent(v -> out.add(new Source(stack, v.mass())));
+		}
 	}
 
 	public int available() {

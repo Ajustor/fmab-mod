@@ -32,25 +32,33 @@ class TreatiseTest {
 		}
 	}
 
+	/**
+	 * Chaque exemple fonctionne pour le rang qu'il demande, avec les seuls glyphes de ce rang ; et
+	 * il y a au moins six exemples à la portée d'un Apprenti.
+	 */
 	@Test
-	void everyExampleWorksForAnApprenticeWhoStudiedTheTreatise() {
+	void everyExampleWorksForTheRankItNeedsOnceTheGlyphsAreStudied() {
 		CircleParser parser = new CircleParser(new GlyphRecognizer(TestGlyphs.all().values()));
 		CircleAnalyzer analyzer = new CircleAnalyzer(TestGlyphs.combinations(), TestGlyphs.all().values());
-		Set<String> apprenticeGlyphs = TestGlyphs.all().values().stream()
-				.filter(g -> g.rank() == Rank.APPRENTICE)
-				.map(Glyph::id)
-				.collect(Collectors.toSet());
-		int examples = 0;
+		int apprentice = 0;
 		for (Treatise.Chapter chapter : load().chapters()) {
 			for (Treatise.Page page : chapter.pages()) {
 				if (page instanceof Treatise.ExamplePage example) {
-					Analysis a = analyzer.analyze(parser.parse(example.drawing()), Rank.APPRENTICE, apprenticeGlyphs);
+					Rank rank = analyzer.analyze(parser.parse(example.drawing()), Rank.GATE, null).requiredRank();
+					assertTrue(Rank.ALCHEMIST.atLeast(rank), () -> example.textKey() + " demande " + rank);
+					Set<String> studied = TestGlyphs.all().values().stream()
+							.filter(g -> rank.atLeast(g.rank()))
+							.map(Glyph::id)
+							.collect(Collectors.toSet());
+					Analysis a = analyzer.analyze(parser.parse(example.drawing()), rank, studied);
 					assertEquals(Analysis.Outcome.WORKS, a.outcome(), () -> example.textKey() + " : " + a.issues());
-					examples++;
+					if (rank == Rank.APPRENTICE) {
+						apprentice++;
+					}
 				}
 			}
 		}
-		assertTrue(examples >= 6, "le Traité doit montrer chaque combinaison de départ");
+		assertTrue(apprentice >= 6, "le Traité doit montrer chaque combinaison de départ");
 	}
 
 	@Test

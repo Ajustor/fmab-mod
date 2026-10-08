@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_dye",
+  "dye": "#minecraft:dyes",
+  "group": "dyed_gloves",
+  "result": {
+    "id": "fmab:leather_gloves"
+  },
+  "target": "fmab:leather_gloves"
+}

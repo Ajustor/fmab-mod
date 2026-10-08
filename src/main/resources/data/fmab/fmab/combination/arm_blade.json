@@ -1,0 +1,1 @@
+{ "elements": ["iron"], "action": "recompose", "effect": "fmab:arm_blade", "range": 1, "requires": "fmab:metal/arm_blade" }

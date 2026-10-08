@@ -8,6 +8,7 @@ import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.network.AddToNotebookPayload;
 import com.ajustor.fmab.network.LearnGlyphPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Le Traité d'alchimie : sommaire, chapitres de texte, catalogue des glyphes (on y étudie chaque
@@ -51,6 +54,8 @@ public class TreatiseScreen extends Screen {
 	private int left;
 	private int top;
 	private Button actionButton;
+	/** Second bouton : ajouter le cercle (de l'exemple, ou un cercle simple du glyphe) au carnet. */
+	private Button notebookButton;
 	private final List<Button> contentsButtons = new ArrayList<>();
 
 	public TreatiseScreen() {
@@ -70,11 +75,16 @@ public class TreatiseScreen extends Screen {
 				.bounds(left + BOOK_WIDTH / 2 - 40, top + BOOK_HEIGHT - 24, 80, 18).build());
 		actionButton = addRenderableWidget(Button.builder(Component.empty(), b -> action())
 				.bounds(left + BOOK_WIDTH - 12 - IMAGE, top + 30 + IMAGE + 6, IMAGE, 18).build());
+		notebookButton = addRenderableWidget(Button.builder(Component.translatable("treatise.fmab.add_to_notebook"),
+				b -> addToNotebook()).bounds(left + BOOK_WIDTH - 12 - IMAGE, top + 30 + IMAGE + 26, IMAGE, 18).build());
 		contentsButtons.clear();
+		contentsButtons.add(addRenderableWidget(Button.builder(Component.translatable("knowledge.fmab.title"),
+				b -> minecraft.gui.setScreen(new KnowledgeScreen(this)))
+				.bounds(left + BOOK_WIDTH - 90, top + 6, 80, 16).build()));
 		for (int c = 0; c < treatise.chapters().size(); c++) {
 			int chapter = c;
 			Button b = addRenderableWidget(Button.builder(Component.translatable(treatise.chapters().get(c).titleKey()),
-					btn -> go(firstPageOf(chapter))).bounds(left + 30, top + 30 + c * 20, BOOK_WIDTH - 60, 18).build());
+					btn -> go(firstPageOf(chapter))).bounds(left + 30, top + 26 + c * 19, BOOK_WIDTH - 60, 17).build());
 			contentsButtons.add(b);
 		}
 		go(index);
@@ -120,16 +130,60 @@ public class TreatiseScreen extends Screen {
 		contentsButtons.forEach(b -> b.visible = index < 0);
 		Entry e = current();
 		actionButton.visible = false;
+		notebookButton.visible = false;
+		notebookButton.active = true;
+		notebookButton.setMessage(Component.translatable("treatise.fmab.add_to_notebook"));
 		if (e != null && e.glyph() != null) {
 			actionButton.visible = true;
 			boolean known = alchemist().known().contains(e.glyph().id());
 			actionButton.active = !known;
 			actionButton.setMessage(Component.translatable(known ? "treatise.fmab.known" : "treatise.fmab.study"));
+			notebookButton.visible = glyphExample(e.glyph()).isPresent();
 		} else if (e != null && e.page() instanceof Treatise.ExamplePage) {
 			actionButton.visible = true;
 			actionButton.active = true;
 			actionButton.setMessage(Component.translatable("treatise.fmab.copy"));
+			notebookButton.visible = true;
 		}
+	}
+
+	/** Le cercle simple qui montre ce glyphe à l'œuvre, avec le nom de son effet. */
+	private Optional<Map.Entry<String, Drawing>> glyphExample(Glyph glyph) {
+		if (minecraft == null || minecraft.level == null) {
+			return Optional.empty();
+		}
+		AlchemyRules rules = AlchemyRules.of(minecraft.level.registryAccess());
+		return rules.simpleCombinationWith(glyph).flatMap(c -> rules.simpleCircle(c)
+				.map(d -> Map.entry("effect." + c.effect().replace(':', '.'), d)));
+	}
+
+	/** Recopie dans le carnet le cercle de la page : il n'y a plus qu'à le tracer à la craie. */
+	private void addToNotebook() {
+		Entry e = current();
+		if (e == null) {
+			return;
+		}
+		if (e.glyph() != null) {
+			glyphExample(e.glyph()).ifPresent(ex ->
+					ClientPlayNetworking.send(new AddToNotebookPayload("@" + ex.getKey(), ex.getValue())));
+		} else if (e.page() instanceof Treatise.ExamplePage example) {
+			String title = exampleTitle(Component.translatable(example.textKey()).getString());
+			ClientPlayNetworking.send(new AddToNotebookPayload(title, example.drawing()));
+		}
+		notebookButton.active = false;
+		notebookButton.setMessage(Component.translatable("treatise.fmab.added_short"));
+	}
+
+	/** « Lance de pierre (Alchimiste, …) : Terre et… » donne « Lance de pierre ». */
+	static String exampleTitle(String text) {
+		int end = text.length();
+		for (String stop : new String[]{" :", ":", " (", "\n"}) {
+			int i = text.indexOf(stop);
+			if (i > 0) {
+				end = Math.min(end, i);
+			}
+		}
+		return text.substring(0, end).strip();
 	}
 
 	private void action() {
@@ -188,6 +242,10 @@ public class TreatiseScreen extends Screen {
 		lines.add(Component.translatable("treatise.fmab.rank", Component.translatable(g.rank().translationKey())));
 		lines.add(Component.empty());
 		lines.add(Component.translatable(g.descriptionKey()));
+		glyphExample(g).ifPresent(ex -> {
+			lines.add(Component.empty());
+			lines.add(Component.translatable("treatise.fmab.example_line", Component.translatable(ex.getKey())));
+		});
 		int y = top + 26;
 		for (Component line : lines) {
 			for (FormattedCharSequence seq : font.split(line, BOOK_WIDTH - IMAGE - 36)) {

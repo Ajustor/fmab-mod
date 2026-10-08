@@ -1,11 +1,14 @@
 package com.ajustor.fmab.alchemy;
 
 import com.ajustor.fmab.alchemy.circle.CircleIssue;
+import com.ajustor.fmab.alchemy.circle.LinkKind;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
 import com.ajustor.fmab.alchemy.glyph.Rank;
-import com.ajustor.fmab.alchemy.rules.Combination;
+import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
+import com.ajustor.fmab.alchemy.rules.Combination;
+import com.ajustor.fmab.tattoo.TattooSlot;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
@@ -53,6 +56,26 @@ class LocalizationTest {
 		}
 		for (Analysis.Outcome o : Analysis.Outcome.values()) {
 			needed.add("notebook.fmab.outcome." + o.name().toLowerCase(Locale.ROOT));
+		}
+		for (String kind : new String[]{"items", "blockstates"}) {
+			String prefix = kind.equals("items") ? "item.fmab." : "block.fmab.";
+			try (var files = Files.list(TestGlyphs.resources().resolve("assets/fmab/" + kind))) {
+				files.forEach(f -> needed.add(prefix + f.getFileName().toString().replace(".json", "")));
+			}
+		}
+		for (KnowledgeNode n : TestGlyphs.knowledgeNodes()) {
+			needed.add(n.nameKey());
+			needed.add(n.descriptionKey());
+			needed.add("knowledge.fmab.school." + n.school());
+		}
+		for (Combination c : TestGlyphs.combinations().all()) {
+			needed.add("knowledge.fmab.school." + c.school());
+		}
+		for (TattooSlot s : TattooSlot.values()) {
+			needed.add(s.translationKey());
+		}
+		for (LinkKind k : LinkKind.values()) {
+			needed.add("notebook.fmab.link." + k.name().toLowerCase(Locale.ROOT));
 		}
 		for (GlyphLayer l : GlyphLayer.values()) {
 			needed.add("treatise.fmab.layer." + l.name().toLowerCase(Locale.ROOT));

@@ -1,0 +1,1 @@
+{ "elements": ["earth"], "action": "fix", "effect": "fmab:wall", "range": 2, "passive": "fmab:reinforce" }

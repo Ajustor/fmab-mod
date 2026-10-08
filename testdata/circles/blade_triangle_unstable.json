@@ -1,0 +1,135 @@
+{
+  "description": "Fer + Projeter dans un triangle : instable",
+  "rank": "apprentice",
+  "primitives": [
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        16.0
+      ],
+      "radius": 14.0
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          16.0,
+          2.0
+        ],
+        [
+          28.0,
+          23.0
+        ],
+        [
+          4.0,
+          23.0
+        ]
+      ]
+    },
+    {
+      "type": "circle",
+      "center": [
+        15.5,
+        11.5
+      ],
+      "radius": 1.5
+    },
+    {
+      "type": "line",
+      "from": [
+        16.5,
+        10.5
+      ],
+      "to": [
+        18.5,
+        9.0
+      ]
+    },
+    {
+      "type": "polyline",
+      "points": [
+        [
+          17.0,
+          9.0
+        ],
+        [
+          18.5,
+          9.0
+        ],
+        [
+          18.5,
+          10.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          14.5,
+          20.0
+        ],
+        [
+          17.5,
+          20.0
+        ],
+        [
+          16.0,
+          17.5
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        16.0,
+        20.0
+      ],
+      "to": [
+        16.0,
+        22.5
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.0,
+        21.5
+      ],
+      "to": [
+        17.0,
+        21.5
+      ]
+    }
+  ],
+  "expected": {
+    "outcome": "rebound",
+    "complexity": 4,
+    "concentration": 7,
+    "stability": 0.938,
+    "required_rank": "apprentice",
+    "rebound": 0.063,
+    "stages": [
+      {
+        "sides": 3,
+        "capacity": 3,
+        "hexagram": false,
+        "intensity": 0,
+        "direction": false,
+        "link": "none",
+        "glyphs": [
+          "fmab:fer",
+          "fmab:projeter"
+        ],
+        "satellites": 0
+      }
+    ],
+    "effects": [
+      "fmab:blade"
+    ],
+    "issues": [
+      "unstable"
+    ]
+  }
+}

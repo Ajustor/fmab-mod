@@ -1,0 +1,13 @@
+{
+  "school": "earth",
+  "mastery": 30,
+  "parent": "fmab:earth/docile_stone",
+  "perks": [
+    {
+      "type": "wall_thickness",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.earth.thick_wall",
+  "description_key": "knowledge.fmab.earth.thick_wall.desc"
+}
