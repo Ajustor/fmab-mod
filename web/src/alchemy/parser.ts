@@ -227,7 +227,7 @@ export class CircleParser {
       }
       const m = this.recognizer.recognize(g);
       if (m === null || m.glyph.layer === "modifier") {
-        issues.push(issue("unknown_glyph", at));
+        issues.push(issue("unknown_glyph", at, this.closest(g)));
         continue;
       }
       const stage = stageOf(at, rings);
@@ -256,6 +256,19 @@ export class CircleParser {
       });
     }
     return { stages, issues };
+  }
+
+  /** Le glyphe le plus proche d'un tracé non reconnu, « id|écart », comme côté Java. */
+  private closest(strokes: Primitive[]): string {
+    let best: Glyph | null = null;
+    let score = Number.POSITIVE_INFINITY;
+    for (const [glyph, d] of this.recognizer.distances(strokes)) {
+      if (glyph.layer !== "modifier" && d < score) {
+        best = glyph;
+        score = d;
+      }
+    }
+    return best === null ? "" : `${best.id}|${score.toFixed(3)}`;
   }
 }
 

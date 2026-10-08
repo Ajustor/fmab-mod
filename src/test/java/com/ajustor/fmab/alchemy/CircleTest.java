@@ -124,6 +124,19 @@ class CircleTest {
 				&& i.where().distance(new Vec2(7, 16)) < 0.5));
 	}
 
+	@Test
+	void anUnreadableGlyphNamesTheGlyphItComesClosestTo() {
+		// La Terre tournée bien au-delà de sa marge de 15° : illisible, mais on dit de quoi elle se rapproche.
+		List<Primitive> strokes = new ArrayList<>();
+		for (Primitive p : glyph("terre", TOP)) {
+			strokes.add(p.map(v -> v.sub(TOP).rotate(Math.toRadians(40)).add(TOP)));
+		}
+		strokes.addAll(glyph("fixer", BOTTOM));
+		Analysis a = analyze(circle(4, strokes));
+		CircleIssue issue = a.issues().stream().filter(i -> i.kind() == Kind.UNKNOWN_GLYPH).findFirst().orElseThrow();
+		assertTrue(issue.detail().matches("fmab:[a-z_]+\\|\\d+\\.\\d{3}"), issue.detail());
+	}
+
 	private void assertEffect(String element, String action, String effect) {
 		Analysis a = analyze(circle(4, glyph(element, TOP), glyph(action, BOTTOM)));
 		assertEquals(Outcome.WORKS, a.outcome(), () -> element + "+" + action + " : " + a.issues());
