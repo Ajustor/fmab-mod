@@ -66,8 +66,13 @@ joueur compose lui-même :
   l'alchimiste. Elle échoue toujours : une créature difforme naît du cercle, l'alchimiste est happé
   dans l'**Espace blanc**, devant sa Porte et la Vérité.
 - **Péage** selon l'ambition : un bras (la main ne tient plus rien), une jambe (lent, sans course),
-  les organes (−4 cœurs, toux), la vue (voile sombre), ou le corps entier : l'âme est scellée dans
-  une armure, sans faim ni souffle, les coups bosselent l'armure, le sceau effacé l'âme s'en va.
+  les organes (−4 cœurs, toux), la vue (voile sombre). La Vérité est une copie blanche de
+  l'alchimiste : ce qu'elle prend, elle le porte, avec sa peau.
+- **Corps entier** : la première fois, l'âme se réveille dans une armure de fer scellée de son sang
+  (sans faim ni souffle). Les coups usent les pièces, qu'on refait ; si le plastron cède, l'âme erre
+  devant la Porte jusqu'à ce qu'un **cercle d'âme** (Humain + Fixer) l'appelle dans une armure. Une
+  âme prévoyante prépare des plastrons scellés sur des porte-armure, au-dessus de cercles d'âme, et
+  demande à sa Vérité de l'y rappeler.
 - **Transmutation sans cercle** pour les Initiés de la Porte : Maj+G joint les mains et lance le
   cercle sélectionné du carnet.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : établi d'automail, usure,
@@ -116,8 +121,10 @@ hamlet of Resembool.
 **v0.4 (Gate), in progress:** glyphs you do not understand work with a risk of rebound and are
 learned through practice or alchemy tomes, and the notebook stamps the ones you know; human
 transmutation drags the alchemist into the White Space before their Gate and Truth, which takes a
-toll weighed by ambition (an arm, a leg, the organs, the sight, or the whole body with the soul
-sealed into armor); Gate initiates transmute without a circle by joining their hands; automail
+toll weighed by ambition (an arm, a leg, the organs, the sight), and Truth, a white copy of the
+alchemist, wears what it takes; losing the whole body seals the soul into an iron armor whose pieces
+wear out and can be remade, and a soul whose breastplate breaks wanders before the Gate until a soul
+circle calls it into another armor (prepared seals let it call itself back); Gate initiates transmute without a circle by joining their hands; automail
 (iron, Rush Valley, Briggs) replaces lost limbs and is repaired by Winry in the town of Rush Valley.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.

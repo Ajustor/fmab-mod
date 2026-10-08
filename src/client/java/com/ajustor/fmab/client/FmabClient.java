@@ -40,6 +40,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EquipmentSlot;
 import org.lwjgl.glfw.GLFW;
 
 public class FmabClient implements ClientModInitializer {
@@ -101,7 +102,14 @@ public class FmabClient implements ClientModInitializer {
 			return;
 		}
 		GateState gate = mc.player.getAttached(FmabAttachments.GATE);
-		if (gate == null || !gate.lost(BodyPart.SIGHT) || gate.soulBound()) {
+		if (gate == null) {
+			return;
+		}
+		// Une armure d'âme voit par son heaume : sans heaume, elle voit aussi mal qu'un aveugle.
+		boolean blind = gate.soulBound()
+				? gate.inArmor() && mc.player.getItemBySlot(EquipmentSlot.HEAD).isEmpty()
+				: gate.lost(BodyPart.SIGHT);
+		if (!blind) {
 			return;
 		}
 		int w = graphics.guiWidth();

@@ -2,6 +2,7 @@ package com.ajustor.fmab.block;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -14,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -41,6 +43,10 @@ public class AlchemistTableBlock extends Block {
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
+		if (stack.is(ItemTags.CHEST_ARMOR) && !stack.is(FmabItems.SOUL_CHESTPLATE)
+				&& player.getAttachedOrCreate(FmabAttachments.GATE).inArmor()) {
+			return seal(stack, level, pos, player);
+		}
 		if (stack.is(FmabTags.EMBROIDERABLE)) {
 			return embroider(stack, level, pos, player);
 		}
@@ -96,6 +102,39 @@ public class AlchemistTableBlock extends Block {
 		stack.set(FmabComponents.EMBROIDERY, drawing);
 		level.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.8f, 1.2f);
 		player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.embroidered"));
+		return InteractionResult.SUCCESS;
+	}
+
+	/**
+	 * Une âme fixée dans une armure trace son sceau de sang dans un plastron de rechange, à l'encre
+	 * alchimique : posé sur un porte-armure, au-dessus d'un cercle d'âme, il pourra l'accueillir si
+	 * son armure cède.
+	 */
+	private static InteractionResult seal(ItemStack stack, Level level, BlockPos pos, Player player) {
+		if (level.isClientSide()) {
+			return InteractionResult.SUCCESS;
+		}
+		ItemStack ink = ItemStack.EMPTY;
+		for (ItemStack s : player.getInventory()) {
+			if (s.is(FmabItems.ALCHEMICAL_INK)) {
+				ink = s;
+				break;
+			}
+		}
+		if (ink.isEmpty() && !player.isCreative()) {
+			player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.needs_ink"));
+			return InteractionResult.FAIL;
+		}
+		if (!player.isCreative()) {
+			ink.shrink(1);
+		}
+		ItemStack sealed = SoulArmor.sealed(level.registryAccess(), player.getUUID(), stack);
+		stack.shrink(1);
+		if (!player.getInventory().add(sealed)) {
+			player.drop(sealed, false);
+		}
+		level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 0.8f);
+		player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.sealed"));
 		return InteractionResult.SUCCESS;
 	}
 

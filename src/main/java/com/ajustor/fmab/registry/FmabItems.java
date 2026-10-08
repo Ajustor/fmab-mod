@@ -75,15 +75,12 @@ public final class FmabItems {
 	public static final Item ARM_BLADE = register("arm_blade", TransmutedWeaponItem::new,
 			new Item.Properties().sword(ToolMaterial.IRON, 4.0F, -2.2F).durability(60));
 
-	/** L'armure où s'est fixée l'âme d'un joueur qui a perdu son corps à la Porte. */
-	public static final Item SOUL_HELMET = register("soul_helmet", Item::new,
-			new Item.Properties().humanoidArmor(SoulArmor.MATERIAL, ArmorType.HELMET));
+	/**
+	 * Le plastron d'âme : il porte le sceau de sang d'une âme qui a perdu son corps. Les autres pièces
+	 * de son armure sont des pièces ordinaires.
+	 */
 	public static final Item SOUL_CHESTPLATE = register("soul_chestplate", Item::new,
 			new Item.Properties().humanoidArmor(SoulArmor.MATERIAL, ArmorType.CHESTPLATE));
-	public static final Item SOUL_LEGGINGS = register("soul_leggings", Item::new,
-			new Item.Properties().humanoidArmor(SoulArmor.MATERIAL, ArmorType.LEGGINGS));
-	public static final Item SOUL_BOOTS = register("soul_boots", Item::new,
-			new Item.Properties().humanoidArmor(SoulArmor.MATERIAL, ArmorType.BOOTS));
 
 	public static final Item AUTOMAIL_BENCH = register("automail_bench",
 			p -> new BlockItem(FmabBlocks.AUTOMAIL_BENCH, p), new Item.Properties().useBlockDescriptionPrefix());

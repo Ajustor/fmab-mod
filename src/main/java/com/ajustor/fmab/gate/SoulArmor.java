@@ -2,58 +2,86 @@ package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
- * L'armure où l'âme d'un joueur qui a perdu son corps à la Porte est fixée, comme Alphonse. Le
- * sceau de sang est tracé à l'intérieur du plastron : effacé (plastron brisé ou retiré), l'âme s'en
- * va.
+ * L'armure où vit l'âme d'un joueur qui a perdu son corps à la Porte, comme Alphonse. Seul le
+ * plastron compte : il porte le sceau de sang, maudit de lien. Le heaume, les jambières et les
+ * solerets sont des pièces d'armure ordinaires, qu'on refait quand elles cèdent.
  */
 public final class SoulArmor {
-	/** Acier épais, sous l'apparence d'une armure de fer : solide comme du diamant. */
-	public static final ArmorMaterial MATERIAL = new ArmorMaterial(33,
-			Map.of(ArmorType.BOOTS, 3, ArmorType.LEGGINGS, 6, ArmorType.CHESTPLATE, 8, ArmorType.HELMET, 3,
-					ArmorType.BODY, 11),
-			0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.1F, ItemTags.REPAIRS_IRON_ARMOR, EquipmentAssets.IRON);
+	/** L'acier d'un plastron d'âme, sous l'apparence du fer. */
+	public static final ArmorMaterial MATERIAL = new ArmorMaterial(24,
+			Map.of(ArmorType.BOOTS, 2, ArmorType.LEGGINGS, 5, ArmorType.CHESTPLATE, 6, ArmorType.HELMET, 2,
+					ArmorType.BODY, 5),
+			0, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F, ItemTags.REPAIRS_IRON_ARMOR, EquipmentAssets.IRON);
+
+	/** Les emplacements que l'armure occupe, le plastron (le sceau) compris. */
+	public static final List<EquipmentSlot> SLOTS = List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST,
+			EquipmentSlot.LEGS, EquipmentSlot.FEET);
 
 	private SoulArmor() {
 	}
 
-	private static Map<EquipmentSlot, Item> pieces() {
-		return Map.of(EquipmentSlot.HEAD, FmabItems.SOUL_HELMET, EquipmentSlot.CHEST, FmabItems.SOUL_CHESTPLATE,
-				EquipmentSlot.LEGS, FmabItems.SOUL_LEGGINGS, EquipmentSlot.FEET, FmabItems.SOUL_BOOTS);
+	/** Un plastron d'âme scellé au nom de cette âme, maudit de lien. */
+	public static ItemStack sealed(HolderLookup.Provider registries, UUID soul, ItemStack base) {
+		ItemStack chest = new ItemStack(FmabItems.SOUL_CHESTPLATE);
+		if (base.isDamageableItem() && base.getMaxDamage() > 0) {
+			// L'usure du plastron d'origine se retrouve, à proportion, dans le plastron d'âme.
+			chest.setDamageValue(base.getDamageValue() * chest.getMaxDamage() / base.getMaxDamage());
+		}
+		chest.enchant(registries.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.BINDING_CURSE), 1);
+		chest.set(FmabComponents.BLOOD_SEAL, soul.toString());
+		return chest;
+	}
+
+	public static Optional<UUID> sealOf(ItemStack stack) {
+		String seal = stack.get(FmabComponents.BLOOD_SEAL);
+		return seal == null ? Optional.empty() : Optional.of(UUID.fromString(seal));
 	}
 
 	/**
-	 * L'âme entre dans l'armure : ce que le joueur portait tombe dans son inventaire, l'armure prend
-	 * sa place, maudite de lien (on ne l'ôte pas), le sceau tracé dans le plastron.
+	 * La première fois que la Vérité prend le corps, l'âme se retrouve aussitôt dans une armure de
+	 * fer : ce que le joueur portait passe dans son sac.
 	 */
-	public static void bind(ServerPlayer player) {
-		var binding = player.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
-				.getOrThrow(Enchantments.BINDING_CURSE);
-		for (Map.Entry<EquipmentSlot, Item> piece : pieces().entrySet()) {
-			ItemStack worn = player.getItemBySlot(piece.getKey());
-			if (!worn.isEmpty() && !player.getInventory().add(worn.copy())) {
-				player.drop(worn.copy(), false);
+	public static void bindFirstTime(ServerPlayer player) {
+		inhabit(player, Map.of(
+				EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET),
+				EquipmentSlot.CHEST, sealed(player.level().registryAccess(), player.getUUID(), ItemStack.EMPTY),
+				EquipmentSlot.LEGS, new ItemStack(Items.IRON_LEGGINGS),
+				EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS)));
+	}
+
+	/** L'âme entre dans une armure : chaque pièce prend sa place, ce qui était porté va au sac. */
+	public static void inhabit(ServerPlayer player, Map<EquipmentSlot, ItemStack> pieces) {
+		for (EquipmentSlot slot : SLOTS) {
+			ItemStack piece = pieces.getOrDefault(slot, ItemStack.EMPTY);
+			ItemStack worn = player.getItemBySlot(slot);
+			if (!worn.isEmpty()) {
+				if (!player.getInventory().add(worn.copy())) {
+					player.drop(worn.copy(), false);
+				}
+				player.setItemSlot(slot, ItemStack.EMPTY);
 			}
-			ItemStack armor = new ItemStack(piece.getValue());
-			armor.enchant(binding, 1);
-			if (piece.getKey() == EquipmentSlot.CHEST) {
-				armor.set(FmabComponents.BLOOD_SEAL, player.getUUID().toString());
+			if (!piece.isEmpty()) {
+				player.setItemSlot(slot, piece.copy());
 			}
-			player.setItemSlot(piece.getKey(), armor);
 		}
 	}
 
@@ -61,6 +89,17 @@ public final class SoulArmor {
 	public static boolean sealIntact(ServerPlayer player) {
 		ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
 		return chest.is(FmabItems.SOUL_CHESTPLATE)
-				&& player.getUUID().toString().equals(chest.get(FmabComponents.BLOOD_SEAL));
+				&& sealOf(chest).filter(player.getUUID()::equals).isPresent();
+	}
+
+	/** Une pièce d'armure qui peut servir de corps à cet emplacement. */
+	public static boolean fits(EquipmentSlot slot, ItemStack stack) {
+		return switch (slot) {
+			case HEAD -> stack.is(ItemTags.HEAD_ARMOR);
+			case CHEST -> stack.is(ItemTags.CHEST_ARMOR);
+			case LEGS -> stack.is(ItemTags.LEG_ARMOR);
+			case FEET -> stack.is(ItemTags.FOOT_ARMOR);
+			default -> false;
+		};
 	}
 }

@@ -63,19 +63,22 @@ class GateTest {
 	}
 
 	@Test
-	void payingAndReleasingTheSoul() {
+	void aSoulLosesItsArmorAndDriftsBeforeTheGate() {
 		GateState gate = GateState.NONE.pay(BodyPart.ORGANS).pay(BodyPart.BODY);
 		assertEquals(2, gate.openings());
 		assertTrue(gate.soulBound());
-		assertTrue(gate.lost(BodyPart.ORGANS));
-		GateState released = gate.releaseSoul();
-		assertFalse(released.soulBound());
-		assertTrue(released.lost(BodyPart.ORGANS));
+		assertTrue(gate.inArmor());
+		GateState adrift = gate.payWithSeal();
+		assertEquals(3, adrift.openings());
+		assertTrue(adrift.adrift());
+		assertFalse(adrift.inArmor());
+		assertTrue(adrift.lost(BodyPart.ORGANS));
+		assertTrue(adrift.withAdrift(false).inArmor());
 	}
 
 	@Test
 	void theGateStateSurvivesSaving() {
-		GateState gate = GateState.NONE.pay(BodyPart.RIGHT_ARM)
+		GateState gate = GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.BODY).withAdrift(true)
 				.withVisit(new GateState.Visit("minecraft:overworld", new BlockPos(3, 64, -7), 2, false, 120));
 		var json = GateState.CODEC.encodeStart(JsonOps.INSTANCE, gate).getOrThrow();
 		GateState back = GateState.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow();

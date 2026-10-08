@@ -4,6 +4,7 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.registry.FmabAttachments;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
@@ -34,8 +35,9 @@ import net.minecraft.world.item.ItemStack;
  *   <li>une jambe : 30 % de vitesse en moins, pas de course, saut réduit ;</li>
  *   <li>les organes : quatre cœurs en moins et une toux qui fait mal ;</li>
  *   <li>la vue : un voile sombre (dessiné par le client) ;</li>
- *   <li>le corps : l'âme vit dans une armure, sans faim ni souffle ; les coups bosselent l'armure,
- *   et si le sceau du plastron est effacé, l'âme s'en va.</li>
+ *   <li>le corps : l'âme vit dans une armure, sans faim ni souffle. Les coups usent les pièces ; une
+ *   pièce qui cède se refait (sans heaume on voit mal, sans jambières ni solerets on avance mal). Si
+ *   le plastron et son sceau cèdent, l'âme retourne errer devant la Porte.</li>
  * </ul>
  * Un automail en état remplace le membre perdu.
  */
@@ -45,13 +47,16 @@ public final class Tolls {
 	private static final Identifier LEFT_LEG_JUMP = Fmab.id("toll_left_leg_jump");
 	private static final Identifier RIGHT_LEG_JUMP = Fmab.id("toll_right_leg_jump");
 	private static final Identifier ORGANS_HEALTH = Fmab.id("toll_organs_health");
+	private static final Identifier SOUL_NO_LEGGINGS = Fmab.id("soul_no_leggings");
+	private static final Identifier SOUL_NO_BOOTS = Fmab.id("soul_no_boots");
 	private static final double LEG_SPEED = -0.3;
 	private static final double LEG_JUMP = -0.3;
+	private static final double SOUL_NO_BOOTS_SPEED = -0.15;
 	private static final double ORGANS_MAX_HEALTH = -8;
 	/** En moyenne une quinte de toux toutes les deux minutes. */
 	private static final int COUGH_CHANCE = 2400;
-	/** Usure de l'armure d'âme par point de dégât encaissé. */
-	private static final int SOUL_WEAR_PER_DAMAGE = 3;
+	/** Usure de chaque pièce d'une armure d'âme, par point de dégât encaissé. */
+	private static final int SOUL_WEAR_PER_DAMAGE = 2;
 
 	private Tolls() {
 	}
@@ -89,15 +94,27 @@ public final class Tolls {
 			if (gate == null) {
 				return true;
 			}
-			if (gate.visit().isPresent()) {
+			if (gate.visit().isPresent() || gate.adrift()) {
 				// Dans l'Espace blanc, rien ne blesse : la Vérité prend ce qu'elle veut, elle.
 				return false;
 			}
-			if (gate.soulBound()) {
-				dent(player, gate, amount);
+			if (gate.inArmor()) {
+				dent(player, amount);
 				return false;
 			}
 			return true;
+		});
+		// Une âme ne meurt pas : quand son armure tombe, elle retourne devant la Porte.
+		ServerPlayerEvents.ALLOW_DEATH.register((player, source, amount) -> {
+			GateState gate = player.getAttached(FmabAttachments.GATE);
+			if (gate == null || !gate.soulBound()) {
+				return true;
+			}
+			player.setHealth(player.getMaxHealth());
+			if (gate.inArmor()) {
+				sealErased(player);
+			}
+			return false;
 		});
 	}
 
@@ -117,7 +134,7 @@ public final class Tolls {
 	 */
 	public static boolean disabled(Player player, BodyPart part) {
 		GateState gate = player.getAttached(FmabAttachments.GATE);
-		if (gate == null || !gate.lost(part) || gate.soulBound()) {
+		if (gate == null || gate.soulBound() || !gate.lost(part)) {
 			return false;
 		}
 		return !part.limb() || !Automails.working(player, part);
@@ -130,9 +147,10 @@ public final class Tolls {
 		}
 		dropFromLostHands(player, gate);
 		legs(player);
-		organs(player, gate);
+		organs(player);
+		soulLimbs(player, gate);
 		if (gate.soulBound()) {
-			soul(player);
+			soul(player, gate);
 		}
 	}
 
@@ -173,7 +191,7 @@ public final class Tolls {
 		}
 	}
 
-	private static void organs(ServerPlayer player, GateState gate) {
+	private static void organs(ServerPlayer player) {
 		boolean missing = disabled(player, BodyPart.ORGANS);
 		modifier(player, Attributes.MAX_HEALTH, ORGANS_HEALTH, missing ? ORGANS_MAX_HEALTH : 0);
 		if (player.getHealth() > player.getMaxHealth()) {
@@ -186,39 +204,73 @@ public final class Tolls {
 		}
 	}
 
-	/** Une armure n'a ni faim ni souffle ; et sans son sceau, plus d'âme. */
-	private static void soul(ServerPlayer player) {
+	/** Les jambes d'une armure d'âme sont ses jambières et ses solerets : sans eux, on avance mal. */
+	private static void soulLimbs(ServerPlayer player, GateState gate) {
+		boolean armored = gate.inArmor();
+		boolean noLeggings = armored && player.getItemBySlot(EquipmentSlot.LEGS).isEmpty();
+		boolean noBoots = armored && player.getItemBySlot(EquipmentSlot.FEET).isEmpty();
+		modifier(player, Attributes.MOVEMENT_SPEED, SOUL_NO_LEGGINGS, noLeggings ? LEG_SPEED : 0);
+		modifier(player, Attributes.MOVEMENT_SPEED, SOUL_NO_BOOTS, noBoots ? SOUL_NO_BOOTS_SPEED : 0);
+		if (noLeggings && player.isSprinting()) {
+			player.setSprinting(false);
+		}
+	}
+
+	/** Une armure n'a ni faim ni souffle ; et sans son sceau, l'âme s'en va. */
+	private static void soul(ServerPlayer player, GateState gate) {
 		player.getFoodData().setFoodLevel(20);
 		player.getFoodData().setSaturation(5);
 		player.setAirSupply(player.getMaxAirSupply());
-		if (!SoulArmor.sealIntact(player)) {
+		if (gate.inArmor() && gate.visit().isEmpty() && !SoulArmor.sealIntact(player)) {
 			sealErased(player);
 		}
 	}
 
-	/** Un coup bosselle l'armure ; si le plastron cède, le sceau est effacé. */
-	private static void dent(ServerPlayer player, GateState gate, float amount) {
-		ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
+	/**
+	 * Un coup use chaque pièce portée. Une pièce qui cède tombe : on en refera une. Si c'est le
+	 * plastron, le sceau est effacé.
+	 */
+	private static void dent(ServerPlayer player, float amount) {
 		if (!SoulArmor.sealIntact(player)) {
 			sealErased(player);
 			return;
 		}
 		int wear = Math.max(1, Math.round(amount * SOUL_WEAR_PER_DAMAGE));
 		player.level().playSound(null, player.blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.5f, 1.4f);
-		if (chest.getDamageValue() + wear >= chest.getMaxDamage()) {
-			player.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
-			sealErased(player);
-			return;
+		for (EquipmentSlot slot : SoulArmor.SLOTS) {
+			ItemStack piece = player.getItemBySlot(slot);
+			if (piece.isEmpty() || !piece.isDamageableItem()) {
+				continue;
+			}
+			if (piece.getDamageValue() + wear < piece.getMaxDamage()) {
+				piece.setDamageValue(piece.getDamageValue() + wear);
+				continue;
+			}
+			player.setItemSlot(slot, ItemStack.EMPTY);
+			player.level().playSound(null, player.blockPosition(), SoundEvents.ITEM_BREAK.value(), SoundSource.PLAYERS, 1, 0.7f);
+			if (slot == EquipmentSlot.CHEST) {
+				sealErased(player);
+				return;
+			}
+			player.sendOverlayMessage(Component.translatable("gate.fmab.soul.piece_broken"));
 		}
-		chest.setDamageValue(chest.getDamageValue() + wear);
 	}
 
-	/** Le sceau est effacé : l'âme quitte l'armure, et le joueur meurt. */
+	/**
+	 * Le sceau est effacé : l'armure s'effondre, ses pièces tombent, et l'âme retourne errer devant
+	 * la Porte jusqu'à ce qu'un cercle d'âme l'appelle.
+	 */
 	private static void sealErased(ServerPlayer player) {
 		GateState gate = player.getAttachedOrCreate(FmabAttachments.GATE);
-		player.setAttached(FmabAttachments.GATE, gate.releaseSoul());
+		for (EquipmentSlot slot : SoulArmor.SLOTS) {
+			ItemStack piece = player.getItemBySlot(slot);
+			if (!piece.isEmpty() && slot != EquipmentSlot.CHEST) {
+				player.drop(piece.copy(), false);
+			}
+			player.setItemSlot(slot, ItemStack.EMPTY);
+		}
+		player.setAttached(FmabAttachments.GATE, gate.withAdrift(true));
 		player.sendSystemMessage(Component.translatable("gate.fmab.seal_erased").withStyle(s -> s.withColor(0xB0201A)));
-		player.kill(player.level());
 	}
 
 	private static void modifier(ServerPlayer player, Holder<Attribute> attribute, Identifier id, double amount) {
