@@ -5,6 +5,7 @@ import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.tattoo.TattooSlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -38,18 +39,56 @@ public final class GloveCasting {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.hand_not_free"));
 			return;
 		}
-		Gloves gloves = player.getAttachedOrCreate(FmabAttachments.GLOVES);
-		boolean right = inscribed(gloves.right());
-		boolean left = inscribed(gloves.left());
+		boolean right = hasCircle(player, false);
+		boolean left = hasCircle(player, true);
 		if (!right && !left) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.no_glove_circle"));
 			return;
 		}
 		// La main droite d'abord ; la gauche suit quand on joint les mains.
-		if (!castWith(player, gloves, !right, null, null) || !combine || !right || !left) {
+		if (!castHand(player, !right, null, null) || !combine || !right || !left) {
 			return;
 		}
-		castWith(player, player.getAttachedOrCreate(FmabAttachments.GLOVES), true, null, null);
+		castHand(player, true, null, null);
+	}
+
+	/** Une main porte-t-elle un cercle : celui de son gant, ou, paume nue, celui de son tatouage ? */
+	private static boolean hasCircle(ServerPlayer player, boolean left) {
+		ItemStack glove = player.getAttachedOrCreate(FmabAttachments.GLOVES).get(left);
+		if (!glove.isEmpty()) {
+			return inscribed(glove);
+		}
+		return player.getAttachedOrCreate(FmabAttachments.TATTOOS).get(TattooSlot.palm(left)).isPresent();
+	}
+
+	private static boolean castHand(ServerPlayer player, boolean left, BlockPos target, Direction face) {
+		Gloves gloves = player.getAttachedOrCreate(FmabAttachments.GLOVES);
+		if (!gloves.get(left).isEmpty()) {
+			return castWith(player, gloves, left, target, face);
+		}
+		// Paume nue tatouée : le cercle fait partie du corps, il ne s'use pas.
+		TattooSlot palm = TattooSlot.palm(left);
+		Drawing drawing = player.getAttachedOrCreate(FmabAttachments.TATTOOS).get(palm).orElse(null);
+		if (drawing == null) {
+			return false;
+		}
+		BlockHitResult hit = aimed(player, player.blockInteractionRange());
+		if (hit == null) {
+			return false;
+		}
+		Transmutation.Result result = Transmutation.activate(player.level(), hit.getBlockPos().relative(hit.getDirection()),
+				CircleFrame.forFace(hit.getDirection(), player.getDirection()), drawing, player, false, palm.stages());
+		return result != Transmutation.Result.INERT && result != Transmutation.Result.TIRED;
+	}
+
+	/** La surface visée, ou null (avec un message) s'il n'y en a pas à portée. */
+	private static BlockHitResult aimed(ServerPlayer player, double reach) {
+		HitResult hit = player.pick(reach, 1, false);
+		if (!(hit instanceof BlockHitResult block) || hit.getType() != HitResult.Type.BLOCK) {
+			player.sendOverlayMessage(Component.translatable("transmutation.fmab.no_surface"));
+			return null;
+		}
+		return block;
 	}
 
 	/**
@@ -104,9 +143,8 @@ public final class GloveCasting {
 		ServerLevel level = player.level();
 		if (target == null) {
 			double reach = item.kind().reach() > 0 ? item.kind().reach() : player.blockInteractionRange();
-			HitResult hit = player.pick(reach, 1, false);
-			if (!(hit instanceof BlockHitResult block) || hit.getType() != HitResult.Type.BLOCK) {
-				player.sendOverlayMessage(Component.translatable("transmutation.fmab.no_surface"));
+			BlockHitResult block = aimed(player, reach);
+			if (block == null) {
 				return false;
 			}
 			target = block.getBlockPos();

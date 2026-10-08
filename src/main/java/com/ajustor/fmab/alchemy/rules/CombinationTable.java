@@ -51,7 +51,8 @@ public final class CombinationTable {
 					json.has("range") ? json.get("range").getAsDouble() : 1,
 					json.has("school") ? json.get("school").getAsString() : SCHOOLS.getOrDefault(
 							elements.stream().sorted().findFirst().orElse(""), "earth"),
-					json.has("requires") ? Optional.of(json.get("requires").getAsString()) : Optional.empty());
+					json.has("requires") ? Optional.of(json.get("requires").getAsString()) : Optional.empty(),
+					json.has("passive") ? Optional.of(json.get("passive").getAsString()) : Optional.empty());
 		} catch (RuntimeException e) {
 			throw new IllegalArgumentException("Combinaison " + id + " invalide : " + e.getMessage(), e);
 		}
@@ -67,6 +68,7 @@ public final class CombinationTable {
 		o.addProperty("range", c.range());
 		o.addProperty("school", c.school());
 		c.requires().ifPresent(r -> o.addProperty("requires", r));
+		c.passive().ifPresent(p -> o.addProperty("passive", p));
 		return o;
 	}
 }

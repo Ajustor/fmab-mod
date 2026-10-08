@@ -10,6 +10,8 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -19,6 +21,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -28,11 +31,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 /**
  * Les effets que les combinaisons peuvent déclencher, par identifiant ({@code fmab:wall}...).
@@ -66,6 +71,10 @@ public final class Effects {
 	private static final int INGOT_MASS = 9;
 	private static final float FLAME_DAMAGE = 4;
 	private static final float BURST_DAMAGE = 7;
+	/** Distance à laquelle une pique ou un mur de glace va chercher son eau. */
+	private static final int ICE_REACH = 3;
+	/** Puissance d'une détonation, avant le savoir (une TNT vaut 4). */
+	private static final float BLAST_POWER = 2;
 	/** Une lance de pierre demande deux blocs. */
 	private static final int LANCE_BLOCKS = 2;
 	/** Un charbon cuit huit objets, comme au fourneau. */
@@ -84,6 +93,9 @@ public final class Effects {
 		register("fmab:smelt", Effects::smelt);
 		register("fmab:stone_lance", Effects::stoneLance);
 		register("fmab:arm_blade", Effects::armBlade);
+		register("fmab:ice_spike", Effects::iceSpike);
+		register("fmab:ice_wall", Effects::iceWall);
+		register("fmab:detonate", Effects::detonate);
 	}
 
 	private Effects() {
@@ -426,6 +438,90 @@ public final class Effects {
 		}
 	}
 
+	/** L'eau se fige : glace tassée, qui ne fond pas. */
+	private static BlockState frozen(BlockState state) {
+		return Blocks.PACKED_ICE.defaultBlockState();
+	}
+
+	/** L'eau, la glace et la neige à portée d'un point, les plus proches d'abord. */
+	private static List<BlockPos> waterAround(ServerLevel level, BlockPos center, int r) {
+		TagKey<Block> water = FmabTags.elementBlocks("water");
+		List<BlockPos> out = new ArrayList<>();
+		for (BlockPos p : BlockPos.betweenClosed(center.offset(-r, -2, -r), center.offset(r, 1, r))) {
+			BlockState state = level.getBlockState(p);
+			if (state.is(water) && (!state.is(Blocks.WATER) || state.getFluidState().isSource())) {
+				out.add(p.immutable());
+			}
+		}
+		out.sort(Comparator.comparingDouble(p -> p.distSqr(center)));
+		return out;
+	}
+
+	/**
+	 * Eau + Projeter : une pique de glace jaillit à portée, faite de l'eau, de la glace ou de la
+	 * neige qui l'entoure. Ce qu'elle touche est ralenti.
+	 */
+	private static Result iceSpike(EffectContext ctx) {
+		ServerLevel level = ctx.level();
+		BlockPos column = surface(level, ctx.origin().relative(ctx.horizontalDirection(), ctx.range()));
+		if (column == null) {
+			return Result.NO_TARGET;
+		}
+		int raised = raise(ctx, waterAround(level, column, ICE_REACH), column, Direction.UP,
+				FmabTags.elementBlocks("water"), SPIKE_HEIGHT, SPIKE_DAMAGE, Effects::frozen);
+		if (raised > 0) {
+			for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(column).inflate(1.5))) {
+				if (e != ctx.caster()) {
+					e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100, 2));
+				}
+			}
+		}
+		return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
+	}
+
+	/**
+	 * Eau + Air + Fixer : un mur de glace se lève devant le cercle, fait de l'eau alentour. L'Air
+	 * porte l'humidité jusqu'au mur.
+	 */
+	private static Result iceWall(EffectContext ctx) {
+		ServerLevel level = ctx.level();
+		Direction d = ctx.horizontalDirection();
+		Direction along = d.getClockWise();
+		BlockPos center = ctx.origin().relative(d, 2);
+		List<BlockPos> water = waterAround(level, ctx.origin(), ctx.range() * 2 + ICE_REACH);
+		int moved = 0;
+		for (int i = -ctx.range(); i <= ctx.range(); i++) {
+			BlockPos column = surface(level, center.relative(along, i));
+			if (column != null) {
+				moved += raise(ctx, water, column, Direction.UP, FmabTags.elementBlocks("water"), WALL_HEIGHT, 0,
+						Effects::frozen);
+			}
+		}
+		return moved > 0 ? Result.DONE : Result.NO_MATERIAL;
+	}
+
+	/**
+	 * Feu + Air + Décomposer : la matière visée devient explosif et saute. Le bloc qui explose
+	 * disparaît : c'est lui qui a été transmuté. Les dégâts aux blocs suivent la règle mobGriefing.
+	 */
+	private static Result detonate(EffectContext ctx) {
+		ServerLevel level = ctx.level();
+		BlockPos target = surface(level, ctx.origin().relative(ctx.horizontalDirection(), ctx.range()));
+		if (target == null) {
+			return Result.NO_TARGET;
+		}
+		BlockPos charge = target.below();
+		BlockState state = level.getBlockState(charge);
+		if (state.isAir() || state.hasBlockEntity() || state.getDestroySpeed(level, charge) < 0) {
+			return Result.NO_MATERIAL;
+		}
+		level.removeBlock(charge, false);
+		float power = BLAST_POWER + (float) ctx.perk("blast_power");
+		Vec3 c = Vec3.atCenterOf(charge);
+		level.explode(ctx.caster(), c.x, c.y, c.z, power, Level.ExplosionInteraction.MOB);
+		return Result.DONE;
+	}
+
 	private static Optional<ItemStack> cooked(ServerLevel level, ItemStack stack) {
 		if (stack.isEmpty()) {
 			return Optional.empty();
@@ -446,6 +542,15 @@ public final class Effects {
 	 */
 	private static int raise(EffectContext ctx, List<BlockPos> quarry, BlockPos column, Direction up,
 			TagKey<Block> element, int maxHeight, float damage) {
+		return raise(ctx, quarry, column, up, element, maxHeight, damage, UnaryOperator.identity());
+	}
+
+	/**
+	 * Comme {@link #raise(EffectContext, List, BlockPos, Direction, TagKey, int, float)}, mais la
+	 * matière est reformée par {@code recompose} : l'eau puisée autour devient de la glace.
+	 */
+	private static int raise(EffectContext ctx, List<BlockPos> quarry, BlockPos column, Direction up,
+			TagKey<Block> element, int maxHeight, float damage, UnaryOperator<BlockState> recompose) {
 		ServerLevel level = ctx.level();
 		int height = 0;
 		Iterator<BlockPos> world = quarry.iterator();
@@ -470,7 +575,7 @@ public final class Effects {
 				}
 				level.setBlockAndUpdate(from, Blocks.AIR.defaultBlockState());
 			}
-			level.setBlockAndUpdate(to, state);
+			level.setBlockAndUpdate(to, recompose.apply(state));
 			height++;
 		}
 		if (height > 0) {

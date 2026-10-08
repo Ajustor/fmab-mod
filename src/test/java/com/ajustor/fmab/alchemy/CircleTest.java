@@ -58,7 +58,7 @@ class CircleTest {
 
 	@Test
 	void aCombinationMissingFromTheTableRebounds() {
-		Analysis a = analyze(circle(4, glyph("eau", TOP), glyph("projeter", BOTTOM)));
+		Analysis a = analyze(circle(4, glyph("eau", TOP), glyph("decomposer", BOTTOM)));
 		assertEquals(Outcome.REBOUND, a.outcome());
 		assertTrue(kinds(a).contains(Kind.UNKNOWN_COMBINATION));
 	}
@@ -122,6 +122,19 @@ class CircleTest {
 		assertEquals(Outcome.REBOUND, a.outcome());
 		assertTrue(a.issues().stream().anyMatch(i -> i.kind() == Kind.UNKNOWN_GLYPH
 				&& i.where().distance(new Vec2(7, 16)) < 0.5));
+	}
+
+	@Test
+	void anUnreadableGlyphNamesTheGlyphItComesClosestTo() {
+		// La Terre tournée bien au-delà de sa marge de 15° : illisible, mais on dit de quoi elle se rapproche.
+		List<Primitive> strokes = new ArrayList<>();
+		for (Primitive p : glyph("terre", TOP)) {
+			strokes.add(p.map(v -> v.sub(TOP).rotate(Math.toRadians(40)).add(TOP)));
+		}
+		strokes.addAll(glyph("fixer", BOTTOM));
+		Analysis a = analyze(circle(4, strokes));
+		CircleIssue issue = a.issues().stream().filter(i -> i.kind() == Kind.UNKNOWN_GLYPH).findFirst().orElseThrow();
+		assertTrue(issue.detail().matches("fmab:[a-z_]+\\|\\d+\\.\\d{3}"), issue.detail());
 	}
 
 	private void assertEffect(String element, String action, String effect) {

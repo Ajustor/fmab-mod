@@ -32,8 +32,10 @@ import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Carnet de cercles : on y trace ses cercles sur une grille de 32 cases, on les nomme, on les
@@ -56,6 +58,13 @@ public class NotebookScreen extends Screen {
 	private static final int GLYPH_MARK = 0xFF2E9E4F;
 	private static final int ISSUE_MARK = 0xFFD03A2F;
 	private static final int TEXT = 0xFFE0E0E0;
+	private static final int DIM = 0xFFA8A8A8;
+	private static final int GOOD = 0xFF7FD67F;
+	private static final int BAD = 0xFFFF7A6A;
+	private static final int WARN = 0xFFFFB45A;
+	private static final int EFFECT = 0xFFF0D080;
+	private static final int STATUS = 0xFF9CC8FF;
+	private static final int PANEL_BG = 0xB0101018;
 	private static final int PANEL_WIDTH = 190;
 
 	private final InteractionHand hand;
@@ -83,6 +92,13 @@ public class NotebookScreen extends Screen {
 	private final List<Button> toolButtons = new ArrayList<>();
 	private Button sidesButton;
 	private Button symmetryButton;
+	/** Ordonnée de la rangée « < page > » et haut du panneau d'analyse. */
+	private int navY;
+	private int panelTop;
+
+	/** Une ligne du panneau d'analyse et sa couleur. */
+	private record Line(Component text, int color) {
+	}
 
 	public NotebookScreen(InteractionHand hand, ItemStack stack) {
 		super(Component.translatable("item.fmab.circle_notebook"));
@@ -134,6 +150,7 @@ public class NotebookScreen extends Screen {
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.new_page"), b -> newPage())
 				.bounds(px + 128, y, 62, 18).build());
 		y += 20;
+		navY = y;
 		addRenderableWidget(Button.builder(Component.literal("<"), b -> turn(-1)).bounds(px, y, 20, 18).build());
 		addRenderableWidget(Button.builder(Component.literal(">"), b -> turn(1)).bounds(px + 106, y, 20, 18).build());
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.delete_page"), b -> deletePage())
@@ -143,6 +160,7 @@ public class NotebookScreen extends Screen {
 				.bounds(px, y, 94, 18).build());
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.import"), b -> importCode())
 				.bounds(px + 96, y, 94, 18).build());
+		panelTop = y + 26;
 		refreshLabels();
 	}
 
@@ -196,61 +214,122 @@ public class NotebookScreen extends Screen {
 
 	private void drawPanel(GuiGraphicsExtractor graphics) {
 		int px = canvasX + cell * Drawing.GRID + 10;
-		int y = canvasY + 6 * 20 + 2;
-		graphics.centeredText(font, pageLabel(), px + 63, y - 15, TEXT);
-		List<Component> lines = analysisLines();
-		lines.add(status);
-		for (Component line : lines) {
-			for (FormattedCharSequence seq : font.split(line, PANEL_WIDTH)) {
-				graphics.text(font, seq, px, y, TEXT);
-				y += 10;
+		// Numéro de page entre les deux flèches.
+		graphics.centeredText(font, pageLabel(), px + 63, navY + 5, TEXT);
+
+		List<Line> lines = analysisLines();
+		if (!status.getString().isEmpty()) {
+			lines.add(new Line(status, STATUS));
+		}
+		List<FormattedCharSequence> wrapped = new ArrayList<>();
+		List<Integer> colors = new ArrayList<>();
+		for (Line line : lines) {
+			for (FormattedCharSequence seq : font.split(line.text(), PANEL_WIDTH - 8)) {
+				wrapped.add(seq);
+				colors.add(line.color());
 			}
+		}
+		int bottom = Math.min(height - 4, panelTop + 6 + wrapped.size() * 10);
+		graphics.fill(px, panelTop, px + PANEL_WIDTH, bottom, PANEL_BG);
+		int y = panelTop + 4;
+		for (int i = 0; i < wrapped.size() && y + 9 <= bottom; i++) {
+			graphics.text(font, wrapped.get(i), px + 4, y, colors.get(i));
+			y += 10;
 		}
 	}
 
-	private List<Component> analysisLines() {
-		List<Component> out = new ArrayList<>();
+	private List<Line> analysisLines() {
+		List<Line> out = new ArrayList<>();
 		Analysis a = analysis();
 		if (a == null) {
-			out.add(Component.translatable("notebook.fmab.empty"));
+			out.add(new Line(Component.translatable("notebook.fmab.empty"), TEXT));
 			return out;
 		}
 		AlchemistData me = alchemist();
+		// Le verdict d'abord : c'est ce qu'on cherche en ouvrant le carnet.
+		int verdictColor = switch (a.outcome()) {
+			case WORKS -> GOOD;
+			case REBOUND -> BAD;
+			default -> DIM;
+		};
+		out.add(new Line(Component.translatable("notebook.fmab.outcome." + a.outcome().name().toLowerCase(Locale.ROOT),
+				Math.round(a.reboundSeverity() * 100)), verdictColor));
+		for (Analysis.StageEffect e : a.effects()) {
+			out.add(new Line(Component.translatable("notebook.fmab.effect",
+					Component.translatable("effect." + e.combination().effect().replace(':', '.')),
+					String.format(Locale.ROOT, "%.1f", e.range())), EFFECT));
+		}
+		addIssues(out, a);
 		if (!a.parsed().stages().isEmpty()) {
 			Stage first = a.parsed().stages().getFirst();
-			out.add(Component.translatable("notebook.fmab.stages", a.parsed().stages().size(),
+			out.add(new Line(Component.translatable("notebook.fmab.stages", a.parsed().stages().size(),
 					first.sides() == 0 ? Component.translatable("notebook.fmab.no_polygon")
-							: Component.translatable("notebook.fmab.polygon", first.sides())));
+							: Component.translatable("notebook.fmab.polygon", first.sides())), TEXT));
 			List<Component> names = new ArrayList<>();
 			for (Stage s : a.parsed().stages()) {
 				s.glyphs().forEach(g -> names.add(Component.translatable(g.glyph().nameKey())));
 				if (s.index() > 0) {
-					out.add(Component.translatable("notebook.fmab.link", s.index() + 1,
-							Component.translatable("notebook.fmab.link." + s.link().name().toLowerCase(Locale.ROOT))));
+					out.add(new Line(Component.translatable("notebook.fmab.link", s.index() + 1,
+							Component.translatable("notebook.fmab.link." + s.link().name().toLowerCase(Locale.ROOT))),
+							TEXT));
 				}
 				if (!s.satellites().isEmpty()) {
-					out.add(Component.translatable("notebook.fmab.satellites", s.index() + 1, s.satellites().size()));
+					out.add(new Line(Component.translatable("notebook.fmab.satellites", s.index() + 1,
+							s.satellites().size()), TEXT));
 				}
 			}
-			if (!names.isEmpty()) {
-				out.add(Component.translatable("notebook.fmab.glyphs", join(names)));
+			out.add(new Line(names.isEmpty() ? Component.translatable("notebook.fmab.no_glyphs")
+					: Component.translatable("notebook.fmab.glyphs", join(names)), TEXT));
+		}
+		int cap = me.rank().complexityCap();
+		out.add(new Line(Component.translatable("notebook.fmab.complexity", a.complexity(), cap,
+				Component.translatable(a.requiredRank().translationKey())), a.complexity() > cap ? BAD : DIM));
+		out.add(new Line(Component.translatable("notebook.fmab.stability", Math.round(a.stability() * 100)),
+				a.stability() < 1 ? WARN : DIM));
+		out.add(new Line(Component.translatable("notebook.fmab.concentration", a.concentration(),
+				(int) me.concentration()), a.concentration() > me.concentration() ? BAD : DIM));
+		return out;
+	}
+
+	/**
+	 * Les problèmes, regroupés quand ils se répètent. Pour un trait non reconnu, on dit de quel
+	 * glyphe il se rapproche et de combien il s'en écarte.
+	 */
+	private void addIssues(List<Line> out, Analysis a) {
+		Map<CircleIssue.Kind, Integer> counts = new LinkedHashMap<>();
+		List<String> hints = new ArrayList<>();
+		for (CircleIssue issue : a.issues()) {
+			counts.merge(issue.kind(), 1, Integer::sum);
+			if (issue.kind() == CircleIssue.Kind.UNKNOWN_GLYPH) {
+				hints.add(issue.detail());
 			}
 		}
-		for (Analysis.StageEffect e : a.effects()) {
-			out.add(Component.translatable("notebook.fmab.effect",
-					Component.translatable("effect." + e.combination().effect().replace(':', '.')),
-					String.format(Locale.ROOT, "%.1f", e.range())));
+		for (Map.Entry<CircleIssue.Kind, Integer> e : counts.entrySet()) {
+			Component text = Component.translatable(e.getKey().translationKey());
+			if (e.getValue() > 1) {
+				text = Component.translatable("notebook.fmab.issue_count", text, e.getValue());
+			}
+			out.add(new Line(Component.literal("• ").append(text), WARN));
+			if (e.getKey() == CircleIssue.Kind.UNKNOWN_GLYPH) {
+				hints.forEach(h -> out.add(new Line(closestHint(h), DIM)));
+			}
 		}
-		out.add(Component.translatable("notebook.fmab.complexity", a.complexity(), me.rank().complexityCap(),
-				Component.translatable(a.requiredRank().translationKey())));
-		out.add(Component.translatable("notebook.fmab.stability", Math.round(a.stability() * 100)));
-		out.add(Component.translatable("notebook.fmab.concentration", a.concentration(), (int) me.concentration()));
-		out.add(Component.translatable("notebook.fmab.outcome." + a.outcome().name().toLowerCase(Locale.ROOT),
-				Math.round(a.reboundSeverity() * 100)));
-		for (CircleIssue issue : a.issues()) {
-			out.add(Component.literal("• ").append(Component.translatable(issue.kind().translationKey())));
+	}
+
+	/** « Le plus proche : Terre (écart 0.140, marge 0.100) », à partir du détail {@code id|écart}. */
+	private Component closestHint(String detail) {
+		int bar = detail.indexOf('|');
+		if (bar < 0 || minecraft == null || minecraft.level == null) {
+			return Component.translatable("notebook.fmab.no_close_glyph");
 		}
-		return out;
+		String id = detail.substring(0, bar);
+		String score = detail.substring(bar + 1);
+		return AlchemyRules.of(minecraft.level.registryAccess()).glyphs().stream()
+				.filter(g -> g.id().equals(id))
+				.findFirst()
+				.<Component>map(g -> Component.translatable("notebook.fmab.closest", Component.translatable(g.nameKey()),
+						score, String.format(Locale.ROOT, "%.3f", g.tolerance().position())))
+				.orElseGet(() -> Component.translatable("notebook.fmab.no_close_glyph"));
 	}
 
 	private static Component join(List<Component> parts) {
@@ -493,7 +572,12 @@ public class NotebookScreen extends Screen {
 	// ---- Pages ------------------------------------------------------------------------------------
 
 	private String currentName() {
-		return page < contents.pages().size() ? contents.pages().get(page).name() : defaultName(page);
+		return page < contents.pages().size() ? displayName(contents.pages().get(page).name()) : defaultName(page);
+	}
+
+	/** Un nom de page « @clé » (cercles du carnet de départ et du Traité) s'affiche traduit. */
+	public static String displayName(String name) {
+		return name.startsWith("@") ? Component.translatable(name.substring(1)).getString() : name;
 	}
 
 	private Component pageLabel() {

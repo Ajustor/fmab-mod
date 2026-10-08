@@ -81,13 +81,15 @@ public final class Transmutation {
 			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.support_too_small", maxStages));
 			return Result.INERT;
 		}
-		if (alchemist.concentration() < analysis.concentration()) {
+		boolean watch = StateWatch.empowers(caster);
+		int cost = StateWatch.cost(analysis.concentration(), watch);
+		if (alchemist.concentration() < cost) {
 			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired",
-					analysis.concentration(), (int) alchemist.concentration()));
+					cost, (int) alchemist.concentration()));
 			return Result.TIRED;
 		}
 		caster.setAttached(FmabAttachments.ALCHEMIST,
-				alchemist.withConcentration(alchemist.concentration() - analysis.concentration()));
+				alchemist.withConcentration(alchemist.concentration() - cost));
 
 		if (analysis.outcome() == Analysis.Outcome.REBOUND) {
 			rebound(level, circle, frame, caster, analysis, inscribed);
@@ -114,7 +116,8 @@ public final class Transmutation {
 			}
 			Effects.Result stageResult = Effects.Result.NO_TARGET;
 			for (Analysis.StageEffect effect : effects) {
-				EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, flow, knowledge);
+				EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, flow, knowledge,
+						watch ? StateWatch.RANGE_BONUS : 0);
 				Effects.Result result = Effects.get(effect.combination().effect())
 						.map(e -> e.apply(ctx))
 						.orElse(Effects.Result.NO_TARGET);

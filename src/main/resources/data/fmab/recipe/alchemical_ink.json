@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:ink_sac",
+    "minecraft:redstone",
+    "minecraft:glass_bottle",
+    "minecraft:bone_meal"
+  ],
+  "result": {
+    "id": "fmab:alchemical_ink",
+    "count": 2
+  }
+}

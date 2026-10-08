@@ -29,6 +29,15 @@ public final class FmabComponents {
 					.networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(FmabCodecs.DRAWING))
 					.build());
 
+	/** Cercle brodé sur un vêtement : il agit tant qu'on le porte. */
+	public static final DataComponentType<Drawing> EMBROIDERY = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("embroidery"),
+			DataComponentType.<Drawing>builder()
+					.persistent(FmabCodecs.DRAWING)
+					.networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(FmabCodecs.DRAWING))
+					.build());
+
 	/** Heure de jeu (ticks) à laquelle une arme transmutée se défait. */
 	public static final DataComponentType<Long> EXPIRES = Registry.register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,

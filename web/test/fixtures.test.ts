@@ -13,7 +13,7 @@ import { GlyphRecognizer } from "../src/alchemy/recognizer";
 import { summary } from "../src/alchemy/summary";
 
 const root = join(__dirname, "..", "..");
-const data = join(root, "src", "main", "resources", "data", "fmab");
+const data = join(root, "src", "main", "resources", "data", "fmab", "fmab");
 const readJson = (path: string): Record<string, unknown> => JSON.parse(readFileSync(path, "utf-8"));
 const jsonFiles = (dir: string): string[] => readdirSync(dir).filter((f) => f.endsWith(".json")).sort();
 

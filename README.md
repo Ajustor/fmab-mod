@@ -41,6 +41,20 @@ joueur compose lui-même :
 - **Éditeur web** (`web/`) : même parseur, porté en TypeScript, vérifié contre le Java par des
   cercles de test communs (`testdata/circles`). `cd web && npm install && npm run dev`.
 
+**v0.3 (État), en cours :**
+
+- **Écoles** du Feu, de la Glace (piques et murs de glace) et de l'Explosion (Feu + Air +
+  Décomposer), avec leurs arbres de savoir.
+- **Examen d'Alchimiste d'État** : un examinateur de l'armée demande des objets, puis l'épreuve
+  oppose le candidat à un golem de pierre lié à un cercle gravé. Récompense : le rang d'État et la
+  montre d'Alchimiste d'État (+1 de portée, −20 % de concentration).
+- **Cercles portés** : vêtements de cuir brodés, tatouages par rituel (encre alchimique sur un
+  cercle tracé au sol). Ils donnent des passifs : renfort, protection contre le feu, vitesse,
+  régénération, épines. Une paume tatouée se lance comme un gant.
+- **Structures** : Central City, grande ville circulaire fortifiée (quartier général et arène,
+  bibliothèque, maisons), et le hameau de Resembool (maison des Rockbell, fermes, champs).
+  `/locate structure fmab:central`.
+
 Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/glyph`), combinaisons
 (`data/<ns>/combination`), valeurs d'échange (`data/<ns>/exchange`), éléments visés (tags
 `fmab:element/*`), pages du Traité. Textes en français et en anglais.
@@ -73,6 +87,11 @@ rebounds. Everything that can be data-driven is. Texts in English and French.
 Recompose glyphs, a practice-based knowledge tree, circles on walls and ceilings (chalk, paint,
 engraving), alchemist gloves cast with a key, Izumi's trials and sparring, and a web circle editor
 (`web/`) running a TypeScript port of the parser checked against the Java one on shared test circles.
+
+**v0.3 (State), in progress:** Fire, Ice and Explosion schools, the State Alchemist examination
+against a stone golem bound to its circle, the State Alchemist's watch, embroidered garments and
+ritual tattoos bearing passive circles, and two generated places: the walled Central City and the
+hamlet of Resembool.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 

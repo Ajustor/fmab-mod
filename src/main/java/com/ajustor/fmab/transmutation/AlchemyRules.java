@@ -1,8 +1,11 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.circle.CircleParser;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.alchemy.drawing.SimpleCircles;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
+import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
 import com.ajustor.fmab.alchemy.glyph.GlyphRecognizer;
 import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
@@ -18,6 +21,7 @@ import net.minecraft.core.RegistryAccess;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.WeakHashMap;
 
 /**
@@ -32,6 +36,7 @@ public final class AlchemyRules {
 	private final List<KnowledgeNode> nodes;
 	private final CircleParser parser;
 	private final CircleAnalyzer analyzer;
+	private final List<Combination> combinations;
 
 	private AlchemyRules(Registry<Glyph> glyphRegistry, Registry<Combination> combinationRegistry,
 			Registry<KnowledgeNode> knowledgeRegistry) {
@@ -45,6 +50,9 @@ public final class AlchemyRules {
 				.forEach(e -> combinations.add(e.getValue().withId(e.getKey().identifier().toString())));
 		this.parser = new CircleParser(new GlyphRecognizer(glyphs));
 		this.analyzer = new CircleAnalyzer(new CombinationTable(combinations), glyphs);
+		this.combinations = List.copyOf(combinations);
+		Fmab.LOGGER.info("Règles alchimiques chargées : {} glyphes, {} combinaisons, {} nœuds de savoir",
+				glyphs.size(), combinations.size(), nodes.size());
 	}
 
 	public static synchronized AlchemyRules of(RegistryAccess access) {
@@ -55,6 +63,41 @@ public final class AlchemyRules {
 
 	public List<Glyph> glyphs() {
 		return glyphs;
+	}
+
+	public List<Combination> combinations() {
+		return combinations;
+	}
+
+	/**
+	 * Le cercle simple (un élément, une action) d'une combinaison, s'il en existe un : anneau,
+	 * polygone juste assez grand, élément en haut, action en bas.
+	 */
+	public Optional<Drawing> simpleCircle(Combination c) {
+		if (c.elements().size() != 1) {
+			return Optional.empty();
+		}
+		Optional<Glyph> element = glyph(GlyphLayer.ELEMENT, c.elements().iterator().next());
+		Optional<Glyph> action = glyph(GlyphLayer.ACTION, c.action());
+		if (element.isEmpty() || action.isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.of(SimpleCircles.of(element.get(), action.get(),
+				SimpleCircles.sidesFor(element.get(), action.get())));
+	}
+
+	/** La première combinaison simple où figure ce glyphe. */
+	public Optional<Combination> simpleCombinationWith(Glyph glyph) {
+		return combinations.stream()
+				.filter(c -> c.elements().size() == 1)
+				.filter(c -> glyph.layer() == GlyphLayer.ELEMENT ? c.elements().contains(glyph.role())
+						: glyph.layer() == GlyphLayer.ACTION && c.action().equals(glyph.role()))
+				.filter(c -> c.requires().isEmpty())
+				.findFirst();
+	}
+
+	private Optional<Glyph> glyph(GlyphLayer layer, String role) {
+		return glyphs.stream().filter(g -> g.is(layer, role)).findFirst();
 	}
 
 	public List<KnowledgeNode> nodes() {

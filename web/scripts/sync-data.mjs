@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 const web = join(dirname(fileURLToPath(import.meta.url)), "..");
 const repo = join(web, "..");
 const resources = join(repo, "src", "main", "resources");
-const data = join(resources, "data", "fmab");
+const data = join(resources, "data", "fmab", "fmab");
 
 const readJson = (path) => JSON.parse(readFileSync(path, "utf-8"));
 const jsonFiles = (dir) => readdirSync(dir).filter((f) => f.endsWith(".json")).sort();

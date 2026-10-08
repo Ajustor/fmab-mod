@@ -3,6 +3,7 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.CircleMedium;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.ScreenItem;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.ToolMaterial;
 
@@ -37,6 +39,8 @@ public final class FmabItems {
 			new Item.Properties().stacksTo(1));
 
 	public static final Item ALCHEMICAL_THREAD = register("alchemical_thread", Item::new, new Item.Properties());
+	public static final Item ALCHEMICAL_INK = register("alchemical_ink", AlchemicalInkItem::new,
+			new Item.Properties().stacksTo(16));
 	public static final Item ALCHEMIST_TABLE = register("alchemist_table",
 			p -> new BlockItem(FmabBlocks.ALCHEMIST_TABLE, p), new Item.Properties().useBlockDescriptionPrefix());
 	public static final Item CLOTH_GLOVES = glove("cloth_gloves", GloveItem.Kind.CLOTH, 64);
@@ -47,6 +51,12 @@ public final class FmabItems {
 
 	public static final Item IZUMI_SPAWN_EGG = register("izumi_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.IZUMI));
+
+	public static final Item STATE_EXAMINER_SPAWN_EGG = register("state_examiner_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.STATE_EXAMINER));
+	/** Montre d'Alchimiste d'État : portée et concentration améliorées pour son titulaire. */
+	public static final Item STATE_WATCH = register("state_watch", Item::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
 
 	/** Lance de pierre : les réglages de la lance de pierre vanilla, mais peu de durabilité. */
 	public static final Item STONE_LANCE = register("stone_lance", TransmutedWeaponItem::new,
@@ -82,12 +92,14 @@ public final class FmabItems {
 					output.accept(ALCHEMIST_CHISEL);
 					output.accept(ALCHEMIST_TABLE);
 					output.accept(ALCHEMICAL_THREAD);
+					output.accept(ALCHEMICAL_INK);
 					output.accept(CLOTH_GLOVES);
 					output.accept(LEATHER_GLOVES);
 					output.accept(SPARK_GLOVES);
 					output.accept(IRON_GAUNTLETS);
 					output.accept(STATE_GLOVES);
 					output.accept(IZUMI_SPAWN_EGG);
+					output.accept(STATE_EXAMINER_SPAWN_EGG);
 				})
 				.build());
 	}

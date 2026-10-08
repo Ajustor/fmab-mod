@@ -1,0 +1,12 @@
+{
+  "school": "water",
+  "mastery": 30,
+  "parent": "fmab:water/docile_water",
+  "perks": [
+    {
+      "type": "unlock"
+    }
+  ],
+  "name_key": "knowledge.fmab.water.ice_wall",
+  "description_key": "knowledge.fmab.water.ice_wall.desc"
+}

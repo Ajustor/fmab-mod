@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
@@ -197,7 +199,7 @@ public final class CircleParser {
 			Optional<GlyphRecognizer.Match> match = recognizer.recognize(group)
 					.filter(m -> m.glyph().layer() != GlyphLayer.MODIFIER);
 			if (match.isEmpty()) {
-				issues.add(CircleIssue.at(CircleIssue.Kind.UNKNOWN_GLYPH, at));
+				issues.add(new CircleIssue(CircleIssue.Kind.UNKNOWN_GLYPH, at, closest(group)));
 				continue;
 			}
 			int stage = stageOf(at, rings);
@@ -469,5 +471,18 @@ public final class CircleParser {
 
 	private static boolean overlap(double[] a, double[] b) {
 		return a[0] <= b[2] && b[0] <= a[2] && a[1] <= b[3] && b[1] <= a[3];
+	}
+
+	/**
+	 * Le glyphe dont un tracé non reconnu se rapproche le plus, sous la forme {@code id|écart} :
+	 * l'interface peut dire « ça ressemble à la Terre, mais trop de travers ». Vide s'il n'y en a
+	 * aucun.
+	 */
+	private String closest(List<Primitive> group) {
+		return recognizer.distances(group).entrySet().stream()
+				.filter(e -> e.getKey().layer() != GlyphLayer.MODIFIER && Double.isFinite(e.getValue()))
+				.min(Map.Entry.comparingByValue())
+				.map(e -> e.getKey().id() + "|" + String.format(Locale.ROOT, "%.3f", e.getValue()))
+				.orElse("");
 	}
 }

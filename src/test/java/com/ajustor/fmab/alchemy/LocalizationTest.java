@@ -6,8 +6,9 @@ import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
-import com.ajustor.fmab.alchemy.rules.Combination;
 import com.ajustor.fmab.alchemy.rules.Analysis;
+import com.ajustor.fmab.alchemy.rules.Combination;
+import com.ajustor.fmab.tattoo.TattooSlot;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
@@ -69,6 +70,9 @@ class LocalizationTest {
 		}
 		for (Combination c : TestGlyphs.combinations().all()) {
 			needed.add("knowledge.fmab.school." + c.school());
+		}
+		for (TattooSlot s : TattooSlot.values()) {
+			needed.add(s.translationKey());
 		}
 		for (LinkKind k : LinkKind.values()) {
 			needed.add("notebook.fmab.link." + k.name().toLowerCase(Locale.ROOT));

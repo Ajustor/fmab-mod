@@ -15,7 +15,30 @@ export const SUPPORTS: { id: string; stages: number }[] = [
   { id: "spark_gloves", stages: 2 },
   { id: "iron_gauntlets", stages: 2 },
   { id: "state_gloves", stages: 5 },
+  { id: "clothes", stages: 1 },
+  { id: "palm", stages: 2 },
+  { id: "forearm", stages: 1 },
+  { id: "back", stages: 5 },
+  { id: "chest", stages: 3 },
 ];
+
+/** Nom d'un support dans la langue choisie : clés du mod (objets, emplacements de tatouage). */
+export function supportName(id: string): string {
+  switch (id) {
+    case "surface":
+      return t("editor.fmab.support.surface");
+    case "clothes":
+      return t("editor.fmab.support.clothes");
+    case "palm":
+    case "forearm":
+      return t("editor.fmab.support.tattoo", t(`tattoo.fmab.slot.${id}_right`));
+    case "back":
+    case "chest":
+      return t("editor.fmab.support.tattoo", t(`tattoo.fmab.slot.${id}`));
+    default:
+      return t(`item.fmab.${id}`);
+  }
+}
 
 const el = <K extends keyof HTMLElementTagNameMap>(
   tag: K,

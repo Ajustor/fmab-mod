@@ -1,0 +1,1 @@
+{ "elements": ["air", "water"], "action": "fix", "effect": "fmab:ice_wall", "range": 2, "school": "water", "requires": "fmab:water/ice_wall" }
