@@ -170,6 +170,14 @@ public final class GateOfTruth {
 				.stream().findFirst();
 	}
 
+	/** La Vérité rend une partie volée : elle ne la porte plus. */
+	public static void returnPart(ServerPlayer player, BodyPart part) {
+		ServerLevel space = player.level().getServer().getLevel(WHITE_SPACE);
+		if (space != null) {
+			truth(space, player).ifPresent(t -> t.setStolen(player.getAttachedOrCreate(FmabAttachments.GATE).lost()));
+		}
+	}
+
 	/** On quitte l'Espace blanc : la Vérité ne reste pas seule devant une Porte fermée. */
 	public static void leaveTruth(ServerPlayer player) {
 		ServerLevel space = player.level().getServer().getLevel(WHITE_SPACE);

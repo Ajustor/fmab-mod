@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "CBC",
+    " C "
+  ],
+  "key": {
+    "C": "fmab:philosopher_stone_core",
+    "B": "fmab:crystallized_blood"
+  },
+  "result": {
+    "id": "fmab:philosopher_stone",
+    "count": 1
+  }
+}

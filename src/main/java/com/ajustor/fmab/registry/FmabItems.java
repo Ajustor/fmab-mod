@@ -8,6 +8,7 @@ import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
+import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.item.ScreenItem;
 import com.ajustor.fmab.item.TomeItem;
 import com.ajustor.fmab.item.Tomes;
@@ -102,6 +103,9 @@ public final class FmabItems {
 	 */
 	public static final Item PHILOSOPHER_STONE_CORE = register("philosopher_stone_core", Item::new,
 			new Item.Properties().stacksTo(16).rarity(Rarity.EPIC));
+	/** La Pierre philosophale : fondue de quatre noyaux, elle rend son corps à une âme. */
+	public static final Item PHILOSOPHER_STONE = register("philosopher_stone", PhilosopherStoneItem::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
 	public static final Item CRYSTALLIZED_BLOOD = register("crystallized_blood",
 			p -> new BlockItem(FmabBlocks.CRYSTALLIZED_BLOOD, p), new Item.Properties().useBlockDescriptionPrefix());
 	public static final Item LUST_SPAWN_EGG = register("lust_spawn_egg", SpawnEggItem::new,
@@ -167,6 +171,7 @@ public final class FmabItems {
 					output.accept(WINRY_SPAWN_EGG);
 					output.accept(TRUTH_SPAWN_EGG);
 					output.accept(PHILOSOPHER_STONE_CORE);
+					output.accept(PHILOSOPHER_STONE);
 					output.accept(CRYSTALLIZED_BLOOD);
 					output.accept(LUST_SPAWN_EGG);
 					output.accept(GLUTTONY_SPAWN_EGG);

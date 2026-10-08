@@ -77,6 +77,16 @@ class GateTest {
 	}
 
 	@Test
+	void thePhilosophersStoneGivesTheBodyBack() {
+		GateState soul = GateState.NONE.pay(BodyPart.LEFT_ARM).pay(BodyPart.BODY);
+		GateState healed = soul.restore(BodyPart.BODY);
+		assertFalse(healed.soulBound());
+		assertFalse(healed.adrift());
+		assertTrue(healed.lost(BodyPart.LEFT_ARM), "la Pierre ne rend que le corps");
+		assertEquals(soul.openings(), healed.openings());
+	}
+
+	@Test
 	void theGateStateSurvivesSaving() {
 		GateState gate = GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.BODY).withAdrift(true)
 				.withVisit(new GateState.Visit("minecraft:overworld", new BlockPos(3, 64, -7), 2, false, 120));

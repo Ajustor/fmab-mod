@@ -153,7 +153,7 @@ public final class SoulBinding {
 	 */
 	private static void summon(ServerPlayer soul, ServerLevel level, Vec3 at, ArmorStand stand, ItemEntity loose) {
 		if (inArmor(soul)) {
-			leaveShell(soul);
+			leaveShell(soul, true);
 		}
 		Map<EquipmentSlot, ItemStack> pieces = new EnumMap<>(EquipmentSlot.class);
 		if (stand != null) {
@@ -189,10 +189,12 @@ public final class SoulBinding {
 	}
 
 	/**
-	 * L'âme quitte son armure pour une autre : l'ancienne reste debout, vide, sur un porte-armure. Son
-	 * plastron garde le sceau : c'est un sceau de rechange de plus.
+	 * L'âme quitte son armure : elle reste debout, vide, sur un porte-armure.
+	 *
+	 * @param asSeal vrai si l'âme change d'armure : le plastron garde le sceau et devient un sceau de
+	 *               rechange ; faux si elle retrouve son corps
 	 */
-	private static void leaveShell(ServerPlayer soul) {
+	public static void leaveShell(ServerPlayer soul, boolean asSeal) {
 		ServerLevel level = soul.level();
 		ArmorStand shell = EntityTypes.ARMOR_STAND.create(level, EntitySpawnReason.TRIGGERED);
 		for (EquipmentSlot slot : SoulArmor.SLOTS) {
@@ -212,6 +214,9 @@ public final class SoulBinding {
 		}
 		shell.snapTo(soul.getX(), soul.getY(), soul.getZ(), soul.getYRot(), 0);
 		level.addFreshEntity(shell);
+		if (!asSeal) {
+			return;
+		}
 		Anchors.get(level.getServer()).add(soul.getUUID(), new Anchors.Anchor(level.dimension().identifier().toString(),
 				shell.getUUID(), shell.blockPosition()));
 	}
