@@ -105,12 +105,15 @@ public record GateState(int openings, Set<BodyPart> lost, boolean adrift, Option
 		return new GateState(openings + 1, more, adrift, visit);
 	}
 
-	/** Ce que la Vérité avait pris revient (la Pierre philosophale a payé). */
-	public GateState restore(BodyPart part) {
+	/**
+	 * Ce que la Vérité avait pris revient : la Pierre philosophale a payé. Le corps rendu, l'âme
+	 * n'erre plus.
+	 */
+	public GateState restore(Set<BodyPart> parts) {
 		Set<BodyPart> rest = EnumSet.noneOf(BodyPart.class);
 		rest.addAll(lost);
-		rest.remove(part);
-		return new GateState(openings, rest, part == BodyPart.BODY ? false : adrift, visit);
+		rest.removeAll(parts);
+		return new GateState(openings, rest, adrift && rest.contains(BodyPart.BODY), visit);
 	}
 
 	/** Une ouverture de plus, sans rien à prendre que le sceau : l'âme perd son armure. */

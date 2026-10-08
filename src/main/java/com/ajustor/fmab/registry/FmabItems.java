@@ -3,6 +3,7 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.CircleMedium;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.gate.Restoration;
 import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.AutomailItem;
@@ -105,7 +106,7 @@ public final class FmabItems {
 			new Item.Properties().stacksTo(16).rarity(Rarity.EPIC));
 	/** La Pierre philosophale : fondue de quatre noyaux, elle rend son corps à une âme. */
 	public static final Item PHILOSOPHER_STONE = register("philosopher_stone", PhilosopherStoneItem::new,
-			new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
+			new Item.Properties().durability(Restoration.STONE_SOULS).rarity(Rarity.EPIC));
 	public static final Item CRYSTALLIZED_BLOOD = register("crystallized_blood",
 			p -> new BlockItem(FmabBlocks.CRYSTALLIZED_BLOOD, p), new Item.Properties().useBlockDescriptionPrefix());
 	public static final Item LUST_SPAWN_EGG = register("lust_spawn_egg", SpawnEggItem::new,
