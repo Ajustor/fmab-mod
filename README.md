@@ -59,7 +59,8 @@ joueur compose lui-même :
 
 - **Savoir** : un glyphe qu'on ne comprend pas fonctionne, avec 25 % de risque de rebond chacun ; on
   le comprend après cinq usages, ou en lisant un **tome d'alchimie** (Rudiments au départ, tomes
-  d'Izumi, de l'examen d'État et de Hohenheim). Le Traité décrit sans enseigner. Le carnet pose au
+  vendus par les bibliothécaires des villages, offerts par Izumi et l'examen d'État, notes de
+  Hohenheim à Resembool). Le Traité décrit sans enseigner. Le carnet pose au
   **tampon** les glyphes compris.
 - **Transmutation humaine** : glyphe Humain et Recomposer, ingrédients d'un corps et sang de
   l'alchimiste. Elle échoue toujours : une créature difforme naît du cercle, l'alchimiste est happé

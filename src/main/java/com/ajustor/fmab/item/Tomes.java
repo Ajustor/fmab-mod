@@ -9,7 +9,9 @@ import java.util.List;
 
 /**
  * Les tomes d'alchimie du mod. Chacun enseigne un groupe de glyphes ; on les trouve dans le kit de
- * départ, auprès d'Izumi, de l'examinateur et dans les structures.
+ * départ, auprès d'Izumi et de l'examinateur, et les bibliothécaires des villages les vendent comme
+ * des livres enchantés ({@code data/fmab/villager_trade/librarian}). Les notes de Hohenheim ne se
+ * trouvent qu'à Resembool.
  */
 public final class Tomes {
 	/** Les bases : de quoi lever un mur, une pique ou une plateforme de glace. */

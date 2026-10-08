@@ -1,0 +1,26 @@
+{
+  "additional_wants": {
+    "id": "minecraft:book"
+  },
+  "gives": {
+    "id": "fmab:alchemy_tome",
+    "components": {
+      "fmab:tome": {
+        "title": "tome.fmab.stone_and_metal",
+        "glyphs": [
+          "fmab:fer",
+          "fmab:cuivre",
+          "fmab:decomposer",
+          "fmab:reparer"
+        ]
+      }
+    }
+  },
+  "max_uses": 4.0,
+  "reputation_discount": 0.2,
+  "wants": {
+    "count": 12.0,
+    "id": "minecraft:emerald"
+  },
+  "xp": 10.0
+}
