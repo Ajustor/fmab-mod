@@ -1,0 +1,13 @@
+{
+  "school": "explosion",
+  "mastery": 40,
+  "parent": "fmab:explosion/steady_hand",
+  "perks": [
+    {
+      "type": "blast_power",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.explosion.blast",
+  "description_key": "knowledge.fmab.explosion.blast.desc"
+}

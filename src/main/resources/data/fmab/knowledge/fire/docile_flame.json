@@ -1,0 +1,12 @@
+{
+  "school": "fire",
+  "mastery": 15,
+  "perks": [
+    {
+      "type": "concentration_discount",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.fire.docile_flame",
+  "description_key": "knowledge.fmab.fire.docile_flame.desc"
+}

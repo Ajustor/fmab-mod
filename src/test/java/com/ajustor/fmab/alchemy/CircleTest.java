@@ -58,7 +58,7 @@ class CircleTest {
 
 	@Test
 	void aCombinationMissingFromTheTableRebounds() {
-		Analysis a = analyze(circle(4, glyph("eau", TOP), glyph("projeter", BOTTOM)));
+		Analysis a = analyze(circle(4, glyph("eau", TOP), glyph("decomposer", BOTTOM)));
 		assertEquals(Outcome.REBOUND, a.outcome());
 		assertTrue(kinds(a).contains(Kind.UNKNOWN_COMBINATION));
 	}

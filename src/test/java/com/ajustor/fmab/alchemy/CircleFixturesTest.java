@@ -128,7 +128,9 @@ class CircleFixturesTest {
 				circle(4, glyph("terre", top), glyph("decomposer", bottom))));
 		s.put("repair", new Scenario("apprentice", "Fer + Réparer",
 				circle(4, glyph("fer", top), glyph("reparer", bottom))));
-		s.put("unknown_combination", new Scenario("apprentice", "Eau + Projeter : rebond",
+		s.put("unknown_combination", new Scenario("apprentice", "Eau + Décomposer : rebond",
+				circle(4, glyph("eau", top), glyph("decomposer", bottom))));
+		s.put("ice_spike", new Scenario("apprentice", "Eau + Projeter : pique de glace",
 				circle(4, glyph("eau", top), glyph("projeter", bottom))));
 		s.put("no_ring", new Scenario("apprentice", "Pas d'anneau", glyph("terre", top)));
 		s.put("hexagon_apprentice", new Scenario("apprentice", "Un hexagone dépasse l'Apprenti",
@@ -171,6 +173,10 @@ class CircleFixturesTest {
 		fusion.addAll(TestGlyphs.drawn("air", new Vec2(20, 12), 2.5, 0));
 		fusion.addAll(TestGlyphs.drawn("projeter", new Vec2(16, 20), 2.5, 0));
 		s.put("fusion_layered", new Scenario("alchemist", "Hexagramme et hexagone", fusion));
+		List<Primitive> blast = new ArrayList<>(fusion.subList(0, fusion.size()));
+		blast.removeAll(TestGlyphs.drawn("projeter", new Vec2(16, 20), 2.5, 0));
+		blast.addAll(TestGlyphs.drawn("decomposer", new Vec2(16, 20), 2.5, 0));
+		s.put("detonation", new Scenario("alchemist", "Feu + Air + Décomposer : détonation", blast));
 		List<Primitive> noFusion = new ArrayList<>(fusion.subList(0, 1));
 		noFusion.add(polygon(14, 4, -90));
 		noFusion.addAll(fusion.subList(4, fusion.size()));

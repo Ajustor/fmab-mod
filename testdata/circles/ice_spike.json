@@ -1,5 +1,5 @@
 {
-  "description": "Eau + Décomposer : rebond",
+  "description": "Eau + Projeter : pique de glace",
   "rank": "apprentice",
   "primitives": [
     {
@@ -49,67 +49,52 @@
       ]
     },
     {
-      "type": "line",
-      "from": [
-        14.0,
-        20.0
-      ],
-      "to": [
-        18.0,
-        20.0
+      "type": "polygon",
+      "points": [
+        [
+          14.5,
+          20.0
+        ],
+        [
+          17.5,
+          20.0
+        ],
+        [
+          16.0,
+          17.5
+        ]
       ]
     },
     {
       "type": "line",
       "from": [
         16.0,
-        18.0
+        20.0
       ],
       "to": [
-        16.0,
-        22.0
-      ]
-    },
-    {
-      "type": "circle",
-      "center": [
-        18.5,
-        20.0
-      ],
-      "radius": 0.5
-    },
-    {
-      "type": "circle",
-      "center": [
-        13.5,
-        20.0
-      ],
-      "radius": 0.5
-    },
-    {
-      "type": "circle",
-      "center": [
         16.0,
         22.5
-      ],
-      "radius": 0.5
+      ]
     },
     {
-      "type": "circle",
-      "center": [
-        16.0,
-        17.5
+      "type": "line",
+      "from": [
+        15.0,
+        21.5
       ],
-      "radius": 0.5
+      "to": [
+        17.0,
+        21.5
+      ]
     }
   ],
   "expected": {
-    "outcome": "rebound",
+    "outcome": "works",
     "complexity": 3,
     "concentration": 6,
     "stability": 1.667,
     "required_rank": "apprentice",
-    "rebound": 0.5,
+    "rebound": 0.0,
     "stages": [
       {
         "sides": 4,
@@ -120,14 +105,14 @@
         "link": "none",
         "glyphs": [
           "fmab:eau",
-          "fmab:decomposer"
+          "fmab:projeter"
         ],
         "satellites": 0
       }
     ],
-    "effects": [],
-    "issues": [
-      "unknown_combination"
-    ]
+    "effects": [
+      "fmab:ice_spike"
+    ],
+    "issues": []
   }
 }
