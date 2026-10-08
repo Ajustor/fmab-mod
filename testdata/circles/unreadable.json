@@ -1,0 +1,122 @@
+{
+  "description": "Un trait illisible",
+  "rank": "apprentice",
+  "primitives": [
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        16.0
+      ],
+      "radius": 14.0
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          16.0,
+          2.0
+        ],
+        [
+          30.0,
+          16.0
+        ],
+        [
+          16.0,
+          30.0
+        ],
+        [
+          2.0,
+          16.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          13.5,
+          9.0
+        ],
+        [
+          18.5,
+          9.0
+        ],
+        [
+          16.0,
+          13.5
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        14.5,
+        11.5
+      ],
+      "to": [
+        17.5,
+        11.5
+      ]
+    },
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        20.0
+      ],
+      "radius": 2.0
+    },
+    {
+      "type": "line",
+      "from": [
+        14.0,
+        20.0
+      ],
+      "to": [
+        18.0,
+        20.0
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        6.0,
+        14.0
+      ],
+      "to": [
+        8.0,
+        18.0
+      ]
+    }
+  ],
+  "expected": {
+    "outcome": "rebound",
+    "complexity": 2,
+    "concentration": 5,
+    "stability": 2.5,
+    "required_rank": "apprentice",
+    "rebound": 0.3,
+    "stages": [
+      {
+        "sides": 4,
+        "capacity": 4,
+        "hexagram": false,
+        "intensity": 0,
+        "direction": false,
+        "link": "none",
+        "glyphs": [
+          "fmab:terre",
+          "fmab:fixer"
+        ],
+        "satellites": 0
+      }
+    ],
+    "effects": [
+      "fmab:wall"
+    ],
+    "issues": [
+      "unknown_glyph"
+    ]
+  }
+}

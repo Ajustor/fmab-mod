@@ -1,0 +1,21 @@
+{
+  "id": "fmab:recomposer",
+  "layer": "action",
+  "action": "recompose",
+  "primitives": [
+    { "type": "polygon", "points": [[-0.7, -0.7], [0.7, -0.7], [0.7, 0.7], [-0.7, 0.7]] },
+    { "type": "line", "from": [-0.7, -0.7], "to": [0.7, 0.7] },
+    { "type": "line", "from": [0.7, -0.7], "to": [-0.7, 0.7] }
+  ],
+  "complexity": 2,
+  "concentration": 4,
+  "rank": "alchemist",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.recomposer",
+  "description_key": "glyph.fmab.recomposer.desc",
+  "since": "0.2"
+}

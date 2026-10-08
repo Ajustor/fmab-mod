@@ -1,0 +1,20 @@
+{
+  "id": "fmab:direction",
+  "layer": "modifier",
+  "modifier": "direction",
+  "primitives": [
+    { "type": "line", "from": [-0.8, 0.0], "to": [0.8, 0.0] },
+    { "type": "polyline", "points": [[0.4, -0.4], [0.8, 0.0], [0.4, 0.4]] }
+  ],
+  "complexity": 1,
+  "concentration": 1,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 180,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.direction",
+  "description_key": "glyph.fmab.direction.desc",
+  "since": "0.1"
+}

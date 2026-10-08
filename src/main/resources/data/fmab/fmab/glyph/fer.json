@@ -1,0 +1,21 @@
+{
+  "id": "fmab:fer",
+  "layer": "element",
+  "element": "iron",
+  "primitives": [
+    { "type": "circle", "center": [-0.2, 0.2], "radius": 0.5 },
+    { "type": "line", "from": [0.154, -0.154], "to": [0.75, -0.75] },
+    { "type": "polyline", "points": [[0.35, -0.75], [0.75, -0.75], [0.75, -0.35]] }
+  ],
+  "complexity": 2,
+  "concentration": 3,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.fer",
+  "description_key": "glyph.fmab.fer.desc",
+  "since": "0.1"
+}

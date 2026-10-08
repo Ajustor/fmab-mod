@@ -1,0 +1,13 @@
+{
+  "school": "water",
+  "mastery": 60,
+  "parent": "fmab:water/docile_water",
+  "perks": [
+    {
+      "type": "range_bonus",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.water.long_reach",
+  "description_key": "knowledge.fmab.water.long_reach.desc"
+}

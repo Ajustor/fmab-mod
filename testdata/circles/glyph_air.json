@@ -1,0 +1,129 @@
+{
+  "description": "Reconnaissance : air",
+  "rank": "alchemist",
+  "primitives": [
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        16.0
+      ],
+      "radius": 14.0
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          16.0,
+          2.0
+        ],
+        [
+          30.0,
+          16.0
+        ],
+        [
+          16.0,
+          30.0
+        ],
+        [
+          2.0,
+          16.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          13.5,
+          13.0
+        ],
+        [
+          18.5,
+          13.0
+        ],
+        [
+          16.0,
+          8.5
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        14.5,
+        10.5
+      ],
+      "to": [
+        17.5,
+        10.5
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          14.5,
+          20.0
+        ],
+        [
+          17.5,
+          20.0
+        ],
+        [
+          16.0,
+          17.5
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        16.0,
+        20.0
+      ],
+      "to": [
+        16.0,
+        22.5
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.0,
+        21.5
+      ],
+      "to": [
+        17.0,
+        21.5
+      ]
+    }
+  ],
+  "expected": {
+    "outcome": "works",
+    "complexity": 5,
+    "concentration": 9,
+    "stability": 1.0,
+    "required_rank": "alchemist",
+    "rebound": 0.0,
+    "stages": [
+      {
+        "sides": 4,
+        "capacity": 4,
+        "hexagram": false,
+        "intensity": 0,
+        "direction": false,
+        "link": "none",
+        "glyphs": [
+          "fmab:air",
+          "fmab:projeter"
+        ],
+        "satellites": 0
+      }
+    ],
+    "effects": [
+      "fmab:gust"
+    ],
+    "issues": []
+  }
+}

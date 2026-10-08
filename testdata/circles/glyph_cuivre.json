@@ -1,0 +1,131 @@
+{
+  "description": "Reconnaissance : cuivre",
+  "rank": "alchemist",
+  "primitives": [
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        16.0
+      ],
+      "radius": 14.0
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          16.0,
+          2.0
+        ],
+        [
+          30.0,
+          16.0
+        ],
+        [
+          16.0,
+          30.0
+        ],
+        [
+          2.0,
+          16.0
+        ]
+      ]
+    },
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        10.0
+      ],
+      "radius": 1.5
+    },
+    {
+      "type": "line",
+      "from": [
+        16.0,
+        11.0
+      ],
+      "to": [
+        16.0,
+        14.0
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.0,
+        12.5
+      ],
+      "to": [
+        17.0,
+        12.5
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          14.5,
+          20.0
+        ],
+        [
+          17.5,
+          20.0
+        ],
+        [
+          16.0,
+          17.5
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        16.0,
+        20.0
+      ],
+      "to": [
+        16.0,
+        22.5
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.0,
+        21.5
+      ],
+      "to": [
+        17.0,
+        21.5
+      ]
+    }
+  ],
+  "expected": {
+    "outcome": "rebound",
+    "complexity": 4,
+    "concentration": 7,
+    "stability": 1.25,
+    "required_rank": "apprentice",
+    "rebound": 0.5,
+    "stages": [
+      {
+        "sides": 4,
+        "capacity": 4,
+        "hexagram": false,
+        "intensity": 0,
+        "direction": false,
+        "link": "none",
+        "glyphs": [
+          "fmab:cuivre",
+          "fmab:projeter"
+        ],
+        "satellites": 0
+      }
+    ],
+    "effects": [],
+    "issues": [
+      "unknown_combination"
+    ]
+  }
+}

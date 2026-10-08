@@ -1,0 +1,47 @@
+{
+  "description": "Pas d\u0027anneau",
+  "rank": "apprentice",
+  "primitives": [
+    {
+      "type": "polygon",
+      "points": [
+        [
+          13.5,
+          9.0
+        ],
+        [
+          18.5,
+          9.0
+        ],
+        [
+          16.0,
+          13.5
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        14.5,
+        11.5
+      ],
+      "to": [
+        17.5,
+        11.5
+      ]
+    }
+  ],
+  "expected": {
+    "outcome": "inert",
+    "complexity": 0,
+    "concentration": 0,
+    "stability": 0.0,
+    "required_rank": "apprentice",
+    "rebound": 0.0,
+    "stages": [],
+    "effects": [],
+    "issues": [
+      "no_ring"
+    ]
+  }
+}

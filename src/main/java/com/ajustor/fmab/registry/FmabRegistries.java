@@ -1,0 +1,39 @@
+package com.ajustor.fmab.registry;
+
+import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.alchemy.glyph.Glyph;
+import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
+import com.ajustor.fmab.alchemy.rules.Combination;
+import com.ajustor.fmab.data.ExchangeGroup;
+import com.ajustor.fmab.data.FmabCodecs;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+
+/**
+ * Registres de données : tout ce qu'un pack peut étendre sans recompiler le mod. Les glyphes, les
+ * combinaisons et le savoir sont synchronisés vers le client, qui en a besoin pour analyser les
+ * cercles dans le carnet ; la valeur d'échange reste côté serveur.
+ */
+public final class FmabRegistries {
+	/** {@code data/<ns>/fmab/glyph/<nom>.json} */
+	public static final ResourceKey<Registry<Glyph>> GLYPH = ResourceKey.createRegistryKey(Fmab.id("glyph"));
+	/** {@code data/<ns>/fmab/combination/<nom>.json} */
+	public static final ResourceKey<Registry<Combination>> COMBINATION =
+			ResourceKey.createRegistryKey(Fmab.id("combination"));
+	/** {@code data/<ns>/fmab/knowledge/<école>/<nom>.json} */
+	public static final ResourceKey<Registry<KnowledgeNode>> KNOWLEDGE =
+			ResourceKey.createRegistryKey(Fmab.id("knowledge"));
+	/** {@code data/<ns>/fmab/exchange/<nom>.json} */
+	public static final ResourceKey<Registry<ExchangeGroup>> EXCHANGE = ResourceKey.createRegistryKey(Fmab.id("exchange"));
+
+	private FmabRegistries() {
+	}
+
+	public static void register() {
+		DynamicRegistries.registerSynced(GLYPH, FmabCodecs.GLYPH);
+		DynamicRegistries.registerSynced(COMBINATION, FmabCodecs.COMBINATION);
+		DynamicRegistries.registerSynced(KNOWLEDGE, FmabCodecs.KNOWLEDGE_NODE);
+		DynamicRegistries.register(EXCHANGE, ExchangeGroup.CODEC);
+	}
+}

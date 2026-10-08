@@ -1,0 +1,20 @@
+{
+  "id": "fmab:terre",
+  "layer": "element",
+  "element": "earth",
+  "primitives": [
+    { "type": "polygon", "points": [[-0.8, -0.6], [0.8, -0.6], [0.0, 0.8]] },
+    { "type": "line", "from": [-0.55, 0.2], "to": [0.55, 0.2] }
+  ],
+  "complexity": 1,
+  "concentration": 2,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.terre",
+  "description_key": "glyph.fmab.terre.desc",
+  "since": "0.1"
+}

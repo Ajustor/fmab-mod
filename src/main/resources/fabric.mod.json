@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "fmab",
+	"version": "${version}",
+	"name": "FMAB — Alchemy of Amestris",
+	"description": "Fan-made Fullmetal Alchemist: Brotherhood mod: equivalent exchange, player-drawn transmutation circles, the Gate of Truth. Fan-made, not affiliated with Hiromu Arakawa, Square Enix, Bones or Aniplex. Fullmetal Alchemist and all related names belong to their rights holders. / Mod de fan Fullmetal Alchemist: Brotherhood. Fan-made, non affilié à Hiromu Arakawa, Square Enix, Bones ni Aniplex ; Fullmetal Alchemist et les noms associés appartiennent à leurs ayants droit.",
+	"authors": [
+		"Ajustor"
+	],
+	"contact": {
+		"sources": "https://github.com/Ajustor/fmab-mod",
+		"issues": "https://github.com/Ajustor/fmab-mod/issues"
+	},
+	"license": "All-Rights-Reserved",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.ajustor.fmab.Fmab"
+		],
+		"client": [
+			"com.ajustor.fmab.client.FmabClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": ">=0.152.0"
+	},
+	"custom": {
+		"fmab:disclaimer": {
+			"en_us": "Independent, free and unofficial fan project. Fullmetal Alchemist, its characters, names, places and universe belong to their rights holders: Hiromu Arakawa and Square Enix for the manga; Bones, Aniplex and their partners for the anime Fullmetal Alchemist: Brotherhood. Not affiliated with or endorsed by them.",
+			"fr_fr": "Projet de fan indépendant, gratuit et non officiel. Fullmetal Alchemist, ses personnages, noms, lieux et éléments d'univers appartiennent à leurs ayants droit : Hiromu Arakawa et Square Enix pour le manga ; Bones, Aniplex et leurs partenaires pour l'anime Fullmetal Alchemist: Brotherhood. Sans lien avec eux ni approbation de leur part."
+		}
+	}
+}

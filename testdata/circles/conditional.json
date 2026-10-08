@@ -1,0 +1,284 @@
+{
+  "description": "Deux étages, trait brisé",
+  "rank": "alchemist",
+  "primitives": [
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        16.0
+      ],
+      "radius": 6.0
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          16.0,
+          10.0
+        ],
+        [
+          22.0,
+          16.0
+        ],
+        [
+          16.0,
+          22.0
+        ],
+        [
+          10.0,
+          16.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          14.5,
+          12.5
+        ],
+        [
+          17.5,
+          12.5
+        ],
+        [
+          16.0,
+          15.0
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.0,
+        14.0
+      ],
+      "to": [
+        17.0,
+        14.0
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.0,
+        18.5
+      ],
+      "to": [
+        17.0,
+        18.5
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        16.0,
+        17.5
+      ],
+      "to": [
+        16.0,
+        19.5
+      ]
+    },
+    {
+      "type": "circle",
+      "center": [
+        17.5,
+        18.5
+      ],
+      "radius": 0.5
+    },
+    {
+      "type": "circle",
+      "center": [
+        14.5,
+        18.5
+      ],
+      "radius": 0.5
+    },
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        20.0
+      ],
+      "radius": 0.5
+    },
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        17.0
+      ],
+      "radius": 0.5
+    },
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        16.0
+      ],
+      "radius": 12.0
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          16.0,
+          4.0
+        ],
+        [
+          26.0,
+          10.0
+        ],
+        [
+          26.0,
+          22.0
+        ],
+        [
+          16.0,
+          28.0
+        ],
+        [
+          6.0,
+          22.0
+        ],
+        [
+          6.0,
+          10.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          14.5,
+          6.0
+        ],
+        [
+          17.5,
+          6.0
+        ],
+        [
+          16.0,
+          8.5
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.0,
+        7.5
+      ],
+      "to": [
+        17.0,
+        7.5
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          15.0,
+          25.0
+        ],
+        [
+          17.0,
+          25.0
+        ],
+        [
+          16.0,
+          23.5
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        16.0,
+        25.0
+      ],
+      "to": [
+        16.0,
+        27.0
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.5,
+        26.0
+      ],
+      "to": [
+        16.5,
+        26.0
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        11.5,
+        20.5
+      ],
+      "to": [
+        10.0,
+        22.0
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        9.0,
+        23.0
+      ],
+      "to": [
+        7.5,
+        24.5
+      ]
+    }
+  ],
+  "expected": {
+    "outcome": "works",
+    "complexity": 6,
+    "concentration": 24,
+    "stability": 1.667,
+    "required_rank": "alchemist",
+    "rebound": 0.0,
+    "stages": [
+      {
+        "sides": 4,
+        "capacity": 4,
+        "hexagram": false,
+        "intensity": 0,
+        "direction": false,
+        "link": "none",
+        "glyphs": [
+          "fmab:terre",
+          "fmab:decomposer"
+        ],
+        "satellites": 0
+      },
+      {
+        "sides": 6,
+        "capacity": 6,
+        "hexagram": false,
+        "intensity": 0,
+        "direction": false,
+        "link": "conditional",
+        "glyphs": [
+          "fmab:terre",
+          "fmab:projeter"
+        ],
+        "satellites": 0
+      }
+    ],
+    "effects": [
+      "fmab:decompose",
+      "fmab:spike"
+    ],
+    "issues": []
+  }
+}

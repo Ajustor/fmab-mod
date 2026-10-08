@@ -1,0 +1,20 @@
+{
+  "id": "fmab:reparer",
+  "layer": "action",
+  "action": "repair",
+  "primitives": [
+    { "type": "arc", "center": [0.0, 0.0], "radius": 0.65, "start_deg": 20, "sweep_deg": 320 },
+    { "type": "circle", "center": [0.65, 0.0], "radius": 0.22 }
+  ],
+  "complexity": 2,
+  "concentration": 4,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 30,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.reparer",
+  "description_key": "glyph.fmab.reparer.desc",
+  "since": "0.1"
+}

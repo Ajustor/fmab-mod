@@ -1,0 +1,12 @@
+{
+  "family": "crystal",
+  "values": {
+    "minecraft:ice": 1,
+    "minecraft:packed_ice": 9,
+    "minecraft:blue_ice": 81,
+    "minecraft:snowball": 1,
+    "minecraft:snow_block": 4,
+    "minecraft:quartz": 1,
+    "minecraft:amethyst_shard": 1
+  }
+}

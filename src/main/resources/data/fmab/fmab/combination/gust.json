@@ -1,0 +1,1 @@
+{ "elements": ["air"], "action": "project", "effect": "fmab:gust", "range": 4, "passive": "fmab:swiftness" }

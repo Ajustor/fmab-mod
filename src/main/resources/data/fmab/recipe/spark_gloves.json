@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "fmab:cloth_gloves",
+    "minecraft:flint",
+    "minecraft:iron_nugget",
+    "minecraft:blaze_powder"
+  ],
+  "result": {
+    "id": "fmab:spark_gloves",
+    "count": 1
+  }
+}

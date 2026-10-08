@@ -1,0 +1,24 @@
+{
+  "id": "fmab:decomposer",
+  "layer": "action",
+  "action": "decompose",
+  "primitives": [
+    { "type": "line", "from": [-0.6, 0.0], "to": [0.6, 0.0] },
+    { "type": "line", "from": [0.0, -0.6], "to": [0.0, 0.6] },
+    { "type": "circle", "center": [0.8, 0.0], "radius": 0.2 },
+    { "type": "circle", "center": [-0.8, 0.0], "radius": 0.2 },
+    { "type": "circle", "center": [0.0, 0.8], "radius": 0.2 },
+    { "type": "circle", "center": [0.0, -0.8], "radius": 0.2 }
+  ],
+  "complexity": 2,
+  "concentration": 4,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.decomposer",
+  "description_key": "glyph.fmab.decomposer.desc",
+  "since": "0.1"
+}

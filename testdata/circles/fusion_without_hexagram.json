@@ -1,0 +1,148 @@
+{
+  "description": "Deux éléments sans hexagramme",
+  "rank": "alchemist",
+  "primitives": [
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        16.0
+      ],
+      "radius": 14.0
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          16.0,
+          2.0
+        ],
+        [
+          30.0,
+          16.0
+        ],
+        [
+          16.0,
+          30.0
+        ],
+        [
+          2.0,
+          16.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          10.0,
+          13.5
+        ],
+        [
+          14.0,
+          13.5
+        ],
+        [
+          12.0,
+          10.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          18.0,
+          13.5
+        ],
+        [
+          22.0,
+          13.5
+        ],
+        [
+          20.0,
+          10.0
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        18.5,
+        11.5
+      ],
+      "to": [
+        21.5,
+        11.5
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          15.0,
+          20.0
+        ],
+        [
+          17.5,
+          20.0
+        ],
+        [
+          16.0,
+          18.0
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        16.0,
+        20.0
+      ],
+      "to": [
+        16.0,
+        22.5
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.0,
+        21.0
+      ],
+      "to": [
+        17.0,
+        21.0
+      ]
+    }
+  ],
+  "expected": {
+    "outcome": "rebound",
+    "complexity": 8,
+    "concentration": 14,
+    "stability": 0.5,
+    "required_rank": "alchemist",
+    "rebound": 0.5,
+    "stages": [
+      {
+        "sides": 4,
+        "capacity": 4,
+        "hexagram": false,
+        "intensity": 0,
+        "direction": false,
+        "link": "none",
+        "glyphs": [
+          "fmab:feu",
+          "fmab:air",
+          "fmab:projeter"
+        ],
+        "satellites": 0
+      }
+    ],
+    "effects": [],
+    "issues": [
+      "fusion_needs_hexagram",
+      "unstable"
+    ]
+  }
+}

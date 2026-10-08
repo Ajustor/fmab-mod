@@ -1,0 +1,12 @@
+{
+  "school": "water",
+  "mastery": 15,
+  "perks": [
+    {
+      "type": "concentration_discount",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.water.docile_water",
+  "description_key": "knowledge.fmab.water.docile_water.desc"
+}

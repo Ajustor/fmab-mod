@@ -1,0 +1,20 @@
+{
+  "id": "fmab:fixer",
+  "layer": "action",
+  "action": "fix",
+  "primitives": [
+    { "type": "circle", "center": [0.0, 0.0], "radius": 0.7 },
+    { "type": "line", "from": [-0.7, 0.0], "to": [0.7, 0.0] }
+  ],
+  "complexity": 1,
+  "concentration": 3,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.fixer",
+  "description_key": "glyph.fmab.fixer.desc",
+  "since": "0.1"
+}

@@ -1,0 +1,13 @@
+{
+  "school": "fire",
+  "mastery": 45,
+  "parent": "fmab:fire/docile_flame",
+  "perks": [
+    {
+      "type": "range_bonus",
+      "value": 2
+    }
+  ],
+  "name_key": "knowledge.fmab.fire.long_reach",
+  "description_key": "knowledge.fmab.fire.long_reach.desc"
+}

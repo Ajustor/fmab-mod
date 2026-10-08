@@ -1,0 +1,9 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "fmab:block/transmutation_circle"
+      }
+    }
+  ]
+}

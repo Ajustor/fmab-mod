@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "L L",
+    "LSL"
+  ],
+  "key": {
+    "L": "minecraft:leather",
+    "S": "minecraft:string"
+  },
+  "result": {
+    "id": "fmab:leather_gloves",
+    "count": 1
+  }
+}

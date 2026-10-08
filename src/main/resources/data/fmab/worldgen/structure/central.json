@@ -1,0 +1,7 @@
+{
+  "type": "fmab:central",
+  "biomes": "#fmab:has_structure/central",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none"
+}

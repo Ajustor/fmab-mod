@@ -1,0 +1,21 @@
+{
+  "id": "fmab:projeter",
+  "layer": "action",
+  "action": "project",
+  "primitives": [
+    { "type": "polygon", "points": [[-0.5, 0.0], [0.5, 0.0], [0.0, -0.8]] },
+    { "type": "line", "from": [0.0, 0.0], "to": [0.0, 0.9] },
+    { "type": "line", "from": [-0.35, 0.45], "to": [0.35, 0.45] }
+  ],
+  "complexity": 2,
+  "concentration": 4,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.projeter",
+  "description_key": "glyph.fmab.projeter.desc",
+  "since": "0.1"
+}

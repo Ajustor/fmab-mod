@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BR",
+    "TT"
+  ],
+  "key": {
+    "B": "minecraft:book",
+    "R": "minecraft:redstone",
+    "T": "#minecraft:planks"
+  },
+  "result": {
+    "id": "fmab:alchemist_table",
+    "count": 1
+  }
+}

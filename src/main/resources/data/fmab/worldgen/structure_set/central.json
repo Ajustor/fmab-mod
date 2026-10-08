@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1857300121,
+    "separation": 40,
+    "spacing": 80
+  },
+  "structures": [
+    {
+      "structure": "fmab:central",
+      "weight": 1
+    }
+  ]
+}
