@@ -1,0 +1,57 @@
+# Publie le site sur GitHub Pages à chaque push sur master : la page d'accueil (site/) à la racine,
+# l'éditeur de cercles (web/) sous /editor/. Les pages Releases et Changelog viendront avec le
+# workflow de release au tag.
+name: pages
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un seul déploiement à la fois ; on laisse finir celui en cours.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: setup node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: build editor
+        working-directory: web
+        run: |
+          npm ci
+          npm test
+          npm run build
+      - name: assemble site
+        run: |
+          mkdir -p _site
+          cp -r site/. _site/
+          cp -r web/dist _site/editor
+      - name: upload site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
