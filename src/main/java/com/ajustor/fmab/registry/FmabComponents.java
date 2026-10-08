@@ -75,6 +75,15 @@ public final class FmabComponents {
 					.networkSynchronized(ByteBufCodecs.STRING_UTF8)
 					.build());
 
+	/** La taille (en blocs) des cercles que trace une craie, une peinture ou un burin. */
+	public static final DataComponentType<Integer> CIRCLE_SIZE = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("circle_size"),
+			DataComponentType.<Integer>builder()
+					.persistent(Codec.INT)
+					.networkSynchronized(ByteBufCodecs.VAR_INT)
+					.build());
+
 	private FmabComponents() {
 	}
 

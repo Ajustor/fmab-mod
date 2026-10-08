@@ -153,7 +153,7 @@ public class TransmutationCircleBlock extends BaseEntityBlock {
 			BlockHitResult hitResult) {
 		if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer
 				&& level.getBlockEntity(pos) instanceof TransmutationCircleBlockEntity circle) {
-			Transmutation.activate(serverLevel, pos, state, circle.drawing(), serverPlayer);
+			Transmutation.activate(serverLevel, pos, state, circle.drawing(), serverPlayer, circle.size());
 		}
 		return InteractionResult.SUCCESS;
 	}

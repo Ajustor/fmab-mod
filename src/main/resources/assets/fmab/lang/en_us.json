@@ -2,6 +2,8 @@
   "itemGroup.fmab.alchemy": "Alchemy of Amestris",
   "item.fmab.chalk": "Transmutation Chalk",
   "item.fmab.chalk.no_circle": "No circle selected: hold a Circle Notebook in your other hand.",
+  "item.fmab.circle_size": "Circle size: %s blocks",
+  "item.fmab.circle_size.tooltip": "%s-block circles (crouch + click in the air to change)",
   "item.fmab.alchemical_paint": "Alchemical Paint",
   "item.fmab.alchemist_chisel": "Alchemist's Chisel",
   "item.fmab.alchemist_chisel.not_engravable": "The chisel only engraves stone and metal.",

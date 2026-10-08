@@ -2,6 +2,8 @@
   "itemGroup.fmab.alchemy": "Alchimie d'Amestris",
   "item.fmab.chalk": "Craie de transmutation",
   "item.fmab.chalk.no_circle": "Aucun cercle sélectionné : tenez un Carnet de cercles dans l'autre main.",
+  "item.fmab.circle_size": "Taille des cercles : %s blocs",
+  "item.fmab.circle_size.tooltip": "Cercles de %s blocs (accroupi + clic dans le vide pour changer)",
   "item.fmab.alchemical_paint": "Peinture alchimique",
   "item.fmab.alchemist_chisel": "Burin d'alchimiste",
   "item.fmab.alchemist_chisel.not_engravable": "Le burin ne grave que la pierre et le métal.",

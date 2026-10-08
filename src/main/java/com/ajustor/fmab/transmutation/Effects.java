@@ -90,8 +90,8 @@ public final class Effects {
 		register("fmab:ice_platform", Effects::icePlatform);
 		register("fmab:decompose", Effects::decompose);
 		register("fmab:repair", Effects::repair);
-		register("fmab:flame_jet", ctx -> flames(ctx, 0, FLAME_DAMAGE, 1));
-		register("fmab:flame_burst", ctx -> flames(ctx, 1, BURST_DAMAGE, 2));
+		register("fmab:flame_jet", ctx -> flames(ctx, 0, ctx.damage(FLAME_DAMAGE), 1));
+		register("fmab:flame_burst", ctx -> flames(ctx, 1, ctx.damage(BURST_DAMAGE), 2));
 		register("fmab:gust", Effects::gust);
 		register("fmab:smelt", Effects::smelt);
 		register("fmab:stone_lance", Effects::stoneLance);
@@ -163,7 +163,7 @@ public final class Effects {
 				}
 			}
 			int raised = raise(ctx, quarry, ctx.circle().relative(frame.normal()), frame.normal(), earth, SPIKE_HEIGHT,
-					SPIKE_DAMAGE);
+					ctx.damage(SPIKE_DAMAGE));
 			return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
 		}
 		BlockPos column = surface(level, ctx.origin().relative(ctx.direction(), ctx.range()));
@@ -175,7 +175,7 @@ public final class Effects {
 			quarry.add(column.relative(side).below());
 			quarry.add(column.relative(side).relative(side.getClockWise()).below());
 		}
-		int raised = raise(ctx, quarry, column, Direction.UP, earth, SPIKE_HEIGHT, SPIKE_DAMAGE);
+		int raised = raise(ctx, quarry, column, Direction.UP, earth, SPIKE_HEIGHT, ctx.damage(SPIKE_DAMAGE));
 		return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
 	}
 
@@ -482,7 +482,7 @@ public final class Effects {
 			return Result.NO_TARGET;
 		}
 		int raised = raise(ctx, waterAround(level, column, ICE_REACH), column, Direction.UP,
-				FmabTags.elementBlocks("water"), SPIKE_HEIGHT, SPIKE_DAMAGE, Effects::frozen);
+				FmabTags.elementBlocks("water"), SPIKE_HEIGHT, ctx.damage(SPIKE_DAMAGE), Effects::frozen);
 		if (raised > 0) {
 			for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(column).inflate(1.5))) {
 				if (e != ctx.caster()) {
@@ -530,7 +530,7 @@ public final class Effects {
 			return Result.NO_MATERIAL;
 		}
 		level.removeBlock(charge, false);
-		float power = BLAST_POWER + (float) ctx.perk("blast_power");
+		float power = ctx.damage(BLAST_POWER + (float) ctx.perk("blast_power"));
 		Vec3 c = Vec3.atCenterOf(charge);
 		level.explode(ctx.caster(), c.x, c.y, c.z, power, Level.ExplosionInteraction.MOB);
 		return Result.DONE;

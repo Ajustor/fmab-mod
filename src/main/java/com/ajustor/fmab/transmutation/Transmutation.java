@@ -8,6 +8,7 @@ import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
+import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.training.Trainings;
@@ -50,10 +51,19 @@ public final class Transmutation {
 		DONE
 	}
 
-	/** Un cercle inscrit sur une surface : en cas de rebond, c'est lui qui brûle. */
+	/**
+	 * Un cercle inscrit sur une surface : en cas de rebond, c'est lui qui brûle. Sa taille règle la
+	 * puissance et le coût.
+	 */
 	public static Result activate(ServerLevel level, BlockPos circle, BlockState state, Drawing drawing,
-			ServerPlayer caster) {
-		return activate(level, circle, CircleFrame.of(state), drawing, caster, true, Integer.MAX_VALUE);
+			ServerPlayer caster, CircleSize size) {
+		return activate(level, circle, CircleFrame.of(state), drawing, caster, true, Integer.MAX_VALUE, size);
+	}
+
+	/** Un cercle porté (gant, tatouage) ou les mains jointes : de taille normale. */
+	public static Result activate(ServerLevel level, BlockPos circle, CircleFrame frame, Drawing drawing,
+			ServerPlayer caster, boolean inscribed, int maxStages) {
+		return activate(level, circle, frame, drawing, caster, inscribed, maxStages, CircleSize.NORMAL);
 	}
 
 	/**
@@ -61,9 +71,10 @@ public final class Transmutation {
 	 *                  gant
 	 * @param inscribed vrai pour un cercle inscrit, qui disparaît en cas de rebond
 	 * @param maxStages étages que le support peut porter (un gant de tissu n'en porte qu'un)
+	 * @param size      taille du cercle : portée, dégâts et coût en dépendent
 	 */
 	public static Result activate(ServerLevel level, BlockPos circle, CircleFrame frame, Drawing drawing,
-			ServerPlayer caster, boolean inscribed, int maxStages) {
+			ServerPlayer caster, boolean inscribed, int maxStages, CircleSize size) {
 		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Knowledge knowledge = rules.knowledge(alchemist);
@@ -82,7 +93,7 @@ public final class Transmutation {
 			return Result.INERT;
 		}
 		boolean watch = StateWatch.empowers(caster);
-		int cost = StateWatch.cost(analysis.concentration(), watch);
+		int cost = (int) Math.ceil(StateWatch.cost(analysis.concentration(), watch) * size.cost());
 		if (alchemist.concentration() < cost) {
 			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired",
 					cost, (int) alchemist.concentration()));
@@ -125,7 +136,7 @@ public final class Transmutation {
 			Effects.Result stageResult = Effects.Result.NO_TARGET;
 			for (Analysis.StageEffect effect : effects) {
 				EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, flow, knowledge,
-						watch ? StateWatch.RANGE_BONUS : 0);
+						watch ? StateWatch.RANGE_BONUS : 0, size.power());
 				Effects.Result result = Effects.get(effect.combination().effect())
 						.map(e -> e.apply(ctx))
 						.orElse(Effects.Result.NO_TARGET);
