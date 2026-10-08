@@ -17,6 +17,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.ToolMaterial;
 
@@ -47,6 +48,12 @@ public final class FmabItems {
 
 	public static final Item IZUMI_SPAWN_EGG = register("izumi_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.IZUMI));
+
+	public static final Item STATE_EXAMINER_SPAWN_EGG = register("state_examiner_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.STATE_EXAMINER));
+	/** Montre d'Alchimiste d'État : portée et concentration améliorées pour son titulaire. */
+	public static final Item STATE_WATCH = register("state_watch", Item::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
 
 	/** Lance de pierre : les réglages de la lance de pierre vanilla, mais peu de durabilité. */
 	public static final Item STONE_LANCE = register("stone_lance", TransmutedWeaponItem::new,
@@ -88,6 +95,7 @@ public final class FmabItems {
 					output.accept(IRON_GAUNTLETS);
 					output.accept(STATE_GLOVES);
 					output.accept(IZUMI_SPAWN_EGG);
+					output.accept(STATE_EXAMINER_SPAWN_EGG);
 				})
 				.build());
 	}

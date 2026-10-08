@@ -2,13 +2,17 @@ package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.client.render.IzumiRenderer;
+import com.ajustor.fmab.client.render.StateExaminerRenderer;
+import com.ajustor.fmab.client.render.StoneGolemRenderer;
 import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
+import com.ajustor.fmab.client.screen.ExamScreen;
 import com.ajustor.fmab.client.screen.GlovesScreen;
 import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.network.CastGlovesPayload;
+import com.ajustor.fmab.network.OpenExamPayload;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
@@ -51,6 +55,10 @@ public class FmabClient implements ClientModInitializer {
 			}
 		});
 		EntityRendererRegistry.register(FmabEntities.IZUMI, IzumiRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.STATE_EXAMINER, StateExaminerRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.STONE_GOLEM, StoneGolemRenderer::new);
+		ClientPlayNetworking.registerGlobalReceiver(OpenExamPayload.TYPE,
+				(payload, context) -> context.client().gui.setScreen(new ExamScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenIzumiPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new IzumiScreen(payload)));
 		BlockEntityRendererRegistry.register(FmabBlockEntities.TRANSMUTATION_CIRCLE, TransmutationCircleRenderer::new);

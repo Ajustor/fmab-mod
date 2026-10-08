@@ -2,6 +2,7 @@ package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.ExamProgress;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.Training;
 import com.mojang.serialization.Codec;
@@ -32,6 +33,13 @@ public final class FmabAttachments {
 			.initializer(() -> Training.NONE)
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("training"));
+
+	/** L'examen d'Alchimiste d'État : gardé à la mort, inutile au client. */
+	public static final AttachmentType<ExamProgress> EXAM = AttachmentRegistry.<ExamProgress>builder()
+			.persistent(ExamProgress.CODEC)
+			.initializer(() -> ExamProgress.NONE)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("exam"));
 
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()
