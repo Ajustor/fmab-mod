@@ -42,3 +42,7 @@ replay_*.log
 # fmab
 run-alt/
 .remember/now.md
+
+# journaux du jeu lancé depuis la racine
+
+logs/
