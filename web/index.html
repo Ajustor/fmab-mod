@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Éditeur de cercles — FMAB</title>
+    <meta name="description" content="Concevoir des cercles de transmutation pour le mod FMAB et les importer dans le Carnet de cercles." />
+  </head>
+  <body>
+    <header>
+      <h1 data-i18n="editor.fmab.title">Éditeur de cercles</h1>
+      <span id="version" class="muted"></span>
+      <nav class="langs">
+        <button type="button" data-lang="fr_fr">FR</button>
+        <button type="button" data-lang="en_us">EN</button>
+      </nav>
+    </header>
+    <p class="intro" data-i18n="editor.fmab.intro"></p>
+    <main>
+      <section class="board">
+        <div class="tools">
+          <button type="button" data-tool="line" data-i18n="notebook.fmab.tool.line"></button>
+          <button type="button" data-tool="circle" data-i18n="notebook.fmab.tool.circle"></button>
+          <button type="button" data-tool="polygon" data-i18n="notebook.fmab.tool.polygon"></button>
+          <button type="button" data-tool="arc" data-i18n="notebook.fmab.tool.arc"></button>
+          <button type="button" data-tool="dot" data-i18n="notebook.fmab.tool.dot"></button>
+          <button type="button" id="sides"></button>
+          <button type="button" id="symmetry"></button>
+          <button type="button" id="undo" data-i18n="notebook.fmab.undo"></button>
+          <button type="button" id="redo" data-i18n="editor.fmab.redo"></button>
+          <button type="button" id="clear" data-i18n="notebook.fmab.clear"></button>
+        </div>
+        <div id="stamp-options" class="stamp" hidden>
+          <span data-i18n="editor.fmab.stamp"></span> <strong id="stamp-name"></strong>
+          <label><span data-i18n="editor.fmab.size"></span> <input id="stamp-size" type="range" min="1.5" max="6" step="0.5" value="3" /></label>
+        </div>
+        <canvas id="canvas" aria-label="Carnet"></canvas>
+        <p class="hint muted" data-i18n="editor.fmab.hint"></p>
+      </section>
+      <aside>
+        <div class="row">
+          <label><span data-i18n="editor.fmab.support"></span> <select id="support"></select></label>
+          <label><span data-i18n="editor.fmab.rank"></span> <select id="rank"></select></label>
+        </div>
+        <h2 data-i18n="editor.fmab.analysis"></h2>
+        <div id="analysis"></div>
+        <h2 data-i18n="editor.fmab.palette"></h2>
+        <div id="palette"></div>
+        <div id="sheet" class="muted" data-i18n="editor.fmab.sheet_hint"></div>
+        <h2 data-i18n="editor.fmab.export"></h2>
+        <div class="row wrap">
+          <button type="button" id="copy" data-i18n="editor.fmab.copy_code"></button>
+          <button type="button" id="share" data-i18n="editor.fmab.share"></button>
+          <button type="button" id="json">JSON</button>
+          <button type="button" id="png">PNG</button>
+        </div>
+        <textarea id="import-code" rows="3" data-i18n-title="editor.fmab.import_hint"></textarea>
+        <button type="button" id="import" data-i18n="notebook.fmab.import"></button>
+        <p id="status" class="status" role="status"></p>
+      </aside>
+    </main>
+    <footer class="muted" data-i18n="editor.fmab.disclaimer"></footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

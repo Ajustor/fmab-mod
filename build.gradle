@@ -58,6 +58,11 @@ test {
 	// Les tests lisent les JSON de glyphes et les fichiers de langue directement dans le dépôt,
 	// les mêmes que ceux que l'éditeur web publiera.
 	systemProperty 'fmab.resources', file('src/main/resources').absolutePath
+	// Cercles de test partagés avec l'éditeur web ; -PwriteFixtures=true réécrit leurs résultats
+	// attendus à partir de l'implémentation Java, qui fait référence.
+	systemProperty 'fmab.testdata', file('testdata').absolutePath
+	systemProperty 'fmab.writeFixtures', (findProperty('writeFixtures') ?: 'false')
+	inputs.dir file('testdata')
 	testLogging {
 		events 'failed'
 		exceptionFormat 'full'

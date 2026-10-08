@@ -1,0 +1,144 @@
+{
+  "description": "Reconnaissance : recomposer",
+  "rank": "alchemist",
+  "primitives": [
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        16.0
+      ],
+      "radius": 14.0
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          16.0,
+          2.0
+        ],
+        [
+          30.0,
+          16.0
+        ],
+        [
+          16.0,
+          30.0
+        ],
+        [
+          2.0,
+          16.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          14.0,
+          9.0
+        ],
+        [
+          18.0,
+          9.0
+        ],
+        [
+          18.0,
+          13.0
+        ],
+        [
+          14.0,
+          13.0
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        14.0,
+        9.0
+      ],
+      "to": [
+        18.0,
+        13.0
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        18.0,
+        9.0
+      ],
+      "to": [
+        14.0,
+        13.0
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          14.5,
+          20.0
+        ],
+        [
+          17.5,
+          20.0
+        ],
+        [
+          16.0,
+          17.5
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        16.0,
+        20.0
+      ],
+      "to": [
+        16.0,
+        22.5
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        15.0,
+        21.5
+      ],
+      "to": [
+        17.0,
+        21.5
+      ]
+    }
+  ],
+  "expected": {
+    "outcome": "inert",
+    "complexity": 4,
+    "concentration": 8,
+    "stability": 1.25,
+    "required_rank": "alchemist",
+    "rebound": 0.0,
+    "stages": [
+      {
+        "sides": 4,
+        "capacity": 4,
+        "hexagram": false,
+        "intensity": 0,
+        "direction": false,
+        "link": "none",
+        "glyphs": [
+          "fmab:recomposer",
+          "fmab:projeter"
+        ],
+        "satellites": 0
+      }
+    ],
+    "effects": [],
+    "issues": [
+      "too_many_actions"
+    ]
+  }
+}

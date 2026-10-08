@@ -1,0 +1,23 @@
+{
+  "name": "fmab-circle-editor",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Éditeur de cercles de transmutation du mod FMAB, sur le même parseur que le jeu.",
+  "scripts": {
+    "sync": "node scripts/sync-data.mjs",
+    "dev": "npm run sync && vite",
+    "build": "npm run sync && tsc --noEmit && vite build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.0.0",
+    "vitest": "^5.0.0"
+  }
+}

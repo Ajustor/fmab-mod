@@ -1,0 +1,94 @@
+{
+  "description": "Eau + Fixer",
+  "rank": "apprentice",
+  "primitives": [
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        16.0
+      ],
+      "radius": 14.0
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          16.0,
+          2.0
+        ],
+        [
+          28.0,
+          23.0
+        ],
+        [
+          4.0,
+          23.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          13.5,
+          9.0
+        ],
+        [
+          18.5,
+          9.0
+        ],
+        [
+          16.0,
+          13.5
+        ]
+      ]
+    },
+    {
+      "type": "circle",
+      "center": [
+        16.0,
+        20.0
+      ],
+      "radius": 2.0
+    },
+    {
+      "type": "line",
+      "from": [
+        14.0,
+        20.0
+      ],
+      "to": [
+        18.0,
+        20.0
+      ]
+    }
+  ],
+  "expected": {
+    "outcome": "works",
+    "complexity": 2,
+    "concentration": 5,
+    "stability": 1.875,
+    "required_rank": "apprentice",
+    "rebound": 0.0,
+    "stages": [
+      {
+        "sides": 3,
+        "capacity": 3,
+        "hexagram": false,
+        "intensity": 0,
+        "direction": false,
+        "link": "none",
+        "glyphs": [
+          "fmab:eau",
+          "fmab:fixer"
+        ],
+        "satellites": 0
+      }
+    ],
+    "effects": [
+      "fmab:ice_platform"
+    ],
+    "issues": []
+  }
+}

@@ -24,6 +24,23 @@ joueur compose lui-même :
   plus de masse produite que donnée.
 - Rangs, concentration (se recharge au repos), rebond proportionnel à l'erreur.
 
+**v0.2 (Alchimiste), en cours :**
+
+- **Cercles complexes** : plusieurs étages reliés par un trait simple (série : la matière produite
+  passe à l'étage suivant), double (parallèle) ou brisé (conditionnel) ; satellites sur les sommets
+  (infusion d'un élément ou effet propre) ; fusion de deux éléments dans un hexagramme ; polygones
+  superposés.
+- **Glyphes** Feu, Air et Recomposer : jet de flammes, rafale, fonte, combustion amplifiée, lance de
+  pierre et lame-bras temporaires.
+- **Savoir** : maîtrise par école gagnée en pratiquant, nœuds qui donnent des bonus, rang Alchimiste
+  atteint par la pratique.
+- **Supports** : sol, murs et plafonds ; craie, peinture alchimique, gravure au burin.
+- **Gants** brodés ou gravés à la table d'alchimiste, lancés d'une touche (G, Maj+G pour joindre les
+  mains, H pour l'écran des gants).
+- **Izumi** : épreuves récompensées en savoir et combats d'entraînement.
+- **Éditeur web** (`web/`) : même parseur, porté en TypeScript, vérifié contre le Java par des
+  cercles de test communs (`testdata/circles`). `cd web && npm install && npm run dev`.
+
 Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/glyph`), combinaisons
 (`data/<ns>/combination`), valeurs d'échange (`data/<ns>/exchange`), éléments visés (tags
 `fmab:element/*`), pages du Traité. Textes en français et en anglais.
@@ -39,7 +56,10 @@ JDK 25 ou plus récent, puis :
 Le jar est dans `build/libs/`. Dépendances à l'exécution : Fabric Loader ≥ 0.19.3 et Fabric API.
 
 Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab forget_all`,
-`/fmab rest`.
+`/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`.
+
+Les cercles de test partagés se régénèrent depuis l'implémentation Java, qui fait référence :
+`./gradlew test -PwriteFixtures=true`.
 
 ## English
 
@@ -48,6 +68,11 @@ circles the player designs: a Circle Notebook to draw them on a 32-cell grid wit
 Transmutation Chalk to draw them on the ground, and an Alchemy Treatise that teaches the glyphs and
 the rules. 10 glyphs, 6 combinations, strict equivalent exchange, ranks, concentration and
 rebounds. Everything that can be data-driven is. Texts in English and French.
+
+**v0.2 (Alchemist), in progress:** multi-stage circles with links and satellites, Fire, Air and
+Recompose glyphs, a practice-based knowledge tree, circles on walls and ceilings (chalk, paint,
+engraving), alchemist gloves cast with a key, Izumi's trials and sparring, and a web circle editor
+(`web/`) running a TypeScript port of the parser checked against the Java one on shared test circles.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 
