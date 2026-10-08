@@ -76,6 +76,18 @@ joueur compose lui-même :
   plastrons scellés sur des porte-armure au-dessus de cercles d'âme, et demande à sa Vérité de l'y
   rappeler ; elle peut aussi changer d'armure, et se répare en y transmutant son matériau.
 - **Taille des cercles** : 1, 3, 5 ou 7 blocs, de plus en plus puissants et coûteux.
+- **Éclairs bleus** de la réaction alchimique à chaque transmutation.
+
+**v0.5 (Homonculus), en cours :**
+
+- Les **homonculus** se reconstituent sur place tant que leur Pierre philosophale a des âmes ; à la
+  dernière, ils laissent un noyau de Pierre.
+- **Lust** (doigts-lames qui ignorent les boucliers, craint le feu) et **Gluttony** (aspire et avale
+  dans son **Ventre**, une dimension noyée de sang) gardent le **Laboratoire 5**
+  (`/locate structure fmab:laboratory_5`).
+- **Envy** erre déguisé (un joueur, un habitant), se révèle, devient un monstre géant puis un lézard.
+- **Greed** et son Bouclier ultime tiennent le **Devil's Nest** ; un pacte (or, émeraudes, diamants,
+  ou le battre) en fait un allié payé à la journée.
 - **Transmutation sans cercle** pour les Initiés de la Porte : Maj+G joint les mains et lance le
   cercle sélectionné du carnet.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : établi d'automail, usure,
@@ -129,6 +141,11 @@ alchemist, wears what it takes; losing the whole body seals the soul into an iro
 wear out and can be remade, and a soul whose breastplate breaks wanders before the Gate until a soul
 circle calls it into another armor (prepared seals let it call itself back); Gate initiates transmute without a circle by joining their hands; automail
 (iron, Rush Valley, Briggs) replaces lost limbs and is repaired by Winry in the town of Rush Valley.
+
+**v0.5 (Homunculi), in progress:** homunculi reconstitute while their Philosopher's Stone holds
+souls; Lust and Gluttony (who swallows into his Belly) guard Laboratory 5; Envy roams in disguise,
+then turns into a giant monster and a lizard; Greed and his Ultimate Shield run the Devil's Nest and
+can be hired as an ally.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 

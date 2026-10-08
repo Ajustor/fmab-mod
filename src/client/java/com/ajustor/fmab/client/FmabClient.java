@@ -3,6 +3,7 @@ package com.ajustor.fmab.client;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.client.render.EnvyRenderer;
 import com.ajustor.fmab.client.render.GluttonyRenderer;
+import com.ajustor.fmab.client.render.GreedRenderer;
 import com.ajustor.fmab.client.render.IzumiRenderer;
 import com.ajustor.fmab.client.render.LustRenderer;
 import com.ajustor.fmab.client.render.StateExaminerRenderer;
@@ -78,6 +79,7 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.LUST, LustRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.GLUTTONY, GluttonyRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.ENVY, EnvyRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.GREED, GreedRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new WinryScreen(payload.entityId())));
 		ClientPlayNetworking.registerGlobalReceiver(OpenTattooPayload.TYPE,

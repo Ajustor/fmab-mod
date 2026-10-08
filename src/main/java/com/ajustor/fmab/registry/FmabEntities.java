@@ -3,6 +3,7 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
+import com.ajustor.fmab.entity.GreedEntity;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.LustEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
@@ -98,6 +99,16 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(ENVY_KEY));
 
+	private static final ResourceKey<EntityType<?>> GREED_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("greed"));
+
+	/** Greed (Avarice), dans son bar du Devil's Nest. */
+	public static final EntityType<GreedEntity> GREED = Registry.register(BuiltInRegistries.ENTITY_TYPE, GREED_KEY,
+			EntityType.Builder.<GreedEntity>of(GreedEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(GREED_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -110,5 +121,6 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(LUST, LustEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(GLUTTONY, GluttonyEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(ENVY, EnvyEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(GREED, GreedEntity.createAttributes());
 	}
 }

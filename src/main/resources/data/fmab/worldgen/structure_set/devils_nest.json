@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 88213307,
+    "separation": 18,
+    "spacing": 52
+  },
+  "structures": [
+    {
+      "structure": "fmab:devils_nest",
+      "weight": 1
+    }
+  ]
+}
