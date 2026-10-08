@@ -5,6 +5,7 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabRegistries;
 import com.ajustor.fmab.transmutation.Concentration;
@@ -33,6 +34,7 @@ public class Fmab implements ModInitializer {
 		FmabAttachments.register();
 		FmabBlocks.register();
 		FmabBlockEntities.register();
+		FmabEntities.register();
 		FmabItems.register();
 		FmabNetwork.register();
 		FmabCommands.register();

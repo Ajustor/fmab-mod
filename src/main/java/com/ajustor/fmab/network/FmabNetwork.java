@@ -4,10 +4,13 @@ import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.training.Trainings;
+import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -27,6 +30,8 @@ public final class FmabNetwork {
 		PayloadTypeRegistry.serverboundPlay().register(LearnGlyphPayload.TYPE, LearnGlyphPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(OpenIzumiPayload.TYPE, OpenIzumiPayload.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
 				(payload, context) -> saveNotebook(context.player(), payload.hand(), payload.contents()));
@@ -36,6 +41,26 @@ public final class FmabNetwork {
 				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
 		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,
 				(payload, context) -> removeGlove(context.player(), payload.left()));
+		ServerPlayNetworking.registerGlobalReceiver(IzumiActionPayload.TYPE,
+				(payload, context) -> izumi(context.player(), payload.entityId(), payload.action()));
+	}
+
+	/** Le joueur doit être à portée de voix d'Izumi. */
+	private static void izumi(ServerPlayer player, int entityId, String action) {
+		if (!(player.level().getEntity(entityId) instanceof IzumiEntity izumi) || player.distanceToSqr(izumi) > 64) {
+			return;
+		}
+		if (action.equals(IzumiActionPayload.SPAR)) {
+			izumi.startSpar(player);
+			return;
+		}
+		try {
+			if (Trainings.claim(player, Trial.byId(action))) {
+				ServerPlayNetworking.send(player, OpenIzumiPayload.of(izumi, player));
+			}
+		} catch (IllegalArgumentException unknownTrial) {
+			// Rien à rendre : action inconnue.
+		}
 	}
 
 	private static void removeGlove(ServerPlayer player, boolean left) {

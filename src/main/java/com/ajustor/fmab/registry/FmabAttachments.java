@@ -3,6 +3,7 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Gloves;
+import com.ajustor.fmab.data.Training;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
@@ -24,6 +25,13 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.syncWith(Gloves.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("gloves"));
+
+	/** Les épreuves d'Izumi : gardées à la mort, inutiles au client. */
+	public static final AttachmentType<Training> TRAINING = AttachmentRegistry.<Training>builder()
+			.persistent(Training.CODEC)
+			.initializer(() -> Training.NONE)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("training"));
 
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()

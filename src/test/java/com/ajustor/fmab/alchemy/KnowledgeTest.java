@@ -11,6 +11,7 @@ import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.alchemy.rules.CircleAnalyzer;
+import com.ajustor.fmab.training.Trial;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -53,6 +54,9 @@ class KnowledgeTest {
 		}
 		for (var c : TestGlyphs.combinations().all()) {
 			c.requires().ifPresent(r -> assertTrue(ids.contains(r), () -> c.id() + " demande " + r));
+		}
+		for (Trial trial : Trial.values()) {
+			trial.nodes().forEach(n -> assertTrue(ids.contains(n), () -> trial + " accorde " + n));
 		}
 	}
 

@@ -1,19 +1,24 @@
 package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.client.render.IzumiRenderer;
 import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.screen.GlovesScreen;
+import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.network.CastGlovesPayload;
+import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
+import com.ajustor.fmab.registry.FmabEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.KeyMapping;
@@ -45,6 +50,9 @@ public class FmabClient implements ClientModInitializer {
 				mc.gui.setScreen(new GlovesScreen());
 			}
 		});
+		EntityRendererRegistry.register(FmabEntities.IZUMI, IzumiRenderer::new);
+		ClientPlayNetworking.registerGlobalReceiver(OpenIzumiPayload.TYPE,
+				(payload, context) -> context.client().gui.setScreen(new IzumiScreen(payload)));
 		BlockEntityRendererRegistry.register(FmabBlockEntities.TRANSMUTATION_CIRCLE, TransmutationCircleRenderer::new);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("concentration"),
 				(graphics, delta) -> concentrationBar(graphics));

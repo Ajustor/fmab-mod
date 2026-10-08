@@ -17,6 +17,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.ToolMaterial;
 
 import java.util.function.Function;
@@ -43,6 +44,9 @@ public final class FmabItems {
 	public static final Item SPARK_GLOVES = glove("spark_gloves", GloveItem.Kind.SPARK, 160);
 	public static final Item IRON_GAUNTLETS = glove("iron_gauntlets", GloveItem.Kind.GAUNTLET, 256);
 	public static final Item STATE_GLOVES = glove("state_gloves", GloveItem.Kind.STATE, 384);
+
+	public static final Item IZUMI_SPAWN_EGG = register("izumi_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.IZUMI));
 
 	/** Lance de pierre : les réglages de la lance de pierre vanilla, mais peu de durabilité. */
 	public static final Item STONE_LANCE = register("stone_lance", TransmutedWeaponItem::new,
@@ -83,6 +87,7 @@ public final class FmabItems {
 					output.accept(SPARK_GLOVES);
 					output.accept(IRON_GAUNTLETS);
 					output.accept(STATE_GLOVES);
+					output.accept(IZUMI_SPAWN_EGG);
 				})
 				.build());
 	}

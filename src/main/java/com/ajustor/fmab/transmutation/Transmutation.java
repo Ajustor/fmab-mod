@@ -10,6 +10,7 @@ import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.training.Trainings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -95,6 +96,7 @@ public final class Transmutation {
 
 		boolean anything = false;
 		List<String> practiced = new ArrayList<>();
+		List<String> done = new ArrayList<>();
 		Effects.Result last = Effects.Result.DONE;
 		// Résultat de l'étage précédent, pour les liaisons. Un étage sans effet est transparent.
 		Effects.Result previous = Effects.Result.DONE;
@@ -121,6 +123,7 @@ public final class Transmutation {
 					stageResult = result;
 					anything = true;
 					practiced.add(effect.combination().school());
+					done.add(effect.combination().effect());
 				} else {
 					last = result;
 				}
@@ -132,6 +135,7 @@ public final class Transmutation {
 			sparks(level, circle, 40);
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 1.4f);
 			practice(caster, rules, knowledge, practiced);
+			Trainings.onTransmutation(caster, analysis, frame, inscribed, done);
 			return Result.DONE;
 		}
 		caster.sendOverlayMessage(Component.translatable(last == Effects.Result.NO_MATERIAL
