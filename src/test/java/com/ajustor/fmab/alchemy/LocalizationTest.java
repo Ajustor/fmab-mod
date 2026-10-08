@@ -56,6 +56,12 @@ class LocalizationTest {
 		for (Analysis.Outcome o : Analysis.Outcome.values()) {
 			needed.add("notebook.fmab.outcome." + o.name().toLowerCase(Locale.ROOT));
 		}
+		for (String kind : new String[]{"items", "blockstates"}) {
+			String prefix = kind.equals("items") ? "item.fmab." : "block.fmab.";
+			try (var files = Files.list(TestGlyphs.resources().resolve("assets/fmab/" + kind))) {
+				files.forEach(f -> needed.add(prefix + f.getFileName().toString().replace(".json", "")));
+			}
+		}
 		for (KnowledgeNode n : TestGlyphs.knowledgeNodes()) {
 			needed.add(n.nameKey());
 			needed.add(n.descriptionKey());

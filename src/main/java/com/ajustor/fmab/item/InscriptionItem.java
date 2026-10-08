@@ -1,15 +1,17 @@
 package com.ajustor.fmab.item;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
-import com.ajustor.fmab.block.ChalkCircleBlock;
-import com.ajustor.fmab.block.ChalkCircleBlockEntity;
+import com.ajustor.fmab.block.CircleMedium;
+import com.ajustor.fmab.block.TransmutationCircleBlock;
+import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.registry.FmabTags;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -22,27 +24,35 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Craie de transmutation : trace au sol le cercle sélectionné dans un Carnet de cercles porté par
- * le joueur (main secondaire en priorité, sinon le premier carnet de l'inventaire).
+ * Craie, peinture alchimique ou burin : inscrit sur la face cliquée (sol, mur ou plafond) le cercle
+ * sélectionné dans un Carnet de cercles porté par le joueur (main secondaire en priorité, sinon le
+ * premier carnet de l'inventaire).
  */
-public class ChalkItem extends Item {
-	public ChalkItem(Properties properties) {
+public class InscriptionItem extends Item {
+	private final CircleMedium medium;
+
+	public InscriptionItem(CircleMedium medium, Properties properties) {
 		super(properties);
+		this.medium = medium;
 	}
 
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
-		if (context.getClickedFace() != Direction.UP) {
-			return InteractionResult.PASS;
-		}
 		Level level = context.getLevel();
 		Player player = context.getPlayer();
-		BlockPos pos = context.getClickedPos().above();
 		if (player == null) {
 			return InteractionResult.PASS;
 		}
-		BlockState state = FmabBlocks.CHALK_CIRCLE.defaultBlockState()
-				.setValue(ChalkCircleBlock.FACING, player.getDirection());
+		BlockPos support = context.getClickedPos();
+		BlockPos pos = support.relative(context.getClickedFace());
+		if (medium == CircleMedium.ENGRAVING && !level.getBlockState(support).is(FmabTags.ENGRAVABLE)) {
+			if (!level.isClientSide()) {
+				player.sendOverlayMessage(Component.translatable("item.fmab.alchemist_chisel.not_engravable"));
+			}
+			return InteractionResult.FAIL;
+		}
+		BlockState state = ((TransmutationCircleBlock) FmabBlocks.TRANSMUTATION_CIRCLE)
+				.stateFor(context.getClickedFace(), player.getDirection(), medium);
 		if (!level.getBlockState(pos).canBeReplaced() || !state.canSurvive(level, pos)) {
 			return InteractionResult.FAIL;
 		}
@@ -55,13 +65,21 @@ public class ChalkItem extends Item {
 		}
 		if (!level.isClientSide()) {
 			level.setBlock(pos, state, 3);
-			if (level.getBlockEntity(pos) instanceof ChalkCircleBlockEntity circle) {
+			if (level.getBlockEntity(pos) instanceof TransmutationCircleBlockEntity circle) {
 				circle.setDrawing(drawing);
 			}
-			level.playSound(null, pos, SoundEvents.BRUSH_GENERIC, SoundSource.BLOCKS, 1, 1.2f);
+			level.playSound(null, pos, sound(), SoundSource.BLOCKS, 1, 1.2f);
 			context.getItemInHand().hurtAndBreak(1, player, context.getHand());
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	private SoundEvent sound() {
+		return switch (medium) {
+			case CHALK -> SoundEvents.BRUSH_GENERIC;
+			case PAINT -> SoundEvents.HONEY_BLOCK_PLACE;
+			case ENGRAVING -> SoundEvents.STONE_HIT;
+		};
 	}
 
 	public static Drawing selectedDrawing(Player player) {

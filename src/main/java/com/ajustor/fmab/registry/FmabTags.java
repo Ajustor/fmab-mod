@@ -14,6 +14,9 @@ public final class FmabTags {
 	private FmabTags() {
 	}
 
+	/** Ce que le burin peut graver : la pierre et le métal. */
+	public static final TagKey<Block> ENGRAVABLE = TagKey.create(Registries.BLOCK, Fmab.id("engravable"));
+
 	public static TagKey<Block> elementBlocks(String element) {
 		return TagKey.create(Registries.BLOCK, Fmab.id("element/" + element));
 	}

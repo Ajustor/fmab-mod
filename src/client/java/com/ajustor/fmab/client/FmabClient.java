@@ -1,7 +1,7 @@
 package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
-import com.ajustor.fmab.client.render.ChalkCircleRenderer;
+import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
 import com.ajustor.fmab.data.AlchemistData;
@@ -24,7 +24,7 @@ public class FmabClient implements ClientModInitializer {
 				case TREATISE -> mc.gui.setScreen(new TreatiseScreen());
 			}
 		});
-		BlockEntityRendererRegistry.register(FmabBlockEntities.CHALK_CIRCLE, ChalkCircleRenderer::new);
+		BlockEntityRendererRegistry.register(FmabBlockEntities.TRANSMUTATION_CIRCLE, TransmutationCircleRenderer::new);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("concentration"),
 				(graphics, delta) -> concentrationBar(graphics));
 	}

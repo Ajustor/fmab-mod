@@ -1,8 +1,9 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.block.CircleMedium;
 import com.ajustor.fmab.data.NotebookContents;
-import com.ajustor.fmab.item.ChalkItem;
+import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.ScreenItem;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
@@ -19,7 +20,12 @@ import net.minecraft.world.item.ToolMaterial;
 import java.util.function.Function;
 
 public final class FmabItems {
-	public static final Item CHALK = register("chalk", ChalkItem::new, new Item.Properties().durability(64));
+	public static final Item CHALK = register("chalk", p -> new InscriptionItem(CircleMedium.CHALK, p),
+			new Item.Properties().durability(64));
+	public static final Item ALCHEMICAL_PAINT = register("alchemical_paint",
+			p -> new InscriptionItem(CircleMedium.PAINT, p), new Item.Properties().durability(32));
+	public static final Item ALCHEMIST_CHISEL = register("alchemist_chisel",
+			p -> new InscriptionItem(CircleMedium.ENGRAVING, p), new Item.Properties().durability(128));
 	public static final Item CIRCLE_NOTEBOOK = register("circle_notebook",
 			p -> new ScreenItem(ScreenItem.Kind.NOTEBOOK, p),
 			new Item.Properties().stacksTo(1).component(FmabComponents.NOTEBOOK, NotebookContents.EMPTY));
@@ -53,6 +59,8 @@ public final class FmabItems {
 					output.accept(ALCHEMY_TREATISE);
 					output.accept(CIRCLE_NOTEBOOK);
 					output.accept(CHALK);
+					output.accept(ALCHEMICAL_PAINT);
+					output.accept(ALCHEMIST_CHISEL);
 				})
 				.build());
 	}

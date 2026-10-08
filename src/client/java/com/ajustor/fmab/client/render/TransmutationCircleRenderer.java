@@ -1,8 +1,9 @@
 package com.ajustor.fmab.client.render;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
-import com.ajustor.fmab.block.ChalkCircleBlock;
-import com.ajustor.fmab.block.ChalkCircleBlockEntity;
+import com.ajustor.fmab.block.CircleMedium;
+import com.ajustor.fmab.block.TransmutationCircleBlock;
+import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -16,25 +17,37 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Dessine le cercle de craie comme une décalcomanie posée sur le sol, trois blocs de côté, le haut
- * de la page tourné vers la direction où regardait celui qui l'a tracé.
+ * Dessine le cercle comme une décalcomanie de trois blocs de côté posée sur sa surface, dans la
+ * couleur de ce qui l'a tracé. Au sol et au plafond, le haut de la page regarde la direction où se
+ * tenait l'alchimiste ; sur un mur, il regarde le ciel.
  */
-public class ChalkCircleRenderer implements BlockEntityRenderer<ChalkCircleBlockEntity, ChalkCircleRenderer.State> {
-	/** Blanc cassé de la craie. */
-	private static final int CHALK = 0xF0EEEAE0;
+public class TransmutationCircleRenderer
+		implements BlockEntityRenderer<TransmutationCircleBlockEntity, TransmutationCircleRenderer.State> {
 	private static final float HALF = 1.5f;
 	private static final float LIFT = 0.01f;
+	/**
+	 * Demi-tour autour de l'axe (0, 1, −1) : la décalcomanie, définie à plat (normale +Y, haut de
+	 * la page vers −Z), devient verticale, normale vers −Z, haut de la page vers +Y, sans être vue
+	 * en miroir.
+	 */
+	private static final Quaternionf TO_WALL =
+			new Quaternionf().rotationAxis((float) Math.PI, 0, (float) Math.sqrt(0.5), (float) -Math.sqrt(0.5));
 
 	public static class State extends BlockEntityRenderState {
 		Drawing drawing = Drawing.EMPTY;
+		AttachFace face = AttachFace.FLOOR;
 		Direction facing = Direction.NORTH;
+		CircleMedium medium = CircleMedium.CHALK;
 	}
 
-	public ChalkCircleRenderer(BlockEntityRendererProvider.Context context) {
+	public TransmutationCircleRenderer(BlockEntityRendererProvider.Context context) {
 	}
 
 	@Override
@@ -43,11 +56,14 @@ public class ChalkCircleRenderer implements BlockEntityRenderer<ChalkCircleBlock
 	}
 
 	@Override
-	public void extractRenderState(ChalkCircleBlockEntity blockEntity, State state, float partialTicks,
+	public void extractRenderState(TransmutationCircleBlockEntity blockEntity, State state, float partialTicks,
 			Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
 		BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
+		BlockState block = blockEntity.getBlockState();
 		state.drawing = blockEntity.drawing();
-		state.facing = blockEntity.getBlockState().getValue(ChalkCircleBlock.FACING);
+		state.face = block.getValue(TransmutationCircleBlock.FACE);
+		state.facing = block.getValue(TransmutationCircleBlock.FACING);
+		state.medium = block.getValue(TransmutationCircleBlock.MEDIUM);
 	}
 
 	@Override
@@ -55,13 +71,26 @@ public class ChalkCircleRenderer implements BlockEntityRenderer<ChalkCircleBlock
 		if (state.drawing.isEmpty()) {
 			return;
 		}
-		Identifier texture = CircleTextures.get(state.drawing, CHALK);
+		Identifier texture = CircleTextures.get(state.drawing, state.medium.color());
 		poseStack.pushPose();
-		poseStack.translate(0.5f, LIFT, 0.5f);
+		poseStack.translate(0.5f, 0.5f, 0.5f);
+		// Après cette rotation, −Z local pointe vers state.facing.
 		poseStack.mulPose(Axis.YP.rotationDegrees(180 - state.facing.toYRot()));
+		switch (state.face) {
+			case FLOOR -> poseStack.translate(0, -0.5f + LIFT, 0);
+			case CEILING -> {
+				poseStack.translate(0, 0.5f - LIFT, 0);
+				poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+			}
+			case WALL -> {
+				// Le support est derrière, du côté +Z local.
+				poseStack.translate(0, 0, 0.5f - LIFT);
+				poseStack.mulPose(TO_WALL);
+			}
+		}
 		int light = state.lightCoords;
 		collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, buffer) -> {
-			// Vu de dessus, le nord de la pose est le haut de la page.
+			// Vu de face, −Z est le haut de la page et +X sa droite.
 			vertex(buffer, pose, -HALF, -HALF, 0, 0, light);
 			vertex(buffer, pose, -HALF, HALF, 0, 1, light);
 			vertex(buffer, pose, HALF, HALF, 1, 1, light);

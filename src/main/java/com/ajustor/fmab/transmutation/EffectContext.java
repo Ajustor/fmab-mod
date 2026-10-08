@@ -17,20 +17,20 @@ import java.util.List;
 /**
  * Ce qu'un effet sait de la transmutation en cours.
  *
- * @param circle    position du cercle (le bloc de craie, posé sur son support)
- * @param pageUp    direction du monde qui correspond au haut de la page du carnet
+ * @param circle    position du cercle (le bloc inscrit, posé contre son support)
+ * @param frame     orientation du cercle : sol, mur ou plafond
  * @param flow      matière produite par l'étage précédent, quand il est relié en série ; les effets
  *                  y puisent avant le monde, et y déposent ce qu'ils décomposent
  * @param knowledge savoir de l'alchimiste, dont certains bonus changent la forme des effets
  */
-public record EffectContext(ServerLevel level, BlockPos circle, Direction pageUp, ServerPlayer caster,
+public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame frame, ServerPlayer caster,
 		Analysis.StageEffect stage, List<ItemStack> flow, Knowledge knowledge) {
 	/** Un satellite agit à ce nombre de blocs du centre, du côté de son sommet. */
 	private static final int SATELLITE_OFFSET = 2;
 
 	/** Le bloc qui porte le cercle. */
 	public BlockPos support() {
-		return circle.below();
+		return circle.relative(frame.normal().getOpposite());
 	}
 
 	/** D'où part l'effet : le cercle, ou le côté de son satellite. */
@@ -38,7 +38,7 @@ public record EffectContext(ServerLevel level, BlockPos circle, Direction pageUp
 		if (stage.satellite() < 0) {
 			return circle;
 		}
-		return circle.relative(toWorld(stage.origin().angle()), SATELLITE_OFFSET);
+		return circle.relative(frame.toWorld(stage.origin().angle()), SATELLITE_OFFSET);
 	}
 
 	/** Zone où l'on pose les objets à transmuter : le cercle et un peu autour. */
@@ -47,14 +47,25 @@ public record EffectContext(ServerLevel level, BlockPos circle, Direction pageUp
 	}
 
 	/**
-	 * Direction de l'effet : celle de la flèche du cercle (ou du sommet d'un satellite) si elle
-	 * existe, sinon celle où regarde l'alchimiste.
+	 * Direction de l'effet. Au sol : celle de la flèche du cercle (ou du sommet d'un satellite) si
+	 * elle existe, sinon celle où regarde l'alchimiste. Sur un mur ou un plafond : droit devant la
+	 * surface.
 	 */
 	public Direction direction() {
+		if (!frame.onFloor()) {
+			return frame.normal();
+		}
 		if (!stage.hasDirection()) {
 			return caster.getDirection();
 		}
-		return toWorld(stage.direction());
+		Direction d = frame.toWorld(stage.direction());
+		return d.getAxis().isHorizontal() ? d : caster.getDirection();
+	}
+
+	/** Comme {@link #direction()}, mais toujours horizontale : sous un plafond, celle de l'alchimiste. */
+	public Direction horizontalDirection() {
+		Direction d = direction();
+		return d.getAxis().isHorizontal() ? d : caster.getDirection();
 	}
 
 	/** Bonus de savoir de l'école de l'effet. */
@@ -79,19 +90,5 @@ public record EffectContext(ServerLevel level, BlockPos circle, Direction pageUp
 			target.push(d.getStepX() * 0.8, 0.3, d.getStepZ() * 0.8);
 			target.hurtMarked = true;
 		}
-	}
-
-	/** Angle de la page (radians, x à droite, y vers le bas) vers la direction du monde la plus proche. */
-	private Direction toWorld(double angle) {
-		// Le bas de la page est derrière pageUp.
-		Direction right = pageUp.getClockWise();
-		Direction down = pageUp.getOpposite();
-		double cos = Math.cos(angle), sin = Math.sin(angle);
-		double x = right.getStepX() * cos + down.getStepX() * sin;
-		double z = right.getStepZ() * cos + down.getStepZ() * sin;
-		if (Math.abs(x) >= Math.abs(z)) {
-			return x >= 0 ? Direction.EAST : Direction.WEST;
-		}
-		return z >= 0 ? Direction.SOUTH : Direction.NORTH;
 	}
 }

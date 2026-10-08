@@ -11,7 +11,6 @@ import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -21,6 +20,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -37,8 +37,9 @@ public final class Transmutation {
 	private Transmutation() {
 	}
 
-	public static void activate(ServerLevel level, BlockPos circle, Direction pageUp, Drawing drawing,
+	public static void activate(ServerLevel level, BlockPos circle, BlockState state, Drawing drawing,
 			ServerPlayer caster) {
+		CircleFrame frame = CircleFrame.of(state);
 		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Knowledge knowledge = rules.knowledge(alchemist);
@@ -61,7 +62,7 @@ public final class Transmutation {
 				alchemist.withConcentration(alchemist.concentration() - analysis.concentration()));
 
 		if (analysis.outcome() == Analysis.Outcome.REBOUND) {
-			rebound(level, circle, caster, analysis);
+			rebound(level, circle, frame, caster, analysis);
 			return;
 		}
 
@@ -84,7 +85,7 @@ public final class Transmutation {
 			}
 			Effects.Result stageResult = Effects.Result.NO_TARGET;
 			for (Analysis.StageEffect effect : effects) {
-				EffectContext ctx = new EffectContext(level, circle, pageUp, caster, effect, flow, knowledge);
+				EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, flow, knowledge);
 				Effects.Result result = Effects.get(effect.combination().effect())
 						.map(e -> e.apply(ctx))
 						.orElse(Effects.Result.NO_TARGET);
@@ -116,7 +117,8 @@ public final class Transmutation {
 	 * L'énergie revient sur l'alchimiste : quelques dégâts pour un cercle à peine instable, une
 	 * explosion qui détruit le support pour un cercle qui n'avait aucune chance.
 	 */
-	private static void rebound(ServerLevel level, BlockPos circle, ServerPlayer caster, Analysis analysis) {
+	private static void rebound(ServerLevel level, BlockPos circle, CircleFrame frame, ServerPlayer caster,
+			Analysis analysis) {
 		double severity = analysis.reboundSeverity();
 		caster.hurtServer(level, level.damageSources().magic(), (float) (2 + 16 * severity));
 		caster.sendOverlayMessage(Component.translatable("transmutation.fmab.rebound"));
@@ -126,7 +128,7 @@ public final class Transmutation {
 		if (severity >= SHATTERING_SEVERITY) {
 			Vec3 c = Vec3.atCenterOf(circle);
 			level.explode(null, c.x, c.y, c.z, 1.5f, Level.ExplosionInteraction.NONE);
-			level.destroyBlock(circle.below(), false);
+			level.destroyBlock(circle.relative(frame.normal().getOpposite()), false);
 		} else {
 			level.playSound(null, circle, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1, 0.7f);
 		}

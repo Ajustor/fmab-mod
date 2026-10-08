@@ -2,9 +2,12 @@
   "itemGroup.fmab.alchemy": "Alchemy of Amestris",
   "item.fmab.chalk": "Transmutation Chalk",
   "item.fmab.chalk.no_circle": "No circle selected: hold a Circle Notebook in your other hand.",
+  "item.fmab.alchemical_paint": "Alchemical Paint",
+  "item.fmab.alchemist_chisel": "Alchemist's Chisel",
+  "item.fmab.alchemist_chisel.not_engravable": "The chisel only engraves stone and metal.",
   "item.fmab.circle_notebook": "Circle Notebook",
   "item.fmab.alchemy_treatise": "Alchemy Treatise",
-  "block.fmab.chalk_circle": "Chalk Circle",
+  "block.fmab.transmutation_circle": "Transmutation Circle",
   "item.fmab.stone_lance": "Stone Lance",
   "item.fmab.arm_blade": "Arm Blade",
 
@@ -175,6 +178,7 @@
   "treatise.fmab.ch4.p6": "Satellites: a small circle (radius 2.5 to 5 cells) centered on a corner of the polygon.\n\nWith an element alone, it infuses the stage: Fire sets alight what the effect hits, Water slows, Air pushes back.\n\nWith an element and an action, it casts its own effect, on the side of its corner. An Alchemist can place two.",
   "treatise.fmab.ch4.p7": "Fusion: two elements in the same stage only combine within a hexagram (two inscribed triangles, one pointing up, one down).\n\nPolygons can be layered: a stage bears the sum of their sides. An Alchemist layers three, a hexagram counting as two.",
   "treatise.fmab.ch4.p8": "Knowledge.\n\nEvery successful transmutation raises the mastery of its school. Schools open node by node: cheaper concentration, more range, thick walls, transmuted weapons. The \"Knowledge\" button on the contents page shows where you stand.\n\nAn experienced enough Apprentice becomes an Alchemist: two stages, the hexagon, satellites.",
+  "treatise.fmab.ch4.p9": "Surfaces.\n\nChalk draws anywhere but washes away in the rain. Alchemical paint lasts. The chisel engraves forever, but only stone and metal.\n\nCircles go on floors, walls or ceilings. On a wall or a ceiling, the effect goes straight out from the surface: a spike bursts from the wall, a wall rises in front of it.",
 
   "treatise.fmab.ch5.title": "V. Circles to copy",
   "treatise.fmab.ch5.p1": "Each page shows a working circle. \"Copy drawing\" puts its code on the clipboard: in the notebook, \"Import\" copies it in.\n\nRedrawing it yourself is better, though: that is how one learns.",

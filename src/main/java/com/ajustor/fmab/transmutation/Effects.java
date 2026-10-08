@@ -104,7 +104,7 @@ public final class Effects {
 	 */
 	private static Result wall(EffectContext ctx) {
 		ServerLevel level = ctx.level();
-		Direction d = ctx.direction();
+		Direction d = ctx.horizontalDirection();
 		Direction along = d.getClockWise();
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
 		int thickness = 1 + (int) ctx.perk("wall_thickness");
@@ -121,7 +121,7 @@ public final class Effects {
 				for (int k = 1; k <= WALL_HEIGHT; k++) {
 					quarry.add(column.relative(d, thickness - layer).below(k));
 				}
-				moved += raise(ctx, quarry, column, earth, WALL_HEIGHT, 0);
+				moved += raise(ctx, quarry, column, Direction.UP, earth, WALL_HEIGHT, 0);
 			}
 		}
 		return moved > 0 ? Result.DONE : Result.NO_MATERIAL;
@@ -129,10 +129,28 @@ public final class Effects {
 
 	/**
 	 * Terre + Projeter : une pique jaillit à portée, dans la direction du cercle. La pierre vient
-	 * de l'étage précédent s'il en a décomposé, sinon du sol tout autour de sa base.
+	 * de l'étage précédent s'il en a décomposé, sinon du sol tout autour de sa base. Sur un mur ou
+	 * un plafond, la pique sort droit de la surface, faite de la pierre qui entoure le support.
 	 */
 	private static Result spike(EffectContext ctx) {
 		ServerLevel level = ctx.level();
+		TagKey<Block> earth = FmabTags.elementBlocks("earth");
+		CircleFrame frame = ctx.frame();
+		if (!frame.onFloor()) {
+			BlockPos support = ctx.support();
+			// Les huit blocs qui entourent le support, dans le plan de la surface.
+			List<BlockPos> quarry = new ArrayList<>();
+			for (int a = -1; a <= 1; a++) {
+				for (int b = -1; b <= 1; b++) {
+					if (a != 0 || b != 0) {
+						quarry.add(support.relative(frame.pageRight(), a).relative(frame.pageUp(), b));
+					}
+				}
+			}
+			int raised = raise(ctx, quarry, ctx.circle().relative(frame.normal()), frame.normal(), earth, SPIKE_HEIGHT,
+					SPIKE_DAMAGE);
+			return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
+		}
 		BlockPos column = surface(level, ctx.origin().relative(ctx.direction(), ctx.range()));
 		if (column == null) {
 			return Result.NO_TARGET;
@@ -142,7 +160,7 @@ public final class Effects {
 			quarry.add(column.relative(side).below());
 			quarry.add(column.relative(side).relative(side.getClockWise()).below());
 		}
-		int raised = raise(ctx, quarry, column, FmabTags.elementBlocks("earth"), SPIKE_HEIGHT, SPIKE_DAMAGE);
+		int raised = raise(ctx, quarry, column, Direction.UP, earth, SPIKE_HEIGHT, SPIKE_DAMAGE);
 		return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
 	}
 
@@ -252,7 +270,7 @@ public final class Effects {
 		}
 		ServerLevel level = ctx.level();
 		Direction d = ctx.direction();
-		Direction side = d.getClockWise();
+		Direction side = d.getAxis().isHorizontal() ? d.getClockWise() : ctx.frame().pageRight();
 		for (int i = 1; i <= ctx.range(); i++) {
 			for (int w = -halfWidth; w <= halfWidth; w++) {
 				BlockPos p = surface(level, ctx.origin().relative(d, i).relative(side, w));
@@ -419,19 +437,20 @@ public final class Effects {
 	}
 
 	/**
-	 * Empile jusqu'à {@code maxHeight} blocs de l'élément à partir de {@code column}. Ils viennent
-	 * d'abord de la matière de l'étage précédent, puis des positions de {@code quarry}. Les
-	 * créatures prises dans la colonne sont soulevées et, si {@code damage} est positif, blessées.
+	 * Empile jusqu'à {@code maxHeight} blocs de l'élément à partir de {@code column}, dans la
+	 * direction {@code up}. Ils viennent d'abord de la matière de l'étage précédent, puis des
+	 * positions de {@code quarry}. Les créatures prises dans la colonne sont repoussées au bout et,
+	 * si {@code damage} est positif, blessées.
 	 *
 	 * @return nombre de blocs déplacés
 	 */
-	private static int raise(EffectContext ctx, List<BlockPos> quarry, BlockPos column, TagKey<Block> element,
-			int maxHeight, float damage) {
+	private static int raise(EffectContext ctx, List<BlockPos> quarry, BlockPos column, Direction up,
+			TagKey<Block> element, int maxHeight, float damage) {
 		ServerLevel level = ctx.level();
 		int height = 0;
 		Iterator<BlockPos> world = quarry.iterator();
 		while (height < maxHeight) {
-			BlockPos to = column.above(height);
+			BlockPos to = column.relative(up, height);
 			if (!level.getBlockState(to).canBeReplaced()) {
 				break;
 			}
@@ -455,12 +474,17 @@ public final class Effects {
 			height++;
 		}
 		if (height > 0) {
-			AABB space = new AABB(column).expandTowards(0, height - 1, 0);
+			AABB space = new AABB(column).expandTowards(up.getStepX() * (height - 1), up.getStepY() * (height - 1),
+					up.getStepZ() * (height - 1));
+			Vec3 tip = Vec3.atBottomCenterOf(column.relative(up, height));
 			for (Entity e : level.getEntities((Entity) null, space, Entity::isAlive)) {
-				e.setPos(e.getX(), column.getY() + height, e.getZ());
+				if (up == Direction.UP) {
+					e.setPos(e.getX(), tip.y, e.getZ());
+				}
 				if (damage > 0 && e instanceof LivingEntity living) {
 					living.hurtServer(level, level.damageSources().magic(), damage);
-					living.setDeltaMovement(living.getDeltaMovement().add(0, 0.8, 0));
+					living.setDeltaMovement(living.getDeltaMovement().add(up.getStepX() * 0.8,
+							up == Direction.DOWN ? -0.4 : 0.8, up.getStepZ() * 0.8));
 					living.hurtMarked = true;
 					ctx.afflict(living);
 				}

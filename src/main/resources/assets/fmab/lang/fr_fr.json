@@ -2,9 +2,12 @@
   "itemGroup.fmab.alchemy": "Alchimie d'Amestris",
   "item.fmab.chalk": "Craie de transmutation",
   "item.fmab.chalk.no_circle": "Aucun cercle sélectionné : tenez un Carnet de cercles dans l'autre main.",
+  "item.fmab.alchemical_paint": "Peinture alchimique",
+  "item.fmab.alchemist_chisel": "Burin d'alchimiste",
+  "item.fmab.alchemist_chisel.not_engravable": "Le burin ne grave que la pierre et le métal.",
   "item.fmab.circle_notebook": "Carnet de cercles",
   "item.fmab.alchemy_treatise": "Traité d'alchimie",
-  "block.fmab.chalk_circle": "Cercle à la craie",
+  "block.fmab.transmutation_circle": "Cercle de transmutation",
   "item.fmab.stone_lance": "Lance de pierre",
   "item.fmab.arm_blade": "Lame-bras",
 
@@ -175,6 +178,7 @@
   "treatise.fmab.ch4.p6": "Les satellites : un petit cercle (rayon 2,5 à 5 cases) centré sur un sommet du polygone.\n\nAvec un élément seul, il infuse l'étage : le Feu enflamme ce que l'effet touche, l'Eau ralentit, l'Air repousse.\n\nAvec un élément et une action, il lance son propre effet, du côté de son sommet. Un Alchimiste en pose deux.",
   "treatise.fmab.ch4.p7": "La fusion : deux éléments dans un même étage ne se combinent que dans un hexagramme (deux triangles inscrits, pointe en haut et pointe en bas).\n\nLes polygones se superposent : un étage supporte la somme de leurs côtés. Un Alchimiste en superpose trois, un hexagramme comptant pour deux.",
   "treatise.fmab.ch4.p8": "Le savoir.\n\nChaque transmutation réussie fait progresser la maîtrise de son école. Les écoles s'ouvrent nœud par nœud : concentration moins coûteuse, plus de portée, murs épais, armes transmutées. Le bouton « Savoir » du sommaire montre où vous en êtes.\n\nUn Apprenti assez expérimenté devient Alchimiste : deux étages, l'hexagone, les satellites.",
+  "treatise.fmab.ch4.p9": "Les supports.\n\nLa craie trace partout mais s'efface sous la pluie. La peinture alchimique tient. Le burin grave pour toujours, mais seulement la pierre et le métal.\n\nOn inscrit au sol, sur un mur ou au plafond. Sur un mur ou un plafond, l'effet part droit devant la surface : une pique jaillit du mur, un mur se lève en face de lui.",
 
   "treatise.fmab.ch5.title": "V. Cercles à recopier",
   "treatise.fmab.ch5.p1": "Chaque page montre un cercle qui fonctionne. « Copier le tracé » met son code dans le presse-papiers : dans le carnet, « Importer » le recopie.\n\nMieux vaut toutefois le redessiner soi-même : c'est ainsi qu'on apprend.",

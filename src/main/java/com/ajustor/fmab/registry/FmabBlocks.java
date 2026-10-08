@@ -1,7 +1,7 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
-import com.ajustor.fmab.block.ChalkCircleBlock;
+import com.ajustor.fmab.block.TransmutationCircleBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
@@ -14,7 +14,7 @@ import net.minecraft.world.level.material.PushReaction;
 import java.util.function.Function;
 
 public final class FmabBlocks {
-	public static final Block CHALK_CIRCLE = register("chalk_circle", ChalkCircleBlock::new,
+	public static final Block TRANSMUTATION_CIRCLE = register("transmutation_circle", TransmutationCircleBlock::new,
 			BlockBehaviour.Properties.of()
 					.mapColor(MapColor.SNOW)
 					.noCollision()

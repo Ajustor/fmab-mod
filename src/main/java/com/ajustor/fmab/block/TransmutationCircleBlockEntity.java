@@ -15,14 +15,14 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 /**
- * Mémorise le tracé du cercle posé au sol. On ne relit jamais les blocs autour : le cercle est ce
- * que la craie a enregistré.
+ * Mémorise le tracé du cercle inscrit sur une surface. On ne relit jamais les blocs autour : le
+ * cercle est ce que la craie, la peinture ou le burin a enregistré.
  */
-public class ChalkCircleBlockEntity extends BlockEntity {
+public class TransmutationCircleBlockEntity extends BlockEntity {
 	private Drawing drawing = Drawing.EMPTY;
 
-	public ChalkCircleBlockEntity(BlockPos pos, BlockState state) {
-		super(FmabBlockEntities.CHALK_CIRCLE, pos, state);
+	public TransmutationCircleBlockEntity(BlockPos pos, BlockState state) {
+		super(FmabBlockEntities.TRANSMUTATION_CIRCLE, pos, state);
 	}
 
 	public Drawing drawing() {
