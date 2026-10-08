@@ -1,5 +1,6 @@
 package com.ajustor.fmab;
 
+import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.network.FmabNetwork;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
@@ -8,6 +9,7 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabRegistries;
+import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Passives;
@@ -18,10 +20,12 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Fmab implements ModInitializer {
 	public static final String MOD_ID = "fmab";
@@ -65,12 +69,34 @@ public class Fmab implements ModInitializer {
 			return;
 		}
 		player.setAttached(FmabAttachments.EQUIPPED, true);
-		for (Item item : new Item[]{FmabItems.ALCHEMY_TREATISE, FmabItems.CIRCLE_NOTEBOOK, FmabItems.CHALK}) {
-			ItemStack stack = new ItemStack(item);
+		for (ItemStack stack : new ItemStack[]{new ItemStack(FmabItems.ALCHEMY_TREATISE), starterNotebook(player),
+				new ItemStack(FmabItems.CHALK)}) {
 			if (!player.getInventory().add(stack)) {
 				player.drop(stack, false);
 			}
 		}
+	}
+
+	/** Effets des cercles simples recopiés dans le carnet de départ. */
+	private static final List<String> STARTER_CIRCLES = List.of("fmab:wall", "fmab:spike", "fmab:ice_platform");
+
+	/**
+	 * Un carnet qui contient déjà quelques cercles simples, prêts à tracer à la craie. Les noms de
+	 * page sont des clés de traduction ({@code @}), affichées dans la langue du joueur.
+	 */
+	private static ItemStack starterNotebook(ServerPlayer player) {
+		AlchemyRules rules = AlchemyRules.of(player.level().registryAccess());
+		List<NotebookContents.Page> pages = new ArrayList<>();
+		for (String effect : STARTER_CIRCLES) {
+			rules.combinations().stream()
+					.filter(c -> c.effect().equals(effect))
+					.findFirst()
+					.flatMap(rules::simpleCircle)
+					.ifPresent(d -> pages.add(new NotebookContents.Page("@effect." + effect.replace(':', '.'), d)));
+		}
+		ItemStack notebook = new ItemStack(FmabItems.CIRCLE_NOTEBOOK);
+		notebook.set(FmabComponents.NOTEBOOK, new NotebookContents(pages, 0));
+		return notebook;
 	}
 
 	public static Identifier id(String path) {

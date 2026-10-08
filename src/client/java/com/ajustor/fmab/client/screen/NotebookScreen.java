@@ -493,7 +493,12 @@ public class NotebookScreen extends Screen {
 	// ---- Pages ------------------------------------------------------------------------------------
 
 	private String currentName() {
-		return page < contents.pages().size() ? contents.pages().get(page).name() : defaultName(page);
+		return page < contents.pages().size() ? displayName(contents.pages().get(page).name()) : defaultName(page);
+	}
+
+	/** Un nom de page « @clé » (cercles du carnet de départ et du Traité) s'affiche traduit. */
+	public static String displayName(String name) {
+		return name.startsWith("@") ? Component.translatable(name.substring(1)).getString() : name;
 	}
 
 	private Component pageLabel() {
