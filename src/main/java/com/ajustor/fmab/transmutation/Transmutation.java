@@ -90,9 +90,17 @@ public final class Transmutation {
 		}
 		caster.setAttached(FmabAttachments.ALCHEMIST,
 				alchemist.withConcentration(alchemist.concentration() - cost));
+		// L'énergie est partie : quoi qu'il arrive, on s'est familiarisé avec les glyphes tracés.
+		practiceGlyphs(caster, rules, analysis);
 
 		if (analysis.outcome() == Analysis.Outcome.REBOUND) {
-			rebound(level, circle, frame, caster, analysis, inscribed);
+			rebound(level, circle, frame, caster, analysis.reboundSeverity(), inscribed);
+			return Result.REBOUND;
+		}
+		// Un glyphe qu'on ne comprend pas peut tout faire basculer.
+		if (analysis.risk() > 0 && caster.getRandom().nextDouble() < analysis.risk()) {
+			caster.sendSystemMessage(Component.translatable("transmutation.fmab.misunderstood"));
+			rebound(level, circle, frame, caster, analysis.risk(), inscribed);
 			return Result.REBOUND;
 		}
 
@@ -153,8 +161,7 @@ public final class Transmutation {
 	 * explosion qui détruit le support pour un cercle inscrit qui n'avait aucune chance.
 	 */
 	private static void rebound(ServerLevel level, BlockPos circle, CircleFrame frame, ServerPlayer caster,
-			Analysis analysis, boolean inscribed) {
-		double severity = analysis.reboundSeverity();
+			double severity, boolean inscribed) {
 		caster.hurtServer(level, level.damageSources().magic(), (float) (2 + 16 * severity));
 		caster.sendOverlayMessage(Component.translatable("transmutation.fmab.rebound"));
 		level.sendParticles(ParticleTypes.LARGE_SMOKE, circle.getX() + 0.5, circle.getY() + 0.2, circle.getZ() + 0.5,
@@ -193,6 +200,26 @@ public final class Transmutation {
 					Component.translatable(Rank.ALCHEMIST.translationKey())));
 			caster.level().playSound(null, caster.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS,
 					1, 1);
+		}
+		caster.setAttached(FmabAttachments.ALCHEMIST, data);
+	}
+
+	/**
+	 * Chaque usage d'un glyphe pas encore compris rapproche de sa compréhension ; au bout de
+	 * {@link AlchemistData#USES_TO_LEARN} usages, on le comprend.
+	 */
+	private static void practiceGlyphs(ServerPlayer caster, AlchemyRules rules, Analysis analysis) {
+		AlchemistData data = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		for (CircleIssue issue : analysis.issues()) {
+			if (issue.kind() != CircleIssue.Kind.GLYPH_NOT_LEARNED) {
+				continue;
+			}
+			String id = issue.detail();
+			data = data.practiceGlyph(id);
+			if (data.known().contains(id)) {
+				rules.glyph(id).ifPresent(g -> caster.sendSystemMessage(Component.translatable(
+						"transmutation.fmab.glyph_understood", Component.translatable(g.nameKey()))));
+			}
 		}
 		caster.setAttached(FmabAttachments.ALCHEMIST, data);
 	}

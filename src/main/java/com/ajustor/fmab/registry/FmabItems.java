@@ -7,6 +7,8 @@ import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.ScreenItem;
+import com.ajustor.fmab.item.TomeItem;
+import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
@@ -37,6 +39,10 @@ public final class FmabItems {
 	public static final Item ALCHEMY_TREATISE = register("alchemy_treatise",
 			p -> new ScreenItem(ScreenItem.Kind.TREATISE, p),
 			new Item.Properties().stacksTo(1));
+
+	/** Tome d'alchimie : enseigne les glyphes de son composant {@link FmabComponents#TOME}. */
+	public static final Item ALCHEMY_TOME = register("alchemy_tome", TomeItem::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
 
 	public static final Item ALCHEMICAL_THREAD = register("alchemical_thread", Item::new, new Item.Properties());
 	public static final Item ALCHEMICAL_INK = register("alchemical_ink", AlchemicalInkItem::new,
@@ -87,6 +93,7 @@ public final class FmabItems {
 				.displayItems((parameters, output) -> {
 					output.accept(ALCHEMY_TREATISE);
 					output.accept(CIRCLE_NOTEBOOK);
+					Tomes.ALL.forEach(t -> output.accept(Tomes.stack(t)));
 					output.accept(CHALK);
 					output.accept(ALCHEMICAL_PAINT);
 					output.accept(ALCHEMIST_CHISEL);

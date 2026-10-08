@@ -98,11 +98,17 @@ class CircleTest {
 	}
 
 	@Test
-	void aGlyphNotYetUnderstoodLeavesTheCircleInert() {
+	void aGlyphNotYetUnderstoodStillWorksButMayRebound() {
 		Drawing d = circle(3, glyph("terre", TOP), glyph("fixer", BOTTOM));
-		Analysis a = analyzer.analyze(parser.parse(d), Rank.APPRENTICE, Set.of("fmab:terre"));
-		assertEquals(Outcome.INERT, a.outcome());
-		assertTrue(kinds(a).contains(Kind.GLYPH_NOT_LEARNED));
+		Analysis one = analyzer.analyze(parser.parse(d), Rank.APPRENTICE, Set.of("fmab:terre"));
+		assertEquals(Outcome.WORKS, one.outcome());
+		assertTrue(kinds(one).contains(Kind.GLYPH_NOT_LEARNED));
+		assertEquals(0.25, one.risk(), 1e-9);
+
+		Analysis none = analyzer.analyze(parser.parse(d), Rank.APPRENTICE, Set.of());
+		assertEquals(0.5, none.risk(), 1e-9);
+		Analysis all = analyzer.analyze(parser.parse(d), Rank.APPRENTICE, Set.of("fmab:terre", "fmab:fixer"));
+		assertEquals(0, all.risk(), 1e-9);
 	}
 
 	@Test

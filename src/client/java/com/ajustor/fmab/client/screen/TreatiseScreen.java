@@ -9,7 +9,6 @@ import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.network.AddToNotebookPayload;
-import com.ajustor.fmab.network.LearnGlyphPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.google.gson.JsonParser;
@@ -134,10 +133,6 @@ public class TreatiseScreen extends Screen {
 		notebookButton.active = true;
 		notebookButton.setMessage(Component.translatable("treatise.fmab.add_to_notebook"));
 		if (e != null && e.glyph() != null) {
-			actionButton.visible = true;
-			boolean known = alchemist().known().contains(e.glyph().id());
-			actionButton.active = !known;
-			actionButton.setMessage(Component.translatable(known ? "treatise.fmab.known" : "treatise.fmab.study"));
 			notebookButton.visible = glyphExample(e.glyph()).isPresent();
 		} else if (e != null && e.page() instanceof Treatise.ExamplePage) {
 			actionButton.visible = true;
@@ -191,11 +186,7 @@ public class TreatiseScreen extends Screen {
 		if (e == null) {
 			return;
 		}
-		if (e.glyph() != null) {
-			ClientPlayNetworking.send(new LearnGlyphPayload(e.glyph().id()));
-			actionButton.active = false;
-			actionButton.setMessage(Component.translatable("treatise.fmab.known"));
-		} else if (e.page() instanceof Treatise.ExamplePage example) {
+		if (e.page() instanceof Treatise.ExamplePage example) {
 			Minecraft.getInstance().keyboardHandler.setClipboard(DrawingCode.encode(example.drawing()));
 			actionButton.setMessage(Component.translatable("treatise.fmab.copied"));
 		}
@@ -240,6 +231,7 @@ public class TreatiseScreen extends Screen {
 		lines.add(Component.translatable("treatise.fmab.layer." + g.layer().name().toLowerCase(Locale.ROOT)));
 		lines.add(Component.translatable("treatise.fmab.cost", g.complexity(), g.concentration()));
 		lines.add(Component.translatable("treatise.fmab.rank", Component.translatable(g.rank().translationKey())));
+		lines.add(understanding(g));
 		lines.add(Component.empty());
 		lines.add(Component.translatable(g.descriptionKey()));
 		glyphExample(g).ifPresent(ex -> {
@@ -253,6 +245,19 @@ public class TreatiseScreen extends Screen {
 				y += 10;
 			}
 		}
+	}
+
+	/**
+	 * Le Traité décrit, il n'enseigne pas : on comprend un glyphe grâce à un tome, ou à force de le
+	 * tracer.
+	 */
+	private Component understanding(Glyph g) {
+		AlchemistData me = alchemist();
+		if (me.known().contains(g.id())) {
+			return Component.translatable("treatise.fmab.understood").withStyle(s -> s.withColor(0x2E7D32));
+		}
+		return Component.translatable("treatise.fmab.not_understood", me.uses(g.id()), AlchemistData.USES_TO_LEARN)
+				.withStyle(s -> s.withColor(0xA8321E));
 	}
 
 	private void drawText(GuiGraphicsExtractor graphics, Component text, int width) {

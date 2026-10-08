@@ -1,6 +1,7 @@
 package com.ajustor.fmab;
 
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.network.FmabNetwork;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
@@ -61,16 +62,17 @@ public class Fmab implements ModInitializer {
 	}
 
 	/**
-	 * Comme les frères Elric à Resembool, chacun commence avec de quoi apprendre : le Traité, un
-	 * carnet et de la craie. Une seule fois par joueur.
+	 * Comme les frères Elric à Resembool, chacun commence avec de quoi apprendre : le Traité, les
+	 * Rudiments (qui enseignent les glyphes des cercles du carnet), un carnet et de la craie. Une
+	 * seule fois par joueur.
 	 */
 	private static void equip(ServerPlayer player) {
 		if (Boolean.TRUE.equals(player.getAttached(FmabAttachments.EQUIPPED))) {
 			return;
 		}
 		player.setAttached(FmabAttachments.EQUIPPED, true);
-		for (ItemStack stack : new ItemStack[]{new ItemStack(FmabItems.ALCHEMY_TREATISE), starterNotebook(player),
-				new ItemStack(FmabItems.CHALK)}) {
+		for (ItemStack stack : new ItemStack[]{new ItemStack(FmabItems.ALCHEMY_TREATISE),
+				Tomes.stack(Tomes.RUDIMENTS), starterNotebook(player), new ItemStack(FmabItems.CHALK)}) {
 			if (!player.getInventory().add(stack)) {
 				player.drop(stack, false);
 			}

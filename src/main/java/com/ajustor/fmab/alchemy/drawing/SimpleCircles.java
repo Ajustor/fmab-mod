@@ -44,9 +44,25 @@ public final class SimpleCircles {
 
 	/** Le tracé de référence d'un glyphe, posé et accroché à la demi-case comme dans le carnet. */
 	public static List<Primitive> place(Glyph glyph, Vec2 at) {
+		return place(glyph, at, GLYPH_HALF_SIZE, 0);
+	}
+
+	/**
+	 * Le tracé d'un glyphe à la taille et l'orientation voulues : c'est le tampon du carnet.
+	 *
+	 * @param halfSize    demi-largeur en cases (le glyphe de référence tient dans −1..1)
+	 * @param rotationDeg rotation dans le sens horaire (y vers le bas)
+	 */
+	public static List<Primitive> place(Glyph glyph, Vec2 at, double halfSize, double rotationDeg) {
+		double rad = Math.toRadians(rotationDeg);
 		List<Primitive> out = new ArrayList<>();
 		for (Primitive p : glyph.primitives()) {
-			out.add(snap(p.map(v -> v.scale(GLYPH_HALF_SIZE).add(at))));
+			Primitive placed = p.map(v -> v.rotate(rad).scale(halfSize).add(at));
+			if (placed instanceof Primitive.Arc a) {
+				// Un arc tourne aussi par ses angles, pas seulement par son centre.
+				placed = new Primitive.Arc(a.center(), a.radius(), a.startDeg() + rotationDeg, a.sweepDeg());
+			}
+			out.add(snap(placed));
 		}
 		return out;
 	}

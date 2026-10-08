@@ -21,12 +21,16 @@ import java.util.Set;
  * @param concentration réserve d'énergie, de 0 à {@link #MAX_CONCENTRATION}
  * @param mastery       maîtrise par école ({@code earth}, {@code metal}...)
  * @param granted       nœuds de savoir accordés par un livre ou un maître, sans attendre la maîtrise
+ * @param familiarity   usages de chaque glyphe tracé sans être compris ; à {@link #USES_TO_LEARN},
+ *                      il est compris
  */
 public record AlchemistData(Rank rank, Set<String> known, float concentration, Map<String, Integer> mastery,
-		Set<String> granted) {
+		Set<String> granted, Map<String, Integer> familiarity) {
 	public static final float MAX_CONCENTRATION = 20;
+	/** À force de tracer un glyphe qu'on ne comprend pas, on finit par le comprendre. */
+	public static final int USES_TO_LEARN = 5;
 	public static final AlchemistData NEW =
-			new AlchemistData(Rank.APPRENTICE, Set.of(), MAX_CONCENTRATION, Map.of(), Set.of());
+			new AlchemistData(Rank.APPRENTICE, Set.of(), MAX_CONCENTRATION, Map.of(), Set.of(), Map.of());
 
 	private static final Codec<Rank> RANK = Codec.STRING.xmap(Rank::fromSerializedName, Rank::serializedName);
 	private static final StreamCodec<ByteBuf, Rank> RANK_STREAM =
@@ -42,7 +46,9 @@ public record AlchemistData(Rank rank, Set<String> known, float concentration, M
 			Codec.FLOAT.optionalFieldOf("concentration", MAX_CONCENTRATION).forGetter(AlchemistData::concentration),
 			Codec.unboundedMap(Codec.STRING, Codec.INT).optionalFieldOf("mastery", Map.of())
 					.forGetter(AlchemistData::mastery),
-			STRING_SET.optionalFieldOf("granted", Set.of()).forGetter(AlchemistData::granted)
+			STRING_SET.optionalFieldOf("granted", Set.of()).forGetter(AlchemistData::granted),
+			Codec.unboundedMap(Codec.STRING, Codec.INT).optionalFieldOf("familiarity", Map.of())
+					.forGetter(AlchemistData::familiarity)
 	).apply(i, AlchemistData::new));
 
 	public static final StreamCodec<ByteBuf, AlchemistData> STREAM_CODEC = StreamCodec.composite(
@@ -51,41 +57,66 @@ public record AlchemistData(Rank rank, Set<String> known, float concentration, M
 			ByteBufCodecs.FLOAT, AlchemistData::concentration,
 			ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.VAR_INT), AlchemistData::mastery,
 			STRING_SET_STREAM, AlchemistData::granted,
+			ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.VAR_INT),
+			AlchemistData::familiarity,
 			AlchemistData::new);
 
 	public AlchemistData {
 		known = Set.copyOf(known);
 		mastery = Map.copyOf(mastery);
 		granted = Set.copyOf(granted);
+		familiarity = Map.copyOf(familiarity);
 	}
 
 	public AlchemistData learn(String glyph) {
 		Set<String> more = new HashSet<>(known);
 		more.add(glyph);
-		return new AlchemistData(rank, more, concentration, mastery, granted);
+		Map<String, Integer> rest = new HashMap<>(familiarity);
+		rest.remove(glyph);
+		return new AlchemistData(rank, more, concentration, mastery, granted, rest);
 	}
 
 	public AlchemistData forgetAll() {
-		return new AlchemistData(rank, Set.of(), concentration, mastery, granted);
+		return new AlchemistData(rank, Set.of(), concentration, mastery, granted, Map.of());
 	}
 
 	public AlchemistData withConcentration(float value) {
-		return new AlchemistData(rank, known, Math.clamp(value, 0, MAX_CONCENTRATION), mastery, granted);
+		return new AlchemistData(rank, known, Math.clamp(value, 0, MAX_CONCENTRATION), mastery, granted,
+				familiarity);
 	}
 
 	public AlchemistData withRank(Rank value) {
-		return new AlchemistData(value, known, concentration, mastery, granted);
+		return new AlchemistData(value, known, concentration, mastery, granted, familiarity);
 	}
 
 	public AlchemistData addMastery(String school, int amount) {
 		Map<String, Integer> more = new HashMap<>(mastery);
 		more.merge(school, amount, Integer::sum);
-		return new AlchemistData(rank, known, concentration, more, granted);
+		return new AlchemistData(rank, known, concentration, more, granted, familiarity);
 	}
 
 	public AlchemistData grant(String node) {
 		Set<String> more = new HashSet<>(granted);
 		more.add(node);
-		return new AlchemistData(rank, known, concentration, mastery, more);
+		return new AlchemistData(rank, known, concentration, mastery, more, familiarity);
+	}
+
+	/** Usages d'un glyphe pas encore compris. */
+	public int uses(String glyph) {
+		return familiarity.getOrDefault(glyph, 0);
+	}
+
+	/** Un usage de plus d'un glyphe pas encore compris ; au dernier, il est compris. */
+	public AlchemistData practiceGlyph(String glyph) {
+		if (known.contains(glyph)) {
+			return this;
+		}
+		int uses = uses(glyph) + 1;
+		if (uses >= USES_TO_LEARN) {
+			return learn(glyph);
+		}
+		Map<String, Integer> more = new HashMap<>(familiarity);
+		more.put(glyph, uses);
+		return new AlchemistData(rank, known, concentration, mastery, granted, more);
 	}
 }

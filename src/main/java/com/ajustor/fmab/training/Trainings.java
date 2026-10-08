@@ -1,5 +1,7 @@
 package com.ajustor.fmab.training;
 
+import net.minecraft.world.item.ItemStack;
+import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.data.AlchemistData;
@@ -65,6 +67,12 @@ public final class Trainings {
 							Component.translatable(key))));
 		}
 		player.setAttached(FmabAttachments.ALCHEMIST, data);
+		trial.tome().ifPresent(t -> {
+			ItemStack tome = Tomes.stack(t);
+			if (!player.getInventory().add(tome)) {
+				player.drop(tome, false);
+			}
+		});
 		player.setAttached(FmabAttachments.TRAINING, training.reward(trial.id()));
 		player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1, 1.2f);
 		return true;

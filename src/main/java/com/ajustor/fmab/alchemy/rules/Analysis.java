@@ -16,6 +16,8 @@ import java.util.Set;
  * @param stability       capacité du polygone rapportée à la charge, sur l'étage le plus faible ;
  *                        en dessous de 1, le cercle rebondit
  * @param reboundSeverity de 0 (rien) à 1 (le support est détruit)
+ * @param risk            probabilité qu'un cercle qui devrait fonctionner rebondisse quand même,
+ *                        parce que l'alchimiste y trace des glyphes qu'il ne comprend pas
  */
 public record Analysis(
 		ParsedCircle parsed,
@@ -26,7 +28,8 @@ public record Analysis(
 		List<StageEffect> effects,
 		List<CircleIssue> issues,
 		Outcome outcome,
-		double reboundSeverity
+		double reboundSeverity,
+		double risk
 ) {
 	public Analysis {
 		effects = List.copyOf(effects);
@@ -34,7 +37,7 @@ public record Analysis(
 	}
 
 	public enum Outcome {
-		/** Le cercle ne réagit pas : rien à faire, ou l'alchimiste ne le comprend pas. */
+		/** Le cercle ne réagit pas : rien à faire, ou au-delà du rang de l'alchimiste. */
 		INERT,
 		/** L'énergie revient sur l'alchimiste. */
 		REBOUND,
