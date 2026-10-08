@@ -55,9 +55,28 @@ joueur compose lui-même :
   bibliothèque, maisons), et le hameau de Resembool (maison des Rockbell, fermes, champs).
   `/locate structure fmab:central`.
 
-Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/glyph`), combinaisons
-(`data/<ns>/combination`), valeurs d'échange (`data/<ns>/exchange`), éléments visés (tags
-`fmab:element/*`), pages du Traité. Textes en français et en anglais.
+**v0.4 (Porte), en cours :**
+
+- **Savoir** : un glyphe qu'on ne comprend pas fonctionne, avec 25 % de risque de rebond chacun ; on
+  le comprend après cinq usages, ou en lisant un **tome d'alchimie** (Rudiments au départ, tomes
+  d'Izumi, de l'examen d'État et de Hohenheim). Le Traité décrit sans enseigner. Le carnet pose au
+  **tampon** les glyphes compris.
+- **Transmutation humaine** : glyphe Humain et Recomposer, ingrédients d'un corps et sang de
+  l'alchimiste. Elle échoue toujours : une créature difforme naît du cercle, l'alchimiste est happé
+  dans l'**Espace blanc**, devant sa Porte et la Vérité.
+- **Péage** selon l'ambition : un bras (la main ne tient plus rien), une jambe (lent, sans course),
+  les organes (−4 cœurs, toux), la vue (voile sombre), ou le corps entier : l'âme est scellée dans
+  une armure, sans faim ni souffle, les coups bosselent l'armure, le sceau effacé l'âme s'en va.
+- **Transmutation sans cercle** pour les Initiés de la Porte : Maj+G joint les mains et lance le
+  cercle sélectionné du carnet.
+- **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : établi d'automail, usure,
+  réparation chez **Winry**, dans la ville de **Rush Valley** (`/locate structure fmab:rush_valley`).
+  À Resembool, la maison des Elric garde les notes de Hohenheim.
+
+Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/fmab/glyph`), combinaisons
+(`data/<ns>/fmab/combination`), valeurs d'échange (`data/<ns>/fmab/exchange`), éléments visés (tags
+`fmab:element/*`), pages du Traité, Espace blanc (`data/fmab/dimension`). Textes en français et en
+anglais.
 
 ### Compiler
 
@@ -92,6 +111,13 @@ engraving), alchemist gloves cast with a key, Izumi's trials and sparring, and a
 against a stone golem bound to its circle, the State Alchemist's watch, embroidered garments and
 ritual tattoos bearing passive circles, and two generated places: the walled Central City and the
 hamlet of Resembool.
+
+**v0.4 (Gate), in progress:** glyphs you do not understand work with a risk of rebound and are
+learned through practice or alchemy tomes, and the notebook stamps the ones you know; human
+transmutation drags the alchemist into the White Space before their Gate and Truth, which takes a
+toll weighed by ambition (an arm, a leg, the organs, the sight, or the whole body with the soul
+sealed into armor); Gate initiates transmute without a circle by joining their hands; automail
+(iron, Rush Valley, Briggs) replaces lost limbs and is repaired by Winry in the town of Rush Valley.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 

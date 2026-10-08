@@ -4,6 +4,8 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.client.render.IzumiRenderer;
 import com.ajustor.fmab.client.render.StateExaminerRenderer;
 import com.ajustor.fmab.client.render.StoneGolemRenderer;
+import com.ajustor.fmab.client.render.TruthRenderer;
+import com.ajustor.fmab.client.render.WinryRenderer;
 import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.screen.ExamScreen;
 import com.ajustor.fmab.client.screen.TattooScreen;
@@ -11,11 +13,15 @@ import com.ajustor.fmab.client.screen.GlovesScreen;
 import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
+import com.ajustor.fmab.client.screen.WinryScreen;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.network.CastGlovesPayload;
 import com.ajustor.fmab.network.OpenExamPayload;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.network.OpenTattooPayload;
+import com.ajustor.fmab.network.OpenWinryPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
 import com.ajustor.fmab.registry.FmabComponents;
@@ -63,6 +69,10 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.IZUMI, IzumiRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.STATE_EXAMINER, StateExaminerRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.STONE_GOLEM, StoneGolemRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.TRUTH, TruthRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.WINRY, WinryRenderer::new);
+		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,
+				(payload, context) -> context.client().gui.setScreen(new WinryScreen(payload.entityId())));
 		ClientPlayNetworking.registerGlobalReceiver(OpenTattooPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TattooScreen(payload)));
 		ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> {
@@ -77,6 +87,40 @@ public class FmabClient implements ClientModInitializer {
 		BlockEntityRendererRegistry.register(FmabBlockEntities.TRANSMUTATION_CIRCLE, TransmutationCircleRenderer::new);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("concentration"),
 				(graphics, delta) -> concentrationBar(graphics));
+		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("lost_sight"),
+				(graphics, delta) -> lostSight(graphics));
+	}
+
+	/**
+	 * La vue que la Vérité a prise : un voile noir qui ne laisse qu'un trou flou au centre, comme
+	 * Mustang après le Jour promis.
+	 */
+	private static void lostSight(GuiGraphicsExtractor graphics) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null) {
+			return;
+		}
+		GateState gate = mc.player.getAttached(FmabAttachments.GATE);
+		if (gate == null || !gate.lost(BodyPart.SIGHT) || gate.soulBound()) {
+			return;
+		}
+		int w = graphics.guiWidth();
+		int h = graphics.guiHeight();
+		int cx = w / 2;
+		int cy = h / 2;
+		double clear = Math.min(w, h) * 0.18;
+		double dark = Math.min(w, h) * 0.55;
+		int step = 6;
+		for (int y = 0; y < h; y += step) {
+			for (int x = 0; x < w; x += step) {
+				double d = Math.hypot(x + step / 2.0 - cx, (y + step / 2.0 - cy) * 1.2);
+				double t = Math.clamp((d - clear) / (dark - clear), 0, 1);
+				int alpha = (int) (t * 250);
+				if (alpha > 0) {
+					graphics.fill(x, y, x + step, y + step, alpha << 24);
+				}
+			}
+		}
 	}
 
 	/**

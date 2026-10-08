@@ -1,0 +1,221 @@
+package com.ajustor.fmab.gate;
+
+import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.alchemy.glyph.Rank;
+import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.entity.TruthEntity;
+import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabBlocks;
+import com.ajustor.fmab.registry.FmabEntities;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
+/**
+ * La visite de l'Espace blanc : l'alchimiste arrive devant sa Porte, la Vérité lui parle, la Porte
+ * s'ouvre, le savoir déferle, la Vérité prend son péage, et l'alchimiste se réveille sur son cercle.
+ * Chaque étape a son heure ; la visite est enregistrée sur le joueur, elle reprend s'il se déconnecte.
+ */
+public final class GateOfTruth {
+	public static final ResourceKey<Level> WHITE_SPACE = ResourceKey.create(Registries.DIMENSION, Fmab.id("white_space"));
+
+	/** Où l'on se tient : face à la Porte, au nord. */
+	private static final Vec3 ARRIVAL = new Vec3(0.5, 1, 6.5);
+	private static final Vec3 TRUTH = new Vec3(0.5, 1, 3.5);
+	/** La Porte : douze de haut, huit de large, au nord de la Vérité. */
+	private static final int GATE_Z = -2;
+	private static final int GATE_HALF_WIDTH = 4;
+	private static final int GATE_HEIGHT = 12;
+
+	private static final int GREETING = 40;
+	private static final int PRESENTATION = 110;
+	private static final int OPENING = 190;
+	private static final int KNOWLEDGE = 250;
+	private static final int TOLL = 330;
+	private static final int RETURN = 400;
+
+	private GateOfTruth() {
+	}
+
+	public static void register() {
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+				GateState gate = player.getAttached(FmabAttachments.GATE);
+				if (gate != null && gate.visit().isPresent()) {
+					step(server, player, gate, gate.visit().get());
+				} else if (player.level().dimension() == WHITE_SPACE && player.tickCount % 20 == 0) {
+					// Personne ne reste dans l'Espace blanc sans y avoir été appelé.
+					sendHome(server, player, null);
+				}
+			}
+		});
+	}
+
+	private static void step(MinecraftServer server, ServerPlayer player, GateState gate, GateState.Visit visit) {
+		ServerLevel space = server.getLevel(WHITE_SPACE);
+		if (space == null) {
+			Fmab.LOGGER.error("Dimension {} introuvable : la Porte ne peut pas s'ouvrir", WHITE_SPACE.identifier());
+			player.setAttached(FmabAttachments.GATE, gate.withVisit(null));
+			return;
+		}
+		if (visit.ticks() < 0 || player.level() != space) {
+			if (visit.ticks() >= 0) {
+				// Revenu d'ailleurs (mort, commande) au milieu de la visite : on la reprend au début.
+				visit = new GateState.Visit(visit.dimension(), visit.origin(), visit.ambition(), visit.severe(), -1);
+			}
+			arrive(space, player);
+			player.setAttached(FmabAttachments.GATE, gate.withVisit(visit.tick()));
+			return;
+		}
+		int t = visit.ticks();
+		switch (t) {
+			case GREETING -> say(player, "truth.fmab.greeting");
+			case PRESENTATION -> say(player, "truth.fmab.presentation");
+			case OPENING -> open(space, player);
+			case KNOWLEDGE -> knowledge(space, player);
+			case TOLL -> gate = toll(player, gate, visit);
+			default -> {
+			}
+		}
+		if (t > OPENING && t < TOLL && t % 4 == 0) {
+			blackArms(space, player);
+		}
+		if (t >= RETURN) {
+			close(space);
+			player.setAttached(FmabAttachments.GATE, gate.withVisit(null));
+			sendHome(server, player, visit);
+			return;
+		}
+		player.setAttached(FmabAttachments.GATE, gate.withVisit(visit.tick()));
+	}
+
+	private static void arrive(ServerLevel space, ServerPlayer player) {
+		build(space);
+		player.teleport(new TeleportTransition(space, ARRIVAL, Vec3.ZERO, 180, 0, TeleportTransition.DO_NOTHING));
+		AABB around = new AABB(BlockPos.containing(TRUTH)).inflate(4);
+		if (space.getEntitiesOfClass(TruthEntity.class, around).isEmpty()) {
+			TruthEntity truth = FmabEntities.TRUTH.create(space, EntitySpawnReason.TRIGGERED);
+			if (truth != null) {
+				truth.snapTo(TRUTH.x, TRUTH.y, TRUTH.z, 0, 0);
+				space.addFreshEntity(truth);
+			}
+		}
+		space.playSound(null, BlockPos.containing(ARRIVAL), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1, 0.5f);
+	}
+
+	/** La Porte fermée : un cadre de pierre sculptée, deux battants de pierre. */
+	private static void build(ServerLevel space) {
+		for (int x = -GATE_HALF_WIDTH; x < GATE_HALF_WIDTH; x++) {
+			for (int y = 1; y <= GATE_HEIGHT; y++) {
+				space.setBlockAndUpdate(new BlockPos(x, y, GATE_Z), FmabBlocks.GATE_STONE.defaultBlockState());
+				space.setBlockAndUpdate(new BlockPos(x, y, GATE_Z - 1), FmabBlocks.GATE_DARKNESS.defaultBlockState());
+			}
+		}
+	}
+
+	private static void close(ServerLevel space) {
+		build(space);
+		space.getEntitiesOfClass(TruthEntity.class, new AABB(BlockPos.containing(TRUTH)).inflate(8))
+				.forEach(TruthEntity::discard);
+	}
+
+	private static void open(ServerLevel space, ServerPlayer player) {
+		BlockState air = Blocks.AIR.defaultBlockState();
+		for (int x = -GATE_HALF_WIDTH + 1; x < GATE_HALF_WIDTH - 1; x++) {
+			for (int y = 1; y < GATE_HEIGHT; y++) {
+				space.setBlockAndUpdate(new BlockPos(x, y, GATE_Z), air);
+			}
+		}
+		space.playSound(null, new BlockPos(0, 4, GATE_Z), SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 2, 0.5f);
+		say(player, "truth.fmab.opening");
+	}
+
+	/** Le savoir déferle : des images, trop, trop vite. */
+	private static void knowledge(ServerLevel space, ServerPlayer player) {
+		player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 160, 0, false, false));
+		player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 50, 0, false, false));
+		space.playSound(null, player.blockPosition(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 1, 0.5f);
+		say(player, "truth.fmab.knowledge");
+	}
+
+	/** Les bras noirs sortent de la Porte et tirent l'alchimiste vers elle. */
+	private static void blackArms(ServerLevel space, ServerPlayer player) {
+		for (int i = 0; i < 6; i++) {
+			double x = (space.getRandom().nextDouble() - 0.5) * 2 * (GATE_HALF_WIDTH - 1);
+			double y = 1 + space.getRandom().nextDouble() * (GATE_HEIGHT - 2);
+			Vec3 toward = player.position().add(0, 1, 0).subtract(x, y, GATE_Z + 0.5).normalize().scale(0.6);
+			space.sendParticles(ParticleTypes.SQUID_INK, x, y, GATE_Z + 0.5, 0, toward.x, toward.y, toward.z, 1);
+		}
+		player.push(0, 0, -0.02);
+		player.hurtMarked = true;
+	}
+
+	/** La Vérité prend son dû ; l'alchimiste a vu la Porte, il transmute désormais sans cercle. */
+	private static GateState toll(ServerPlayer player, GateState gate, GateState.Visit visit) {
+		BodyPart part = TollChooser.choose(gate.lost(), visit.ambition(), visit.severe(), player.getRandom().nextDouble());
+		if (part == BodyPart.BODY && gate.soulBound()) {
+			// Une âme déjà sans corps n'a plus rien à donner que son sceau.
+			say(player, "truth.fmab.toll.nothing_left");
+			player.setAttached(FmabAttachments.GATE, gate.releaseSoul().withVisit(null));
+			player.kill(player.level());
+			return player.getAttachedOrCreate(FmabAttachments.GATE);
+		}
+		GateState paid = gate.pay(part);
+		player.setAttached(FmabAttachments.GATE, paid);
+		say(player, "truth.fmab.toll");
+		player.sendSystemMessage(Component.translatable("gate.fmab.toll_taken",
+				Component.translatable(part.translationKey())).withStyle(s -> s.withColor(0xB0201A)));
+		player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1, 0.5f);
+		if (part == BodyPart.BODY) {
+			SoulArmor.bind(player);
+		}
+		Tolls.dropFromLostHands(player, paid);
+		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		if (!me.rank().atLeast(Rank.GATE)) {
+			player.setAttached(FmabAttachments.ALCHEMIST, me.withRank(Rank.GATE));
+			player.sendSystemMessage(Component.translatable("gate.fmab.initiated",
+					Component.translatable(Rank.GATE.translationKey())));
+		}
+		return paid;
+	}
+
+	private static void say(ServerPlayer player, String key) {
+		player.sendSystemMessage(Component.translatable(key).withStyle(s -> s.withItalic(true).withColor(0x9A9A9A)));
+	}
+
+	/** Le réveil sur le cercle, ou au point d'apparition si le cercle n'est plus accessible. */
+	private static void sendHome(MinecraftServer server, ServerPlayer player, GateState.Visit visit) {
+		ServerLevel home = null;
+		Vec3 at = null;
+		if (visit != null) {
+			home = server.getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(visit.dimension())));
+			at = Vec3.atBottomCenterOf(visit.origin());
+		}
+		if (home == null) {
+			home = server.overworld();
+			at = Vec3.atBottomCenterOf(home.getRespawnData().pos());
+		}
+		player.teleport(new TeleportTransition(home, at, Vec3.ZERO, player.getYRot(), 0,
+				TeleportTransition.DO_NOTHING));
+		player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100, 2, false, false));
+	}
+}

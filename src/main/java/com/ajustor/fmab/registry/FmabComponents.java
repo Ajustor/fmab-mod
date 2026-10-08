@@ -66,6 +66,15 @@ public final class FmabComponents {
 					.networkSynchronized(Tome.STREAM_CODEC)
 					.build());
 
+	/** Le sceau de sang tracé dans le plastron d'une armure d'âme : l'UUID de l'âme qui l'habite. */
+	public static final DataComponentType<String> BLOOD_SEAL = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("blood_seal"),
+			DataComponentType.<String>builder()
+					.persistent(Codec.STRING)
+					.networkSynchronized(ByteBufCodecs.STRING_UTF8)
+					.build());
+
 	private FmabComponents() {
 	}
 

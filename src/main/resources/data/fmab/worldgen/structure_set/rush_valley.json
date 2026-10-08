@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 742911305,
+    "separation": 16,
+    "spacing": 44
+  },
+  "structures": [
+    {
+      "structure": "fmab:rush_valley",
+      "weight": 1
+    }
+  ]
+}

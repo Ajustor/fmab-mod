@@ -2,9 +2,11 @@ package com.ajustor.fmab.world;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Plan d'un bâtiment ou d'un ouvrage : quel bloc mettre à chaque position locale. Une fonction
@@ -20,6 +22,14 @@ public interface Blueprint {
 	 * @return l'état à poser, ou null pour laisser le monde tel quel
 	 */
 	BlockState at(int x, int y, int z, Plot plot);
+
+	/**
+	 * Coffres à poser et à remplir, en coordonnées locales. Le contenu est une fonction de la graine,
+	 * pour que deux maisons d'une même sorte n'aient pas les mêmes trésors.
+	 */
+	default List<Chest> chests(Plot plot) {
+		return List.of();
+	}
 
 	/** Créatures à faire apparaître, en coordonnées locales. */
 	default List<Spawn> spawns(Plot plot) {
@@ -49,5 +59,9 @@ public interface Blueprint {
 	}
 
 	record Spawn(EntityType<?> type, BlockPos local) {
+	}
+
+	/** Un coffre et ce qu'il contient ; il fait face à l'avant du bâtiment. */
+	record Chest(BlockPos local, Function<Plot, List<ItemStack>> contents) {
 	}
 }

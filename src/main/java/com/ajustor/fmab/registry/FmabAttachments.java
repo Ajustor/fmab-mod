@@ -2,7 +2,9 @@ package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.Automail;
 import com.ajustor.fmab.data.ExamProgress;
+import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.data.Training;
@@ -49,6 +51,22 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.syncWith(Tattoos.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("tattoos"));
+
+	/** Ce que la Porte a pris, et la visite en cours ; le client voit ce qui manque (vue, mains). */
+	public static final AttachmentType<GateState> GATE = AttachmentRegistry.<GateState>builder()
+			.persistent(GateState.CODEC)
+			.initializer(() -> GateState.NONE)
+			.copyOnDeath()
+			.syncWith(GateState.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("gate"));
+
+	/** Les automails posés sur les membres perdus. */
+	public static final AttachmentType<Automail> AUTOMAIL = AttachmentRegistry.<Automail>builder()
+			.persistent(Automail.CODEC)
+			.initializer(() -> Automail.NONE)
+			.copyOnDeath()
+			.syncWith(Automail.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("automail"));
 
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()

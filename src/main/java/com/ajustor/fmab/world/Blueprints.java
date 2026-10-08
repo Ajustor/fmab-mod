@@ -1,9 +1,15 @@
 package com.ajustor.fmab.world;
 
+import com.ajustor.fmab.item.Tomes;
+import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
@@ -15,6 +21,7 @@ import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +64,10 @@ public final class Blueprints {
 		out.put("resembool_house", (x, y, z, p) -> house(x, y, z, p, RURAL_PALETTES[p.variant(RURAL_PALETTES.length)]));
 		out.put("rockbell_house", Blueprints::rockbell);
 		out.put("resembool_field", Blueprints::field);
+		out.put("elric_house", new ElricHouse());
+		out.put("rush_valley_workshop", new Workshop(false));
+		out.put("rush_valley_shop", new Workshop(true));
+		out.put("rush_valley_square", Blueprints::square);
 		plans = out;
 		return plans;
 	}
@@ -387,10 +398,130 @@ public final class Blueprints {
 				case 0 -> b(Blocks.ANVIL);
 				case 1 -> b(Blocks.SMITHING_TABLE);
 				case 2 -> b(Blocks.GRINDSTONE);
-				default -> b(Blocks.CRAFTING_TABLE);
+				default -> b(FmabBlocks.AUTOMAIL_BENCH);
 			};
 		}
 		return shell;
+	}
+
+	/**
+	 * La maison des Elric : une ferme ordinaire, mais le bureau de Hohenheim est resté tel qu'il
+	 * l'a laissé. Ses notes de recherche dorment dans un coffre, sous les étagères.
+	 */
+	private static final class ElricHouse implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			BlockState shell = house(x, y, z, p, RURAL_PALETTES[1]);
+			int sx = p.sizeX(), sz = p.sizeZ();
+			boolean inside = x > 0 && x < sx - 1 && z > 0 && z < sz - 1;
+			if (!inside) {
+				return shell;
+			}
+			// Le bureau : des étagères le long du mur du fond, un pupitre.
+			if (z == sz - 2 && (y == 1 || y == 2) && x > 1) {
+				return b(Blocks.BOOKSHELF);
+			}
+			if (z == sz - 3 && y == 1 && x == sx / 2) {
+				return b(Blocks.LECTERN);
+			}
+			return shell;
+		}
+
+		@Override
+		public List<Chest> chests(Plot p) {
+			return List.of(new Chest(new BlockPos(1, 1, p.sizeZ() - 2), plot -> List.of(
+					Tomes.stack(Tomes.HOHENHEIM),
+					Tomes.stack(Tomes.RUDIMENTS),
+					new ItemStack(Items.PAPER, 3 + plot.noise(1, 1, 1, 5)),
+					new ItemStack(Items.BONE_MEAL, 2 + plot.noise(2, 1, 1, 4)))));
+		}
+	}
+
+	private static final Palette RUSH_VALLEY_PALETTE = new Palette(b(Blocks.SMOOTH_SANDSTONE), b(Blocks.CUT_SANDSTONE),
+			b(Blocks.SPRUCE_PLANKS), b(Blocks.SANDSTONE), Blocks.SANDSTONE_STAIRS, b(Blocks.CUT_SANDSTONE),
+			Blocks.SPRUCE_DOOR);
+
+	/**
+	 * Un atelier d'automail de Rush Valley : grès, enclumes et établis contre le mur du fond, des
+	 * pièces dans le coffre. La boutique de Garfiel accueille Winry.
+	 */
+	private static final class Workshop implements Blueprint {
+		private final boolean winry;
+
+		Workshop(boolean winry) {
+			this.winry = winry;
+		}
+
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			BlockState shell = house(x, y, z, p, RUSH_VALLEY_PALETTE);
+			int sx = p.sizeX(), sz = p.sizeZ();
+			boolean inside = x > 0 && x < sx - 1 && z > 0 && z < sz - 1;
+			if (!inside || y != 1 || z != sz - 2 || x == 1) {
+				return shell;
+			}
+			return switch ((x + p.variant(3)) % 4) {
+				case 0 -> b(Blocks.ANVIL);
+				case 1 -> b(FmabBlocks.AUTOMAIL_BENCH);
+				case 2 -> b(Blocks.GRINDSTONE);
+				default -> b(Blocks.SMITHING_TABLE);
+			};
+		}
+
+		@Override
+		public List<Chest> chests(Plot p) {
+			return List.of(new Chest(new BlockPos(1, 1, p.sizeZ() - 2), Workshop::stock));
+		}
+
+		/** Des pièces de rechange, du fer, et parfois un automail complet. */
+		private static List<ItemStack> stock(Plot p) {
+			Item[] parts = {FmabItems.RUSH_VALLEY_AUTOMAIL_ARM, FmabItems.RUSH_VALLEY_AUTOMAIL_LEG,
+					FmabItems.IRON_AUTOMAIL_ARM, FmabItems.IRON_AUTOMAIL_LEG};
+			List<ItemStack> out = new ArrayList<>();
+			out.add(new ItemStack(Items.IRON_INGOT, 2 + p.noise(3, 0, 0, 6)));
+			out.add(new ItemStack(Items.REDSTONE, 1 + p.noise(4, 0, 0, 4)));
+			if (p.noise(5, 0, 0, 3) == 0) {
+				out.add(new ItemStack(parts[p.noise(6, 0, 0, parts.length)]));
+			}
+			return out;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			return winry ? List.of(new Spawn(FmabEntities.WINRY, new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2)))
+					: List.of();
+		}
+	}
+
+	/** La place de Rush Valley : un dallage de grès, des lanternes aux coins, un puits au centre. */
+	private static BlockState square(int x, int y, int z, Blueprint.Plot p) {
+		int sx = p.sizeX(), sz = p.sizeZ();
+		int cx = sx / 2, cz = sz / 2;
+		boolean well = Math.abs(x - cx) <= 1 && Math.abs(z - cz) <= 1;
+		boolean corner = (x == 1 || x == sx - 2) && (z == 1 || z == sz - 2);
+		if (y < -1) {
+			return b(Blocks.SANDSTONE);
+		}
+		if (y == -1) {
+			if (well) {
+				return x == cx && z == cz ? b(Blocks.WATER) : b(Blocks.CUT_SANDSTONE);
+			}
+			return (x + z) % 2 == 0 ? b(Blocks.SMOOTH_SANDSTONE) : b(Blocks.CUT_SANDSTONE);
+		}
+		if (well) {
+			if (x == cx && z == cz) {
+				return y == 0 ? AIR : y <= 2 ? AIR : null;
+			}
+			return y == 0 ? b(Blocks.SANDSTONE_WALL) : y <= 2 ? AIR : null;
+		}
+		if (corner) {
+			return switch (y) {
+				case 0, 1 -> b(Blocks.SANDSTONE_WALL);
+				case 2 -> b(Blocks.LANTERN);
+				default -> null;
+			};
+		}
+		return y <= 2 ? AIR : null;
 	}
 
 	/** Champ de blé clos, avec un point d'eau au centre. */

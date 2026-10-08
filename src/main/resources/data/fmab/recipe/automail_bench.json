@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "RCR",
+    "PPP"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone",
+    "C": "minecraft:crafting_table",
+    "P": "#minecraft:planks"
+  },
+  "result": {
+    "id": "fmab:automail_bench",
+    "count": 1
+  }
+}

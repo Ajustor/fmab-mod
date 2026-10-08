@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "minecraft:block/iron_block",
+    "up": "fmab:block/automail_bench_top",
+    "north": "fmab:block/automail_bench_side",
+    "south": "fmab:block/automail_bench_side",
+    "east": "fmab:block/automail_bench_side",
+    "west": "fmab:block/automail_bench_side",
+    "particle": "fmab:block/automail_bench_side"
+  }
+}

@@ -8,6 +8,8 @@ import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.alchemy.rules.Combination;
+import com.ajustor.fmab.gate.BodyPart;
+import com.ajustor.fmab.gate.HumanTransmutation;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -70,6 +72,12 @@ class LocalizationTest {
 		}
 		for (Combination c : TestGlyphs.combinations().all()) {
 			needed.add("knowledge.fmab.school." + c.school());
+		}
+		for (BodyPart p : BodyPart.values()) {
+			needed.add(p.translationKey());
+		}
+		for (HumanTransmutation.Ingredient i : HumanTransmutation.INGREDIENTS) {
+			needed.add(i.nameKey());
 		}
 		for (TattooSlot s : TattooSlot.values()) {
 			needed.add(s.translationKey());

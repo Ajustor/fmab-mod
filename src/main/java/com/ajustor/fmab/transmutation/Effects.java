@@ -2,6 +2,7 @@ package com.ajustor.fmab.transmutation;
 
 import com.ajustor.fmab.alchemy.exchange.Family;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
+import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabTags;
 import net.minecraft.core.BlockPos;
@@ -9,10 +10,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BlockItem;
@@ -247,6 +250,17 @@ public final class Effects {
 			ItemStack stack = entity.getItem();
 			if (stack.isDamaged() && stack.isValidRepairItem(ingot)) {
 				damaged.add(stack);
+			}
+		}
+		// Une âme scellée dans une armure, debout sur le cercle : on la répare comme Ed répare Al.
+		for (ServerPlayer soul : level.getEntitiesOfClass(ServerPlayer.class, ctx.onCircle().expandTowards(0, 1, 0),
+				p -> p.getAttachedOrCreate(FmabAttachments.GATE).soulBound())) {
+			for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS,
+					EquipmentSlot.FEET}) {
+				ItemStack piece = soul.getItemBySlot(slot);
+				if (piece.isDamaged() && piece.isValidRepairItem(ingot)) {
+					damaged.add(piece);
+				}
 			}
 		}
 		if (damaged.isEmpty()) {

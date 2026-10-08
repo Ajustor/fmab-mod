@@ -4,6 +4,8 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.StoneGolemEntity;
+import com.ajustor.fmab.entity.TruthEntity;
+import com.ajustor.fmab.entity.WinryEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -42,6 +44,26 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(GOLEM_KEY));
 
+	private static final ResourceKey<EntityType<?>> TRUTH_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("truth"));
+
+	/** La Vérité, devant la Porte. */
+	public static final EntityType<TruthEntity> TRUTH = Registry.register(BuiltInRegistries.ENTITY_TYPE, TRUTH_KEY,
+			EntityType.Builder.<TruthEntity>of(TruthEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.8F)
+					.eyeHeight(1.62F)
+					.clientTrackingRange(10)
+					.build(TRUTH_KEY));
+
+	private static final ResourceKey<EntityType<?>> WINRY_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("winry"));
+
+	/** Winry Rockbell, mécanicienne d'automail à Rush Valley. */
+	public static final EntityType<WinryEntity> WINRY = Registry.register(BuiltInRegistries.ENTITY_TYPE, WINRY_KEY,
+			EntityType.Builder.<WinryEntity>of(WinryEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.8F)
+					.eyeHeight(1.62F)
+					.clientTrackingRange(10)
+					.build(WINRY_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -49,5 +71,7 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(IZUMI, IzumiEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(STATE_EXAMINER, StateExaminerEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(STONE_GOLEM, StoneGolemEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(TRUTH, TruthEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(WINRY, WinryEntity.createAttributes());
 	}
 }

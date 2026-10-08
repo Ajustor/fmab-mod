@@ -1,6 +1,10 @@
 package com.ajustor.fmab;
 
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.gate.Automails;
+import com.ajustor.fmab.gate.GateOfTruth;
+import com.ajustor.fmab.gate.HumanTransmutation;
+import com.ajustor.fmab.gate.Tolls;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.network.FmabNetwork;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -48,6 +52,10 @@ public class Fmab implements ModInitializer {
 		FmabCommands.register();
 		Concentration.register();
 		Passives.register();
+		HumanTransmutation.register();
+		GateOfTruth.register();
+		Tolls.register();
+		Automails.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> equip(handler.getPlayer()));
 		// Gantelets : frapper un bloc, main libre, y lance leur cercle au lieu de commencer à le casser.
 		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
