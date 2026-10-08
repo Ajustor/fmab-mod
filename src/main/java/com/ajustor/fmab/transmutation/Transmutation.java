@@ -4,6 +4,9 @@ import com.ajustor.fmab.alchemy.circle.CircleIssue;
 import com.ajustor.fmab.alchemy.circle.LinkKind;
 import com.ajustor.fmab.alchemy.circle.Stage;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.alchemy.glyph.Rank;
+import com.ajustor.fmab.alchemy.knowledge.Knowledge;
+import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -37,8 +40,9 @@ public final class Transmutation {
 	public static void activate(ServerLevel level, BlockPos circle, Direction pageUp, Drawing drawing,
 			ServerPlayer caster) {
 		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-		Analysis analysis = AlchemyRules.of(level.registryAccess())
-				.analyze(drawing, alchemist.rank(), alchemist.known());
+		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
+		Knowledge knowledge = rules.knowledge(alchemist);
+		Analysis analysis = rules.analyze(drawing, alchemist);
 
 		if (analysis.outcome() == Analysis.Outcome.INERT) {
 			CircleIssue first = analysis.issues().isEmpty() ? null : analysis.issues().getFirst();
@@ -62,6 +66,7 @@ public final class Transmutation {
 		}
 
 		boolean anything = false;
+		List<String> practiced = new ArrayList<>();
 		Effects.Result last = Effects.Result.DONE;
 		// Résultat de l'étage précédent, pour les liaisons. Un étage sans effet est transparent.
 		Effects.Result previous = Effects.Result.DONE;
@@ -79,7 +84,7 @@ public final class Transmutation {
 			}
 			Effects.Result stageResult = Effects.Result.NO_TARGET;
 			for (Analysis.StageEffect effect : effects) {
-				EffectContext ctx = new EffectContext(level, circle, pageUp, caster, effect, flow);
+				EffectContext ctx = new EffectContext(level, circle, pageUp, caster, effect, flow, knowledge);
 				Effects.Result result = Effects.get(effect.combination().effect())
 						.map(e -> e.apply(ctx))
 						.orElse(Effects.Result.NO_TARGET);
@@ -87,6 +92,7 @@ public final class Transmutation {
 				if (result == Effects.Result.DONE) {
 					stageResult = result;
 					anything = true;
+					practiced.add(effect.combination().school());
 				} else {
 					last = result;
 				}
@@ -97,6 +103,7 @@ public final class Transmutation {
 		if (anything) {
 			sparks(level, circle, 40);
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 1.4f);
+			practice(caster, rules, knowledge, practiced);
 		} else {
 			caster.sendOverlayMessage(Component.translatable(last == Effects.Result.NO_MATERIAL
 					? "transmutation.fmab.no_material"
@@ -123,6 +130,32 @@ public final class Transmutation {
 		} else {
 			level.playSound(null, circle, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1, 0.7f);
 		}
+	}
+
+	/**
+	 * On apprend en pratiquant : chaque effet réussi fait progresser la maîtrise de son école. Les
+	 * nœuds atteints sont annoncés, et un Apprenti assez expérimenté devient Alchimiste.
+	 */
+	private static void practice(ServerPlayer caster, AlchemyRules rules, Knowledge before, List<String> schools) {
+		AlchemistData data = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		for (String school : schools) {
+			data = data.addMastery(school, Knowledge.MASTERY_PER_EFFECT);
+		}
+		Knowledge after = rules.knowledge(data);
+		for (KnowledgeNode node : after.nodes()) {
+			if (after.has(node.id()) && !before.has(node.id())) {
+				caster.sendSystemMessage(Component.translatable("knowledge.fmab.unlocked",
+						Component.translatable(node.nameKey())));
+			}
+		}
+		if (data.rank() == Rank.APPRENTICE && after.totalMastery() >= Knowledge.ALCHEMIST_MASTERY) {
+			data = data.withRank(Rank.ALCHEMIST);
+			caster.sendSystemMessage(Component.translatable("knowledge.fmab.promoted",
+					Component.translatable(Rank.ALCHEMIST.translationKey())));
+			caster.level().playSound(null, caster.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS,
+					1, 1);
+		}
+		caster.setAttached(FmabAttachments.ALCHEMIST, data);
 	}
 
 	/** L'étage reçoit-il l'énergie, compte tenu de sa liaison et du sort de l'étage précédent ? */

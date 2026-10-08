@@ -1,6 +1,8 @@
 package com.ajustor.fmab.transmutation;
 
 import com.ajustor.fmab.alchemy.exchange.Family;
+import com.ajustor.fmab.item.TransmutedWeaponItem;
+import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -64,6 +66,8 @@ public final class Effects {
 	private static final int INGOT_MASS = 9;
 	private static final float FLAME_DAMAGE = 4;
 	private static final float BURST_DAMAGE = 7;
+	/** Une lance de pierre demande deux blocs. */
+	private static final int LANCE_BLOCKS = 2;
 	/** Un charbon cuit huit objets, comme au fourneau. */
 	private static final int ITEMS_PER_FUEL = 8;
 
@@ -78,6 +82,8 @@ public final class Effects {
 		register("fmab:flame_burst", ctx -> flames(ctx, 1, BURST_DAMAGE, 2));
 		register("fmab:gust", Effects::gust);
 		register("fmab:smelt", Effects::smelt);
+		register("fmab:stone_lance", Effects::stoneLance);
+		register("fmab:arm_blade", Effects::armBlade);
 	}
 
 	private Effects() {
@@ -92,24 +98,31 @@ public final class Effects {
 		return Optional.ofNullable(EFFECTS.get(id));
 	}
 
-	/** Terre + Fixer : un mur se lève devant le cercle, fait de la terre creusée juste devant lui. */
+	/**
+	 * Terre + Fixer : un mur se lève devant le cercle, fait de la terre creusée juste devant lui.
+	 * Le nœud « Mur épais » lui ajoute des couches.
+	 */
 	private static Result wall(EffectContext ctx) {
 		ServerLevel level = ctx.level();
 		Direction d = ctx.direction();
 		Direction along = d.getClockWise();
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
-		BlockPos center = ctx.origin().relative(d, 2);
+		int thickness = 1 + (int) ctx.perk("wall_thickness");
 		int moved = 0;
-		for (int i = -ctx.range(); i <= ctx.range(); i++) {
-			BlockPos column = surface(level, center.relative(along, i));
-			if (column == null) {
-				continue;
+		for (int layer = 0; layer < thickness; layer++) {
+			BlockPos center = ctx.origin().relative(d, 2 + layer);
+			for (int i = -ctx.range(); i <= ctx.range(); i++) {
+				BlockPos column = surface(level, center.relative(along, i));
+				if (column == null) {
+					continue;
+				}
+				// La terre vient de devant le mur : derrière sa dernière couche.
+				List<BlockPos> quarry = new ArrayList<>();
+				for (int k = 1; k <= WALL_HEIGHT; k++) {
+					quarry.add(column.relative(d, thickness - layer).below(k));
+				}
+				moved += raise(ctx, quarry, column, earth, WALL_HEIGHT, 0);
 			}
-			List<BlockPos> quarry = new ArrayList<>();
-			for (int k = 1; k <= WALL_HEIGHT; k++) {
-				quarry.add(column.relative(d).below(k));
-			}
-			moved += raise(ctx, quarry, column, earth, WALL_HEIGHT, 0);
 		}
 		return moved > 0 ? Result.DONE : Result.NO_MATERIAL;
 	}
@@ -330,6 +343,69 @@ public final class Effects {
 		ctx.flow().removeIf(ItemStack::isEmpty);
 		ctx.flow().addAll(results);
 		return Result.DONE;
+	}
+
+	/**
+	 * Terre + Recomposer : une lance tirée du sol, faite de deux blocs de terre ou de pierre. Elle se
+	 * défait au bout d'une minute et rend ces deux blocs.
+	 */
+	private static Result stoneLance(EffectContext ctx) {
+		ServerLevel level = ctx.level();
+		TagKey<Block> earth = FmabTags.elementBlocks("earth");
+		List<BlockState> taken = new ArrayList<>();
+		while (taken.size() < LANCE_BLOCKS) {
+			BlockState fromFlow = fromFlow(ctx, earth);
+			if (fromFlow == null) {
+				break;
+			}
+			taken.add(fromFlow);
+		}
+		List<BlockPos> dug = new ArrayList<>();
+		BlockPos below = ctx.origin().below();
+		for (Direction side : Direction.Plane.HORIZONTAL) {
+			if (taken.size() + dug.size() >= LANCE_BLOCKS) {
+				break;
+			}
+			BlockPos p = below.relative(side);
+			BlockState state = level.getBlockState(p);
+			if (state.is(earth) && !state.hasBlockEntity()) {
+				dug.add(p);
+				taken.add(state);
+			}
+		}
+		if (taken.size() < LANCE_BLOCKS) {
+			// Rien n'est consommé : ce qui venait de l'étage précédent y retourne.
+			for (int i = 0; i < taken.size() - dug.size(); i++) {
+				ctx.flow().add(new ItemStack(taken.get(i).getBlock()));
+			}
+			return Result.NO_MATERIAL;
+		}
+		dug.forEach(p -> level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState()));
+		ItemStack remains = new ItemStack(taken.getFirst().getBlock(), LANCE_BLOCKS);
+		give(ctx, TransmutedWeaponItem.create(FmabItems.STONE_LANCE, level, remains));
+		return Result.DONE;
+	}
+
+	/** Fer + Recomposer : une lame-bras, d'un lingot de fer, qu'elle rend en se défaisant. */
+	private static Result armBlade(EffectContext ctx) {
+		MaterialPool pool = MaterialPool.collect(ctx, "iron", Family.METAL);
+		if (!pool.consume(INGOT_MASS)) {
+			return Result.NO_MATERIAL;
+		}
+		ItemStack blade = TransmutedWeaponItem.create(FmabItems.ARM_BLADE, ctx.level(), new ItemStack(Items.IRON_INGOT));
+		if (ctx.stage().infused("fire")) {
+			blade.enchant(ctx.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
+					.getOrThrow(Enchantments.FIRE_ASPECT), 1);
+		}
+		give(ctx, blade);
+		return Result.DONE;
+	}
+
+	/** Une arme transmutée va droit dans la main de l'alchimiste, ou à ses pieds. */
+	private static void give(EffectContext ctx, ItemStack stack) {
+		if (!ctx.caster().getInventory().add(stack)) {
+			drop(ctx, stack);
+		}
 	}
 
 	private static Optional<ItemStack> cooked(ServerLevel level, ItemStack stack) {

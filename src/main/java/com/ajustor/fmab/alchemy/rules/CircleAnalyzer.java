@@ -11,6 +11,7 @@ import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
 import com.ajustor.fmab.alchemy.glyph.Rank;
+import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +49,7 @@ public final class CircleAnalyzer {
 
 	/** Problèmes qui empêchent toute réaction. */
 	private static final Set<Kind> INERT = EnumSet.of(Kind.NO_RING, Kind.NO_ACTION, Kind.NO_ELEMENT,
-			Kind.TOO_MANY_ACTIONS, Kind.RANK_TOO_LOW, Kind.GLYPH_NOT_LEARNED);
+			Kind.TOO_MANY_ACTIONS, Kind.RANK_TOO_LOW, Kind.GLYPH_NOT_LEARNED, Kind.KNOWLEDGE_MISSING);
 	/** Problèmes qui font rebondir le cercle, avec la gravité d'une combinaison inconnue. */
 	private static final Set<Kind> MISCOMPOSED = EnumSet.of(Kind.UNKNOWN_COMBINATION, Kind.CONFLICTING_LINKS,
 			Kind.FUSION_NEEDS_HEXAGRAM, Kind.SATELLITE_INCOMPLETE);
@@ -63,11 +64,17 @@ public final class CircleAnalyzer {
 		this.directionGlyph = glyphs.stream().filter(g -> g.is(GlyphLayer.MODIFIER, "direction")).findFirst();
 	}
 
-	/**
-	 * @param rank  rang de l'alchimiste
-	 * @param known glyphes qu'il a compris ; {@code null} pour ne pas vérifier (éditeur web)
-	 */
+	/** Analyse sans savoir : ni bonus, ni vérification des nœuds demandés (éditeur web, tests). */
 	public Analysis analyze(ParsedCircle parsed, Rank rank, Set<String> known) {
+		return analyze(parsed, rank, known, null);
+	}
+
+	/**
+	 * @param rank      rang de l'alchimiste
+	 * @param known     glyphes qu'il a compris ; {@code null} pour ne pas vérifier
+	 * @param knowledge son savoir ; {@code null} pour ignorer bonus et nœuds demandés
+	 */
+	public Analysis analyze(ParsedCircle parsed, Rank rank, Set<String> known, Knowledge knowledge) {
 		List<CircleIssue> issues = new ArrayList<>(parsed.issues());
 		List<Analysis.StageEffect> effects = new ArrayList<>();
 		int complexity = 0;
@@ -114,9 +121,16 @@ public final class CircleAnalyzer {
 				issues.add(new CircleIssue(Kind.UNLINKED_STAGE, null, Integer.toString(stage.index())));
 			}
 
-			effects.addAll(effects(stage, issues));
+			effects.addAll(effects(stage, issues, knowledge));
 		}
 		concentration *= Math.max(1, parsed.stages().size());
+		if (knowledge != null) {
+			double discount = 0;
+			for (Analysis.StageEffect e : effects) {
+				discount += knowledge.perk(e.combination().school(), "concentration_discount");
+			}
+			concentration = Math.max(1, concentration - (int) discount);
+		}
 		required = max(required, rankFor(parsed.stages().size(), Rank::maxStages));
 		required = max(required, rankFor(complexity, Rank::complexityCap));
 		required = max(required, rankFor(satelliteCount, Rank::maxSatellites));
@@ -154,7 +168,7 @@ public final class CircleAnalyzer {
 	}
 
 	/** L'effet de l'étage, puis ceux de ses satellites complets. */
-	private List<Analysis.StageEffect> effects(Stage stage, List<CircleIssue> issues) {
+	private List<Analysis.StageEffect> effects(Stage stage, List<CircleIssue> issues, Knowledge knowledge) {
 		List<Analysis.StageEffect> out = new ArrayList<>();
 		double direction = stage.direction().orElse(Double.NaN);
 
@@ -172,8 +186,8 @@ public final class CircleAnalyzer {
 			}
 		}
 
-		combination(stage.layer(GlyphLayer.ELEMENT), stage.layer(GlyphLayer.ACTION), stage.hexagram(), issues)
-				.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), -1, c, range(c, stage.intensity()),
+		combination(stage.layer(GlyphLayer.ELEMENT), stage.layer(GlyphLayer.ACTION), stage.hexagram(), issues, knowledge)
+				.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), -1, c, range(c, stage.intensity(), knowledge),
 						stage.intensity(), Vec2.ZERO, direction, infusions, stage.link())));
 
 		for (int i = 0; i < stage.satellites().size(); i++) {
@@ -183,8 +197,8 @@ public final class CircleAnalyzer {
 			}
 			int index = i;
 			// Un satellite n'a pas de polygone à lui : il ne fusionne pas deux éléments.
-			combination(s.layer(GlyphLayer.ELEMENT), s.layer(GlyphLayer.ACTION), false, issues)
-					.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), index, c, range(c, 0), 0,
+			combination(s.layer(GlyphLayer.ELEMENT), s.layer(GlyphLayer.ACTION), false, issues, knowledge)
+					.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), index, c, range(c, 0, knowledge), 0,
 							s.center(), Double.isNaN(direction) ? s.center().angle() : direction, Set.of(),
 							stage.link())));
 		}
@@ -192,7 +206,7 @@ public final class CircleAnalyzer {
 	}
 
 	private Optional<Combination> combination(List<PlacedGlyph> elements, List<PlacedGlyph> actions, boolean hexagram,
-			List<CircleIssue> issues) {
+			List<CircleIssue> issues, Knowledge knowledge) {
 		if (actions.isEmpty() && elements.isEmpty()) {
 			// Un étage vide sert de relais ou de décor : il ne fait rien et ne gêne pas.
 			return Optional.empty();
@@ -219,12 +233,19 @@ public final class CircleAnalyzer {
 		Optional<Combination> combination = combinations.find(roles, action);
 		if (combination.isEmpty()) {
 			issues.add(new CircleIssue(Kind.UNKNOWN_COMBINATION, null, String.join("+", roles) + "+" + action));
+			return combination;
+		}
+		Optional<String> missing = combination.get().requires().filter(n -> knowledge != null && !knowledge.has(n));
+		if (missing.isPresent()) {
+			issues.add(new CircleIssue(Kind.KNOWLEDGE_MISSING, null, missing.get()));
+			return Optional.empty();
 		}
 		return combination;
 	}
 
-	private static double range(Combination c, int intensity) {
-		return c.range() * (1 + INTENSITY_STEP * intensity);
+	private static double range(Combination c, int intensity, Knowledge knowledge) {
+		double bonus = knowledge == null ? 0 : knowledge.perk(c.school(), "range_bonus");
+		return (c.range() + bonus) * (1 + INTENSITY_STEP * intensity);
 	}
 
 	/** Symétrie miroir (axe vertical ou horizontal) ou demi-tour : chaque glyphe a son image. */

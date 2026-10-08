@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,13 +17,14 @@ import java.util.List;
 /**
  * Ce qu'un effet sait de la transmutation en cours.
  *
- * @param circle position du cercle (le bloc de craie, posé sur son support)
- * @param pageUp direction du monde qui correspond au haut de la page du carnet
- * @param flow   matière produite par l'étage précédent, quand il est relié en série ; les effets y
- *               puisent avant le monde, et y déposent ce qu'ils décomposent
+ * @param circle    position du cercle (le bloc de craie, posé sur son support)
+ * @param pageUp    direction du monde qui correspond au haut de la page du carnet
+ * @param flow      matière produite par l'étage précédent, quand il est relié en série ; les effets
+ *                  y puisent avant le monde, et y déposent ce qu'ils décomposent
+ * @param knowledge savoir de l'alchimiste, dont certains bonus changent la forme des effets
  */
 public record EffectContext(ServerLevel level, BlockPos circle, Direction pageUp, ServerPlayer caster,
-		Analysis.StageEffect stage, List<ItemStack> flow) {
+		Analysis.StageEffect stage, List<ItemStack> flow, Knowledge knowledge) {
 	/** Un satellite agit à ce nombre de blocs du centre, du côté de son sommet. */
 	private static final int SATELLITE_OFFSET = 2;
 
@@ -53,6 +55,11 @@ public record EffectContext(ServerLevel level, BlockPos circle, Direction pageUp
 			return caster.getDirection();
 		}
 		return toWorld(stage.direction());
+	}
+
+	/** Bonus de savoir de l'école de l'effet. */
+	public double perk(String type) {
+		return knowledge.perk(stage.combination().school(), type);
 	}
 
 	public int range() {

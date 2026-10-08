@@ -40,7 +40,9 @@ public record CircleIssue(Kind kind, Vec2 where, String detail) {
 		/** Deux éléments dans un même étage sans hexagramme pour les fusionner. */
 		FUSION_NEEDS_HEXAGRAM,
 		/** Un satellite qui n'est ni une infusion (éléments seuls) ni un cercle complet. */
-		SATELLITE_INCOMPLETE;
+		SATELLITE_INCOMPLETE,
+		/** Une combinaison qui demande un nœud de savoir pas encore acquis. */
+		KNOWLEDGE_MISSING;
 
 		public String translationKey() {
 			return "circle.fmab.issue." + name().toLowerCase(Locale.ROOT);

@@ -7,10 +7,20 @@ import com.google.gson.JsonObject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 public final class CombinationTable {
+	/** École d'un élément, quand la combinaison ne la précise pas. */
+	private static final Map<String, String> SCHOOLS = Map.of(
+			"earth", "earth",
+			"iron", "metal",
+			"copper", "metal",
+			"water", "water",
+			"fire", "fire",
+			"air", "fire");
+
 	private final List<Combination> combinations;
 
 	public CombinationTable(Collection<Combination> combinations) {
@@ -38,7 +48,10 @@ public final class CombinationTable {
 					elements,
 					json.get("action").getAsString(),
 					json.get("effect").getAsString(),
-					json.has("range") ? json.get("range").getAsDouble() : 1);
+					json.has("range") ? json.get("range").getAsDouble() : 1,
+					json.has("school") ? json.get("school").getAsString() : SCHOOLS.getOrDefault(
+							elements.stream().sorted().findFirst().orElse(""), "earth"),
+					json.has("requires") ? Optional.of(json.get("requires").getAsString()) : Optional.empty());
 		} catch (RuntimeException e) {
 			throw new IllegalArgumentException("Combinaison " + id + " invalide : " + e.getMessage(), e);
 		}
@@ -52,6 +65,8 @@ public final class CombinationTable {
 		o.addProperty("action", c.action());
 		o.addProperty("effect", c.effect());
 		o.addProperty("range", c.range());
+		o.addProperty("school", c.school());
+		c.requires().ifPresent(r -> o.addProperty("requires", r));
 		return o;
 	}
 }

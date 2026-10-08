@@ -4,6 +4,7 @@ import com.ajustor.fmab.alchemy.drawing.Primitive;
 import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.GlyphJson;
+import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Combination;
 import com.ajustor.fmab.alchemy.rules.CombinationTable;
 import com.google.gson.JsonParser;
@@ -56,6 +57,21 @@ public final class TestGlyphs {
 			throw new UncheckedIOException(e);
 		}
 		return new CombinationTable(out);
+	}
+
+	/** Les nœuds de savoir, identifiés comme le jeu le fait : {@code fmab:<école>/<nom>}. */
+	public static List<KnowledgeNode> knowledgeNodes() {
+		Path root = resources().resolve("data/fmab/knowledge");
+		List<KnowledgeNode> out = new ArrayList<>();
+		try (Stream<Path> files = Files.walk(root)) {
+			for (Path f : files.filter(p -> p.toString().endsWith(".json")).sorted().toList()) {
+				String id = "fmab:" + root.relativize(f).toString().replace('\\', '/').replace(".json", "");
+				out.add(KnowledgeNode.parse(id, JsonParser.parseString(Files.readString(f)).getAsJsonObject()));
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		return out;
 	}
 
 	public static Glyph get(String name) {

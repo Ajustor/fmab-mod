@@ -5,6 +5,7 @@ import com.ajustor.fmab.alchemy.circle.LinkKind;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
 import com.ajustor.fmab.alchemy.glyph.Rank;
+import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Combination;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.google.gson.JsonObject;
@@ -54,6 +55,14 @@ class LocalizationTest {
 		}
 		for (Analysis.Outcome o : Analysis.Outcome.values()) {
 			needed.add("notebook.fmab.outcome." + o.name().toLowerCase(Locale.ROOT));
+		}
+		for (KnowledgeNode n : TestGlyphs.knowledgeNodes()) {
+			needed.add(n.nameKey());
+			needed.add(n.descriptionKey());
+			needed.add("knowledge.fmab.school." + n.school());
+		}
+		for (Combination c : TestGlyphs.combinations().all()) {
+			needed.add("knowledge.fmab.school." + c.school());
 		}
 		for (LinkKind k : LinkKind.values()) {
 			needed.add("notebook.fmab.link." + k.name().toLowerCase(Locale.ROOT));

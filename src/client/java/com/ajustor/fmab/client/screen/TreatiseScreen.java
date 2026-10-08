@@ -71,10 +71,13 @@ public class TreatiseScreen extends Screen {
 		actionButton = addRenderableWidget(Button.builder(Component.empty(), b -> action())
 				.bounds(left + BOOK_WIDTH - 12 - IMAGE, top + 30 + IMAGE + 6, IMAGE, 18).build());
 		contentsButtons.clear();
+		contentsButtons.add(addRenderableWidget(Button.builder(Component.translatable("knowledge.fmab.title"),
+				b -> minecraft.gui.setScreen(new KnowledgeScreen(this)))
+				.bounds(left + BOOK_WIDTH - 90, top + 6, 80, 16).build()));
 		for (int c = 0; c < treatise.chapters().size(); c++) {
 			int chapter = c;
 			Button b = addRenderableWidget(Button.builder(Component.translatable(treatise.chapters().get(c).titleKey()),
-					btn -> go(firstPageOf(chapter))).bounds(left + 30, top + 30 + c * 20, BOOK_WIDTH - 60, 18).build());
+					btn -> go(firstPageOf(chapter))).bounds(left + 30, top + 26 + c * 19, BOOK_WIDTH - 60, 17).build());
 			contentsButtons.add(b);
 		}
 		go(index);

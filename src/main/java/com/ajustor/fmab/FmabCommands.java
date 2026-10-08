@@ -5,6 +5,7 @@ import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.Commands;
@@ -12,11 +13,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Arrays;
-import java.util.Set;
 
 /**
- * {@code /fmab} : réglages de test réservés aux opérateurs (rang, savoir, concentration). Le jeu
- * normal passe par le Traité et le repos.
+ * {@code /fmab} : réglages de test réservés aux opérateurs (rang, glyphes, maîtrise, nœuds de savoir,
+ * concentration). Le jeu normal passe par le Traité, la pratique et le repos.
  */
 public final class FmabCommands {
 	private FmabCommands() {
@@ -50,10 +50,25 @@ public final class FmabCommands {
 						}))
 						.then(Commands.literal("forget_all").executes(c -> {
 							ServerPlayer p = c.getSource().getPlayerOrException();
-							AlchemistData data = data(p);
-							update(p, new AlchemistData(data.rank(), Set.of(), data.concentration()));
+							update(p, data(p).forgetAll());
 							return 1;
 						}))
+						.then(Commands.literal("mastery")
+								.then(Commands.argument("school", StringArgumentType.word())
+										.then(Commands.argument("amount", IntegerArgumentType.integer(0))
+												.executes(c -> {
+													ServerPlayer p = c.getSource().getPlayerOrException();
+													update(p, data(p).addMastery(StringArgumentType.getString(c, "school"),
+															IntegerArgumentType.getInteger(c, "amount")));
+													return 1;
+												}))))
+						.then(Commands.literal("grant")
+								.then(Commands.argument("node", StringArgumentType.greedyString())
+										.executes(c -> {
+											ServerPlayer p = c.getSource().getPlayerOrException();
+											update(p, data(p).grant(StringArgumentType.getString(c, "node")));
+											return 1;
+										})))
 						.then(Commands.literal("rest").executes(c -> {
 							ServerPlayer p = c.getSource().getPlayerOrException();
 							update(p, data(p).withConcentration(AlchemistData.MAX_CONCENTRATION));

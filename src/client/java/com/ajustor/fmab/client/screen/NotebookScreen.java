@@ -582,7 +582,7 @@ public class NotebookScreen extends Screen {
 		}
 		if (!d.equals(analyzed)) {
 			AlchemistData me = alchemist();
-			cachedAnalysis = AlchemyRules.of(minecraft.level.registryAccess()).analyze(d, me.rank(), me.known());
+			cachedAnalysis = AlchemyRules.of(minecraft.level.registryAccess()).analyze(d, me);
 			analyzed = d;
 		}
 		return cachedAnalysis;

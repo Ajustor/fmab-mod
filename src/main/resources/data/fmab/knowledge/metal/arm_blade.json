@@ -1,0 +1,12 @@
+{
+  "school": "metal",
+  "mastery": 45,
+  "parent": "fmab:metal/docile_iron",
+  "perks": [
+    {
+      "type": "unlock"
+    }
+  ],
+  "name_key": "knowledge.fmab.metal.arm_blade",
+  "description_key": "knowledge.fmab.metal.arm_blade.desc"
+}
