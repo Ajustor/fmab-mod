@@ -208,7 +208,7 @@ Cinq systèmes forment le cœur du mod ; tout le reste (items, boss) s'y branche
 
 **Combinaisons de départ.** Terre + Fixer = mur de pierre. Terre + Projeter = pique de pierre. Fer + Projeter = lame de fer (consomme du fer). Eau + Fixer = plateforme de glace. Terre + Décomposer = minage de zone. Fer + Réparer = réparation d'outil. Une combinaison absente de la table produit un rebond.
 
-**Format JSON d'un glyphe** (fichier `data/fmab/glyph/terre.json`, partagé avec l'éditeur web) :
+**Format JSON d'un glyphe** (fichier `data/fmab/fmab/glyph/terre.json`, partagé avec l'éditeur web) :
 
 ```json
 {

@@ -16,15 +16,15 @@ import net.minecraft.resources.ResourceKey;
  * cercles dans le carnet ; la valeur d'échange reste côté serveur.
  */
 public final class FmabRegistries {
-	/** {@code data/<ns>/glyph/<nom>.json} */
+	/** {@code data/<ns>/fmab/glyph/<nom>.json} */
 	public static final ResourceKey<Registry<Glyph>> GLYPH = ResourceKey.createRegistryKey(Fmab.id("glyph"));
-	/** {@code data/<ns>/combination/<nom>.json} */
+	/** {@code data/<ns>/fmab/combination/<nom>.json} */
 	public static final ResourceKey<Registry<Combination>> COMBINATION =
 			ResourceKey.createRegistryKey(Fmab.id("combination"));
-	/** {@code data/<ns>/knowledge/<école>/<nom>.json} */
+	/** {@code data/<ns>/fmab/knowledge/<école>/<nom>.json} */
 	public static final ResourceKey<Registry<KnowledgeNode>> KNOWLEDGE =
 			ResourceKey.createRegistryKey(Fmab.id("knowledge"));
-	/** {@code data/<ns>/exchange/<nom>.json} */
+	/** {@code data/<ns>/fmab/exchange/<nom>.json} */
 	public static final ResourceKey<Registry<ExchangeGroup>> EXCHANGE = ResourceKey.createRegistryKey(Fmab.id("exchange"));
 
 	private FmabRegistries() {

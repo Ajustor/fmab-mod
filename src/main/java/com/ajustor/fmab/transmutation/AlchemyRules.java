@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.circle.CircleParser;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.SimpleCircles;
@@ -50,6 +51,8 @@ public final class AlchemyRules {
 		this.parser = new CircleParser(new GlyphRecognizer(glyphs));
 		this.analyzer = new CircleAnalyzer(new CombinationTable(combinations), glyphs);
 		this.combinations = List.copyOf(combinations);
+		Fmab.LOGGER.info("Règles alchimiques chargées : {} glyphes, {} combinaisons, {} nœuds de savoir",
+				glyphs.size(), combinations.size(), nodes.size());
 	}
 
 	public static synchronized AlchemyRules of(RegistryAccess access) {

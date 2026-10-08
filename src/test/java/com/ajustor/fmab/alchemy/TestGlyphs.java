@@ -33,7 +33,7 @@ public final class TestGlyphs {
 	public static synchronized Map<String, Glyph> all() {
 		if (cache == null) {
 			Map<String, Glyph> out = new LinkedHashMap<>();
-			try (Stream<Path> files = Files.list(resources().resolve("data/fmab/glyph"))) {
+			try (Stream<Path> files = Files.list(resources().resolve("data/fmab/fmab/glyph"))) {
 				for (Path f : files.sorted().toList()) {
 					Glyph g = GlyphJson.parse(JsonParser.parseString(Files.readString(f)).getAsJsonObject());
 					out.put(g.id(), g);
@@ -48,7 +48,7 @@ public final class TestGlyphs {
 
 	public static CombinationTable combinations() {
 		List<Combination> out = new ArrayList<>();
-		try (Stream<Path> files = Files.list(resources().resolve("data/fmab/combination"))) {
+		try (Stream<Path> files = Files.list(resources().resolve("data/fmab/fmab/combination"))) {
 			for (Path f : files.sorted().toList()) {
 				String id = "fmab:" + f.getFileName().toString().replace(".json", "");
 				out.add(CombinationTable.parse(id, JsonParser.parseString(Files.readString(f)).getAsJsonObject()));
@@ -61,7 +61,7 @@ public final class TestGlyphs {
 
 	/** Les nœuds de savoir, identifiés comme le jeu le fait : {@code fmab:<école>/<nom>}. */
 	public static List<KnowledgeNode> knowledgeNodes() {
-		Path root = resources().resolve("data/fmab/knowledge");
+		Path root = resources().resolve("data/fmab/fmab/knowledge");
 		List<KnowledgeNode> out = new ArrayList<>();
 		try (Stream<Path> files = Files.walk(root)) {
 			for (Path f : files.filter(p -> p.toString().endsWith(".json")).sorted().toList()) {
