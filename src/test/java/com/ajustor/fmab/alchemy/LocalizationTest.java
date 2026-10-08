@@ -1,6 +1,7 @@
 package com.ajustor.fmab.alchemy;
 
 import com.ajustor.fmab.alchemy.circle.CircleIssue;
+import com.ajustor.fmab.alchemy.circle.LinkKind;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
 import com.ajustor.fmab.alchemy.glyph.Rank;
@@ -53,6 +54,9 @@ class LocalizationTest {
 		}
 		for (Analysis.Outcome o : Analysis.Outcome.values()) {
 			needed.add("notebook.fmab.outcome." + o.name().toLowerCase(Locale.ROOT));
+		}
+		for (LinkKind k : LinkKind.values()) {
+			needed.add("notebook.fmab.link." + k.name().toLowerCase(Locale.ROOT));
 		}
 		for (GlyphLayer l : GlyphLayer.values()) {
 			needed.add("treatise.fmab.layer." + l.name().toLowerCase(Locale.ROOT));

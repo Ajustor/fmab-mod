@@ -224,6 +224,13 @@ public class NotebookScreen extends Screen {
 			List<Component> names = new ArrayList<>();
 			for (Stage s : a.parsed().stages()) {
 				s.glyphs().forEach(g -> names.add(Component.translatable(g.glyph().nameKey())));
+				if (s.index() > 0) {
+					out.add(Component.translatable("notebook.fmab.link", s.index() + 1,
+							Component.translatable("notebook.fmab.link." + s.link().name().toLowerCase(Locale.ROOT))));
+				}
+				if (!s.satellites().isEmpty()) {
+					out.add(Component.translatable("notebook.fmab.satellites", s.index() + 1, s.satellites().size()));
+				}
 			}
 			if (!names.isEmpty()) {
 				out.add(Component.translatable("notebook.fmab.glyphs", join(names)));

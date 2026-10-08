@@ -47,9 +47,9 @@ class GlyphRecognizerTest {
 	}
 
 	@Test
-	void anUpsideDownWaterIsNotWater() {
-		// Un triangle pointe en haut, c'est le Feu : il n'est pas encore dans le jeu.
-		assertEquals("", recognize(TestGlyphs.drawn("eau", new Vec2(10, 10), 3, 180)));
+	void anUpsideDownWaterIsFire() {
+		assertEquals("fmab:feu", recognize(TestGlyphs.drawn("eau", new Vec2(10, 10), 3, 180)));
+		assertEquals("fmab:air", recognize(TestGlyphs.drawn("terre", new Vec2(10, 10), 3, 180)));
 	}
 
 	@Test

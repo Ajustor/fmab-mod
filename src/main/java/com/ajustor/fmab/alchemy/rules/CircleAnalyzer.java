@@ -2,8 +2,10 @@ package com.ajustor.fmab.alchemy.rules;
 
 import com.ajustor.fmab.alchemy.circle.CircleIssue;
 import com.ajustor.fmab.alchemy.circle.CircleIssue.Kind;
+import com.ajustor.fmab.alchemy.circle.LinkKind;
 import com.ajustor.fmab.alchemy.circle.ParsedCircle;
 import com.ajustor.fmab.alchemy.circle.PlacedGlyph;
+import com.ajustor.fmab.alchemy.circle.Satellite;
 import com.ajustor.fmab.alchemy.circle.Stage;
 import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
@@ -24,12 +26,15 @@ import java.util.function.UnaryOperator;
  * Règles de calcul d'un cercle.
  *
  * <ul>
- *   <li>Complexité : somme des glyphes, modificateurs compris ; elle doit tenir sous le plafond du
- *   rang.</li>
- *   <li>Stabilité : un polygone supporte autant de complexité qu'il a de côtés (2 pour un anneau
- *   nu), un quart de plus si les glyphes sont disposés symétriquement.</li>
+ *   <li>Complexité : somme des glyphes, modificateurs et satellites compris ; elle doit tenir sous
+ *   le plafond du rang.</li>
+ *   <li>Stabilité : un étage supporte autant de complexité que ses polygones ont de côtés en tout
+ *   (2 pour un anneau nu), un quart de plus si les glyphes sont disposés symétriquement.</li>
  *   <li>Concentration : somme des glyphes, multipliée par le nombre d'étages.</li>
  *   <li>Portée : celle de la combinaison, +50 % par point d'intensité.</li>
+ *   <li>Deux éléments dans un étage ne fusionnent que dans un hexagramme.</li>
+ *   <li>Un satellite qui ne porte que des éléments infuse l'effet de son étage ; un satellite
+ *   complet (élément et action) lance son propre effet depuis son sommet.</li>
  * </ul>
  */
 public final class CircleAnalyzer {
@@ -44,6 +49,9 @@ public final class CircleAnalyzer {
 	/** Problèmes qui empêchent toute réaction. */
 	private static final Set<Kind> INERT = EnumSet.of(Kind.NO_RING, Kind.NO_ACTION, Kind.NO_ELEMENT,
 			Kind.TOO_MANY_ACTIONS, Kind.RANK_TOO_LOW, Kind.GLYPH_NOT_LEARNED);
+	/** Problèmes qui font rebondir le cercle, avec la gravité d'une combinaison inconnue. */
+	private static final Set<Kind> MISCOMPOSED = EnumSet.of(Kind.UNKNOWN_COMBINATION, Kind.CONFLICTING_LINKS,
+			Kind.FUSION_NEEDS_HEXAGRAM, Kind.SATELLITE_INCOMPLETE);
 
 	private final CombinationTable combinations;
 	private final Optional<Glyph> intensityGlyph;
@@ -64,6 +72,7 @@ public final class CircleAnalyzer {
 		List<Analysis.StageEffect> effects = new ArrayList<>();
 		int complexity = 0;
 		int concentration = 0;
+		int satelliteCount = 0;
 		Rank required = Rank.APPRENTICE;
 		double stability = Double.POSITIVE_INFINITY;
 		double severity = 0;
@@ -71,12 +80,14 @@ public final class CircleAnalyzer {
 		for (Stage stage : parsed.stages()) {
 			List<Glyph> written = new ArrayList<>();
 			stage.glyphs().forEach(g -> written.add(g.glyph()));
+			stage.satellites().forEach(s -> s.glyphs().forEach(g -> written.add(g.glyph())));
 			for (int i = 0; i < stage.intensity(); i++) {
 				intensityGlyph.ifPresent(written::add);
 			}
 			if (stage.direction().isPresent()) {
 				directionGlyph.ifPresent(written::add);
 			}
+			satelliteCount += stage.satellites().size();
 
 			int load = 0;
 			for (Glyph g : written) {
@@ -91,19 +102,24 @@ public final class CircleAnalyzer {
 			complexity += load;
 
 			if (load > 0) {
-				double capacity = stage.sides() == 0 ? BARE_RING_CAPACITY : stage.sides();
+				double capacity = stage.capacity() == 0 ? BARE_RING_CAPACITY : stage.capacity();
 				if (symmetric(stage.glyphs())) {
 					capacity *= SYMMETRY_BONUS;
 				}
 				stability = Math.min(stability, capacity / load);
 			}
 			required = max(required, rankFor(stage.sides(), Rank::maxPolygonSides));
+			required = max(required, rankFor(stage.polygons(), Rank::maxPolygonsPerStage));
+			if (stage.index() > 0 && stage.link() == LinkKind.NONE && load > 0) {
+				issues.add(new CircleIssue(Kind.UNLINKED_STAGE, null, Integer.toString(stage.index())));
+			}
 
-			effect(stage, issues).ifPresent(effects::add);
+			effects.addAll(effects(stage, issues));
 		}
 		concentration *= Math.max(1, parsed.stages().size());
 		required = max(required, rankFor(parsed.stages().size(), Rank::maxStages));
 		required = max(required, rankFor(complexity, Rank::complexityCap));
+		required = max(required, rankFor(satelliteCount, Rank::maxSatellites));
 		if (!rank.atLeast(required)) {
 			issues.add(new CircleIssue(Kind.RANK_TOO_LOW, null, required.serializedName()));
 		}
@@ -115,7 +131,7 @@ public final class CircleAnalyzer {
 		}
 
 		for (CircleIssue issue : issues) {
-			if (issue.kind() == Kind.UNKNOWN_COMBINATION) {
+			if (MISCOMPOSED.contains(issue.kind())) {
 				severity = Math.max(severity, UNKNOWN_COMBINATION_SEVERITY);
 			} else if (issue.kind() == Kind.UNKNOWN_GLYPH) {
 				severity = Math.min(1, severity + UNKNOWN_GLYPH_SEVERITY);
@@ -137,11 +153,48 @@ public final class CircleAnalyzer {
 				severity);
 	}
 
-	private Optional<Analysis.StageEffect> effect(Stage stage, List<CircleIssue> issues) {
-		List<PlacedGlyph> actions = stage.layer(GlyphLayer.ACTION);
-		List<PlacedGlyph> elements = stage.layer(GlyphLayer.ELEMENT);
+	/** L'effet de l'étage, puis ceux de ses satellites complets. */
+	private List<Analysis.StageEffect> effects(Stage stage, List<CircleIssue> issues) {
+		List<Analysis.StageEffect> out = new ArrayList<>();
+		double direction = stage.direction().orElse(Double.NaN);
+
+		Set<String> infusions = new LinkedHashSet<>();
+		List<Satellite> complete = new ArrayList<>();
+		for (Satellite s : stage.satellites()) {
+			boolean hasElement = !s.layer(GlyphLayer.ELEMENT).isEmpty();
+			int actions = s.layer(GlyphLayer.ACTION).size();
+			if (hasElement && actions == 0) {
+				s.layer(GlyphLayer.ELEMENT).forEach(g -> infusions.add(g.glyph().role()));
+			} else if (hasElement && actions == 1) {
+				complete.add(s);
+			} else {
+				issues.add(CircleIssue.at(Kind.SATELLITE_INCOMPLETE, s.center()));
+			}
+		}
+
+		combination(stage.layer(GlyphLayer.ELEMENT), stage.layer(GlyphLayer.ACTION), stage.hexagram(), issues)
+				.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), -1, c, range(c, stage.intensity()),
+						stage.intensity(), Vec2.ZERO, direction, infusions, stage.link())));
+
+		for (int i = 0; i < stage.satellites().size(); i++) {
+			Satellite s = stage.satellites().get(i);
+			if (!complete.contains(s)) {
+				continue;
+			}
+			int index = i;
+			// Un satellite n'a pas de polygone à lui : il ne fusionne pas deux éléments.
+			combination(s.layer(GlyphLayer.ELEMENT), s.layer(GlyphLayer.ACTION), false, issues)
+					.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), index, c, range(c, 0), 0,
+							s.center(), Double.isNaN(direction) ? s.center().angle() : direction, Set.of(),
+							stage.link())));
+		}
+		return out;
+	}
+
+	private Optional<Combination> combination(List<PlacedGlyph> elements, List<PlacedGlyph> actions, boolean hexagram,
+			List<CircleIssue> issues) {
 		if (actions.isEmpty() && elements.isEmpty()) {
-			// Un étage vide sert de liaison ou de décor : il ne fait rien et ne gêne pas.
+			// Un étage vide sert de relais ou de décor : il ne fait rien et ne gêne pas.
 			return Optional.empty();
 		}
 		if (actions.isEmpty()) {
@@ -158,15 +211,20 @@ public final class CircleAnalyzer {
 		}
 		Set<String> roles = new LinkedHashSet<>();
 		elements.forEach(e -> roles.add(e.glyph().role()));
+		if (roles.size() > 1 && !hexagram) {
+			issues.add(CircleIssue.at(Kind.FUSION_NEEDS_HEXAGRAM, elements.get(1).position()));
+			return Optional.empty();
+		}
 		String action = actions.getFirst().glyph().role();
 		Optional<Combination> combination = combinations.find(roles, action);
 		if (combination.isEmpty()) {
 			issues.add(new CircleIssue(Kind.UNKNOWN_COMBINATION, null, String.join("+", roles) + "+" + action));
-			return Optional.empty();
 		}
-		double range = combination.get().range() * (1 + INTENSITY_STEP * stage.intensity());
-		return Optional.of(new Analysis.StageEffect(stage.index(), combination.get(), range, stage.intensity(),
-				stage.direction().orElse(Double.NaN)));
+		return combination;
+	}
+
+	private static double range(Combination c, int intensity) {
+		return c.range() * (1 + INTENSITY_STEP * intensity);
 	}
 
 	/** Symétrie miroir (axe vertical ou horizontal) ou demi-tour : chaque glyphe a son image. */

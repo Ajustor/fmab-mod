@@ -1,6 +1,8 @@
 package com.ajustor.fmab.transmutation;
 
 import com.ajustor.fmab.alchemy.circle.CircleIssue;
+import com.ajustor.fmab.alchemy.circle.LinkKind;
+import com.ajustor.fmab.alchemy.circle.Stage;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.data.AlchemistData;
@@ -13,8 +15,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activation d'un cercle par un alchimiste : le serveur relit le tracé, vérifie le savoir, le
@@ -56,16 +63,37 @@ public final class Transmutation {
 
 		boolean anything = false;
 		Effects.Result last = Effects.Result.DONE;
-		for (Analysis.StageEffect stage : analysis.effects()) {
-			EffectContext ctx = new EffectContext(level, circle, pageUp, caster, stage);
-			Effects.Result result = Effects.get(stage.combination().effect())
-					.map(e -> e.apply(ctx))
-					.orElse(Effects.Result.NO_TARGET);
-			anything |= result == Effects.Result.DONE;
-			if (result != Effects.Result.DONE) {
-				last = result;
+		// Résultat de l'étage précédent, pour les liaisons. Un étage sans effet est transparent.
+		Effects.Result previous = Effects.Result.DONE;
+		List<ItemStack> flow = new ArrayList<>();
+		for (Stage stage : analysis.parsed().stages()) {
+			List<Analysis.StageEffect> effects = analysis.effects().stream()
+					.filter(e -> e.stage() == stage.index())
+					.toList();
+			if (effects.isEmpty() || !receives(stage, previous)) {
+				continue;
 			}
+			if (stage.link() != LinkKind.SERIES) {
+				// Seule une liaison en série transmet la matière ; le reste retombe sur le cercle.
+				dropAll(level, circle, flow);
+			}
+			Effects.Result stageResult = Effects.Result.NO_TARGET;
+			for (Analysis.StageEffect effect : effects) {
+				EffectContext ctx = new EffectContext(level, circle, pageUp, caster, effect, flow);
+				Effects.Result result = Effects.get(effect.combination().effect())
+						.map(e -> e.apply(ctx))
+						.orElse(Effects.Result.NO_TARGET);
+				flow.removeIf(ItemStack::isEmpty);
+				if (result == Effects.Result.DONE) {
+					stageResult = result;
+					anything = true;
+				} else {
+					last = result;
+				}
+			}
+			previous = stageResult;
 		}
+		dropAll(level, circle, flow);
 		if (anything) {
 			sparks(level, circle, 40);
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 1.4f);
@@ -95,6 +123,30 @@ public final class Transmutation {
 		} else {
 			level.playSound(null, circle, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1, 0.7f);
 		}
+	}
+
+	/** L'étage reçoit-il l'énergie, compte tenu de sa liaison et du sort de l'étage précédent ? */
+	private static boolean receives(Stage stage, Effects.Result previous) {
+		if (stage.index() == 0) {
+			return true;
+		}
+		return switch (stage.link()) {
+			case NONE -> false;
+			case SERIES -> previous == Effects.Result.DONE;
+			case PARALLEL -> true;
+			case CONDITIONAL -> previous != Effects.Result.DONE;
+		};
+	}
+
+	/** Rien ne se perd : la matière que plus aucun étage n'utilise retombe sur le cercle. */
+	private static void dropAll(ServerLevel level, BlockPos circle, List<ItemStack> flow) {
+		Vec3 c = Vec3.atCenterOf(circle);
+		for (ItemStack stack : flow) {
+			if (!stack.isEmpty()) {
+				level.addFreshEntity(new ItemEntity(level, c.x, c.y, c.z, stack));
+			}
+		}
+		flow.clear();
 	}
 
 	/** Les éclairs bleus de la transmutation. */
