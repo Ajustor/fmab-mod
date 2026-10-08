@@ -7,6 +7,8 @@ import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.state.StateExam;
+import com.ajustor.fmab.tattoo.TattooRitual;
+import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
@@ -36,6 +38,8 @@ public final class FmabNetwork {
 		PayloadTypeRegistry.clientboundPlay().register(OpenIzumiPayload.TYPE, OpenIzumiPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(ExamActionPayload.TYPE, ExamActionPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenExamPayload.TYPE, OpenExamPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(TattooPayload.TYPE, TattooPayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(OpenTattooPayload.TYPE, OpenTattooPayload.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
 				(payload, context) -> saveNotebook(context.player(), payload.hand(), payload.contents()));
@@ -49,6 +53,14 @@ public final class FmabNetwork {
 				(payload, context) -> izumi(context.player(), payload.entityId(), payload.action()));
 		ServerPlayNetworking.registerGlobalReceiver(ExamActionPayload.TYPE,
 				(payload, context) -> exam(context.player(), payload.entityId(), payload.action()));
+		ServerPlayNetworking.registerGlobalReceiver(TattooPayload.TYPE, (payload, context) ->
+				TattooSlot.byId(payload.slot()).ifPresent(slot -> {
+					if (payload.erase()) {
+						TattooRitual.erase(context.player(), slot);
+					} else {
+						TattooRitual.tattoo(context.player(), payload.circle(), slot);
+					}
+				}));
 	}
 
 	/** Le candidat doit être face à l'examinateur. */

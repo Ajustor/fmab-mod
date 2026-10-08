@@ -19,6 +19,7 @@ import {
   renderExamples,
   renderPalette,
   starterDrawing,
+  supportName,
 } from "./editor/panel";
 import "./style.css";
 
@@ -95,7 +96,7 @@ async function main(): Promise<void> {
     document.querySelectorAll<HTMLElement>("[data-i18n-title]").forEach((e) => (e.title = t(e.dataset.i18nTitle!)));
     $("version").textContent = t("editor.fmab.version", meta.modVersion, meta.minecraftVersion);
     supportSelect.replaceChildren(
-      ...SUPPORTS.map((s) => new Option(s.id === "surface" ? t("editor.fmab.support.surface") : t(`item.fmab.${s.id}`), s.id)),
+      ...SUPPORTS.map((s) => new Option(supportName(s.id), s.id)),
     );
     const rank = rankSelect.value || "alchemist";
     rankSelect.replaceChildren(...RANKS.map((r) => new Option(t(`rank.fmab.${r.id}`), r.id)));

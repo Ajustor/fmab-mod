@@ -7,6 +7,7 @@ import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.registry.FmabTags;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -30,6 +31,8 @@ import net.minecraft.world.phys.BlockHitResult;
 public class AlchemistTableBlock extends Block {
 	/** Graver un gantelet use le burin plus qu'une inscription au sol. */
 	private static final int CHISEL_WEAR = 4;
+	/** Un vêtement ne porte qu'un cercle à un étage. */
+	private static final int CLOTHES_STAGES = 1;
 
 	public AlchemistTableBlock(Properties properties) {
 		super(properties);
@@ -38,6 +41,9 @@ public class AlchemistTableBlock extends Block {
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
+		if (stack.is(FmabTags.EMBROIDERABLE)) {
+			return embroider(stack, level, pos, player);
+		}
 		if (!(stack.getItem() instanceof GloveItem glove)) {
 			return InteractionResult.TRY_WITH_EMPTY_HAND;
 		}
@@ -65,6 +71,31 @@ public class AlchemistTableBlock extends Block {
 		level.playSound(null, pos, glove.kind().engraved() ? SoundEvents.ANVIL_USE : SoundEvents.WOOL_PLACE,
 				SoundSource.BLOCKS, 0.8f, 1.2f);
 		player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.done"));
+		return InteractionResult.SUCCESS;
+	}
+
+	/** Un vêtement ne porte qu'un étage : son cercle agit en permanence tant qu'on le porte. */
+	private static InteractionResult embroider(ItemStack stack, Level level, BlockPos pos, Player player) {
+		if (level.isClientSide()) {
+			return InteractionResult.SUCCESS;
+		}
+		Drawing drawing = InscriptionItem.selectedDrawing(player);
+		if (drawing.isEmpty()) {
+			player.sendOverlayMessage(Component.translatable("item.fmab.chalk.no_circle"));
+			return InteractionResult.FAIL;
+		}
+		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		if (AlchemyRules.of(level.registryAccess()).analyze(drawing, me).parsed().stages().size() > CLOTHES_STAGES) {
+			player.sendOverlayMessage(Component.translatable("transmutation.fmab.support_too_small", CLOTHES_STAGES));
+			return InteractionResult.FAIL;
+		}
+		if (!consumeTool((ServerPlayer) player, false)) {
+			player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.needs_thread"));
+			return InteractionResult.FAIL;
+		}
+		stack.set(FmabComponents.EMBROIDERY, drawing);
+		level.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.8f, 1.2f);
+		player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.embroidered"));
 		return InteractionResult.SUCCESS;
 	}
 

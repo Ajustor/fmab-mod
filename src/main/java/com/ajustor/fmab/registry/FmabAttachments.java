@@ -4,6 +4,7 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.ExamProgress;
 import com.ajustor.fmab.data.Gloves;
+import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.data.Training;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
@@ -40,6 +41,14 @@ public final class FmabAttachments {
 			.initializer(() -> ExamProgress.NONE)
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("exam"));
+
+	/** Cercles tatoués : permanents, gardés à la mort, visibles du joueur seul. */
+	public static final AttachmentType<Tattoos> TATTOOS = AttachmentRegistry.<Tattoos>builder()
+			.persistent(Tattoos.CODEC)
+			.initializer(() -> Tattoos.NONE)
+			.copyOnDeath()
+			.syncWith(Tattoos.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("tattoos"));
 
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()

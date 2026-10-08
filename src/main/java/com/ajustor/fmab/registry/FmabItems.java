@@ -3,6 +3,7 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.CircleMedium;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.ScreenItem;
@@ -38,6 +39,8 @@ public final class FmabItems {
 			new Item.Properties().stacksTo(1));
 
 	public static final Item ALCHEMICAL_THREAD = register("alchemical_thread", Item::new, new Item.Properties());
+	public static final Item ALCHEMICAL_INK = register("alchemical_ink", AlchemicalInkItem::new,
+			new Item.Properties().stacksTo(16));
 	public static final Item ALCHEMIST_TABLE = register("alchemist_table",
 			p -> new BlockItem(FmabBlocks.ALCHEMIST_TABLE, p), new Item.Properties().useBlockDescriptionPrefix());
 	public static final Item CLOTH_GLOVES = glove("cloth_gloves", GloveItem.Kind.CLOTH, 64);
@@ -89,6 +92,7 @@ public final class FmabItems {
 					output.accept(ALCHEMIST_CHISEL);
 					output.accept(ALCHEMIST_TABLE);
 					output.accept(ALCHEMICAL_THREAD);
+					output.accept(ALCHEMICAL_INK);
 					output.accept(CLOTH_GLOVES);
 					output.accept(LEATHER_GLOVES);
 					output.accept(SPARK_GLOVES);

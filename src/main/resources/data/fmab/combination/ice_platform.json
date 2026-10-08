@@ -1,1 +1,1 @@
-{ "elements": ["water"], "action": "fix", "effect": "fmab:ice_platform", "range": 2 }
+{ "elements": ["water"], "action": "fix", "effect": "fmab:ice_platform", "range": 2, "passive": "fmab:fire_ward" }

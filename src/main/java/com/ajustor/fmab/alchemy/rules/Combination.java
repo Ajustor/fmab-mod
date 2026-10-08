@@ -10,20 +10,21 @@ import java.util.Set;
  *
  * <pre>{@code
  * { "elements": ["earth"], "action": "fix", "effect": "fmab:wall", "range": 2,
- *   "school": "earth", "requires": "fmab:earth/stone_lance" }
+ *   "school": "earth", "requires": "fmab:earth/stone_lance", "passive": "fmab:reinforce" }
  * }</pre>
  *
  * @param range    portée de base en blocs, avant les points d'intensité
  * @param school   école dont la maîtrise progresse, et dont les bonus s'appliquent
  * @param requires nœud de savoir sans lequel la combinaison est inconnue
+ * @param passive  effet permanent du cercle quand il est porté (vêtement brodé, tatouage)
  */
 public record Combination(String id, Set<String> elements, String action, String effect, double range, String school,
-		Optional<String> requires) {
+		Optional<String> requires, Optional<String> passive) {
 	public Combination {
 		elements = Set.copyOf(elements);
 	}
 
 	public Combination withId(String newId) {
-		return new Combination(newId, elements, action, effect, range, school, requires);
+		return new Combination(newId, elements, action, effect, range, school, requires, passive);
 	}
 }

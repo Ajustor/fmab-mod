@@ -1,1 +1,1 @@
-{ "elements": ["iron"], "action": "repair", "effect": "fmab:repair", "range": 1 }
+{ "elements": ["iron"], "action": "repair", "effect": "fmab:repair", "range": 1, "passive": "fmab:mending" }

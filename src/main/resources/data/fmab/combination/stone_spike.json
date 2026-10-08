@@ -1,1 +1,1 @@
-{ "elements": ["earth"], "action": "project", "effect": "fmab:spike", "range": 3 }
+{ "elements": ["earth"], "action": "project", "effect": "fmab:spike", "range": 3, "passive": "fmab:thorns" }
