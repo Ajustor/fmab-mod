@@ -109,6 +109,9 @@ public final class FmabItems {
 	public static final Item GLUTTONY_SPAWN_EGG = register("gluttony_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.GLUTTONY));
 
+	public static final Item ENVY_SPAWN_EGG = register("envy_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.ENVY));
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -164,6 +167,7 @@ public final class FmabItems {
 					output.accept(CRYSTALLIZED_BLOOD);
 					output.accept(LUST_SPAWN_EGG);
 					output.accept(GLUTTONY_SPAWN_EGG);
+					output.accept(ENVY_SPAWN_EGG);
 				})
 				.build());
 	}

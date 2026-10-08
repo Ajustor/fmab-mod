@@ -471,6 +471,9 @@
 
   "entity.fmab.lust": "Lust",
   "entity.fmab.gluttony": "Gluttony",
+  "entity.fmab.envy": "Envy",
+  "item.fmab.envy_spawn_egg": "Envy spawn egg",
+  "homunculus.fmab.envy_reveals": "\"You thought you knew me?\" The face comes apart: it is Envy.",
   "entity.fmab.devoured_remains": "Devoured remains",
   "item.fmab.lust_spawn_egg": "Lust spawn egg",
   "item.fmab.gluttony_spawn_egg": "Gluttony spawn egg",

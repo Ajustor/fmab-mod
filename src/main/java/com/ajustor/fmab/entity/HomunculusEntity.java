@@ -44,6 +44,11 @@ public abstract class HomunculusEntity extends Monster {
 		setPersistenceRequired();
 	}
 
+	/** La barre de boss se montre-t-elle ? Un homonculus déguisé ne s'annonce pas. */
+	protected boolean showBossBar() {
+		return true;
+	}
+
 	/** Multiplicateur des dégâts subis : la faiblesse de l'homonculus. */
 	protected float weakness(DamageSource source) {
 		return 1;
@@ -110,6 +115,7 @@ public abstract class HomunculusEntity extends Monster {
 			}
 		}
 		bossEvent.setProgress(getHealth() / getMaxHealth());
+		bossEvent.setVisible(showBossBar());
 	}
 
 	@Override

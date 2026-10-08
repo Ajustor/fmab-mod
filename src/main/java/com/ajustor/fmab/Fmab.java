@@ -7,6 +7,7 @@ import com.ajustor.fmab.gate.HumanTransmutation;
 import com.ajustor.fmab.gate.SoulBinding;
 import com.ajustor.fmab.gate.Tolls;
 import com.ajustor.fmab.homunculus.Belly;
+import com.ajustor.fmab.homunculus.EnvySpawner;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.network.FmabNetwork;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -62,6 +63,7 @@ public class Fmab implements ModInitializer {
 		Automails.register();
 		SoulBinding.register();
 		Belly.register();
+		EnvySpawner.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> equip(handler.getPlayer()));
 		// Gantelets : frapper un bloc, main libre, y lance leur cercle au lieu de commencer à le casser.
 		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {

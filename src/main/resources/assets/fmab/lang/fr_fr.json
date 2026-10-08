@@ -471,6 +471,9 @@
 
   "entity.fmab.lust": "Lust",
   "entity.fmab.gluttony": "Gluttony",
+  "entity.fmab.envy": "Envy",
+  "item.fmab.envy_spawn_egg": "Œuf d'apparition d'Envy",
+  "homunculus.fmab.envy_reveals": "« Tu croyais me connaître ? » Le visage se défait : c'est Envy.",
   "entity.fmab.devoured_remains": "Restes dévorés",
   "item.fmab.lust_spawn_egg": "Œuf d'apparition de Lust",
   "item.fmab.gluttony_spawn_egg": "Œuf d'apparition de Gluttony",

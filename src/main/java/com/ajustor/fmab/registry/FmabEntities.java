@@ -1,6 +1,7 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.LustEntity;
@@ -87,6 +88,16 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(GLUTTONY_KEY));
 
+	private static final ResourceKey<EntityType<?>> ENVY_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("envy"));
+
+	/** Envy (Envie) : erre déguisé ; sa taille change avec sa forme (attribut d'échelle). */
+	public static final EntityType<EnvyEntity> ENVY = Registry.register(BuiltInRegistries.ENTITY_TYPE, ENVY_KEY,
+			EntityType.Builder.<EnvyEntity>of(EnvyEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.8F)
+					.eyeHeight(1.62F)
+					.clientTrackingRange(10)
+					.build(ENVY_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -98,5 +109,6 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(WINRY, WinryEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(LUST, LustEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(GLUTTONY, GluttonyEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(ENVY, EnvyEntity.createAttributes());
 	}
 }
