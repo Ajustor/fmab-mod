@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FMAB — Alchemy of Amestris</title>
+  <meta name="description" content="Mod Minecraft de fan inspiré de Fullmetal Alchemist: Brotherhood. / Fan-made Minecraft mod inspired by Fullmetal Alchemist: Brotherhood.">
+  <style>
+    :root {
+      --paper: #ede3c8;
+      --ink: #2b2b40;
+      --muted: #6b6250;
+      --accent: #a8321e;
+      --card: #f6efdc;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --paper: #1b1a22; --ink: #e8e2d0; --muted: #a49c88; --accent: #e0664c; --card: #25242e; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 17px/1.55 Georgia, "Times New Roman", serif;
+    }
+    main { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; }
+    header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+    h1 { margin: 0; font-size: 2rem; }
+    .lang button {
+      background: none; border: 1px solid var(--muted); color: var(--ink);
+      padding: 2px 10px; font: inherit; font-size: 0.9rem; cursor: pointer; border-radius: 4px;
+    }
+    .lang button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+    .tagline { color: var(--muted); margin-top: 4px; }
+    .card { background: var(--card); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+    a.button {
+      display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+      padding: 10px 18px; border-radius: 6px; font-weight: bold;
+    }
+    ul { padding-left: 1.2em; }
+    footer { color: var(--muted); font-size: 0.85rem; margin-top: 40px; }
+    [data-lang] { display: none; }
+    html[lang="fr"] [data-lang="fr"], html[lang="en"] [data-lang="en"] { display: block; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>FMAB — Alchemy of Amestris</h1>
+      <p class="tagline" data-lang="fr">Mod Minecraft (Fabric, Java 26.2) inspiré de <em>Fullmetal Alchemist: Brotherhood</em>.</p>
+      <p class="tagline" data-lang="en">Minecraft mod (Fabric, Java 26.2) inspired by <em>Fullmetal Alchemist: Brotherhood</em>.</p>
+    </div>
+    <div class="lang">
+      <button type="button" data-set-lang="fr">FR</button>
+      <button type="button" data-set-lang="en">EN</button>
+    </div>
+  </header>
+
+  <section data-lang="fr">
+    <p>Échange équivalent, cercles de transmutation que l'on dessine soi-même, examen d'Alchimiste
+      d'État, et bientôt la Porte de la Vérité.</p>
+    <div class="card">
+      <h2>Éditeur de cercles</h2>
+      <p>Composez vos cercles dans le navigateur : le même lecteur que dans le jeu reconnaît les glyphes,
+        décrit l'effet et prévient des rebonds. Exportez le code et importez-le dans le carnet.</p>
+      <p><a class="button" href="editor/">Ouvrir l'éditeur</a></p>
+    </div>
+    <h2>Dans le mod</h2>
+    <ul>
+      <li>Carnet de cercles, craie, Traité d'alchimie et ses exemples.</li>
+      <li>Cercles à plusieurs étages, liaisons, satellites, arbre de savoir par école.</li>
+      <li>Gants gravés, tatouages, Izumi Curtis, examen d'Alchimiste d'État.</li>
+      <li>Resembool et Central City.</li>
+    </ul>
+    <p><a href="https://github.com/Ajustor/fmab-mod">Code source et versions sur GitHub</a></p>
+  </section>
+
+  <section data-lang="en">
+    <p>Equivalent exchange, transmutation circles you draw yourself, the State Alchemist exam, and
+      soon the Gate of Truth.</p>
+    <div class="card">
+      <h2>Circle editor</h2>
+      <p>Design your circles in the browser: the same reader as in the game recognizes the glyphs,
+        describes the effect and warns about rebounds. Export the code and import it into the notebook.</p>
+      <p><a class="button" href="editor/">Open the editor</a></p>
+    </div>
+    <h2>In the mod</h2>
+    <ul>
+      <li>Circle notebook, chalk, the Alchemy Treatise and its examples.</li>
+      <li>Multi-stage circles, links, satellites, a knowledge tree per school.</li>
+      <li>Engraved gloves, tattoos, Izumi Curtis, the State Alchemist exam.</li>
+      <li>Resembool and Central City.</li>
+    </ul>
+    <p><a href="https://github.com/Ajustor/fmab-mod">Source code and releases on GitHub</a></p>
+  </section>
+
+  <footer>
+    <p data-lang="fr">Mod de fan, non affilié à Hiromu Arakawa, Square Enix, Bones ni Aniplex.
+      Fullmetal Alchemist et les noms associés appartiennent à leurs ayants droit.</p>
+    <p data-lang="en">Fan-made, not affiliated with Hiromu Arakawa, Square Enix, Bones or Aniplex.
+      Fullmetal Alchemist and all related names belong to their rights holders.</p>
+  </footer>
+</main>
+<script>
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem("fmab-lang"); } catch (e) {}
+    var lang = saved || ((navigator.language || "fr").toLowerCase().indexOf("fr") === 0 ? "fr" : "en");
+    function apply(l) {
+      document.documentElement.lang = l;
+      document.querySelectorAll("[data-set-lang]").forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.getAttribute("data-set-lang") === l));
+      });
+    }
+    document.querySelectorAll("[data-set-lang]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var l = b.getAttribute("data-set-lang");
+        try { localStorage.setItem("fmab-lang", l); } catch (e) {}
+        apply(l);
+      });
+    });
+    apply(lang);
+  })();
+</script>
+</body>
+</html>
