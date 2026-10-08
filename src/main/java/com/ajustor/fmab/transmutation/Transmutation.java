@@ -154,7 +154,7 @@ public final class Transmutation {
 		}
 		dropAll(level, circle, flow);
 		if (anything) {
-			sparks(level, circle, 40);
+			TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 1);
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 1.4f);
 			practice(caster, rules, knowledge, practiced);
 			Trainings.onTransmutation(caster, analysis, frame, inscribed, done);
@@ -163,7 +163,7 @@ public final class Transmutation {
 		caster.sendOverlayMessage(Component.translatable(last == Effects.Result.NO_MATERIAL
 				? "transmutation.fmab.no_material"
 				: "transmutation.fmab.no_target"));
-		sparks(level, circle, 8);
+		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.3);
 		return Result.NOTHING;
 	}
 
@@ -259,9 +259,4 @@ public final class Transmutation {
 		flow.clear();
 	}
 
-	/** Les éclairs bleus de la transmutation. */
-	private static void sparks(ServerLevel level, BlockPos circle, int count) {
-		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, circle.getX() + 0.5, circle.getY() + 0.1,
-				circle.getZ() + 0.5, count, 1.2, 0.2, 1.2, 0.05);
-	}
 }

@@ -9,13 +9,13 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.EffectContext;
 import com.ajustor.fmab.transmutation.Effects;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -183,7 +183,7 @@ public final class SoulBinding {
 				TeleportTransition.DO_NOTHING));
 		SoulArmor.inhabit(soul, pieces);
 		soul.setHealth(soul.getMaxHealth());
-		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y + 1, at.z, 40, 0.5, 0.8, 0.5, 0.05);
+		TransmutationLightning.discharge(level, BlockPos.containing(at), 1.5, 1);
 		level.playSound(null, BlockPos.containing(at), SoundEvents.ARMOR_EQUIP_IRON.value(), SoundSource.PLAYERS, 1, 0.6f);
 		soul.sendSystemMessage(Component.translatable("gate.fmab.soul.summoned"));
 	}

@@ -19,6 +19,7 @@ import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Passives;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.world.FmabStructures;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -53,6 +54,7 @@ public class Fmab implements ModInitializer {
 		FmabCommands.register();
 		Concentration.register();
 		Passives.register();
+		TransmutationLightning.register();
 		HumanTransmutation.register();
 		GateOfTruth.register();
 		Tolls.register();

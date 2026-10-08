@@ -2,6 +2,7 @@ package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.state.StateExam;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -131,7 +132,7 @@ public class StoneGolemEntity extends PathfinderMob {
 		if (anchored() && damage >= getHealth()) {
 			// Le cercle le reconstruit : il retombe en morceaux et se relève aussitôt.
 			setHealth(getMaxHealth());
-			level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 1, getZ(), 30, 0.6, 1, 0.6, 0.1);
+			TransmutationLightning.discharge(level, blockPosition(), 1.5, 1);
 			level.playSound(null, blockPosition(), SoundEvents.STONE_BREAK, SoundSource.HOSTILE, 1.5f, 0.6f);
 			if (source.getEntity() instanceof ServerPlayer player) {
 				player.sendOverlayMessage(Component.translatable("entity.fmab.stone_golem.rebuilt"));
