@@ -1,6 +1,8 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.data.FmabCodecs;
 import com.ajustor.fmab.data.NotebookContents;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -16,6 +18,15 @@ public final class FmabComponents {
 			DataComponentType.<NotebookContents>builder()
 					.persistent(NotebookContents.CODEC)
 					.networkSynchronized(NotebookContents.STREAM_CODEC)
+					.build());
+
+	/** Cercle brodé ou gravé sur un gant. */
+	public static final DataComponentType<Drawing> GLOVE_CIRCLE = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("glove_circle"),
+			DataComponentType.<Drawing>builder()
+					.persistent(FmabCodecs.DRAWING)
+					.networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(FmabCodecs.DRAWING))
 					.build());
 
 	/** Heure de jeu (ticks) à laquelle une arme transmutée se défait. */

@@ -2,6 +2,7 @@ package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.Gloves;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
@@ -15,6 +16,14 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.syncWith(AlchemistData.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("alchemist"));
+
+	/** Les gants portés, à gauche et à droite. */
+	public static final AttachmentType<Gloves> GLOVES = AttachmentRegistry.<Gloves>builder()
+			.persistent(Gloves.CODEC)
+			.initializer(() -> Gloves.NONE)
+			.copyOnDeath()
+			.syncWith(Gloves.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("gloves"));
 
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()

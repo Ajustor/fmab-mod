@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "minecraft:block/oak_planks",
+    "up": "fmab:block/alchemist_table_top",
+    "north": "fmab:block/alchemist_table_side",
+    "south": "fmab:block/alchemist_table_side",
+    "east": "fmab:block/alchemist_table_side",
+    "west": "fmab:block/alchemist_table_side",
+    "particle": "fmab:block/alchemist_table_side"
+  }
+}

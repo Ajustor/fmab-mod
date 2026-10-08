@@ -37,9 +37,32 @@ public final class Transmutation {
 	private Transmutation() {
 	}
 
-	public static void activate(ServerLevel level, BlockPos circle, BlockState state, Drawing drawing,
+	/** Ce qu'a donné l'activation, pour qui l'a demandée (un gant s'use, par exemple). */
+	public enum Result {
+		/** Le cercle n'a pas réagi : rien n'est dépensé. */
+		INERT,
+		/** Pas assez de concentration : rien n'est dépensé. */
+		TIRED,
+		REBOUND,
+		/** L'énergie est partie, mais rien n'a trouvé de matière ou de cible. */
+		NOTHING,
+		DONE
+	}
+
+	/** Un cercle inscrit sur une surface : en cas de rebond, c'est lui qui brûle. */
+	public static Result activate(ServerLevel level, BlockPos circle, BlockState state, Drawing drawing,
 			ServerPlayer caster) {
-		CircleFrame frame = CircleFrame.of(state);
+		return activate(level, circle, CircleFrame.of(state), drawing, caster, true, Integer.MAX_VALUE);
+	}
+
+	/**
+	 * @param circle    où le cercle agit : le bloc inscrit, ou la case devant la surface visée par un
+	 *                  gant
+	 * @param inscribed vrai pour un cercle inscrit, qui disparaît en cas de rebond
+	 * @param maxStages étages que le support peut porter (un gant de tissu n'en porte qu'un)
+	 */
+	public static Result activate(ServerLevel level, BlockPos circle, CircleFrame frame, Drawing drawing,
+			ServerPlayer caster, boolean inscribed, int maxStages) {
 		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Knowledge knowledge = rules.knowledge(alchemist);
@@ -51,19 +74,23 @@ public final class Transmutation {
 					? Component.translatable("transmutation.fmab.inert")
 					: Component.translatable(first.kind().translationKey()));
 			level.playSound(null, circle, SoundEvents.SAND_STEP, SoundSource.BLOCKS, 0.6f, 0.8f);
-			return;
+			return Result.INERT;
+		}
+		if (analysis.parsed().stages().size() > maxStages) {
+			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.support_too_small", maxStages));
+			return Result.INERT;
 		}
 		if (alchemist.concentration() < analysis.concentration()) {
 			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired",
 					analysis.concentration(), (int) alchemist.concentration()));
-			return;
+			return Result.TIRED;
 		}
 		caster.setAttached(FmabAttachments.ALCHEMIST,
 				alchemist.withConcentration(alchemist.concentration() - analysis.concentration()));
 
 		if (analysis.outcome() == Analysis.Outcome.REBOUND) {
-			rebound(level, circle, frame, caster, analysis);
-			return;
+			rebound(level, circle, frame, caster, analysis, inscribed);
+			return Result.REBOUND;
 		}
 
 		boolean anything = false;
@@ -105,27 +132,30 @@ public final class Transmutation {
 			sparks(level, circle, 40);
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 1.4f);
 			practice(caster, rules, knowledge, practiced);
-		} else {
-			caster.sendOverlayMessage(Component.translatable(last == Effects.Result.NO_MATERIAL
-					? "transmutation.fmab.no_material"
-					: "transmutation.fmab.no_target"));
-			sparks(level, circle, 8);
+			return Result.DONE;
 		}
+		caster.sendOverlayMessage(Component.translatable(last == Effects.Result.NO_MATERIAL
+				? "transmutation.fmab.no_material"
+				: "transmutation.fmab.no_target"));
+		sparks(level, circle, 8);
+		return Result.NOTHING;
 	}
 
 	/**
 	 * L'énergie revient sur l'alchimiste : quelques dégâts pour un cercle à peine instable, une
-	 * explosion qui détruit le support pour un cercle qui n'avait aucune chance.
+	 * explosion qui détruit le support pour un cercle inscrit qui n'avait aucune chance.
 	 */
 	private static void rebound(ServerLevel level, BlockPos circle, CircleFrame frame, ServerPlayer caster,
-			Analysis analysis) {
+			Analysis analysis, boolean inscribed) {
 		double severity = analysis.reboundSeverity();
 		caster.hurtServer(level, level.damageSources().magic(), (float) (2 + 16 * severity));
 		caster.sendOverlayMessage(Component.translatable("transmutation.fmab.rebound"));
 		level.sendParticles(ParticleTypes.LARGE_SMOKE, circle.getX() + 0.5, circle.getY() + 0.2, circle.getZ() + 0.5,
 				20, 0.6, 0.1, 0.6, 0.02);
-		level.removeBlock(circle, false);
-		if (severity >= SHATTERING_SEVERITY) {
+		if (inscribed) {
+			level.removeBlock(circle, false);
+		}
+		if (severity >= SHATTERING_SEVERITY && inscribed) {
 			Vec3 c = Vec3.atCenterOf(circle);
 			level.explode(null, c.x, c.y, c.z, 1.5f, Level.ExplosionInteraction.NONE);
 			level.destroyBlock(circle.relative(frame.normal().getOpposite()), false);

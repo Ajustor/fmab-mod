@@ -8,10 +8,13 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabRegistries;
 import com.ajustor.fmab.transmutation.Concentration;
+import com.ajustor.fmab.transmutation.GloveCasting;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
@@ -35,6 +38,16 @@ public class Fmab implements ModInitializer {
 		FmabCommands.register();
 		Concentration.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> equip(handler.getPlayer()));
+		// Gantelets : frapper un bloc, main libre, y lance leur cercle au lieu de commencer à le casser.
+		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
+			if (!GloveCasting.canStrike(player)) {
+				return InteractionResult.PASS;
+			}
+			if (player instanceof ServerPlayer serverPlayer) {
+				GloveCasting.strike(serverPlayer, pos, direction);
+			}
+			return InteractionResult.SUCCESS;
+		});
 	}
 
 	/**

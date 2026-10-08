@@ -3,6 +3,7 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.CircleMedium;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.ScreenItem;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
@@ -12,6 +13,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,6 +35,15 @@ public final class FmabItems {
 			p -> new ScreenItem(ScreenItem.Kind.TREATISE, p),
 			new Item.Properties().stacksTo(1));
 
+	public static final Item ALCHEMICAL_THREAD = register("alchemical_thread", Item::new, new Item.Properties());
+	public static final Item ALCHEMIST_TABLE = register("alchemist_table",
+			p -> new BlockItem(FmabBlocks.ALCHEMIST_TABLE, p), new Item.Properties().useBlockDescriptionPrefix());
+	public static final Item CLOTH_GLOVES = glove("cloth_gloves", GloveItem.Kind.CLOTH, 64);
+	public static final Item LEATHER_GLOVES = glove("leather_gloves", GloveItem.Kind.LEATHER, 128);
+	public static final Item SPARK_GLOVES = glove("spark_gloves", GloveItem.Kind.SPARK, 160);
+	public static final Item IRON_GAUNTLETS = glove("iron_gauntlets", GloveItem.Kind.GAUNTLET, 256);
+	public static final Item STATE_GLOVES = glove("state_gloves", GloveItem.Kind.STATE, 384);
+
 	/** Lance de pierre : les réglages de la lance de pierre vanilla, mais peu de durabilité. */
 	public static final Item STONE_LANCE = register("stone_lance", TransmutedWeaponItem::new,
 			new Item.Properties().spear(ToolMaterial.STONE, 0.75F, 0.82F, 0.7F, 4.5F, 13.0F, 9.0F, 5.1F, 13.75F, 4.6F)
@@ -44,6 +55,10 @@ public final class FmabItems {
 	public static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Fmab.id("alchemy"));
 
 	private FmabItems() {
+	}
+
+	private static Item glove(String name, GloveItem.Kind kind, int durability) {
+		return register(name, p -> new GloveItem(kind, p), new Item.Properties().durability(durability));
 	}
 
 	private static Item register(String name, Function<Item.Properties, Item> factory, Item.Properties properties) {
@@ -61,6 +76,13 @@ public final class FmabItems {
 					output.accept(CHALK);
 					output.accept(ALCHEMICAL_PAINT);
 					output.accept(ALCHEMIST_CHISEL);
+					output.accept(ALCHEMIST_TABLE);
+					output.accept(ALCHEMICAL_THREAD);
+					output.accept(CLOTH_GLOVES);
+					output.accept(LEATHER_GLOVES);
+					output.accept(SPARK_GLOVES);
+					output.accept(IRON_GAUNTLETS);
+					output.accept(STATE_GLOVES);
 				})
 				.build());
 	}

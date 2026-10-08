@@ -1,6 +1,7 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.block.AlchemistTableBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -22,6 +23,12 @@ public final class FmabBlocks {
 					.sound(SoundType.SAND)
 					.pushReaction(PushReaction.DESTROY)
 					.replaceable());
+
+	public static final Block ALCHEMIST_TABLE = register("alchemist_table", AlchemistTableBlock::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.WOOD)
+					.strength(2.5f)
+					.sound(SoundType.WOOD));
 
 	private FmabBlocks() {
 	}

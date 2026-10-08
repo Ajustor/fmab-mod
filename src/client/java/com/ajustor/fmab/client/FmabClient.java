@@ -2,17 +2,24 @@ package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
+import com.ajustor.fmab.client.screen.GlovesScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.network.CastGlovesPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.lwjgl.glfw.GLFW;
 
 public class FmabClient implements ClientModInitializer {
 	@Override
@@ -22,6 +29,20 @@ public class FmabClient implements ClientModInitializer {
 			switch (kind) {
 				case NOTEBOOK -> mc.gui.setScreen(new NotebookScreen(hand, mc.player.getItemInHand(hand)));
 				case TREATISE -> mc.gui.setScreen(new TreatiseScreen());
+			}
+		});
+		KeyMapping.Category category = KeyMapping.Category.register(Fmab.id("alchemy"));
+		KeyMapping cast = KeyMappingHelper.registerKeyMapping(
+				new KeyMapping("key.fmab.cast_gloves", GLFW.GLFW_KEY_G, category));
+		KeyMapping gloves = KeyMappingHelper.registerKeyMapping(
+				new KeyMapping("key.fmab.gloves", GLFW.GLFW_KEY_H, category));
+		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
+			while (cast.consumeClick()) {
+				// Maj : joindre les mains, les deux gants agissent.
+				ClientPlayNetworking.send(new CastGlovesPayload(mc.hasShiftDown()));
+			}
+			while (gloves.consumeClick()) {
+				mc.gui.setScreen(new GlovesScreen());
 			}
 		});
 		BlockEntityRendererRegistry.register(FmabBlockEntities.TRANSMUTATION_CIRCLE, TransmutationCircleRenderer::new);

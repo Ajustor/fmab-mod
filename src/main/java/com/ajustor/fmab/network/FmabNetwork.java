@@ -2,11 +2,13 @@ package com.ajustor.fmab.network;
 
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.GloveCasting;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
@@ -23,11 +25,29 @@ public final class FmabNetwork {
 	public static void register() {
 		PayloadTypeRegistry.serverboundPlay().register(SaveNotebookPayload.TYPE, SaveNotebookPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(LearnGlyphPayload.TYPE, LearnGlyphPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
 				(payload, context) -> saveNotebook(context.player(), payload.hand(), payload.contents()));
 		ServerPlayNetworking.registerGlobalReceiver(LearnGlyphPayload.TYPE,
 				(payload, context) -> learn(context.player(), payload.glyph()));
+		ServerPlayNetworking.registerGlobalReceiver(CastGlovesPayload.TYPE,
+				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
+		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,
+				(payload, context) -> removeGlove(context.player(), payload.left()));
+	}
+
+	private static void removeGlove(ServerPlayer player, boolean left) {
+		Gloves gloves = player.getAttachedOrCreate(FmabAttachments.GLOVES);
+		ItemStack glove = gloves.get(left);
+		if (glove.isEmpty()) {
+			return;
+		}
+		player.setAttached(FmabAttachments.GLOVES, gloves.with(left, ItemStack.EMPTY));
+		if (!player.getInventory().add(glove)) {
+			player.drop(glove, false);
+		}
 	}
 
 	private static void saveNotebook(ServerPlayer player, InteractionHand hand, NotebookContents contents) {

@@ -11,13 +11,24 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
  */
 public record CircleFrame(AttachFace face, Direction normal, Direction pageUp, Direction pageRight) {
 	public static CircleFrame of(BlockState state) {
-		AttachFace face = state.getValue(TransmutationCircleBlock.FACE);
 		Direction facing = state.getValue(TransmutationCircleBlock.FACING);
-		return switch (face) {
-			case FLOOR -> new CircleFrame(face, Direction.UP, facing, facing.getClockWise());
+		return switch (state.getValue(TransmutationCircleBlock.FACE)) {
+			case FLOOR -> forFace(Direction.UP, facing);
+			case CEILING -> forFace(Direction.DOWN, facing);
+			case WALL -> forFace(facing, facing);
+		};
+	}
+
+	/**
+	 * Repère d'un cercle porté par un gant et appliqué sur la face {@code clicked} d'un bloc,
+	 * comme si on l'y avait tracé en regardant dans la direction {@code look}.
+	 */
+	public static CircleFrame forFace(Direction clicked, Direction look) {
+		return switch (clicked) {
+			case UP -> new CircleFrame(AttachFace.FLOOR, Direction.UP, look, look.getClockWise());
 			// Vu d'en dessous, la droite de la page est à l'opposé de ce qu'elle serait vue d'en haut.
-			case CEILING -> new CircleFrame(face, Direction.DOWN, facing, facing.getCounterClockWise());
-			case WALL -> new CircleFrame(face, facing, Direction.UP, facing.getCounterClockWise());
+			case DOWN -> new CircleFrame(AttachFace.CEILING, Direction.DOWN, look, look.getCounterClockWise());
+			default -> new CircleFrame(AttachFace.WALL, clicked, Direction.UP, clicked.getCounterClockWise());
 		};
 	}
 
