@@ -1,0 +1,730 @@
+{
+ "chapters": [
+  {
+   "title": "treatise.fmab.ch1.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.ch1.p1"
+    },
+    {
+     "text": "treatise.fmab.ch1.p2"
+    }
+   ]
+  },
+  {
+   "title": "treatise.fmab.ch2.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.ch2.p1"
+    },
+    {
+     "text": "treatise.fmab.ch2.p2"
+    }
+   ]
+  },
+  {
+   "title": "treatise.fmab.ch3.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.ch3.p1"
+    },
+    {
+     "glyphs": true
+    }
+   ]
+  },
+  {
+   "title": "treatise.fmab.ch4.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.ch4.p1"
+    },
+    {
+     "text": "treatise.fmab.ch4.p2"
+    },
+    {
+     "text": "treatise.fmab.ch4.p3"
+    }
+   ]
+  },
+  {
+   "title": "treatise.fmab.ch5.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.ch5.p1"
+    },
+    {
+     "text": "treatise.fmab.ch5.wall",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         28,
+         23
+        ],
+        [
+         4,
+         23
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.5,
+         9.0
+        ],
+        [
+         18.5,
+         9.0
+        ],
+        [
+         16.0,
+         13.5
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.5,
+        11.5
+       ],
+       "to": [
+        17.5,
+        11.5
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        20.0
+       ],
+       "radius": 2.0
+      },
+      {
+       "type": "line",
+       "from": [
+        14.0,
+        20.0
+       ],
+       "to": [
+        18.0,
+        20.0
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.ch5.spike",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.5,
+         9.0
+        ],
+        [
+         18.5,
+         9.0
+        ],
+        [
+         16.0,
+         13.5
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.5,
+        11.5
+       ],
+       "to": [
+        17.5,
+        11.5
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         14.5,
+         20.0
+        ],
+        [
+         17.5,
+         20.0
+        ],
+        [
+         16.0,
+         17.5
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        20.0
+       ],
+       "to": [
+        16.0,
+        22.5
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        15.0,
+        21.5
+       ],
+       "to": [
+        17.0,
+        21.5
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.ch5.blade",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        15.5,
+        11.5
+       ],
+       "radius": 1.5
+      },
+      {
+       "type": "line",
+       "from": [
+        16.5,
+        10.5
+       ],
+       "to": [
+        18.0,
+        9.0
+       ]
+      },
+      {
+       "type": "polyline",
+       "points": [
+        [
+         17.0,
+         9.0
+        ],
+        [
+         18.0,
+         9.0
+        ],
+        [
+         18.0,
+         10.0
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         14.5,
+         20.0
+        ],
+        [
+         17.5,
+         20.0
+        ],
+        [
+         16.0,
+         17.5
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        20.0
+       ],
+       "to": [
+        16.0,
+        22.5
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        15.0,
+        21.5
+       ],
+       "to": [
+        17.0,
+        21.5
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.ch5.ice",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         28,
+         23
+        ],
+        [
+         4,
+         23
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.5,
+         9.0
+        ],
+        [
+         18.5,
+         9.0
+        ],
+        [
+         16.0,
+         13.5
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        20.0
+       ],
+       "radius": 2.0
+      },
+      {
+       "type": "line",
+       "from": [
+        14.0,
+        20.0
+       ],
+       "to": [
+        18.0,
+        20.0
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.ch5.decompose",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.5,
+         9.0
+        ],
+        [
+         18.5,
+         9.0
+        ],
+        [
+         16.0,
+         13.5
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.5,
+        11.5
+       ],
+       "to": [
+        17.5,
+        11.5
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.0,
+        20.0
+       ],
+       "to": [
+        18.0,
+        20.0
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        18.0
+       ],
+       "to": [
+        16.0,
+        22.0
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        18.5,
+        20.0
+       ],
+       "radius": 0.5
+      },
+      {
+       "type": "circle",
+       "center": [
+        13.5,
+        20.0
+       ],
+       "radius": 0.5
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        22.5
+       ],
+       "radius": 0.5
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        17.5
+       ],
+       "radius": 0.5
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.ch5.repair",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        15.5,
+        11.5
+       ],
+       "radius": 1.5
+      },
+      {
+       "type": "line",
+       "from": [
+        16.5,
+        10.5
+       ],
+       "to": [
+        18.0,
+        9.0
+       ]
+      },
+      {
+       "type": "polyline",
+       "points": [
+        [
+         17.0,
+         9.0
+        ],
+        [
+         18.0,
+         9.0
+        ],
+        [
+         18.0,
+         10.0
+        ]
+       ]
+      },
+      {
+       "type": "arc",
+       "center": [
+        16.0,
+        20.0
+       ],
+       "radius": 2.0,
+       "start_deg": 20,
+       "sweep_deg": 320
+      },
+      {
+       "type": "circle",
+       "center": [
+        18.0,
+        20.0
+       ],
+       "radius": 0.5
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.ch5.wide_wall",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.5,
+         9.0
+        ],
+        [
+         18.5,
+         9.0
+        ],
+        [
+         16.0,
+         13.5
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.5,
+        11.5
+       ],
+       "to": [
+        17.5,
+        11.5
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        20.0
+       ],
+       "radius": 2.0
+      },
+      {
+       "type": "line",
+       "from": [
+        14.0,
+        20.0
+       ],
+       "to": [
+        18.0,
+        20.0
+       ]
+      },
+      {
+       "type": "dot",
+       "at": [
+        2,
+        16
+       ]
+      },
+      {
+       "type": "dot",
+       "at": [
+        30,
+        16
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "treatise.fmab.ch6.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.ch6.p1"
+    },
+    {
+     "text": "treatise.fmab.ch6.p2"
+    }
+   ]
+  },
+  {
+   "title": "treatise.fmab.ch7.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.ch7.p1"
+    }
+   ]
+  }
+ ]
+}

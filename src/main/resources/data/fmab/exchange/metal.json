@@ -1,0 +1,17 @@
+{
+  "family": "metal",
+  "values": {
+    "minecraft:iron_nugget": 1,
+    "minecraft:iron_ingot": 9,
+    "minecraft:iron_block": 81,
+    "minecraft:raw_iron": 9,
+    "minecraft:raw_iron_block": 81,
+    "minecraft:iron_sword": 18,
+    "minecraft:copper_ingot": 9,
+    "minecraft:copper_block": 81,
+    "minecraft:raw_copper": 9,
+    "minecraft:gold_nugget": 1,
+    "minecraft:gold_ingot": 9,
+    "minecraft:gold_block": 81
+  }
+}

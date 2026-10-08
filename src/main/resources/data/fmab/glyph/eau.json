@@ -1,0 +1,19 @@
+{
+  "id": "fmab:eau",
+  "layer": "element",
+  "element": "water",
+  "primitives": [
+    { "type": "polygon", "points": [[-0.8, -0.6], [0.8, -0.6], [0.0, 0.8]] }
+  ],
+  "complexity": 1,
+  "concentration": 2,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.eau",
+  "description_key": "glyph.fmab.eau.desc",
+  "since": "0.1"
+}

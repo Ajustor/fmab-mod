@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "fmab:block/chalk_circle"
+    },
+    "facing=south": {
+      "model": "fmab:block/chalk_circle"
+    },
+    "facing=east": {
+      "model": "fmab:block/chalk_circle"
+    },
+    "facing=west": {
+      "model": "fmab:block/chalk_circle"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "fmab:cuivre",
+  "layer": "element",
+  "element": "copper",
+  "primitives": [
+    { "type": "circle", "center": [0.0, -0.4], "radius": 0.45 },
+    { "type": "line", "from": [0.0, 0.05], "to": [0.0, 0.95] },
+    { "type": "line", "from": [-0.3, 0.5], "to": [0.3, 0.5] }
+  ],
+  "complexity": 2,
+  "concentration": 3,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.cuivre",
+  "description_key": "glyph.fmab.cuivre.desc",
+  "since": "0.1"
+}

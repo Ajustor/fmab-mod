@@ -1,0 +1,19 @@
+{
+  "id": "fmab:intensite",
+  "layer": "modifier",
+  "modifier": "intensity",
+  "primitives": [
+    { "type": "dot", "at": [0.0, 0.0] }
+  ],
+  "complexity": 1,
+  "concentration": 2,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 180,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.intensite",
+  "description_key": "glyph.fmab.intensite.desc",
+  "since": "0.1"
+}
