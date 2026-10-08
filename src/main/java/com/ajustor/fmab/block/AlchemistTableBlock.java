@@ -1,6 +1,7 @@
 package com.ajustor.fmab.block;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.alchemy.drawing.SoulSeal;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.GloveItem;
@@ -25,6 +26,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Table d'alchimiste : on y brode (au fil alchimique) ou grave (au burin) sur un gant le cercle
@@ -108,13 +112,23 @@ public class AlchemistTableBlock extends Block {
 	}
 
 	/**
-	 * Accroupi, on trace son propre sceau dans un plastron, à l'encre alchimique ou de son sang (une
-	 * âme n'en a plus : il lui faut de l'encre). Posé sur un porte-armure, au-dessus d'un cercle
-	 * d'âme, il pourra accueillir son âme le jour où elle n'aura plus d'armure.
+	 * Accroupi, on trace dans un plastron le sceau de sang sélectionné dans le carnet : le sien, ou
+	 * celui d'un ami (comme Ed pour Al). Il se trace à l'encre alchimique ou du sang de qui le trace
+	 * (une âme n'en a plus : il lui faut de l'encre). Posé sur un porte-armure, au-dessus d'un cercle
+	 * d'âme, il pourra accueillir l'âme de son propriétaire.
 	 */
 	private static InteractionResult seal(ItemStack stack, Level level, BlockPos pos, Player player) {
 		if (level.isClientSide()) {
 			return InteractionResult.SUCCESS;
+		}
+		Drawing selected = InscriptionItem.selectedDrawing(player);
+		Optional<UUID> owner = level.getServer().getPlayerList().getPlayers().stream()
+				.map(Player::getUUID)
+				.filter(id -> SoulSeal.of(id).equals(selected))
+				.findFirst();
+		if (owner.isEmpty()) {
+			player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.no_seal"));
+			return InteractionResult.FAIL;
 		}
 		ItemStack ink = ItemStack.EMPTY;
 		for (ItemStack s : player.getInventory()) {
@@ -134,7 +148,7 @@ public class AlchemistTableBlock extends Block {
 			player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.needs_ink"));
 			return InteractionResult.FAIL;
 		}
-		ItemStack sealed = SoulArmor.sealed(level.registryAccess(), player.getUUID(), stack);
+		ItemStack sealed = SoulArmor.sealed(level.registryAccess(), owner.get(), stack);
 		stack.shrink(1);
 		if (!player.getInventory().add(sealed)) {
 			player.drop(sealed, false);

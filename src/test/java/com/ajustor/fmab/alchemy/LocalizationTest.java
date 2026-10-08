@@ -95,6 +95,7 @@ class LocalizationTest {
 				switch (p) {
 					case Treatise.TextPage t -> needed.add(t.textKey());
 					case Treatise.ExamplePage e -> needed.add(e.textKey());
+					case Treatise.SealPage s -> needed.add(s.textKey());
 					case Treatise.GlyphCatalogue g -> {
 					}
 				}

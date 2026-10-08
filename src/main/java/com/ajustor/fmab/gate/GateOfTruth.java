@@ -248,6 +248,7 @@ public final class GateOfTruth {
 			if (part == BodyPart.BODY) {
 				SoulArmor.bindFirstTime(player);
 				player.sendSystemMessage(Component.translatable("gate.fmab.soul.first_armor"));
+				SoulArmor.giveNotes(player);
 			}
 		}
 		player.setAttached(FmabAttachments.GATE, paid);

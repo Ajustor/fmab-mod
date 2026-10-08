@@ -70,9 +70,12 @@ joueur compose lui-même :
   l'alchimiste : ce qu'elle prend, elle le porte, avec sa peau.
 - **Corps entier** : la première fois, l'âme se réveille dans une armure de fer scellée de son sang
   (sans faim ni souffle). Les coups usent les pièces, qu'on refait ; si le plastron cède, l'âme erre
-  devant la Porte jusqu'à ce qu'un **cercle d'âme** (Humain + Fixer) l'appelle dans une armure. Une
-  âme prévoyante prépare des plastrons scellés sur des porte-armure, au-dessus de cercles d'âme, et
-  demande à sa Vérité de l'y rappeler.
+  devant la Porte jusqu'à ce qu'un **cercle d'âme** (Humain + Fixer) l'appelle dans une armure.
+  Chaque joueur a son propre **sceau de sang** (Traité, chapitre VIII) : on le trace dans un plastron
+  à l'encre alchimique ou de son sang, pour soi ou pour un ami. Une âme prévoyante prépare des
+  plastrons scellés sur des porte-armure au-dessus de cercles d'âme, et demande à sa Vérité de l'y
+  rappeler ; elle peut aussi changer d'armure, et se répare en y transmutant son matériau.
+- **Taille des cercles** : 1, 3, 5 ou 7 blocs, de plus en plus puissants et coûteux.
 - **Transmutation sans cercle** pour les Initiés de la Porte : Maj+G joint les mains et lance le
   cercle sélectionné du carnet.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : établi d'automail, usure,

@@ -1,9 +1,13 @@
 package com.ajustor.fmab.gate;
 
+import com.ajustor.fmab.alchemy.drawing.SoulSeal;
+import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.transmutation.AlchemyRules;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
@@ -15,6 +19,7 @@ import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,6 +71,45 @@ public final class SoulArmor {
 				EquipmentSlot.CHEST, sealed(player.level().registryAccess(), player.getUUID(), ItemStack.EMPTY),
 				EquipmentSlot.LEGS, new ItemStack(Items.IRON_LEGGINGS),
 				EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS)));
+	}
+
+	/**
+	 * Ce qu'une âme doit savoir, écrit dans son carnet (ou dans un carnet neuf) : son sceau de sang,
+	 * pour préparer d'autres armures, et le cercle Fer et Réparer qui redresse la sienne.
+	 */
+	public static void giveNotes(ServerPlayer player) {
+		AlchemyRules rules = AlchemyRules.of(player.level().registryAccess());
+		List<NotebookContents.Page> pages = new ArrayList<>();
+		pages.add(new NotebookContents.Page(Component.translatable("gate.fmab.page.seal",
+				player.getName().getString()).getString(), SoulSeal.of(player.getUUID())));
+		rules.combinations().stream()
+				.filter(c -> c.effect().equals("fmab:repair"))
+				.findFirst()
+				.flatMap(rules::simpleCircle)
+				.ifPresent(d -> pages.add(new NotebookContents.Page("@gate.fmab.page.repair", d)));
+		ItemStack notebook = ItemStack.EMPTY;
+		for (ItemStack stack : player.getInventory()) {
+			if (stack.is(FmabItems.CIRCLE_NOTEBOOK)) {
+				NotebookContents c = stack.getOrDefault(FmabComponents.NOTEBOOK, NotebookContents.EMPTY);
+				if (c.pages().size() + pages.size() <= NotebookContents.MAX_PAGES) {
+					notebook = stack;
+					break;
+				}
+			}
+		}
+		boolean fresh = notebook.isEmpty();
+		if (fresh) {
+			notebook = new ItemStack(FmabItems.CIRCLE_NOTEBOOK);
+		}
+		NotebookContents contents = notebook.getOrDefault(FmabComponents.NOTEBOOK, NotebookContents.EMPTY);
+		for (NotebookContents.Page page : pages) {
+			contents = contents.withPage(contents.pages().size(), page);
+		}
+		notebook.set(FmabComponents.NOTEBOOK, contents);
+		if (fresh && !player.getInventory().add(notebook)) {
+			player.drop(notebook, false);
+		}
+		player.sendSystemMessage(Component.translatable("gate.fmab.soul.notes"));
 	}
 
 	/** L'âme entre dans une armure : chaque pièce prend sa place, ce qui était porté va au sac. */

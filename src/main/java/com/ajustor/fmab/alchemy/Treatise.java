@@ -30,6 +30,10 @@ public record Treatise(List<Chapter> chapters) {
 	public record ExamplePage(String textKey, Drawing drawing) implements Page {
 	}
 
+	/** Le sceau de sang du lecteur : chacun y voit le sien. */
+	public record SealPage(String textKey) implements Page {
+	}
+
 	public static Treatise parse(JsonObject json) {
 		List<Chapter> chapters = new ArrayList<>();
 		for (JsonElement c : json.getAsJsonArray("chapters")) {
@@ -39,6 +43,8 @@ public record Treatise(List<Chapter> chapters) {
 				JsonObject page = p.getAsJsonObject();
 				if (page.has("glyphs")) {
 					pages.add(new GlyphCatalogue());
+				} else if (page.has("seal")) {
+					pages.add(new SealPage(page.get("text").getAsString()));
 				} else if (page.has("example")) {
 					List<Primitive> prims = new ArrayList<>();
 					page.getAsJsonArray("example").forEach(e -> prims.add(GlyphJson.primitive(e.getAsJsonObject())));

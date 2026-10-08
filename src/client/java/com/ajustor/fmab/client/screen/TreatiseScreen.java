@@ -4,6 +4,7 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.Treatise;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.DrawingCode;
+import com.ajustor.fmab.alchemy.drawing.SoulSeal;
 import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.client.render.CircleTextures;
@@ -134,7 +135,7 @@ public class TreatiseScreen extends Screen {
 		notebookButton.setMessage(Component.translatable("treatise.fmab.add_to_notebook"));
 		if (e != null && e.glyph() != null) {
 			notebookButton.visible = glyphExample(e.glyph()).isPresent();
-		} else if (e != null && e.page() instanceof Treatise.ExamplePage) {
+		} else if (e != null && (e.page() instanceof Treatise.ExamplePage || e.page() instanceof Treatise.SealPage)) {
 			actionButton.visible = true;
 			actionButton.active = true;
 			actionButton.setMessage(Component.translatable("treatise.fmab.copy"));
@@ -164,6 +165,9 @@ public class TreatiseScreen extends Screen {
 		} else if (e.page() instanceof Treatise.ExamplePage example) {
 			String title = exampleTitle(Component.translatable(example.textKey()).getString());
 			ClientPlayNetworking.send(new AddToNotebookPayload(title, example.drawing()));
+		} else if (e.page() instanceof Treatise.SealPage && minecraft != null && minecraft.player != null) {
+			ClientPlayNetworking.send(new AddToNotebookPayload(Component.translatable("gate.fmab.page.seal",
+					minecraft.player.getName().getString()).getString(), mySeal()));
 		}
 		notebookButton.active = false;
 		notebookButton.setMessage(Component.translatable("treatise.fmab.added_short"));
@@ -189,7 +193,15 @@ public class TreatiseScreen extends Screen {
 		if (e.page() instanceof Treatise.ExamplePage example) {
 			Minecraft.getInstance().keyboardHandler.setClipboard(DrawingCode.encode(example.drawing()));
 			actionButton.setMessage(Component.translatable("treatise.fmab.copied"));
+		} else if (e.page() instanceof Treatise.SealPage) {
+			Minecraft.getInstance().keyboardHandler.setClipboard(DrawingCode.encode(mySeal()));
+			actionButton.setMessage(Component.translatable("treatise.fmab.copied"));
 		}
+	}
+
+	/** Le sceau de sang de qui lit le Traité. */
+	private Drawing mySeal() {
+		return minecraft == null || minecraft.player == null ? Drawing.EMPTY : SoulSeal.of(minecraft.player.getUUID());
 	}
 
 	private Entry current() {
@@ -213,6 +225,9 @@ public class TreatiseScreen extends Screen {
 			} else if (e.page() instanceof Treatise.ExamplePage example) {
 				drawImage(graphics, example.drawing());
 				drawText(graphics, Component.translatable(example.textKey()), BOOK_WIDTH - IMAGE - 36);
+			} else if (e.page() instanceof Treatise.SealPage seal) {
+				drawImage(graphics, mySeal());
+				drawText(graphics, Component.translatable(seal.textKey()), BOOK_WIDTH - IMAGE - 36);
 			} else if (e.page() instanceof Treatise.TextPage text) {
 				drawText(graphics, Component.translatable(text.textKey()), BOOK_WIDTH - 24);
 			}
