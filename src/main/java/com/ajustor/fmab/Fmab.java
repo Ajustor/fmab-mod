@@ -11,6 +11,7 @@ import com.ajustor.fmab.registry.FmabRegistries;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Passives;
+import com.ajustor.fmab.world.FmabStructures;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -36,6 +37,7 @@ public class Fmab implements ModInitializer {
 		FmabBlocks.register();
 		FmabBlockEntities.register();
 		FmabEntities.register();
+		FmabStructures.register();
 		FmabItems.register();
 		FmabNetwork.register();
 		FmabCommands.register();
