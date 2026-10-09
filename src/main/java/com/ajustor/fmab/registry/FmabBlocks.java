@@ -116,6 +116,29 @@ public final class FmabBlocks {
 					.lightLevel(state -> 3)
 					.sound(SoundType.AMETHYST));
 
+	/** Les briques claires des villes d'Amestris, de Central à Dublith. */
+	public static final Block AMESTRIAN_BRICKS = register("amestrian_bricks", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.SAND)
+					.strength(2.0f, 6.0f)
+					.requiresCorrectToolForDrops()
+					.sound(SoundType.STONE));
+
+	/** Les briques rouges des pavillons de Xing. */
+	public static final Block XING_BRICKS = register("xing_bricks", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.COLOR_RED)
+					.strength(2.0f, 6.0f)
+					.requiresCorrectToolForDrops()
+					.sound(SoundType.MUD_BRICKS));
+
+	/** La neige tassée en blocs des remparts de Briggs. */
+	public static final Block BRIGGS_PACKED_SNOW = register("briggs_packed_snow", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.SNOW)
+					.strength(0.8f)
+					.sound(SoundType.SNOW));
+
 	private FmabBlocks() {
 	}
 

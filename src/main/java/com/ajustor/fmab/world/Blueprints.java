@@ -335,6 +335,8 @@ public final class Blueprints {
 	}
 
 	private static final Palette[] CITY_PALETTES = {
+			new Palette(b(FmabBlocks.AMESTRIAN_BRICKS), b(Blocks.STONE_BRICKS), b(Blocks.OAK_PLANKS), b(Blocks.STONE_BRICKS),
+					Blocks.DEEPSLATE_TILE_STAIRS, b(FmabBlocks.AMESTRIAN_BRICKS), Blocks.OAK_DOOR),
 			new Palette(b(Blocks.BRICKS), b(Blocks.STONE_BRICKS), b(Blocks.SPRUCE_PLANKS), b(Blocks.STONE_BRICKS),
 					Blocks.DEEPSLATE_TILE_STAIRS, b(Blocks.BRICKS), Blocks.SPRUCE_DOOR),
 			new Palette(b(Blocks.DYED_TERRACOTTA.pick(DyeColor.WHITE)), b(Blocks.STONE_BRICKS), b(Blocks.OAK_PLANKS), b(Blocks.STONE_BRICKS),
@@ -1042,7 +1044,7 @@ public final class Blueprints {
 			if (z == 0 && Math.abs(x - mid) <= 1) {
 				return AIR;
 			}
-			return y == 4 ? b(Blocks.DEEPSLATE_TILE_SLAB) : b(Blocks.MUD_BRICKS);
+			return y == 4 ? b(Blocks.DEEPSLATE_TILE_SLAB) : b(FmabBlocks.XING_BRICKS);
 		}
 
 		/** Le pavillon : l'estrade, les piliers, les cloisons, et ce qu'on trouve dedans. */
@@ -1170,7 +1172,7 @@ public final class Blueprints {
 		private static BlockState wall(int x, int y, int z, Plot p) {
 			if (y <= WALL_TOP) {
 				if (y == WALL_TOP) {
-					return b(Blocks.SMOOTH_STONE);
+					return b(FmabBlocks.BRIGGS_PACKED_SNOW);
 				}
 				return p.noise(x, y, z, 9) == 0 ? b(Blocks.CRACKED_STONE_BRICKS) : b(Blocks.STONE_BRICKS);
 			}
@@ -1323,7 +1325,7 @@ public final class Blueprints {
 	}
 
 	private static final Palette[] DUBLITH_PALETTES = {
-			new Palette(b(Blocks.BRICKS), b(Blocks.SPRUCE_LOG), b(Blocks.OAK_PLANKS), b(Blocks.COBBLESTONE),
+			new Palette(b(FmabBlocks.AMESTRIAN_BRICKS), b(Blocks.SPRUCE_LOG), b(Blocks.OAK_PLANKS), b(Blocks.COBBLESTONE),
 					Blocks.SPRUCE_STAIRS, b(Blocks.SPRUCE_PLANKS), Blocks.OAK_DOOR),
 			new Palette(b(Blocks.DYED_TERRACOTTA.pick(DyeColor.WHITE)), b(Blocks.DARK_OAK_LOG), b(Blocks.SPRUCE_PLANKS),
 					b(Blocks.COBBLESTONE), Blocks.BRICK_STAIRS, b(Blocks.BRICKS), Blocks.DARK_OAK_DOOR),

@@ -209,6 +209,13 @@ public final class FmabItems {
 	public static final Item HOHENHEIM_SPAWN_EGG = register("hohenheim_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.HOHENHEIM));
 
+	public static final Item AMESTRIAN_BRICKS = register("amestrian_bricks",
+			p -> new BlockItem(FmabBlocks.AMESTRIAN_BRICKS, p), new Item.Properties().useBlockDescriptionPrefix());
+	public static final Item XING_BRICKS = register("xing_bricks",
+			p -> new BlockItem(FmabBlocks.XING_BRICKS, p), new Item.Properties().useBlockDescriptionPrefix());
+	public static final Item BRIGGS_PACKED_SNOW = register("briggs_packed_snow",
+			p -> new BlockItem(FmabBlocks.BRIGGS_PACKED_SNOW, p), new Item.Properties().useBlockDescriptionPrefix());
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -295,6 +302,9 @@ public final class FmabItems {
 					output.accept(RED_STONE_ORE);
 					output.accept(RED_STONE_SHARD);
 					output.accept(XERXES_MURAL);
+					output.accept(AMESTRIAN_BRICKS);
+					output.accept(XING_BRICKS);
+					output.accept(BRIGGS_PACKED_SNOW);
 					output.accept(CORNELLO_SPAWN_EGG);
 					output.accept(SCAR_SPAWN_EGG);
 					output.accept(HOHENHEIM_SPAWN_EGG);

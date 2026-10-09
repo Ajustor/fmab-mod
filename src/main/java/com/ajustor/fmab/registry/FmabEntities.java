@@ -404,6 +404,7 @@ public final class FmabEntities {
 						&& !level.getBlockState(pos.below()).is(BlockTags.STONE_BRICKS)
 						&& !level.getBlockState(pos.below()).is(BlockTags.PLANKS)
 						&& !level.getBlockState(pos.below()).is(Blocks.POLISHED_ANDESITE)
-						&& !level.getBlockState(pos.below()).is(Blocks.SMOOTH_STONE));
+						&& !level.getBlockState(pos.below()).is(Blocks.SMOOTH_STONE)
+						&& !level.getBlockState(pos.below()).is(FmabBlocks.BRIGGS_PACKED_SNOW));
 	}
 }

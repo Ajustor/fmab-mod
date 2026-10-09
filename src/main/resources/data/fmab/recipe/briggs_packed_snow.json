@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "SI",
+    "IS"
+  ],
+  "key": {
+    "S": "minecraft:snow_block",
+    "I": "minecraft:packed_ice"
+  },
+  "result": {
+    "id": "fmab:briggs_packed_snow",
+    "count": 4
+  }
+}
