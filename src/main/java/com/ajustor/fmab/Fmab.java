@@ -19,6 +19,7 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabRegistries;
+import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.Eclipse;
 import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
@@ -55,6 +56,7 @@ public class Fmab implements ModInitializer {
 		FmabConfig.load();
 		FmabRegistries.register();
 		FmabComponents.register();
+		FmabSounds.register();
 		FmabAttachments.register();
 		FmabBlocks.register();
 		FmabBlockEntities.register();

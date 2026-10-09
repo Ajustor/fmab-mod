@@ -7,6 +7,7 @@ import com.ajustor.fmab.client.render.CornelloRenderer;
 import com.ajustor.fmab.client.render.DrachmaSoldierRenderer;
 import com.ajustor.fmab.client.render.EnvyRenderer;
 import com.ajustor.fmab.client.render.FatherRenderer;
+import com.ajustor.fmab.client.render.GateHandRenderer;
 import com.ajustor.fmab.client.render.GluttonyRenderer;
 import com.ajustor.fmab.client.render.GreedRenderer;
 import com.ajustor.fmab.client.render.HauntedArmorRenderer;
@@ -40,6 +41,7 @@ import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.network.CastGlovesPayload;
+import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.network.OpenExamPayload;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.network.OpenTattooPayload;
@@ -121,6 +123,11 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.CORNELLO, CornelloRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.SCAR, ScarRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.HOHENHEIM, HohenheimRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.GATE_HAND, GateHandRenderer::new);
+		ClientPlayNetworking.registerGlobalReceiver(CinematicPayload.TYPE, (payload, context) -> Cinematics.start(payload));
+		ClientTickEvents.END_CLIENT_TICK.register(mc -> Cinematics.tick());
+		// Par-dessus tout, interface comprise : c'est une cinématique.
+		HudElementRegistry.addLast(Fmab.id("cinematic"), Cinematics::render);
 		ClientPlayNetworking.registerGlobalReceiver(OpenTruthPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,

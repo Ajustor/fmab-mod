@@ -10,6 +10,7 @@ import com.ajustor.fmab.entity.CornelloEntity;
 import com.ajustor.fmab.entity.DrachmaSoldierEntity;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.FatherEntity;
+import com.ajustor.fmab.entity.GateHandEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
 import com.ajustor.fmab.entity.GreedEntity;
 import com.ajustor.fmab.entity.HauntedArmorEntity;
@@ -29,6 +30,8 @@ import com.ajustor.fmab.entity.ThrowingKnifeEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.entity.WrathEntity;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.tags.BlockTags;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -340,6 +343,16 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(HOHENHEIM_KEY));
 
+	private static final ResourceKey<EntityType<?>> GATE_HAND_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("gate_hand"));
+
+	/** Un bras noir de la Porte, le temps d'une cinématique. */
+	public static final EntityType<GateHandEntity> GATE_HAND = Registry.register(BuiltInRegistries.ENTITY_TYPE, GATE_HAND_KEY,
+			EntityType.Builder.<GateHandEntity>of(GateHandEntity::new, MobCategory.MISC)
+					.sized(0.4F, 0.4F)
+					.clientTrackingRange(10)
+					.updateInterval(2)
+					.build(GATE_HAND_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -380,7 +393,11 @@ public final class FmabEntities {
 		BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OVERWORLD), MobCategory.MONSTER, CHIMERA_BEAST, 6, 1, 1);
 		BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OVERWORLD), MobCategory.MONSTER, CHIMERA_CRAWLER, 10, 1, 2);
 		// Les soldats de Drachma n'apparaissent que dans le noir, comme tout monstre.
+		// Ils rôdent au pied du mur, pas dans le fort : jamais sur un sol bâti.
 		SpawnPlacements.register(DRACHMA_SOLDIER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-				Monster::checkMonsterSpawnRules);
+				(type, level, reason, pos, random) -> Monster.checkMonsterSpawnRules(type, level, reason, pos, random)
+						&& !level.getBlockState(pos.below()).is(BlockTags.STONE_BRICKS)
+						&& !level.getBlockState(pos.below()).is(BlockTags.PLANKS)
+						&& !level.getBlockState(pos.below()).is(Blocks.POLISHED_ANDESITE));
 	}
 }

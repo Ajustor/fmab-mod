@@ -11,6 +11,7 @@ import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -88,7 +89,7 @@ public final class GloveCasting {
 		if (hit == null) {
 			return;
 		}
-		player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_ATTACK_WEAK, SoundSource.PLAYERS, 1, 1.8f);
+		player.level().playSound(null, player.blockPosition(), FmabSounds.CLAP, SoundSource.PLAYERS, 1, 1);
 		player.swing(InteractionHand.OFF_HAND, true);
 		Transmutation.activate(player.level(), hit.getBlockPos().relative(hit.getDirection()),
 				CircleFrame.forFace(hit.getDirection(), player.getDirection()), drawing, player, false, Integer.MAX_VALUE);

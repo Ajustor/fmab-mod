@@ -5,6 +5,7 @@ import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.KunaiEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabSounds;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -97,7 +98,7 @@ public final class Alkahestry {
 		ring.forEach(KunaiEntity::spend);
 		boolean trap = kunai.trap();
 		CIRCLES.add(new Circle(level, center, radius + 0.5, trap, thrower.getUUID(), level.getGameTime() + DURATION));
-		level.playSound(null, kunai.blockPosition(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.5f,
+		level.playSound(null, kunai.blockPosition(), FmabSounds.ALKAHESTRY, SoundSource.PLAYERS, 1.5f,
 				trap ? 0.6f : 1.4f);
 		thrower.sendOverlayMessage(Component.translatable(trap ? "alkahestry.fmab.trap" : "alkahestry.fmab.heal"));
 		// Les traits du cercle, d'un kunaï à l'autre, et vers le centre.

@@ -4,10 +4,13 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.entity.GateHandEntity;
 import com.ajustor.fmab.entity.TruthEntity;
+import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.LivingStone;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
@@ -63,6 +66,8 @@ public final class GateOfTruth {
 	private static final int KNOWLEDGE = 250;
 	private static final int TOLL = 330;
 	private static final int RETURN = 400;
+	/** Le temps que les bras noirs mettent à tirer l'alchimiste dans la Porte, depuis son cercle. */
+	public static final int PULL = 50;
 	/** Une âme errante entend la Vérité se moquer d'elle toutes les minutes. */
 	private static final int MOCKERY_PERIOD = 1200;
 	private static final int MOCKERIES = 5;
@@ -100,6 +105,13 @@ public final class GateOfTruth {
 		if (space == null) {
 			Fmab.LOGGER.error("Dimension {} introuvable : la Porte ne peut pas s'ouvrir", WHITE_SPACE.identifier());
 			player.setAttached(FmabAttachments.GATE, gate.withVisit(null));
+			return;
+		}
+		if (visit.ticks() < -1 && player.level() != space) {
+			// Les bras noirs le tiennent : il ne bouge plus, le monde s'assombrit.
+			player.setDeltaMovement(player.getDeltaMovement().multiply(0.2, 0.2, 0.2));
+			player.hurtMarked = true;
+			player.setAttached(FmabAttachments.GATE, gate.withVisit(visit.tick()));
 			return;
 		}
 		if (visit.ticks() < 0 || player.level() != space) {
@@ -190,6 +202,7 @@ public final class GateOfTruth {
 		});
 		space.playSound(null, BlockPos.containing(at(player, ARRIVAL)), SoundEvents.AMETHYST_BLOCK_RESONATE,
 				SoundSource.PLAYERS, 1, 0.5f);
+		CinematicPayload.play(player, CinematicPayload.GATE, RETURN + 2);
 	}
 
 	/** La Vérité de ce joueur, devant sa Porte. */
@@ -238,16 +251,38 @@ public final class GateOfTruth {
 				space.setBlockAndUpdate(o.offset(x, y, GATE_Z), air);
 			}
 		}
-		space.playSound(null, o.offset(0, 4, GATE_Z), SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 2, 0.5f);
+		space.playSound(null, o.offset(0, 4, GATE_Z), FmabSounds.GATE_OPEN, SoundSource.PLAYERS, 3, 1);
 		say(player, "truth.fmab.opening");
+		// Les bras noirs sortent des ténèbres derrière la Porte et viennent le chercher.
+		for (int i = 0; i < 8; i++) {
+			double x = o.getX() + 0.5 + (space.getRandom().nextDouble() - 0.5) * 2 * (GATE_HALF_WIDTH - 1.5);
+			double y = o.getY() + 2 + space.getRandom().nextDouble() * (GATE_HEIGHT - 4);
+			GateHandEntity.reach(space, new Vec3(x, y, o.getZ() + GATE_Z - 0.5), player, TOLL - OPENING + 20, 0.035);
+		}
 	}
 
 	/** Le savoir déferle : des images, trop, trop vite. */
 	private static void knowledge(ServerLevel space, ServerPlayer player) {
 		player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 160, 0, false, false));
-		player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 50, 0, false, false));
-		space.playSound(null, player.blockPosition(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 1, 0.5f);
+		space.playSound(null, player.blockPosition(), FmabSounds.GATE_KNOWLEDGE, SoundSource.PLAYERS, 2, 1);
 		say(player, "truth.fmab.knowledge");
+		// Derrière la Porte : l'œil, le torrent des symboles, puis le blanc.
+		CinematicPayload.play(player, CinematicPayload.GATE_KNOWLEDGE, TOLL - KNOWLEDGE);
+	}
+
+	/**
+	 * L'alchimiste est happé par son propre cercle : des bras noirs en jaillissent tout autour et le
+	 * tiennent, le monde s'éteint, puis la Porte l'avale (voir {@link #PULL}).
+	 */
+	public static void pullFromCircle(ServerLevel level, BlockPos circle, ServerPlayer caster) {
+		Vec3 center = Vec3.atBottomCenterOf(circle);
+		for (int i = 0; i < 7; i++) {
+			double a = Math.PI * 2 * i / 7;
+			Vec3 from = center.add(Math.cos(a) * 2.2, 0.05, Math.sin(a) * 2.2);
+			GateHandEntity.reach(level, from, caster, PULL + 10, 0.05);
+		}
+		level.playSound(null, circle, FmabSounds.GATE_HANDS, SoundSource.PLAYERS, 2, 0.8f);
+		CinematicPayload.play(caster, CinematicPayload.GATE_PULL, PULL);
 	}
 
 	/** Les bras noirs sortent de la Porte et tirent l'alchimiste vers elle. */
@@ -262,6 +297,10 @@ public final class GateOfTruth {
 		}
 		player.push(0, 0, -0.02);
 		player.hurtMarked = true;
+		if (space.getRandom().nextInt(6) == 0) {
+			space.playSound(null, player.blockPosition(), FmabSounds.GATE_HANDS, SoundSource.PLAYERS, 0.8f,
+					0.8f + space.getRandom().nextFloat() * 0.4f);
+		}
 	}
 
 	/**

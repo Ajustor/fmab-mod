@@ -1,0 +1,11 @@
+Sons du mod FMAB / FMAB mod sounds
+
+Tous les sons sont dérivés (hauteur, découpe, mixage) de banques placées dans le domaine public (CC0 1.0) :
+All sounds are derived (pitch, trimming, mixing) from public domain (CC0 1.0) packs:
+
+- Kenney, "Sci-Fi Sounds" — https://kenney.nl/assets/sci-fi-sounds (via https://opengameart.org/content/sci-fi-sounds)
+- Kenney, "Impact Sounds" — https://kenney.nl/assets/impact-sounds
+- Kenney, "RPG Audio" — https://kenney.nl/assets/rpg-audio
+- kurt, "gunshots" — https://opengameart.org/content/gunshots
+
+Licence : https://creativecommons.org/publicdomain/zero/1.0/

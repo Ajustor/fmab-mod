@@ -2,6 +2,7 @@ package com.ajustor.fmab.item;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.registry.FmabSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -107,7 +108,8 @@ public class FirearmItem extends Item {
 			Vec3 p = muzzle.add(step.scale((double) i / points));
 			level.sendParticles(ParticleTypes.CRIT, p.x, p.y, p.z, 1, 0, 0, 0, 0);
 		}
-		level.playSound(null, shooter.blockPosition(), SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.PLAYERS, 1.6f, 0.6f);
+		level.playSound(null, shooter.blockPosition(), range > 60 ? FmabSounds.RIFLE : FmabSounds.PISTOL,
+				SoundSource.PLAYERS, 2.5f, 0.95f + shooter.getRandom().nextFloat() * 0.1f);
 		if (entity != null) {
 			Entity target = entity.getEntity();
 			DamageSource bullet = new DamageSource(level.damageSources().damageTypes.getOrThrow(BULLET), shooter, shooter);

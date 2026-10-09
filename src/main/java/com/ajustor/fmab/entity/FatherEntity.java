@@ -1,9 +1,11 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.homunculus.AntiAlchemy;
+import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.promised.NationalCircle;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.Eclipse;
 import com.ajustor.fmab.stone.LivingStone;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -227,7 +229,7 @@ public class FatherEntity extends HomunculusEntity {
 			if (target != null && --sunCooldown <= 0) {
 				entityData.set(SUN, 1);
 				getNavigation().stop();
-				level.playSound(null, blockPosition(), SoundEvents.BLAZE_AMBIENT, SoundSource.HOSTILE, 2, 0.4f);
+				level.playSound(null, blockPosition(), FmabSounds.FATHER_SUN, SoundSource.HOSTILE, 2.5f, 1);
 			}
 			return;
 		}
@@ -327,7 +329,16 @@ public class FatherEntity extends HomunculusEntity {
 			// La Vérité vient reprendre ce qui lui revient : des mains noires l'entraînent.
 			level.sendParticles(BLACK, getX(), getY(0.5), getZ(), 400, 1.5, 2, 1.5, 0.02);
 			level.playSound(null, blockPosition(), SoundEvents.END_PORTAL_SPAWN, SoundSource.HOSTILE, 2, 0.5f);
+			level.playSound(null, blockPosition(), FmabSounds.GATE_OPEN, SoundSource.HOSTILE, 3, 0.8f);
 			say(level, "homunculus.fmab.father_falls");
+			// Des bras noirs jaillissent du sol tout autour et se referment sur lui.
+			for (int i = 0; i < 10; i++) {
+				double a = Math.PI * 2 * i / 10;
+				GateHandEntity.reach(level, position().add(Math.cos(a) * 3, 0, Math.sin(a) * 3), null, 60, 0);
+			}
+			for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(48))) {
+				CinematicPayload.play(p, CinematicPayload.FATHER_FALL, 90);
+			}
 		}
 		super.die(source);
 	}

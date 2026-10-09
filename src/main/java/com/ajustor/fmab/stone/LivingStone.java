@@ -133,7 +133,7 @@ public final class LivingStone {
 	public static void register() {
 		UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
 			if (!(player instanceof ServerPlayer absorber) || hand != InteractionHand.MAIN_HAND
-					|| !player.getMainHandItem().isEmpty() || souls(absorber) <= 0
+					|| !player.getMainHandItem().isEmpty() || souls(absorber) <= 0 || !player.isShiftKeyDown()
 					|| !(entity instanceof LivingEntity target) || entity instanceof TruthEntity) {
 				return InteractionResult.PASS;
 			}

@@ -14,6 +14,7 @@ import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.homunculus.AntiAlchemy;
 import com.ajustor.fmab.homunculus.Belly;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
@@ -305,6 +306,7 @@ public final class Transmutation {
 		} else {
 			level.playSound(null, circle, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1, 0.7f);
 		}
+		level.playSound(null, circle, FmabSounds.REBOUND, SoundSource.BLOCKS, 1, 1);
 	}
 
 	/**

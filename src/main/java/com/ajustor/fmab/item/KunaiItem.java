@@ -2,6 +2,7 @@ package com.ajustor.fmab.item;
 
 import com.ajustor.fmab.entity.KunaiEntity;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.registry.FmabSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -49,7 +50,7 @@ public class KunaiItem extends Item {
 				kunai.pickup = KunaiEntity.Pickup.CREATIVE_ONLY;
 			}
 			server.addFreshEntity(kunai);
-			server.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_THROW.value(), SoundSource.PLAYERS, 0.6f,
+			server.playSound(null, player.blockPosition(), FmabSounds.THROW, SoundSource.PLAYERS, 0.6f,
 					1.6f);
 		}
 		player.getCooldowns().addCooldown(stack, 6);

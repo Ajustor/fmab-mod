@@ -3,6 +3,7 @@ package com.ajustor.fmab.entity;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.Karma;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -106,7 +107,7 @@ public class ScarEntity extends PathfinderMob {
 						below.getY() + 1, below.getZ() + 0.5, 20, 0.4, 0.1, 0.4, 0.1);
 				level.destroyBlock(below, false, this);
 			}
-			level.playSound(null, target.blockPosition(), SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.HOSTILE, 1,
+			level.playSound(null, target.blockPosition(), FmabSounds.DECOMPOSE, SoundSource.HOSTILE, 1,
 					1.3f);
 		}
 		return hit;

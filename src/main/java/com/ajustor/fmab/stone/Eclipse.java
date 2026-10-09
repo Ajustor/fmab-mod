@@ -1,5 +1,6 @@
 package com.ajustor.fmab.stone;
 
+import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.promised.NationalCircle;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
@@ -56,6 +57,7 @@ public final class Eclipse {
 					// Le Jour promis : le cercle national s'éveille, et Père avec lui.
 					p.sendSystemMessage(Component.translatable("promised.fmab.day_begins",
 							NationalCircle.POINTS - circle.sealedCount()).withStyle(ChatFormatting.DARK_RED));
+					CinematicPayload.play(p, CinematicPayload.PROMISED_DAY, 120);
 				}
 			}
 		});

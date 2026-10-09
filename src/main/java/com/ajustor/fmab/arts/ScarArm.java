@@ -2,6 +2,7 @@ package com.ajustor.fmab.arts;
 
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabSounds;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.core.BlockPos;
@@ -62,7 +63,7 @@ public final class ScarArm {
 				target.hurtServer(server, server.damageSources().indirectMagic(p, p), ENTITY_DAMAGE);
 				server.sendParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getY(0.5), target.getZ(), 25,
 						0.3, 0.5, 0.3, 0.1);
-				server.playSound(null, target.blockPosition(), SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.PLAYERS,
+				server.playSound(null, target.blockPosition(), FmabSounds.DECOMPOSE, SoundSource.PLAYERS,
 						0.8f, 1.4f);
 			}
 			// Le coup de poing ordinaire suit.

@@ -4,6 +4,7 @@ import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.entity.AlchemicalMineEntity;
 import com.ajustor.fmab.homunculus.AntiAlchemy;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
@@ -61,7 +62,7 @@ public class CrimsonSealsItem extends Item {
 		Vec3 at = context.getClickLocation();
 		level.addFreshEntity(new AlchemicalMineEntity(level, at, p.getUUID()));
 		level.sendParticles(CRIMSON, at.x, at.y, at.z, 20, 0.25, 0.25, 0.25, 0);
-		level.playSound(null, context.getClickedPos(), SoundEvents.TNT_PRIMED, SoundSource.PLAYERS, 0.4f, 1.6f);
+		level.playSound(null, context.getClickedPos(), FmabSounds.MINE_ARM, SoundSource.PLAYERS, 0.8f, 1);
 		p.sendOverlayMessage(Component.translatable("item.fmab.crimson_seals.armed",
 				Math.min(MAX_MINES, mine.size() + 1), MAX_MINES));
 		return InteractionResult.SUCCESS;
@@ -74,7 +75,7 @@ public class CrimsonSealsItem extends Item {
 		}
 		if (level instanceof ServerLevel server && player instanceof ServerPlayer p) {
 			// Le claquement des mains : tout saute.
-			server.playSound(null, p.blockPosition(), SoundEvents.PLAYER_ATTACK_WEAK, SoundSource.PLAYERS, 1, 1.8f);
+			server.playSound(null, p.blockPosition(), FmabSounds.CLAP, SoundSource.PLAYERS, 1, 0.9f);
 			List<AlchemicalMineEntity> mines = mines(server, p);
 			mines.forEach(m -> m.detonate(server));
 			if (mines.isEmpty()) {

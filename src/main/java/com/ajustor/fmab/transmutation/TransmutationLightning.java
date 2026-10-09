@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.registry.FmabSounds;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -70,8 +71,8 @@ public final class TransmutationLightning {
 		Vec3 center = Vec3.atBottomCenterOf(circle).add(0, 0.1, 0);
 		int bolts = Math.max(1, (int) Math.round((2 + radius) * intensity));
 		ACTIVE.add(new Discharge(level, center, radius, bolts, Math.max(3, (int) (DURATION * intensity))));
-		level.playSound(null, circle, SoundEvents.TRIDENT_THUNDER.value(), SoundSource.PLAYERS,
-				(float) (0.25 * intensity), 1.8f);
+		level.playSound(null, circle, FmabSounds.TRANSMUTE, SoundSource.PLAYERS, (float) (0.6 * intensity),
+				0.9f + level.getRandom().nextFloat() * 0.2f);
 		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, center.x, center.y + 0.2, center.z,
 				(int) (20 * intensity * radius), radius * 0.6, 0.3, radius * 0.6, 0.1);
 	}

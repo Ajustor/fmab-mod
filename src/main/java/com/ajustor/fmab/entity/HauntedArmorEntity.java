@@ -1,5 +1,6 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.registry.FmabSounds;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -108,7 +109,7 @@ public class HauntedArmorEntity extends Monster {
 		setHealth(1);
 		setTarget(null);
 		getNavigation().stop();
-		level.playSound(null, blockPosition(), SoundEvents.ARMOR_EQUIP_IRON.value(), SoundSource.HOSTILE, 1.5f, 0.5f);
+		level.playSound(null, blockPosition(), FmabSounds.ARMOR_COLLAPSE, SoundSource.HOSTILE, 1.5f, 0.9f);
 		level.playSound(null, blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.HOSTILE, 0.6f, 1.6f);
 		for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(16))) {
 			p.sendOverlayMessage(Component.translatable("entity.fmab.haunted_armor.collapsed"));
@@ -123,7 +124,7 @@ public class HauntedArmorEntity extends Monster {
 		}
 		if (level() instanceof ServerLevel level) {
 			level.sendParticles(SEAL, getX(), getY(0.5), getZ(), 40, 0.4, 0.4, 0.4, 0);
-			level.playSound(null, blockPosition(), SoundEvents.SOUL_ESCAPE.value(), SoundSource.HOSTILE, 2, 1);
+			level.playSound(null, blockPosition(), FmabSounds.SEAL_ERASE, SoundSource.HOSTILE, 2, 1);
 			player.sendOverlayMessage(Component.translatable("entity.fmab.haunted_armor.released"));
 			released = true;
 			hurtServer(level, damageSources().playerAttack(player), Float.MAX_VALUE);

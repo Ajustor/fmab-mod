@@ -1,6 +1,7 @@
 package com.ajustor.fmab.item;
 
 import com.ajustor.fmab.entity.ThrowingKnifeEntity;
+import com.ajustor.fmab.registry.FmabSounds;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -27,7 +28,7 @@ public class ThrowingKnifeItem extends Item {
 				knife.pickup = ThrowingKnifeEntity.Pickup.CREATIVE_ONLY;
 			}
 			server.addFreshEntity(knife);
-			server.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_THROW.value(), SoundSource.PLAYERS, 0.5f,
+			server.playSound(null, player.blockPosition(), FmabSounds.THROW, SoundSource.PLAYERS, 0.5f,
 					1.9f);
 		}
 		player.getCooldowns().addCooldown(stack, 5);
