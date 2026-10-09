@@ -1,18 +1,28 @@
 package com.ajustor.fmab.client.mixin;
 
+import com.ajustor.fmab.client.render.BodyHolder;
 import com.ajustor.fmab.client.render.PoseHolder;
 import com.ajustor.fmab.data.TransmutationPose;
+import com.ajustor.fmab.gate.BodyPart;
+import com.ajustor.fmab.item.AutomailItem;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-/** L'état de rendu du joueur retient son geste de transmutation. */
+import java.util.Map;
+import java.util.Set;
+
+/** L'état de rendu du joueur retient son geste de transmutation, ses membres perdus et ses automails. */
 @Mixin(AvatarRenderState.class)
-public abstract class AvatarRenderStateMixin implements PoseHolder {
+public abstract class AvatarRenderStateMixin implements PoseHolder, BodyHolder {
 	@Unique
 	private TransmutationPose.Kind fmab$pose = TransmutationPose.Kind.NONE;
 	@Unique
 	private float fmab$remaining;
+	@Unique
+	private Set<BodyPart> fmab$lostLimbs = Set.of();
+	@Unique
+	private Map<BodyPart, AutomailItem.Model> fmab$automails = Map.of();
 
 	@Override
 	public TransmutationPose.Kind fmab$pose() {
@@ -28,5 +38,21 @@ public abstract class AvatarRenderStateMixin implements PoseHolder {
 	public void fmab$setPose(TransmutationPose.Kind pose, float remaining) {
 		fmab$pose = pose;
 		fmab$remaining = remaining;
+	}
+
+	@Override
+	public Set<BodyPart> fmab$lostLimbs() {
+		return fmab$lostLimbs;
+	}
+
+	@Override
+	public Map<BodyPart, AutomailItem.Model> fmab$automails() {
+		return fmab$automails;
+	}
+
+	@Override
+	public void fmab$setBody(Set<BodyPart> lostLimbs, Map<BodyPart, AutomailItem.Model> automails) {
+		fmab$lostLimbs = lostLimbs;
+		fmab$automails = automails;
 	}
 }

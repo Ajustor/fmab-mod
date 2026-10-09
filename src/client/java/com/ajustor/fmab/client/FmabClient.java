@@ -1,6 +1,7 @@
 package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.client.render.AutomailLayer;
 import com.ajustor.fmab.client.render.BossModels;
 import com.ajustor.fmab.client.render.ChimeraBeastRenderer;
 import com.ajustor.fmab.client.render.ChimeraCrawlerRenderer;
@@ -70,6 +71,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.ChatFormatting;
@@ -79,6 +81,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import org.lwjgl.glfw.GLFW;
@@ -158,6 +161,12 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.MARCOH, MarcohRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.GATE_HAND, GateHandRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.FATHER_SUN, c -> new ThrownItemRenderer<>(c, 4.0F, true));
+		// Les automails se dessinent sur le corps du joueur, à la place des membres perdus.
+		LivingEntityRenderLayerRegistrationCallback.EVENT.register((type, renderer, helper, context) -> {
+			if (renderer instanceof AvatarRenderer avatar) {
+				helper.register(new AutomailLayer(avatar, context));
+			}
+		});
 		ClientPlayNetworking.registerGlobalReceiver(CinematicPayload.TYPE, (payload, context) -> Cinematics.start(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> Cinematics.tick());
 		// Une nouvelle connexion (ou un autre monde) repart sans cinématique en cours.

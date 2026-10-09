@@ -69,20 +69,23 @@ public final class FmabAttachments {
 			.syncWith(Tattoos.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("tattoos"));
 
-	/** Ce que la Porte a pris, et la visite en cours ; le client voit ce qui manque (vue, mains). */
+	/**
+	 * Ce que la Porte a pris, et la visite en cours. Tous les clients voient ce qui manque : le joueur
+	 * pour sa vue et ses mains, les autres pour dessiner ses membres perdus.
+	 */
 	public static final AttachmentType<GateState> GATE = AttachmentRegistry.<GateState>builder()
 			.persistent(GateState.CODEC)
 			.initializer(() -> GateState.NONE)
 			.copyOnDeath()
-			.syncWith(GateState.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.syncWith(GateState.STREAM_CODEC, AttachmentSyncPredicate.all())
 			.buildAndRegister(Fmab.id("gate"));
 
-	/** Les automails posés sur les membres perdus. */
+	/** Les automails posés sur les membres perdus, visibles de tous sur le corps du joueur. */
 	public static final AttachmentType<Automail> AUTOMAIL = AttachmentRegistry.<Automail>builder()
 			.persistent(Automail.CODEC)
 			.initializer(() -> Automail.NONE)
 			.copyOnDeath()
-			.syncWith(Automail.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.syncWith(Automail.STREAM_CODEC, AttachmentSyncPredicate.all())
 			.buildAndRegister(Fmab.id("automail"));
 
 	/** Le joueur est dans le Ventre de Gluttony : perdu à la mort, inutile au client. */
