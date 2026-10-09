@@ -23,6 +23,7 @@ public final class FmabStructures {
 			Laboratory5Structure.CODEC);
 	public static final StructureType<DevilsNestStructure> DEVILS_NEST = type("devils_nest", DevilsNestStructure.CODEC);
 	public static final StructureType<XingStructure> XING = type("xing", XingStructure.CODEC);
+	public static final StructureType<FortBriggsStructure> FORT_BRIGGS = type("fort_briggs", FortBriggsStructure.CODEC);
 
 	private FmabStructures() {
 	}

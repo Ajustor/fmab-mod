@@ -100,6 +100,12 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("alkahestry"));
 
+	/** Reconnu allié de Briggs par Olivier Armstrong : gardé à la mort. */
+	public static final AttachmentType<Boolean> BRIGGS_ALLY = AttachmentRegistry.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("briggs_ally"));
+
 	/** Les homonculus qu'on a vus tomber : la clé du sceau de Père. Gardés à la mort. */
 	public static final AttachmentType<Set<String>> SLAIN = AttachmentRegistry.<Set<String>>builder()
 			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))

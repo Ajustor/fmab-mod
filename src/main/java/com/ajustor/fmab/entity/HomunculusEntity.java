@@ -1,5 +1,6 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.item.BriggsSabreItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -69,6 +70,10 @@ public abstract class HomunculusEntity extends Monster {
 			return false;
 		}
 		float dealt = damage * weakness(source);
+		ItemStack weapon = source.getWeaponItem();
+		if (weapon != null && weapon.getItem() instanceof BriggsSabreItem) {
+			dealt *= BriggsSabreItem.HOMUNCULUS_BONUS;
+		}
 		if (dealt >= getHealth() && souls > 0 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 			reconstitute(level);
 			return true;

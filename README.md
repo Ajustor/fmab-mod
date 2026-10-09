@@ -116,6 +116,19 @@ joueur compose lui-même :
   réparation chez **Winry**, dans la ville de **Rush Valley** (`/locate structure fmab:rush_valley`).
   À Resembool, la maison des Elric garde les notes de Hohenheim.
 
+**v1.0 (Jour promis), en cours :**
+
+- **Père**, l'Homonculus originel, sous Central : un sceau d'Ouroboros au fond du tunnel de Sloth ne
+  cède qu'à qui a vu tomber Sloth, Wrath et Pride. Trois formes (le vieillard, la forme sans visage
+  et son petit soleil, la forme divine instable qui dévore les âmes). Autour de lui, une **zone
+  anti-alchimie** : aucune transmutation d'Amestris ne s'allume.
+- L'**alkahestry de Xing** marche partout, même chez Père : cinq **kunaï** plantés autour d'une
+  zone y dessinent un cercle de soin ou de piège. **May Chang** l'enseigne dans son pavillon des
+  jungles et cerisaies (`/locate structure fmab:xing`).
+- **Fort Briggs** dans les montagnes enneigées (`/locate structure fmab:fort_briggs`) : la générale
+  **Olivier Armstrong** confie aux alliés de bon karma un **sabre de Briggs** (×1,5 contre les
+  homonculus) ; les **soldats de Drachma** rôdent la nuit au pied du mur.
+
 Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/fmab/glyph`), combinaisons
 (`data/<ns>/fmab/combination`), valeurs d'échange (`data/<ns>/fmab/exchange`), éléments visés (tags
 `fmab:element/*`), pages du Traité, Espace blanc (`data/fmab/dimension`). Textes en français et en
@@ -182,6 +195,12 @@ vulnerable child.
 **v0.7 (Stone), in progress:** the Philosopher's Stone amplifies transmutations and draws monsters,
 and is made by sacrificing lives on a human transmutation circle; karma tracks your deeds; every
 eighth day an eclipse lets a Gate initiate holding two full Stones become a Living Stone.
+
+**v1.0 (Promised Day), in progress:** Father waits beneath Central behind an Ouroboros seal that
+yields only to those who saw Sloth, Wrath and Pride fall; he fights in three forms and blocks all
+Amestrian alchemy around him. Xing's alkahestry (five kunai planted in a circle, taught by May
+Chang) still works there. Fort Briggs, Olivier Armstrong and her Briggs sabre hold the snowy north
+against Drachma's soldiers.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 

@@ -79,6 +79,7 @@ public final class Blueprints {
 		out.put("sloth_tunnel", new SlothTunnel());
 		out.put("father_lair", new FatherLair());
 		out.put("xing_pavilion", new XingPavilion());
+		out.put("fort_briggs", new FortBriggs());
 		plans = out;
 		return plans;
 	}
@@ -1069,6 +1070,168 @@ public final class Blueprints {
 		@Override
 		public List<Spawn> spawns(Plot p) {
 			return List.of(new Spawn(FmabEntities.MAY_CHANG, new BlockPos((P0 + P1) / 2, 2, Z0 + 3)));
+		}
+	}
+
+	/**
+	 * Fort Briggs. Au nord (z 0..13), le glacis : on n'y touche pas, c'est là que rôde Drachma. Puis la
+	 * muraille, épaisse de cinq blocs et haute de vingt, crénelée, deux tours pleines à ses bouts. Dos
+	 * au mur, la caserne de trois niveaux (une échelle monte jusqu'au chemin de ronde), et derrière,
+	 * la cour d'arrivée, ouverte vers Amestris.
+	 */
+	static final class FortBriggs implements Blueprint {
+		static final int SIZE_X = 41;
+		static final int SIZE_Y = 27;
+		static final int SIZE_Z = 37;
+		private static final int WALL_Z0 = 14;
+		private static final int WALL_Z1 = 18;
+		private static final int WALL_TOP = 20;
+		private static final int KEEP_Z1 = 30;
+		private static final int KEEP_TOP = 18;
+		private static final int LADDER_X = 3;
+		private static final int MID = SIZE_X / 2;
+
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			if (z < WALL_Z0 - 1) {
+				return null;
+			}
+			boolean tower = (x <= 4 || x >= SIZE_X - 5) && z >= WALL_Z0 - 1 && z <= WALL_Z1 + 1;
+			if (tower) {
+				return tower(x, y, z);
+			}
+			if (z < WALL_Z0) {
+				return null;
+			}
+			if (y < 0) {
+				return b(Blocks.STONE_BRICKS);
+			}
+			if (z <= WALL_Z1) {
+				return wall(x, y, z, p);
+			}
+			if (z <= KEEP_Z1) {
+				return keep(x, y, z, p);
+			}
+			return yard(x, y, z);
+		}
+
+		private static BlockState tower(int x, int y, int z) {
+			if (y < 0 || y <= 24) {
+				return b(Blocks.STONE_BRICKS);
+			}
+			boolean rim = x == 0 || x == 4 || x == SIZE_X - 5 || x == SIZE_X - 1 || z == WALL_Z0 - 1 || z == WALL_Z1 + 1;
+			return y == 25 && rim && (x + z) % 2 == 0 ? b(Blocks.STONE_BRICK_WALL) : AIR;
+		}
+
+		private static BlockState wall(int x, int y, int z, Plot p) {
+			if (y <= WALL_TOP) {
+				if (y == WALL_TOP) {
+					return b(Blocks.SMOOTH_STONE);
+				}
+				return p.noise(x, y, z, 9) == 0 ? b(Blocks.CRACKED_STONE_BRICKS) : b(Blocks.STONE_BRICKS);
+			}
+			if (y == WALL_TOP + 1 && z == WALL_Z0 && x % 2 == 0) {
+				return b(Blocks.STONE_BRICK_WALL);
+			}
+			if (y == WALL_TOP + 1 && z == WALL_Z0 + 2 && x % 8 == 4) {
+				// Les canons de Briggs, pointés vers le nord.
+				return b(Blocks.BLACKSTONE);
+			}
+			if (y == WALL_TOP + 1 && z == WALL_Z0 + 1 && x % 8 == 4) {
+				return b(Blocks.POLISHED_BLACKSTONE_WALL);
+			}
+			if (y == WALL_TOP + 2 && z == WALL_Z0 + 2 && x % 8 == 4) {
+				return b(Blocks.LANTERN);
+			}
+			return AIR;
+		}
+
+		private static BlockState keep(int x, int y, int z, Plot p) {
+			if (x <= 1 || x >= SIZE_X - 2) {
+				return y <= KEEP_TOP ? b(Blocks.STONE_BRICKS) : AIR;
+			}
+			if (y > KEEP_TOP) {
+				// L'échelle continue jusqu'au chemin de ronde, contre la muraille.
+				return x == LADDER_X && z == WALL_Z1 + 1 && y <= WALL_TOP ? ladder() : AIR;
+			}
+			if (x == LADDER_X && z == WALL_Z1 + 1 && y > 0) {
+				return ladder();
+			}
+			boolean shell = x == 2 || x == SIZE_X - 3 || z == KEEP_Z1;
+			if (y == 0) {
+				return b(Blocks.POLISHED_ANDESITE);
+			}
+			if (y == KEEP_TOP) {
+				return b(Blocks.SMOOTH_STONE);
+			}
+			if (shell) {
+				if (z == KEEP_Z1 && Math.abs(x - MID) <= 1 && y <= 3) {
+					return AIR;
+				}
+				if (z == KEEP_Z1 && y % 6 >= 2 && y % 6 <= 3 && x % 4 == 0) {
+					return b(Blocks.GLASS);
+				}
+				return p.noise(x, y, z, 11) == 0 ? b(Blocks.MOSSY_STONE_BRICKS) : b(Blocks.STONE_BRICKS);
+			}
+			if (y == 6 || y == 12) {
+				return b(Blocks.SPRUCE_PLANKS);
+			}
+			if ((y == 1 || y == 7 || y == 13) && z == KEEP_Z1 - 1 && x % 6 == 3) {
+				return b(Blocks.LANTERN);
+			}
+			if (y == 1 && z == WALL_Z1 + 4 && x == MID) {
+				return b(Blocks.CAMPFIRE);
+			}
+			return AIR;
+		}
+
+		private static BlockState yard(int x, int y, int z) {
+			if (y == 0) {
+				return b(Blocks.STONE_BRICKS);
+			}
+			if ((x == 0 || x == SIZE_X - 1) && y <= 2) {
+				return b(Blocks.COBBLESTONE_WALL);
+			}
+			return y <= 6 ? AIR : null;
+		}
+
+		private static BlockState ladder() {
+			// Tournée vers le sud : elle s'appuie sur la muraille, au nord.
+			return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.SOUTH);
+		}
+
+		@Override
+		public List<Chest> chests(Plot p) {
+			return List.of(
+					new Chest(new BlockPos(6, 1, KEEP_Z1 - 2), FortBriggs::armory),
+					new Chest(new BlockPos(SIZE_X - 7, 1, KEEP_Z1 - 2), FortBriggs::armory),
+					new Chest(new BlockPos(MID, 7, KEEP_Z1 - 2), FortBriggs::stores));
+		}
+
+		private static List<ItemStack> armory(Plot p) {
+			List<ItemStack> out = new ArrayList<>();
+			out.add(new ItemStack(Items.IRON_INGOT, 3 + p.noise(1, 0, 0, 6)));
+			out.add(new ItemStack(Items.ARROW, 6 + p.noise(2, 0, 0, 10)));
+			if (p.noise(3, 0, 0, 3) == 0) {
+				out.add(new ItemStack(FmabItems.BRIGGS_SABRE));
+			}
+			if (p.noise(4, 0, 0, 4) == 0) {
+				out.add(new ItemStack(p.noise(5, 0, 0, 2) == 0 ? FmabItems.BRIGGS_AUTOMAIL_ARM : FmabItems.BRIGGS_AUTOMAIL_LEG));
+			}
+			return out;
+		}
+
+		private static List<ItemStack> stores(Plot p) {
+			List<ItemStack> out = new ArrayList<>();
+			out.add(new ItemStack(Items.BREAD, 4 + p.noise(6, 0, 0, 6)));
+			out.add(new ItemStack(Items.COAL, 6 + p.noise(7, 0, 0, 10)));
+			out.add(new ItemStack(Items.LEATHER, 2 + p.noise(8, 0, 0, 4)));
+			return out;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			return List.of(new Spawn(FmabEntities.OLIVIER, new BlockPos(MID, 1, WALL_Z1 + 6)));
 		}
 	}
 

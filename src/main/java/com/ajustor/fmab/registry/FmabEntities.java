@@ -1,6 +1,7 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.entity.DrachmaSoldierEntity;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.FatherEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
@@ -9,6 +10,7 @@ import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.KunaiEntity;
 import com.ajustor.fmab.entity.LustEntity;
 import com.ajustor.fmab.entity.MayChangEntity;
+import com.ajustor.fmab.entity.OlivierEntity;
 import com.ajustor.fmab.entity.PrideEntity;
 import com.ajustor.fmab.entity.SlothEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
@@ -23,6 +25,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.SpawnPlacementTypes;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> IZUMI_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("izumi"));
@@ -175,6 +181,26 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(MAY_CHANG_KEY));
 
+	private static final ResourceKey<EntityType<?>> DRACHMA_SOLDIER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("drachma_soldier"));
+
+	/** Un soldat de Drachma, la nuit au pied de Fort Briggs. */
+	public static final EntityType<DrachmaSoldierEntity> DRACHMA_SOLDIER = Registry.register(BuiltInRegistries.ENTITY_TYPE, DRACHMA_SOLDIER_KEY,
+			EntityType.Builder.<DrachmaSoldierEntity>of(DrachmaSoldierEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(DRACHMA_SOLDIER_KEY));
+
+	private static final ResourceKey<EntityType<?>> OLIVIER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("olivier"));
+
+	/** La générale Olivier Mira Armstrong, qui tient Fort Briggs. */
+	public static final EntityType<OlivierEntity> OLIVIER = Registry.register(BuiltInRegistries.ENTITY_TYPE, OLIVIER_KEY,
+			EntityType.Builder.<OlivierEntity>of(OlivierEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(OLIVIER_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -193,5 +219,10 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(PRIDE, PrideEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(FATHER, FatherEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(MAY_CHANG, MayChangEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(DRACHMA_SOLDIER, DrachmaSoldierEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(OLIVIER, OlivierEntity.createAttributes());
+		// Les soldats de Drachma n'apparaissent que dans le noir, comme tout monstre.
+		SpawnPlacements.register(DRACHMA_SOLDIER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+				Monster::checkMonsterSpawnRules);
 	}
 }

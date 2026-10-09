@@ -7,6 +7,7 @@ import com.ajustor.fmab.gate.Restoration;
 import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.AutomailItem;
+import com.ajustor.fmab.item.BriggsSabreItem;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.KunaiItem;
@@ -140,6 +141,14 @@ public final class FmabItems {
 	public static final Item MAY_CHANG_SPAWN_EGG = register("may_chang_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.MAY_CHANG));
 
+	/** Le sabre de Briggs : lourd et lent, il mord plus fort dans la chair des homonculus. */
+	public static final Item BRIGGS_SABRE = register("briggs_sabre", BriggsSabreItem::new,
+			new Item.Properties().sword(ToolMaterial.IRON, 5.0F, -2.9F).durability(600));
+	public static final Item DRACHMA_SOLDIER_SPAWN_EGG = register("drachma_soldier_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.DRACHMA_SOLDIER));
+	public static final Item OLIVIER_SPAWN_EGG = register("olivier_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.OLIVIER));
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -205,6 +214,9 @@ public final class FmabItems {
 					output.accept(FATHER_PIPE);
 					output.accept(KUNAI);
 					output.accept(MAY_CHANG_SPAWN_EGG);
+					output.accept(BRIGGS_SABRE);
+					output.accept(OLIVIER_SPAWN_EGG);
+					output.accept(DRACHMA_SOLDIER_SPAWN_EGG);
 				})
 				.build());
 	}
