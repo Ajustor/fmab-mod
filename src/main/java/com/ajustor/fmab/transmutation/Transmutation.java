@@ -10,6 +10,7 @@ import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.homunculus.Belly;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.stone.Karma;
@@ -167,8 +168,9 @@ public final class Transmutation {
 			previous = stageResult;
 		}
 		dropAll(level, circle, flow);
-		// Le geste : la paume plaquée sur le cercle, ou les mains jointes.
+		// Le geste : la paume plaquée sur le cercle (les mains jointes, l'appelant les remplace).
 		caster.swing(InteractionHand.MAIN_HAND, true);
+		TransmutationPose.strike(caster, TransmutationPose.Kind.PALM, 14);
 		if (anything) {
 			if (inscribed) {
 				CHANNELS.put(caster.getUUID(), new Channel(circle, level.getGameTime(), 0));
@@ -261,6 +263,7 @@ public final class Transmutation {
 			anything |= result == Effects.Result.DONE;
 		}
 		caster.swing(InteractionHand.MAIN_HAND, true);
+		TransmutationPose.strike(caster, TransmutationPose.Kind.HOLD, CHANNEL_GAP + 2);
 		if (!anything) {
 			// Plus de matière, ou rien qui puisse grandir : l'énergie s'arrête.
 			CHANNELS.remove(caster.getUUID());

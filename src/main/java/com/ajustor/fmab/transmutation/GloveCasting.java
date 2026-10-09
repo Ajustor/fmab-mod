@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.Gloves;
@@ -89,6 +90,7 @@ public final class GloveCasting {
 		player.swing(InteractionHand.OFF_HAND, true);
 		Transmutation.activate(player.level(), hit.getBlockPos().relative(hit.getDirection()),
 				CircleFrame.forFace(hit.getDirection(), player.getDirection()), drawing, player, false, Integer.MAX_VALUE);
+		TransmutationPose.strike(player, TransmutationPose.Kind.CLAP, 14);
 	}
 
 	/** Une main porte-t-elle un cercle : celui de son gant, ou, paume nue, celui de son tatouage ? */

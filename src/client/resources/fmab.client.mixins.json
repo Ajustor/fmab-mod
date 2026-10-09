@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "com.ajustor.fmab.client.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"AvatarRenderStateMixin",
+		"AvatarRendererMixin",
+		"PlayerModelMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

@@ -1,5 +1,6 @@
 package com.ajustor.fmab.stone;
 
+import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.entity.EnvyEntity;
@@ -184,6 +185,7 @@ public final class LivingStone {
 		GRIPS.put(absorber.getUUID(), new Grip(target.getUUID(), now, streak));
 		int rate = Math.min(MAX_RATE, 1 + streak / 3);
 		absorber.swing(InteractionHand.MAIN_HAND, true);
+		TransmutationPose.strike(absorber, TransmutationPose.Kind.REACH, ABSORB_GAP + 2);
 		draw(level, target, absorber);
 
 		int gained;

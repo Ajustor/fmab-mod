@@ -8,6 +8,7 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.data.Training;
+import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.homunculus.Belly;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
@@ -89,6 +90,11 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.syncWith(ByteBufCodecs.VAR_INT, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("living_stone"));
+
+	/** Le geste de transmutation en cours : éphémère, visible de tous pour animer le joueur. */
+	public static final AttachmentType<TransmutationPose> POSE = AttachmentRegistry.<TransmutationPose>builder()
+			.syncWith(TransmutationPose.STREAM_CODEC, AttachmentSyncPredicate.all())
+			.buildAndRegister(Fmab.id("pose"));
 
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()
