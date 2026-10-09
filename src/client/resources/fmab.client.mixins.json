@@ -6,7 +6,8 @@
 		"AvatarRenderStateMixin",
 		"AvatarRendererMixin",
 		"HudMixin",
-		"PlayerModelMixin"
+		"PlayerModelMixin",
+		"SkyRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
