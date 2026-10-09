@@ -155,6 +155,15 @@ Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab 
 Les cercles de test partagés se régénèrent depuis l'implémentation Java, qui fait référence :
 `./gradlew test -PwriteFixtures=true`.
 
+### Publier une version
+
+Pousser un tag `vX.Y.Z` (ou `vX.Y.Z-beta`, publié en préversion) lance `.github/workflows/release.yml` :
+jar à la version du tag, GitHub Release avec le changelog français et anglais (git-cliff,
+`cliff.fr.toml` et `cliff.toml`), `CHANGELOG.fr.md` et `CHANGELOG.md` recommités sur `master`, puis
+le site (pages Versions, Changelog et Installation, générées par `site/build.py`). Chaque commit
+`feat:`, `fix:` ou `perf:` porte les lignes `Changelog-fr:` et `Changelog-en:` ; le check `commits`
+des pull requests refuse ceux qui les oublient.
+
 ## English
 
 **Status: v0.1 in development (foundation).** The heart of the mod is transmutation through
