@@ -24,6 +24,7 @@ public final class FmabStructures {
 	public static final StructureType<DevilsNestStructure> DEVILS_NEST = type("devils_nest", DevilsNestStructure.CODEC);
 	public static final StructureType<XingStructure> XING = type("xing", XingStructure.CODEC);
 	public static final StructureType<FortBriggsStructure> FORT_BRIGGS = type("fort_briggs", FortBriggsStructure.CODEC);
+	public static final StructureType<BloodCrestStructure> BLOOD_CREST = type("blood_crest", BloodCrestStructure.CODEC);
 
 	private FmabStructures() {
 	}

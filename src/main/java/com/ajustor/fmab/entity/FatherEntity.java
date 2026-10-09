@@ -1,8 +1,10 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.homunculus.AntiAlchemy;
+import com.ajustor.fmab.promised.NationalCircle;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.stone.Eclipse;
 import com.ajustor.fmab.stone.LivingStone;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -162,6 +164,7 @@ public class FatherEntity extends HomunculusEntity {
 		}
 		Player target = target(level);
 		hunt(level);
+		promisedDay(level);
 		switch (phase()) {
 			case 0 -> {
 				if (target != null && --strikeCooldown <= 0) {
@@ -270,6 +273,15 @@ public class FatherEntity extends HomunculusEntity {
 			heal(10);
 			level.playSound(null, blockPosition(), SoundEvents.SCULK_SHRIEKER_SHRIEK, SoundSource.HOSTILE, 1.5f, 0.5f);
 		}
+	}
+
+	/** Le Jour promis : pendant l'éclipse, tant que le cercle national tient, il se régénère. */
+	private void promisedDay(ServerLevel level) {
+		if (tickCount % 20 != 0 || !Eclipse.now(level) || NationalCircle.get(level.getServer()).broken()) {
+			return;
+		}
+		heal(4);
+		level.sendParticles(RED, getX(), getY(0.5), getZ(), 20, 0.8, 1.2, 0.8, 0.02);
 	}
 
 	/** Les Pierres vivantes à sa portée : il leur arrache des âmes, et s'en nourrit. */

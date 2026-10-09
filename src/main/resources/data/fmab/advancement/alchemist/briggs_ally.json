@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_fort_briggs",
+  "criteria": {
+    "briggs_ally": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "briggs_ally"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:briggs_sabre"
+    },
+    "title": {
+      "translate": "advancements.fmab.briggs_ally.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.briggs_ally.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "briggs_ally"
+    ]
+  ]
+}

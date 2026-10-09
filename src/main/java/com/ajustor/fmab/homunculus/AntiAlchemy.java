@@ -1,6 +1,8 @@
 package com.ajustor.fmab.homunculus;
 
 import com.ajustor.fmab.entity.FatherEntity;
+import com.ajustor.fmab.promised.NationalCircle;
+import com.ajustor.fmab.stone.Eclipse;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -15,7 +17,8 @@ import net.minecraft.world.phys.Vec3;
  * La zone anti-alchimie de Père : son réseau de Pierres capte l'énergie tectonique qui nourrit
  * l'alchimie d'Amestris. Autour de lui, aucun cercle ne s'allume, ni gant, ni tatouage, ni mains
  * jointes, ni Pierre. L'alkahestry de Xing, qui puise au flux du dragon, n'en souffre pas, pas plus
- * que les armes ordinaires.
+ * que les armes ordinaires. Elle tient au cercle de transmutation national ({@link NationalCircle}) :
+ * brisez-le, et elle s'effondre.
  */
 public final class AntiAlchemy {
 	/** Rayon de la zone, en blocs. */
@@ -24,11 +27,24 @@ public final class AntiAlchemy {
 	private AntiAlchemy() {
 	}
 
-	/** L'alchimie d'Amestris est-elle captée ici ? */
+	/**
+	 * L'alchimie d'Amestris est-elle captée ici ? Plus du tout une fois le cercle national brisé ;
+	 * deux fois plus loin pendant le Jour promis (l'éclipse), tant qu'il tient.
+	 */
 	public static boolean suppressed(ServerLevel level, BlockPos pos) {
-		AABB box = new AABB(pos).inflate(RADIUS);
+		NationalCircle circle = NationalCircle.get(level.getServer());
+		if (circle.broken()) {
+			return false;
+		}
+		double radius = radius(level, circle);
+		AABB box = new AABB(pos).inflate(radius);
 		return !level.getEntitiesOfClass(FatherEntity.class, box,
-				f -> f.isAlive() && f.distanceToSqr(Vec3.atCenterOf(pos)) <= RADIUS * RADIUS).isEmpty();
+				f -> f.isAlive() && f.distanceToSqr(Vec3.atCenterOf(pos)) <= radius * radius).isEmpty();
+	}
+
+	/** Le rayon de la zone, doublé pendant le Jour promis. */
+	public static double radius(ServerLevel level, NationalCircle circle) {
+		return Eclipse.now(level) && !circle.broken() ? RADIUS * 2 : RADIUS;
 	}
 
 	/**

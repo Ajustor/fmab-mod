@@ -3,6 +3,7 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.AlchemistTableBlock;
 import com.ajustor.fmab.block.AutomailBenchBlock;
+import com.ajustor.fmab.block.BloodCrestBlock;
 import com.ajustor.fmab.block.FatherSealBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
 import net.minecraft.core.registries.Registries;
@@ -96,6 +97,15 @@ public final class FmabBlocks {
 					.strength(3.0f, 6.0f)
 					.requiresCorrectToolForDrops()
 					.sound(SoundType.COPPER));
+
+	/** Un point de sang du cercle national : indestructible, on le scelle par un contre-cercle. */
+	public static final Block BLOOD_CREST = register("blood_crest", BloodCrestBlock::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.COLOR_RED)
+					.strength(-1.0f, 3600000.0f)
+					.noLootTable()
+					.lightLevel(state -> state.getValue(BloodCrestBlock.SEALED) ? 0 : 6)
+					.sound(SoundType.DEEPSLATE_TILES));
 
 	private FmabBlocks() {
 	}

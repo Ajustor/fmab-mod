@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_xing",
+  "criteria": {
+    "alkahestry": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "alkahestry"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:kunai"
+    },
+    "title": {
+      "translate": "advancements.fmab.alkahestry.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.alkahestry.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "alkahestry"
+    ]
+  ]
+}

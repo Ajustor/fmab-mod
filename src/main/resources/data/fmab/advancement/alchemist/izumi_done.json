@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/izumi_met",
+  "criteria": {
+    "izumi_done": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "izumi_done"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:mutton"
+    },
+    "title": {
+      "translate": "advancements.fmab.izumi_done.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.izumi_done.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "izumi_done"
+    ]
+  ]
+}

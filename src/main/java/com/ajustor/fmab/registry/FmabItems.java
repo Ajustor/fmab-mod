@@ -149,6 +149,9 @@ public final class FmabItems {
 	public static final Item OLIVIER_SPAWN_EGG = register("olivier_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.OLIVIER));
 
+	public static final Item BLOOD_CREST = register("blood_crest",
+			p -> new BlockItem(FmabBlocks.BLOOD_CREST, p), new Item.Properties().useBlockDescriptionPrefix());
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -217,6 +220,7 @@ public final class FmabItems {
 					output.accept(BRIGGS_SABRE);
 					output.accept(OLIVIER_SPAWN_EGG);
 					output.accept(DRACHMA_SOLDIER_SPAWN_EGG);
+					output.accept(BLOOD_CREST);
 				})
 				.build());
 	}

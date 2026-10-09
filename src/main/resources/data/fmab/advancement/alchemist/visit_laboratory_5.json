@@ -1,0 +1,38 @@
+{
+  "parent": "fmab:alchemist/rank_state",
+  "criteria": {
+    "visit_laboratory_5": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "minecraft:location": {
+                "structures": "fmab:laboratory_5"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:iron_bars"
+    },
+    "title": {
+      "translate": "advancements.fmab.visit_laboratory_5.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.visit_laboratory_5.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "visit_laboratory_5"
+    ]
+  ]
+}

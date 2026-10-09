@@ -80,6 +80,7 @@ public final class Blueprints {
 		out.put("father_lair", new FatherLair());
 		out.put("xing_pavilion", new XingPavilion());
 		out.put("fort_briggs", new FortBriggs());
+		out.put("blood_crest", Blueprints::bloodCrest);
 		plans = out;
 		return plans;
 	}
@@ -1233,6 +1234,45 @@ public final class Blueprints {
 		public List<Spawn> spawns(Plot p) {
 			return List.of(new Spawn(FmabEntities.OLIVIER, new BlockPos(MID, 1, WALL_Z1 + 6)));
 		}
+	}
+
+	/**
+	 * Le champ d'un massacre : une terre brûlée, des pans de murs écroulés, des os et du sang figé ; au
+	 * centre, sur une estrade de pierre noire, le point de sang du cercle national.
+	 */
+	private static BlockState bloodCrest(int x, int y, int z, Blueprint.Plot p) {
+		int c = p.sizeX() / 2;
+		double r = Math.hypot(x - c, z - c);
+		if (r > c + 0.5) {
+			return null;
+		}
+		if (y < 0) {
+			return b(Blocks.COARSE_DIRT);
+		}
+		if (y == 0) {
+			if (r <= 1.5) {
+				return b(Blocks.POLISHED_BLACKSTONE);
+			}
+			int n = p.noise(x, 0, z, 9);
+			return n == 0 ? b(FmabBlocks.CRYSTALLIZED_BLOOD) : n < 4 ? b(Blocks.GRAVEL) : b(Blocks.COARSE_DIRT);
+		}
+		if (y == 1 && x == c && z == c) {
+			return b(FmabBlocks.BLOOD_CREST);
+		}
+		// Les murs écroulés, en arc de cercle, plus ou moins hauts.
+		if (r > 5.5 && r < 7 && p.noise(x, 0, z, 3) != 0 && y <= p.noise(x, 1, z, 4)) {
+			return p.noise(x, y, z, 3) == 0 ? b(Blocks.MOSSY_COBBLESTONE) : b(Blocks.COBBLESTONE);
+		}
+		if (y == 1 && r > 2 && r < 5.5) {
+			int n = p.noise(x, 2, z, 14);
+			if (n == 0) {
+				return b(Blocks.BONE_BLOCK);
+			}
+			if (n == 1) {
+				return b(Blocks.SKELETON_SKULL);
+			}
+		}
+		return AIR;
 	}
 
 	/** La place de Rush Valley : un dallage de grès, des lanternes aux coins, un puits au centre. */

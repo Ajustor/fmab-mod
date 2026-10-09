@@ -1,0 +1,32 @@
+{
+  "parent": "fmab:alchemist/slain_lust",
+  "criteria": {
+    "philosopher_stone": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "fmab:philosopher_stone"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:philosopher_stone"
+    },
+    "title": {
+      "translate": "advancements.fmab.philosopher_stone.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.philosopher_stone.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "philosopher_stone"
+    ]
+  ]
+}

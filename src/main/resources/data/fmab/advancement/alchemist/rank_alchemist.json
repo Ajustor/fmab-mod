@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/transmuted",
+  "criteria": {
+    "rank_alchemist": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "rank_alchemist"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:alchemist_table"
+    },
+    "title": {
+      "translate": "advancements.fmab.rank_alchemist.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.rank_alchemist.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "rank_alchemist"
+    ]
+  ]
+}

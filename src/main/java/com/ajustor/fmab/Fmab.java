@@ -10,6 +10,7 @@ import com.ajustor.fmab.homunculus.Belly;
 import com.ajustor.fmab.homunculus.EnvySpawner;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.network.FmabNetwork;
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
 import com.ajustor.fmab.registry.FmabBlocks;
@@ -75,6 +76,7 @@ public class Fmab implements ModInitializer {
 		PhilosopherStones.register();
 		LivingStone.register();
 		Alkahestry.register();
+		Milestones.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> equip(handler.getPlayer()));
 		// Gantelets : frapper un bloc, main libre, y lance leur cercle au lieu de commencer à le casser.
 		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {

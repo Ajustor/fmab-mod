@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/slain_pride",
+  "criteria": {
+    "seal_opened": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "seal_opened"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:father_seal"
+    },
+    "title": {
+      "translate": "advancements.fmab.seal_opened.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.seal_opened.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "seal_opened"
+    ]
+  ]
+}

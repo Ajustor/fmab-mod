@@ -1,0 +1,7 @@
+{
+  "type": "fmab:blood_crest",
+  "biomes": "#fmab:has_structure/blood_crest",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

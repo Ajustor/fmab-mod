@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_central",
+  "criteria": {
+    "rank_state": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "rank_state"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:state_watch"
+    },
+    "title": {
+      "translate": "advancements.fmab.rank_state.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.rank_state.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "rank_state"
+    ]
+  ]
+}

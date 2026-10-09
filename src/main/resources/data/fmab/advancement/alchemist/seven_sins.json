@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/slain_pride",
+  "criteria": {
+    "seven_sins": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "seven_sins"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:philosopher_stone_core"
+    },
+    "title": {
+      "translate": "advancements.fmab.seven_sins.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.seven_sins.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "seven_sins"
+    ]
+  ]
+}

@@ -1,6 +1,8 @@
 package com.ajustor.fmab.stone;
 
+import com.ajustor.fmab.promised.NationalCircle;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,8 +49,14 @@ public final class Eclipse {
 			if (!starting && !ending) {
 				return;
 			}
+			NationalCircle circle = NationalCircle.get(server);
 			for (ServerPlayer p : overworld.players()) {
 				p.sendSystemMessage(Component.translatable(starting ? "eclipse.fmab.begins" : "eclipse.fmab.ends"));
+				if (starting && !circle.broken()) {
+					// Le Jour promis : le cercle national s'éveille, et Père avec lui.
+					p.sendSystemMessage(Component.translatable("promised.fmab.day_begins",
+							NationalCircle.POINTS - circle.sealedCount()).withStyle(ChatFormatting.DARK_RED));
+				}
 			}
 		});
 	}

@@ -1,5 +1,6 @@
 package com.ajustor.fmab.block;
 
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import net.minecraft.core.BlockPos;
@@ -60,6 +61,7 @@ public class FatherSealBlock extends Block {
 			return InteractionResult.SUCCESS;
 		}
 		open(server, pos);
+		Milestones.reach(p, "seal_opened");
 		p.sendSystemMessage(Component.translatable("block.fmab.father_seal.opens"));
 		return InteractionResult.SUCCESS;
 	}

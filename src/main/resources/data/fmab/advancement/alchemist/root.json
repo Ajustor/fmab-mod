@@ -1,0 +1,34 @@
+{
+  "criteria": {
+    "root": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "fmab:alchemy_treatise"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:alchemy_treatise"
+    },
+    "title": {
+      "translate": "advancements.fmab.root.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.root.description"
+    },
+    "frame": "task",
+    "background": "fmab:gui/advancements/backgrounds/alchemy",
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "requirements": [
+    [
+      "root"
+    ]
+  ]
+}

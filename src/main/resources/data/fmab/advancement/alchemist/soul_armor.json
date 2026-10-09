@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/rank_gate",
+  "criteria": {
+    "soul_armor": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "soul_armor"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:iron_chestplate"
+    },
+    "title": {
+      "translate": "advancements.fmab.soul_armor.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.soul_armor.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "soul_armor"
+    ]
+  ]
+}
