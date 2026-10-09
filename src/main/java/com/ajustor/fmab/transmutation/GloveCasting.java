@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
@@ -85,6 +86,7 @@ public final class GloveCasting {
 			return;
 		}
 		player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_ATTACK_WEAK, SoundSource.PLAYERS, 1, 1.8f);
+		player.swing(InteractionHand.OFF_HAND, true);
 		Transmutation.activate(player.level(), hit.getBlockPos().relative(hit.getDirection()),
 				CircleFrame.forFace(hit.getDirection(), player.getDirection()), drawing, player, false, Integer.MAX_VALUE);
 	}

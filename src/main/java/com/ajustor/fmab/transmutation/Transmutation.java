@@ -23,6 +23,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -30,8 +31,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Activation d'un cercle par un alchimiste : le serveur relit le tracé, vérifie le savoir, le
@@ -146,7 +150,7 @@ public final class Transmutation {
 			for (Analysis.StageEffect effect : effects) {
 				EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, flow, knowledge,
 						watch ? StateWatch.RANGE_BONUS : 0,
-						size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1));
+						size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1), 0);
 				Effects.Result result = Effects.get(effect.combination().effect())
 						.map(e -> e.apply(ctx))
 						.orElse(Effects.Result.NO_TARGET);
@@ -163,7 +167,12 @@ public final class Transmutation {
 			previous = stageResult;
 		}
 		dropAll(level, circle, flow);
+		// Le geste : la paume plaquée sur le cercle, ou les mains jointes.
+		caster.swing(InteractionHand.MAIN_HAND, true);
 		if (anything) {
+			if (inscribed) {
+				CHANNELS.put(caster.getUUID(), new Channel(circle, level.getGameTime(), 0));
+			}
 			TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 1);
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 1.4f);
 			practice(caster, rules, knowledge, practiced);
@@ -184,6 +193,82 @@ public final class Transmutation {
 				: "transmutation.fmab.no_target"));
 		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.3);
 		return Result.NOTHING;
+	}
+
+	/**
+	 * Une transmutation qu'on prolonge en gardant la main sur le cercle.
+	 *
+	 * @param circle le cercle inscrit
+	 * @param last   dernier tick où l'énergie a coulé
+	 * @param growth combien de fois elle a été prolongée
+	 */
+	private record Channel(BlockPos circle, long last, int growth) {
+	}
+
+	private static final Map<UUID, Channel> CHANNELS = new HashMap<>();
+	/** Le jeu répète le geste toutes les quatre ticks tant qu'on maintient le clic. */
+	private static final int CHANNEL_GAP = 8;
+	/** Au-delà, l'ouvrage ne grandit plus. */
+	private static final int MAX_GROWTH = 12;
+
+	/**
+	 * L'alchimiste garde la main sur le cercle qu'il vient d'activer : l'énergie continue de couler.
+	 * Les ouvrages grandissent (un mur monte, une pique s'allonge) tant qu'il reste de la matière,
+	 * les jets se répètent. Chaque prolongation coûte un peu de concentration (rien avec une Pierre).
+	 *
+	 * @return vrai si le geste prolonge une transmutation (il ne faut pas en lancer une nouvelle)
+	 */
+	public static boolean channel(ServerLevel level, BlockPos circle, BlockState state, Drawing drawing,
+			ServerPlayer caster, CircleSize size) {
+		Channel channel = CHANNELS.get(caster.getUUID());
+		long now = level.getGameTime();
+		if (channel == null || !channel.circle().equals(circle) || now - channel.last() > CHANNEL_GAP) {
+			CHANNELS.remove(caster.getUUID());
+			return false;
+		}
+		if (channel.growth() >= MAX_GROWTH) {
+			return true;
+		}
+		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
+		Analysis analysis = rules.analyze(drawing, alchemist);
+		boolean amplified = PhilosopherStones.held(caster).isPresent() || LivingStone.souls(caster) > 0;
+		if (!amplified) {
+			if (alchemist.concentration() < 1) {
+				caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", 1, 0));
+				CHANNELS.remove(caster.getUUID());
+				return true;
+			}
+			caster.setAttached(FmabAttachments.ALCHEMIST, alchemist.withConcentration(alchemist.concentration() - 1));
+		}
+		int growth = channel.growth() + 1;
+		CircleFrame frame = CircleFrame.of(state);
+		Knowledge knowledge = rules.knowledge(alchemist);
+		boolean watch = StateWatch.empowers(caster);
+		boolean anything = false;
+		for (Analysis.StageEffect effect : analysis.effects()) {
+			Effects.Channel mode = Effects.channel(effect.combination().effect());
+			if (mode == Effects.Channel.ONCE) {
+				continue;
+			}
+			EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, new ArrayList<>(), knowledge,
+					watch ? StateWatch.RANGE_BONUS : 0,
+					size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1),
+					mode == Effects.Channel.GROW ? growth : 0);
+			Effects.Result result = Effects.get(effect.combination().effect())
+					.map(e -> e.apply(ctx))
+					.orElse(Effects.Result.NO_TARGET);
+			anything |= result == Effects.Result.DONE;
+		}
+		caster.swing(InteractionHand.MAIN_HAND, true);
+		if (!anything) {
+			// Plus de matière, ou rien qui puisse grandir : l'énergie s'arrête.
+			CHANNELS.remove(caster.getUUID());
+			return true;
+		}
+		CHANNELS.put(caster.getUUID(), new Channel(circle, now, growth));
+		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.4);
+		return true;
 	}
 
 	/**

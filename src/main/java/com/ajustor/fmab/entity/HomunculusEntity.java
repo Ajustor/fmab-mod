@@ -91,8 +91,15 @@ public abstract class HomunculusEntity extends Monster {
 	}
 
 	/** Les âmes qui restent dans la Pierre. */
-	protected int souls() {
+	public int souls() {
 		return souls;
+	}
+
+	/** Une Pierre vivante lui arrache des âmes ; il en rend au plus ce qu'il a. */
+	public int takeSouls(int wanted) {
+		int taken = Math.min(wanted, souls);
+		souls -= taken;
+		return taken;
 	}
 
 	@Override

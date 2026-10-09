@@ -353,6 +353,7 @@
   "tattoo.fmab.slot.back": "Back",
   "tattoo.fmab.slot.chest": "Chest",
   "treatise.fmab.ch4.p12": "Worn circles.\n\nA circle embroidered on a leather garment (one stage) or tattooed anywhere but the palms acts permanently: Earth and Fix reinforce, Water and Fix ward off fire, Air and Project lighten your step, Iron and Repair close wounds, Earth and Project sting whoever strikes you.\n\nThe tattoo: draw the circle on the ground, then use alchemical ink on it.",
+  "treatise.fmab.ch4.hold": "Keep your hand on the circle after activating it: the energy keeps flowing. A wall rises, a spike grows longer as long as there is matter to take; a jet of flame or a gust repeats. Each moment costs a little concentration.",
 
   "treatise.fmab.ch5.title": "V. Circles to copy",
   "treatise.fmab.ch5.p1": "Each page shows a working circle. \"Copy drawing\" puts its code on the clipboard: in the notebook, \"Import\" copies it in.\n\nRedrawing it yourself is better, though: that is how one learns.",
@@ -399,7 +400,7 @@
   "treatise.fmab.ch10.p1": "Held in hand, the Stone amplifies any transmutation: range and damage half again, no concentration, and the circle no longer rebounds from instability or misunderstood glyphs. Each transmutation costs it a soul, plus one per stage.\n\nBut it can be seen from afar: its bearer glows, and the monsters around come running.",
   "treatise.fmab.ch10.p2": "There is only one way to make a Stone: lives. On a human transmutation circle, lay crystallized blood: the circle consumes everything alive in its area and condenses their souls. A villager is worth twelve souls, a beast three.\n\nIt is the absolute taboo.",
   "treatise.fmab.ch10.p3": "Karma keeps track of what you do. Sacrificing and killing villagers lower it; destroying homunculi, defending villagers and repairing raise it. Villagers talk about it: low karma raises their prices and sets their golems on you; very low, the homunculi come to recruit you.",
-  "treatise.fmab.ch10.p4": "Every eight days, around noon, the moon passes before the sun. During this eclipse, a Gate initiate holding a full Stone in each hand, on a human transmutation circle, becomes a Living Stone, like Hohenheim: two hundred souls, no more toll, no more concentration, and they rise from every death. Each death costs twenty souls, each great transmutation one; at zero, it all ends. And the homunculi hunt them.",
+  "treatise.fmab.ch10.p4": "Every eight days, around noon, the moon passes before the sun. During this eclipse, a Gate initiate holding a full Stone in each hand, on a human transmutation circle, becomes a Living Stone, like Hohenheim: the souls of both Stones, without limit, no more toll, no more concentration, and they rise from every death (twenty souls). Bare-handed, they absorb the souls of the living by keeping a hand on them, faster and faster; another Living Stone loses its own one by one. At zero, it all ends. And the homunculi hunt them.",
   "treatise.fmab.ch8.p5": "The first time Truth takes the whole body, the soul at once finds itself in an iron armor, bound by a blood seal drawn inside the breastplate. The armor is hollow: only it can be seen. The soul neither hungers nor breathes, and does not eat. Blows wear the pieces: a piece that gives way can be made again (without a helm you see poorly, without greaves you walk poorly). Crouching, the soul transmutes the material it holds into its armor (an iron ingot for iron) and mends it.\n\nIf the breastplate gives way, the seal is erased: the soul goes back to wander before its Gate.",
 
   "block.fmab.white_floor": "White Space floor",
@@ -548,9 +549,12 @@
   "stone.fmab.sacrifice_done": "The circle closes on the souls. A Philosopher's Stone of %s souls lies at its center.",
   "stone.fmab.ritual_needs_eclipse": "The Living Stone ritual can only be performed during the eclipse.",
   "stone.fmab.ritual_needs_gate": "You must have seen the Gate to become a Living Stone.",
-  "stone.fmab.became_living_stone": "The souls of both Stones melt into you. You are a living Philosopher's Stone (%s souls).",
+  "stone.fmab.became_living_stone": "The souls of both Stones melt into you. You are a living Philosopher's Stone (%s souls). Bare-handed, keep your hand on a being to absorb its souls.",
   "stone.fmab.resurrected": "A soul burns away: you rise again. %s remain.",
   "stone.fmab.living_stone_spent": "Your last soul fades. You are no longer a Stone.",
+  "stone.fmab.absorbed": "+%s souls (%s)",
+  "stone.fmab.being_drained": "Your souls are being torn out! %s remain.",
+  "stone.fmab.drained_dry": "Another Stone drained you of your souls.",
   "stone.fmab.hunted_lust": "Lust: \"A walking Stone… Father will be delighted.\"",
   "stone.fmab.hunted_envy": "Someone who looks exactly like you is watching from afar…",
   "truth.fmab.toll.living_stone": "\"You have already paid everything, with other people's souls.\""

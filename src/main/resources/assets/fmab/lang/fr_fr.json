@@ -353,6 +353,7 @@
   "tattoo.fmab.slot.back": "Dos",
   "tattoo.fmab.slot.chest": "Torse",
   "treatise.fmab.ch4.p12": "Cercles portés.\n\nUn cercle brodé sur un vêtement de cuir (un étage) ou tatoué ailleurs que sur les paumes agit en permanence : Terre et Fixer renforcent, Eau et Fixer protègent du feu, Air et Projeter allègent le pas, Fer et Réparer ressoudent les plaies, Terre et Projeter piquent qui vous frappe.\n\nLe tatouage : tracez le cercle au sol, puis utilisez l'encre alchimique dessus.",
+  "treatise.fmab.ch4.hold": "Gardez la main sur le cercle après l'avoir activé : l'énergie continue de couler. Un mur monte, une pique s'allonge tant qu'il reste de la matière à prendre ; un jet de flammes ou une rafale se répète. Chaque instant coûte un peu de concentration.",
 
   "treatise.fmab.ch5.title": "V. Cercles à recopier",
   "treatise.fmab.ch5.p1": "Chaque page montre un cercle qui fonctionne. « Copier le tracé » met son code dans le presse-papiers : dans le carnet, « Importer » le recopie.\n\nMieux vaut toutefois le redessiner soi-même : c'est ainsi qu'on apprend.",
@@ -399,7 +400,7 @@
   "treatise.fmab.ch10.p1": "Tenue en main, la Pierre amplifie toute transmutation : portée et dégâts accrus de moitié, aucune concentration, et le cercle ne rebondit plus d'instabilité ni de glyphes mal compris. Chaque transmutation lui coûte une âme, plus une par étage.\n\nMais elle se voit de loin : son porteur luit, et les monstres alentour accourent.",
   "treatise.fmab.ch10.p2": "Il n'y a qu'une façon de fabriquer une Pierre : des vies. Sur un cercle de transmutation humaine, posez du sang cristallisé : le cercle consume tout ce qui vit dans son aire et condense leurs âmes. Un villageois vaut douze âmes, une bête trois.\n\nC'est le tabou absolu.",
   "treatise.fmab.ch10.p3": "Le karma garde la trace de ce que vous faites. Sacrifier, tuer des villageois le font chuter ; détruire des homonculus, défendre les villageois, réparer le font monter. Les villageois en parlent : un karma bas renchérit leurs prix et lâche leurs golems sur vous ; très bas, les homonculus viennent vous recruter.",
-  "treatise.fmab.ch10.p4": "Tous les huit jours, vers midi, la lune passe devant le soleil. Pendant cette éclipse, un Initié de la Porte qui tient une Pierre pleine dans chaque main, sur un cercle de transmutation humaine, devient une Pierre vivante, comme Hohenheim : deux cents âmes, plus de péage, plus de concentration, et il se relève de chaque mort. Chaque mort coûte vingt âmes, chaque grande transmutation une ; à zéro, tout s'arrête. Et les homonculus le traquent.",
+  "treatise.fmab.ch10.p4": "Tous les huit jours, vers midi, la lune passe devant le soleil. Pendant cette éclipse, un Initié de la Porte qui tient une Pierre pleine dans chaque main, sur un cercle de transmutation humaine, devient une Pierre vivante, comme Hohenheim : les âmes des deux Pierres, sans limite, plus de péage, plus de concentration, et il se relève de chaque mort (vingt âmes). Main nue, il absorbe les âmes des vivants en gardant la main sur eux, de plus en plus vite ; une autre Pierre vivante perd les siennes une à une. À zéro, tout s'arrête. Et les homonculus le traquent.",
   "treatise.fmab.ch8.p5": "La première fois que la Vérité prend le corps entier, l'âme se retrouve aussitôt dans une armure de fer, fixée par un sceau de sang tracé dans le plastron. L'armure est vide : on ne voit qu'elle. L'âme n'a ni faim ni souffle et ne mange pas. Les coups usent les pièces : une pièce qui cède se refait (sans heaume on voit mal, sans jambières on avance mal). Accroupie, l'âme transmute dans son armure le matériau qu'elle tient (un lingot de fer pour du fer) et la répare.\n\nSi le plastron cède, le sceau est effacé : l'âme retourne errer devant sa Porte.",
 
   "block.fmab.white_floor": "Sol de l'Espace blanc",
@@ -548,9 +549,12 @@
   "stone.fmab.sacrifice_done": "Le cercle se referme sur les âmes. Une Pierre philosophale de %s âmes repose au centre.",
   "stone.fmab.ritual_needs_eclipse": "Le rituel de la Pierre vivante ne s'accomplit que pendant l'éclipse.",
   "stone.fmab.ritual_needs_gate": "Il faut avoir vu la Porte pour devenir une Pierre vivante.",
-  "stone.fmab.became_living_stone": "Les âmes des deux Pierres se fondent en vous. Vous êtes une Pierre philosophale vivante (%s âmes).",
+  "stone.fmab.became_living_stone": "Les âmes des deux Pierres se fondent en vous. Vous êtes une Pierre philosophale vivante (%s âmes). Main nue, gardez la main sur un être pour absorber ses âmes.",
   "stone.fmab.resurrected": "Une âme se consume : vous vous relevez. Il en reste %s.",
   "stone.fmab.living_stone_spent": "Votre dernière âme s'éteint. Vous n'êtes plus une Pierre.",
+  "stone.fmab.absorbed": "+%s âmes (%s)",
+  "stone.fmab.being_drained": "On vous arrache vos âmes ! Il en reste %s.",
+  "stone.fmab.drained_dry": "Une autre Pierre vous a vidé de vos âmes.",
   "stone.fmab.hunted_lust": "Lust : « Une Pierre qui marche… Père va être ravi. »",
   "stone.fmab.hunted_envy": "Quelqu'un qui vous ressemble trait pour trait vous observe de loin…",
   "truth.fmab.toll.living_stone": "« Tu as déjà tout payé, avec les âmes des autres. »"

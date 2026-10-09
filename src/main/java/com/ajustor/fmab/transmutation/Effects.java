@@ -11,6 +11,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -64,6 +65,18 @@ public final class Effects {
 		Result apply(EffectContext ctx);
 	}
 
+	/** Ce que fait un effet quand l'alchimiste garde la main sur le cercle. */
+	public enum Channel {
+		/** Rien de plus : l'effet a lieu une fois. */
+		ONCE,
+		/** L'ouvrage grandit (un mur monte, une pique s'allonge), tant qu'il y a de la matière. */
+		GROW,
+		/** L'effet se répète (un jet de flammes continu). */
+		REPEAT
+	}
+
+	private static final Map<String, Channel> CHANNELS = new HashMap<>();
+
 	private static final Map<String, Effect> EFFECTS = new HashMap<>();
 	private static final int WALL_HEIGHT = 3;
 	private static final int SPIKE_HEIGHT = 3;
@@ -99,6 +112,16 @@ public final class Effects {
 		register("fmab:ice_spike", Effects::iceSpike);
 		register("fmab:ice_wall", Effects::iceWall);
 		register("fmab:detonate", Effects::detonate);
+		for (String grows : new String[]{"fmab:wall", "fmab:spike", "fmab:ice_spike", "fmab:ice_wall"}) {
+			CHANNELS.put(grows, Channel.GROW);
+		}
+		for (String repeats : new String[]{"fmab:flame_jet", "fmab:flame_burst", "fmab:gust"}) {
+			CHANNELS.put(repeats, Channel.REPEAT);
+		}
+	}
+
+	public static Channel channel(String id) {
+		return CHANNELS.getOrDefault(id, Channel.ONCE);
 	}
 
 	private Effects() {
@@ -133,10 +156,10 @@ public final class Effects {
 				}
 				// La terre vient de devant le mur : derrière sa dernière couche.
 				List<BlockPos> quarry = new ArrayList<>();
-				for (int k = 1; k <= WALL_HEIGHT; k++) {
+				for (int k = 1; k <= ctx.grown(WALL_HEIGHT); k++) {
 					quarry.add(column.relative(d, thickness - layer).below(k));
 				}
-				moved += raise(ctx, quarry, column, Direction.UP, earth, WALL_HEIGHT, 0);
+				moved += raise(ctx, quarry, column, Direction.UP, earth, ctx.grown(WALL_HEIGHT), 0);
 			}
 		}
 		return moved > 0 ? Result.DONE : Result.NO_MATERIAL;
@@ -162,8 +185,8 @@ public final class Effects {
 					}
 				}
 			}
-			int raised = raise(ctx, quarry, ctx.circle().relative(frame.normal()), frame.normal(), earth, SPIKE_HEIGHT,
-					ctx.damage(SPIKE_DAMAGE));
+			int raised = raise(ctx, quarry, ctx.circle().relative(frame.normal()), frame.normal(), earth,
+					ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE));
 			return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
 		}
 		BlockPos column = surface(level, ctx.origin().relative(ctx.direction(), ctx.range()));
@@ -171,11 +194,14 @@ public final class Effects {
 			return Result.NO_TARGET;
 		}
 		List<BlockPos> quarry = new ArrayList<>();
-		for (Direction side : Direction.Plane.HORIZONTAL) {
-			quarry.add(column.relative(side).below());
-			quarry.add(column.relative(side).relative(side.getClockWise()).below());
+		// Plus la pique s'allonge, plus elle va chercher sa pierre profond.
+		for (int depth = 1; depth <= 1 + ctx.growth() / 3; depth++) {
+			for (Direction side : Direction.Plane.HORIZONTAL) {
+				quarry.add(column.relative(side).below(depth));
+				quarry.add(column.relative(side).relative(side.getClockWise()).below(depth));
+			}
 		}
-		int raised = raise(ctx, quarry, column, Direction.UP, earth, SPIKE_HEIGHT, ctx.damage(SPIKE_DAMAGE));
+		int raised = raise(ctx, quarry, column, Direction.UP, earth, ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE));
 		return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
 	}
 
@@ -482,7 +508,7 @@ public final class Effects {
 			return Result.NO_TARGET;
 		}
 		int raised = raise(ctx, waterAround(level, column, ICE_REACH), column, Direction.UP,
-				FmabTags.elementBlocks("water"), SPIKE_HEIGHT, ctx.damage(SPIKE_DAMAGE), Effects::frozen);
+				FmabTags.elementBlocks("water"), ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE), Effects::frozen);
 		if (raised > 0) {
 			for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(column).inflate(1.5))) {
 				if (e != ctx.caster()) {
@@ -507,7 +533,7 @@ public final class Effects {
 		for (int i = -ctx.range(); i <= ctx.range(); i++) {
 			BlockPos column = surface(level, center.relative(along, i));
 			if (column != null) {
-				moved += raise(ctx, water, column, Direction.UP, FmabTags.elementBlocks("water"), WALL_HEIGHT, 0,
+				moved += raise(ctx, water, column, Direction.UP, FmabTags.elementBlocks("water"), ctx.grown(WALL_HEIGHT), 0,
 						Effects::frozen);
 			}
 		}
@@ -567,10 +593,17 @@ public final class Effects {
 			TagKey<Block> element, int maxHeight, float damage, UnaryOperator<BlockState> recompose) {
 		ServerLevel level = ctx.level();
 		int height = 0;
+		int placed = 0;
 		Iterator<BlockPos> world = quarry.iterator();
 		while (height < maxHeight) {
 			BlockPos to = column.relative(up, height);
 			if (!level.getBlockState(to).canBeReplaced()) {
+				BlockState here = level.getBlockState(to);
+				if (ctx.growth() > 0 && (here.is(element) || here.is(BlockTags.ICE))) {
+					// L'ouvrage déjà élevé : on monte par-dessus.
+					height++;
+					continue;
+				}
 				break;
 			}
 			BlockState state = fromFlow(ctx, element);
@@ -591,6 +624,7 @@ public final class Effects {
 			}
 			level.setBlockAndUpdate(to, recompose.apply(state));
 			height++;
+			placed++;
 		}
 		if (height > 0) {
 			AABB space = new AABB(column).expandTowards(up.getStepX() * (height - 1), up.getStepY() * (height - 1),
@@ -609,7 +643,7 @@ public final class Effects {
 				}
 			}
 		}
-		return height;
+		return placed;
 	}
 
 	/** Un bloc de l'élément pris dans la matière qui circule entre étages, ou null. */
