@@ -16,6 +16,8 @@ import java.util.Optional;
  */
 public class FortBriggsStructure extends Structure {
 	public static final MapCodec<FortBriggsStructure> CODEC = simpleCodec(FortBriggsStructure::new);
+	/** Écart de hauteur toléré entre les coins de l'emprise. */
+	private static final int MAX_RELIEF = 14;
 
 	public FortBriggsStructure(StructureSettings settings) {
 		super(settings);
@@ -31,6 +33,17 @@ public class FortBriggsStructure extends Structure {
 			return Optional.empty();
 		}
 		int sx = Blueprints.FortBriggs.SIZE_X, sz = Blueprints.FortBriggs.SIZE_Z;
+		// Un col assez régulier : sur une arête trop accidentée, la muraille flotterait ou s'enterrerait.
+		int min = y, max = y;
+		for (int[] d : new int[][]{{-1, -1}, {1, -1}, {-1, 1}, {1, 1}}) {
+			int h = context.chunkGenerator().getFirstFreeHeight(cx + d[0] * sx / 2, cz + d[1] * sz / 2,
+					Heightmap.Types.WORLD_SURFACE_WG, context.heightAccessor(), context.randomState());
+			min = Math.min(min, h);
+			max = Math.max(max, h);
+		}
+		if (max - min > MAX_RELIEF) {
+			return Optional.empty();
+		}
 		BlockPos corner = new BlockPos(cx - sx / 2, y, cz - sz / 2);
 		Rotation rotation = Rotation.values()[context.random().nextInt(4)];
 		long seed = context.random().nextLong();

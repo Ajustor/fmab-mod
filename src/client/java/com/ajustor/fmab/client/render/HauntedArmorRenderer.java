@@ -45,7 +45,12 @@ public class HauntedArmorRenderer<T extends HauntedArmorEntity>
 	}
 
 	public HauntedArmorRenderer(EntityRendererProvider.Context context, String skin) {
-		super(context, new Model(context.bakeLayer(ModelLayers.PLAYER)), 0.5f);
+		this(context, skin, context.bakeLayer(ModelLayers.PLAYER));
+	}
+
+	/** Avec un squelette à soi (Barry et son cimier). */
+	public HauntedArmorRenderer(EntityRendererProvider.Context context, String skin, ModelPart root) {
+		super(context, new Model(root), 0.5f);
 		this.texture = Fmab.id("textures/entity/" + skin + ".png");
 	}
 

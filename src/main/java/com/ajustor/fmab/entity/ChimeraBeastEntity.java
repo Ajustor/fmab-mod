@@ -39,6 +39,8 @@ public class ChimeraBeastEntity extends Monster {
 	private static final EntityDataAccessor<Boolean> REARING =
 			SynchedEntityData.defineId(ChimeraBeastEntity.class, EntityDataSerializers.BOOLEAN);
 	private int rearTicks;
+	private float rearBefore;
+	private float rearNow;
 	/** Son créateur, si elle en a un. */
 	private UUID master;
 
@@ -64,6 +66,11 @@ public class ChimeraBeastEntity extends Monster {
 	/** Dressée sur ses pattes arrière, au moment de frapper. */
 	public boolean rearing() {
 		return entityData.get(REARING);
+	}
+
+	/** Où en est la chimère qui se dresse, de 0 à 1 (côté client, pour l'animer en douceur). */
+	public float rearAmount(float partialTicks) {
+		return rearBefore + (rearNow - rearBefore) * partialTicks;
 	}
 
 	@Override
@@ -120,6 +127,8 @@ public class ChimeraBeastEntity extends Monster {
 		if (rearTicks > 0 && --rearTicks == 0) {
 			entityData.set(REARING, false);
 		}
+		rearBefore = rearNow;
+		rearNow = Math.clamp(rearNow + (rearing() ? 0.3f : -0.2f), 0, 1);
 		if (master != null && level() instanceof ServerLevel level && tickCount % 10 == 0) {
 			follow(level);
 		}

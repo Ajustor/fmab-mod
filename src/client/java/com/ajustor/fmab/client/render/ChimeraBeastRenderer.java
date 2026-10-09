@@ -25,7 +25,7 @@ public class ChimeraBeastRenderer extends MobRenderer<ChimeraBeastEntity, PolarB
 	@Override
 	public void extractRenderState(ChimeraBeastEntity entity, PolarBearRenderState state, float partialTicks) {
 		super.extractRenderState(entity, state, partialTicks);
-		state.standScale = entity.rearing() ? 1 : 0;
+		state.standScale = entity.rearAmount(partialTicks);
 	}
 
 	@Override
