@@ -306,6 +306,7 @@
 
   "treatise.fmab.ch4.title": "IV. Composer un cercle",
   "treatise.fmab.ch4.p1": "L'anneau : un grand cercle centré sur la page (outil Cercle, partez du centre, rayon d'au moins 5 cases). Sans anneau, rien ne se passe.\n\nLe polygone : outil Polygone, depuis le centre jusqu'à l'anneau, pour que tous ses sommets le touchent. Un Apprenti trace un triangle ou un carré.",
+  "treatise.fmab.ch4.triggers": "Un cercle inscrit part d'ordinaire sous la paume. Accroupi, main nue, un clic droit change son déclencheur : à retardement (il part trois secondes après la paume, le temps de s'écarter), en piège (il part quand une créature marche dessus, sauf vous), ou sur un signal de redstone. Qui règle le déclencheur en devient l'auteur : quand le cercle part tout seul, c'est sa concentration et son savoir qu'il consume ; absent, le cercle grésille et s'éteint.",
   "treatise.fmab.ch4.p2": "À l'intérieur : un glyphe d'élément (la matière) et un glyphe d'action (ce qu'on en fait).\n\nSur l'anneau : des points d'Intensité (+50 % de portée chacun) et une flèche de Direction. Sans flèche, l'effet part vers où vous regardez ; le haut de la page est la direction où vous regardiez en traçant.",
   "treatise.fmab.ch4.p3": "Complexité : la somme des glyphes. Un Apprenti en tient 6.\n\nStabilité : un étage supporte autant de complexité que ses polygones ont de côtés (2 pour un anneau nu), un quart de plus si les glyphes sont disposés symétriquement. En dessous de 100 %, le cercle rebondit.\n\nConcentration : chaque glyphe en coûte. Elle revient au repos, plus vite accroupi.",
   "treatise.fmab.ch4.p4": "Cercles d'Alchimiste — les étages.\n\nTracez un second anneau autour du premier : chaque anneau est un étage, lu du centre vers l'extérieur. Un Alchimiste en tient deux.\n\nUn étage extérieur ne reçoit l'énergie que s'il est relié au précédent par un trait qui va d'un anneau à l'autre.",
@@ -860,5 +861,11 @@
   "death.attack.fmab.bullet.item": "%1$s a été abattu par %2$s avec %3$s",
   "death.attack.fmab.alkahestry.item": "%1$s a été pris dans le cercle d'alkahestry de %2$s",
   "death.attack.fmab.lust_lance.item": "%1$s a été transpercé par les doigts de %2$s",
-  "homunculus.fmab.father_drained_dry": "Père a bu vos dernières âmes. Vous n'êtes plus une Pierre philosophale."
+  "homunculus.fmab.father_drained_dry": "Père a bu vos dernières âmes. Vous n'êtes plus une Pierre philosophale.",
+  "circle.fmab.trigger_set": "Déclencheur du cercle : %s",
+  "circle.fmab.trigger.hand": "la paume (clic droit)",
+  "circle.fmab.trigger.delay": "à retardement (3 secondes après la paume)",
+  "circle.fmab.trigger.pressure": "piège (quand une créature marche dessus)",
+  "circle.fmab.trigger.redstone": "signal de redstone",
+  "circle.fmab.armed": "Le cercle est armé : il part dans trois secondes."
 }

@@ -306,6 +306,7 @@
 
   "treatise.fmab.ch4.title": "IV. Composing a circle",
   "treatise.fmab.ch4.p1": "The ring: a large circle centered on the page (Circle tool, start from the center, radius of at least 5 cells). Without a ring, nothing happens.\n\nThe polygon: Polygon tool, from the center out to the ring, so that every corner touches it. An Apprentice draws a triangle or a square.",
+  "treatise.fmab.ch4.triggers": "An inscribed circle normally goes off under the palm. Sneaking, bare-handed, a right-click changes its trigger: delayed (it goes off three seconds after the palm, time to step away), trap (it goes off when a creature steps on it, except you), or on a redstone signal. Whoever sets the trigger becomes its author: when the circle goes off on its own, it consumes their concentration and knowledge; if they are away, the circle fizzles out.",
   "treatise.fmab.ch4.p2": "Inside: one element glyph (the matter) and one action glyph (what is done with it).\n\nOn the ring: Intensity dots (+50% range each) and a Direction arrow. Without an arrow, the effect goes where you are looking; the top of the page is the direction you faced while drawing.",
   "treatise.fmab.ch4.p3": "Complexity: the sum of the glyphs. An Apprentice can hold 6.\n\nStability: a stage bears as much complexity as its polygons have sides (2 for a bare ring), a quarter more if the glyphs are laid out symmetrically. Below 100%, the circle rebounds.\n\nConcentration: every glyph costs some. It comes back with rest, faster while crouching.",
   "treatise.fmab.ch4.p4": "Alchemist circles — stages.\n\nDraw a second ring around the first: each ring is a stage, read from the center outwards. An Alchemist can hold two.\n\nAn outer stage only receives energy if a stroke running from one ring to the other links it to the previous one.",
@@ -860,5 +861,11 @@
   "death.attack.fmab.bullet.item": "%1$s was shot by %2$s using %3$s",
   "death.attack.fmab.alkahestry.item": "%1$s was caught in %2$s's alkahestry circle",
   "death.attack.fmab.lust_lance.item": "%1$s was pierced by %2$s's fingers",
-  "homunculus.fmab.father_drained_dry": "Father drank your last souls. You are no longer a Philosopher's Stone."
+  "homunculus.fmab.father_drained_dry": "Father drank your last souls. You are no longer a Philosopher's Stone.",
+  "circle.fmab.trigger_set": "Circle trigger: %s",
+  "circle.fmab.trigger.hand": "the palm (right-click)",
+  "circle.fmab.trigger.delay": "delayed (3 seconds after the palm)",
+  "circle.fmab.trigger.pressure": "trap (when a creature steps on it)",
+  "circle.fmab.trigger.redstone": "redstone signal",
+  "circle.fmab.armed": "The circle is armed: it goes off in three seconds."
 }

@@ -4,10 +4,17 @@ import com.ajustor.fmab.transmutation.Transmutation;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -24,14 +31,17 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Cercle de transmutation inscrit sur une face de bloc : sol, mur ou plafond. Il s'active paume
- * contre la surface (clic droit main vide).
+ * contre la surface (clic droit main vide), ou par son déclencheur ({@link CircleTrigger}, réglé
+ * accroupi, main vide) : à retardement, en piège, ou sur un signal de redstone.
  *
  * <p>{@link #FACING} : au sol et au plafond, la direction où regardait le joueur en le traçant, qui
  * devient le haut de la page du carnet ; sur un mur, la direction vers laquelle le cercle fait
@@ -153,12 +163,79 @@ public class TransmutationCircleBlock extends BaseEntityBlock {
 			BlockHitResult hitResult) {
 		if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer
 				&& level.getBlockEntity(pos) instanceof TransmutationCircleBlockEntity circle) {
+			if (player.isShiftKeyDown()) {
+				// Accroupi : on règle le déclencheur, et on en devient l'auteur.
+				CircleTrigger next = circle.trigger().next();
+				circle.setTrigger(next, player.getUUID());
+				serverPlayer.sendOverlayMessage(Component.translatable("circle.fmab.trigger_set",
+						Component.translatable(next.translationKey())));
+				serverLevel.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 0.4f, 1.4f);
+				return InteractionResult.SUCCESS;
+			}
+			if (circle.trigger() == CircleTrigger.DELAY) {
+				// La paume l'arme : il partira dans trois secondes, au compte de qui l'a touché.
+				circle.setTrigger(CircleTrigger.DELAY, player.getUUID());
+				serverLevel.scheduleTick(pos, this, CircleTrigger.DELAY_TICKS);
+				serverPlayer.sendOverlayMessage(Component.translatable("circle.fmab.armed"));
+				serverLevel.playSound(null, pos, SoundEvents.TRIPWIRE_CLICK_ON, SoundSource.BLOCKS, 0.8f, 0.8f);
+				return InteractionResult.SUCCESS;
+			}
 			// Garder la main sur le cercle prolonge la transmutation qu'on vient d'y lancer.
 			if (!Transmutation.channel(serverLevel, pos, state, circle.drawing(), serverPlayer, circle.size())) {
 				Transmutation.activate(serverLevel, pos, state, circle.drawing(), serverPlayer, circle.size());
 			}
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	/** Le cercle part tout seul, au compte de son auteur, s'il est là pour le payer. */
+	private static void fire(ServerLevel level, BlockPos pos, BlockState state, TransmutationCircleBlockEntity circle) {
+		ServerPlayer author = circle.author().map(level.getServer().getPlayerList()::getPlayer).orElse(null);
+		if (author == null || author.level() != level || !author.isAlive()) {
+			// Personne pour nourrir le cercle : il grésille et s'éteint.
+			level.sendParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.2, pos.getZ() + 0.5, 8, 0.3, 0.05,
+					0.3, 0.01);
+			return;
+		}
+		Transmutation.activate(level, pos, state, circle.drawing(), author, circle.size());
+	}
+
+	@Override
+	protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+		if (level.getBlockEntity(pos) instanceof TransmutationCircleBlockEntity circle
+				&& circle.trigger() == CircleTrigger.DELAY) {
+			fire(level, pos, state, circle);
+		}
+	}
+
+	@Override
+	protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity,
+			InsideBlockEffectApplier effectApplier, boolean isPrecise) {
+		if (!(level instanceof ServerLevel server) || !(entity instanceof LivingEntity) || entity.isSpectator()
+				|| state.getValue(FACE) != AttachFace.FLOOR
+				|| !(level.getBlockEntity(pos) instanceof TransmutationCircleBlockEntity circle)
+				|| circle.trigger() != CircleTrigger.PRESSURE
+				|| circle.author().map(entity.getUUID()::equals).orElse(false)) {
+			return;
+		}
+		if (circle.rearm(server.getGameTime())) {
+			fire(server, pos, state, circle);
+		}
+	}
+
+	@Override
+	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block,
+			@Nullable Orientation orientation, boolean movedByPiston) {
+		super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
+		if (!(level instanceof ServerLevel server)
+				|| !(level.getBlockEntity(pos) instanceof TransmutationCircleBlockEntity circle)
+				|| circle.trigger() != CircleTrigger.REDSTONE) {
+			return;
+		}
+		boolean signal = level.hasNeighborSignal(pos) || level.hasNeighborSignal(pos.relative(normal(state).getOpposite()));
+		if (circle.power(signal) && circle.rearm(server.getGameTime())) {
+			fire(server, pos, state, circle);
+		}
 	}
 
 	@Override
