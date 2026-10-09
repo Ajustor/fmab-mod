@@ -28,6 +28,7 @@ import com.ajustor.fmab.training.IslandTrial;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
+import com.ajustor.fmab.transmutation.GoldTransmutation;
 import com.ajustor.fmab.transmutation.Passives;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.world.FmabStructures;
@@ -69,6 +70,7 @@ public class Fmab implements ModInitializer {
 		Passives.register();
 		TransmutationLightning.register();
 		HumanTransmutation.register();
+		GoldTransmutation.register();
 		GateOfTruth.register();
 		Tolls.register();
 		Automails.register();

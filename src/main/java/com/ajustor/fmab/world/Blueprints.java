@@ -655,6 +655,9 @@ public final class Blueprints {
 			if (p.noise(11, 0, 0, 2) == 0) {
 				out.add(Tomes.stack(Tomes.FORMS));
 			}
+			if (p.noise(13, 0, 0, 5) == 0) {
+				out.add(Tomes.stack(Tomes.GOLD));
+			}
 			// Kimblee y a fait ses recherches avant sa prison.
 			if (p.noise(12, 0, 0, 4) == 0) {
 				out.add(new ItemStack(FmabItems.CRIMSON_SEALS));
@@ -1606,6 +1609,9 @@ public final class Blueprints {
 			out.add(XerxesMuralItem.of(FmabItems.XERXES_MURAL, first));
 			out.add(XerxesMuralItem.of(FmabItems.XERXES_MURAL, 1 + first % XerxesMuralItem.COUNT));
 			out.add(new ItemStack(Items.GOLD_NUGGET, 4 + p.noise(5, 0, 0, 10)));
+			if (p.noise(6, 0, 0, 2) == 0) {
+				out.add(Tomes.stack(Tomes.GOLD));
+			}
 			return out;
 		}
 

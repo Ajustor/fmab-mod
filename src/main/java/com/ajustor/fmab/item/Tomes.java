@@ -11,7 +11,7 @@ import java.util.List;
  * Les tomes d'alchimie du mod. Chacun enseigne un groupe de glyphes ; on les trouve dans le kit de
  * départ, auprès d'Izumi et de l'examinateur, et les bibliothécaires des villages les vendent comme
  * des livres enchantés ({@code data/fmab/villager_trade/librarian}). Les notes de Hohenheim ne se
- * trouvent qu'à Resembool.
+ * trouvent qu'à Resembool (ou auprès de lui), l'alchimie de l'or que dans des ruines interdites.
  */
 public final class Tomes {
 	/** Les bases : de quoi lever un mur, une pique ou une plateforme de glace. */
@@ -25,8 +25,13 @@ public final class Tomes {
 	public static final Tome FLAME = tome("flame", "fmab:feu", "fmab:air");
 	/** Les notes de recherche de Hohenheim, dans sa maison de Resembool. */
 	public static final Tome HOHENHEIM = tome("hohenheim", "fmab:humain");
+	/**
+	 * L'alchimie de l'or, interdite par la loi d'État : on ne la trouve que dans les ruines de Xerxès
+	 * (le royaume en vivait) et dans les archives du Laboratoire 5.
+	 */
+	public static final Tome GOLD = tome("gold", "fmab:or");
 
-	public static final List<Tome> ALL = List.of(RUDIMENTS, STONE_AND_METAL, FORMS, FLAME, HOHENHEIM);
+	public static final List<Tome> ALL = List.of(RUDIMENTS, STONE_AND_METAL, FORMS, FLAME, HOHENHEIM, GOLD);
 
 	private Tomes() {
 	}
