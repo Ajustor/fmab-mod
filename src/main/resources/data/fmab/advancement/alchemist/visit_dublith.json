@@ -1,0 +1,38 @@
+{
+  "parent": "fmab:alchemist/transmuted",
+  "criteria": {
+    "visit_dublith": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "minecraft:location": {
+                "structures": "fmab:dublith"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:porkchop"
+    },
+    "frame": "task",
+    "title": {
+      "translate": "advancements.fmab.visit_dublith.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.visit_dublith.description"
+    }
+  },
+  "requirements": [
+    [
+      "visit_dublith"
+    ]
+  ]
+}

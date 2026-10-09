@@ -1,5 +1,5 @@
 {
-  "parent": "fmab:alchemist/transmuted",
+  "parent": "fmab:alchemist/visit_dublith",
   "criteria": {
     "izumi_met": {
       "trigger": "fmab:milestone",

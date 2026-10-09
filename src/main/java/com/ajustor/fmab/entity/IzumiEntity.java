@@ -1,18 +1,23 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.data.Gifts;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabTags;
 import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
+import com.ajustor.fmab.world.Maps;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -27,9 +32,12 @@ import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 
 import java.util.UUID;
 
@@ -48,6 +56,9 @@ public class IzumiEntity extends PathfinderMob {
 	/** Une pique jaillit sous l'élève toutes les quatre secondes. */
 	private static final int CLAP_INTERVAL = 80;
 	private static final float CLAP_DAMAGE = 4;
+
+	private static final String ISLAND_MAP = "yock_map";
+	private static final TagKey<Structure> YOCK_MAPS = TagKey.create(Registries.STRUCTURE, Fmab.id("on_yock_island_maps"));
 
 	private UUID student;
 	private int sparTicks;
@@ -80,9 +91,25 @@ public class IzumiEntity extends PathfinderMob {
 		if (player instanceof ServerPlayer serverPlayer && student == null) {
 			serverPlayer.setAttached(FmabAttachments.TRAINING,
 					serverPlayer.getAttachedOrCreate(FmabAttachments.TRAINING).meet());
+			giveIslandMap(serverPlayer);
 			ServerPlayNetworking.send(serverPlayer, OpenIzumiPayload.of(this, serverPlayer));
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	/**
+	 * La dernière épreuve se passe sur l'île de Yock : Izumi en donne la carte à chaque élève, une
+	 * fois. S'il n'y a pas d'île à portée, elle n'en donne pas (et réessaiera la prochaine fois).
+	 */
+	private void giveIslandMap(ServerPlayer player) {
+		if (Gifts.received(player, ISLAND_MAP) || !(level() instanceof ServerLevel level)) {
+			return;
+		}
+		ItemStack map = Maps.toStructure(level, blockPosition(), YOCK_MAPS, MapDecorationTypes.RED_X,
+				Component.translatable("filled_map.fmab.yock_island"));
+		if (!map.isEmpty() && Gifts.give(player, ISLAND_MAP, map)) {
+			player.sendSystemMessage(Component.translatable("entity.fmab.izumi.island_map"));
+		}
 	}
 
 	/** L'élève demande un combat d'entraînement. */
@@ -104,6 +131,10 @@ public class IzumiEntity extends PathfinderMob {
 	@Override
 	protected void customServerAiStep(ServerLevel level) {
 		super.customServerAiStep(level);
+		// Elle ne quitte pas sa boutique.
+		if (!hasHome()) {
+			setHomeTo(blockPosition(), 10);
+		}
 		if (student == null) {
 			return;
 		}
