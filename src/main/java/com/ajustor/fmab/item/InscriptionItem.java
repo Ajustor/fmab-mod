@@ -5,10 +5,9 @@ import com.ajustor.fmab.block.CircleMedium;
 import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
-import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabComponents;
-import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabTags;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -31,8 +30,7 @@ import java.util.function.Consumer;
 
 /**
  * Craie, peinture alchimique ou burin : inscrit sur la face cliquée (sol, mur ou plafond) le cercle
- * sélectionné dans un Carnet de cercles porté par le joueur (main secondaire en priorité, sinon le
- * premier carnet de l'inventaire).
+ * sélectionné dans le Carnet de cercles du joueur.
  */
 public class InscriptionItem extends Item {
 	private final CircleMedium medium;
@@ -62,10 +60,10 @@ public class InscriptionItem extends Item {
 		if (!level.getBlockState(pos).canBeReplaced() || !state.canSurvive(level, pos)) {
 			return InteractionResult.FAIL;
 		}
-		Drawing drawing = selectedDrawing(player);
+		Drawing drawing = Notebooks.selected(player);
 		if (drawing.isEmpty()) {
 			if (!level.isClientSide()) {
-				player.sendOverlayMessage(Component.translatable("item.fmab.chalk.no_circle"));
+				player.sendOverlayMessage(Notebooks.noCircle());
 			}
 			return InteractionResult.FAIL;
 		}
@@ -114,21 +112,5 @@ public class InscriptionItem extends Item {
 			case PAINT -> SoundEvents.HONEY_BLOCK_PLACE;
 			case ENGRAVING -> SoundEvents.STONE_HIT;
 		};
-	}
-
-	public static Drawing selectedDrawing(Player player) {
-		ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
-		if (offhand.is(FmabItems.CIRCLE_NOTEBOOK)) {
-			return offhand.getOrDefault(FmabComponents.NOTEBOOK, NotebookContents.EMPTY).selectedDrawing();
-		}
-		for (ItemStack stack : player.getInventory()) {
-			if (stack.is(FmabItems.CIRCLE_NOTEBOOK)) {
-				Drawing d = stack.getOrDefault(FmabComponents.NOTEBOOK, NotebookContents.EMPTY).selectedDrawing();
-				if (!d.isEmpty()) {
-					return d;
-				}
-			}
-		}
-		return Drawing.EMPTY;
 	}
 }

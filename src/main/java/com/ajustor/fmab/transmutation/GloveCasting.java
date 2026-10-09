@@ -3,14 +3,13 @@ package com.ajustor.fmab.transmutation;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.Gloves;
+import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Tolls;
 import com.ajustor.fmab.item.GloveItem;
-import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
-import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import net.minecraft.core.BlockPos;
@@ -68,19 +67,19 @@ public final class GloveCasting {
 
 	/**
 	 * Qui a vu la Porte joint les mains et transmute sans cercle : le cercle sélectionné dans le
-	 * carnet agit sur la surface visée. Il faut deux mains, et qu'elles soient libres.
+	 * carnet (ou sur la roue des cercles) agit sur la surface visée. Il faut deux mains, et qu'elles
+	 * soient libres.
 	 */
 	private static void clap(ServerPlayer player) {
 		if (Tolls.disabled(player, BodyPart.LEFT_ARM) || Tolls.disabled(player, BodyPart.RIGHT_ARM)) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.clap_needs_hands"));
 			return;
 		}
-		if (!player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty()
-				&& !player.getOffhandItem().is(FmabItems.CIRCLE_NOTEBOOK)) {
+		if (!player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty()) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.hand_not_free"));
 			return;
 		}
-		Drawing drawing = InscriptionItem.selectedDrawing(player);
+		Drawing drawing = Notebooks.selected(player);
 		if (drawing.isEmpty()) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.clap_no_circle"));
 			return;

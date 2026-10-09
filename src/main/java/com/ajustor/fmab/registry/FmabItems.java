@@ -2,7 +2,6 @@ package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.CircleMedium;
-import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.gate.Restoration;
 import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.AlchemicalInkItem;
@@ -12,6 +11,7 @@ import com.ajustor.fmab.item.CipheredNotesItem;
 import com.ajustor.fmab.item.CrimsonSealsItem;
 import com.ajustor.fmab.item.FirearmItem;
 import com.ajustor.fmab.item.GloveItem;
+import com.ajustor.fmab.item.HumanTransmutationNotesItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.IshvalTattooItem;
 import com.ajustor.fmab.item.KunaiItem;
@@ -48,9 +48,6 @@ public final class FmabItems {
 			p -> new InscriptionItem(CircleMedium.PAINT, p), new Item.Properties().durability(32));
 	public static final Item ALCHEMIST_CHISEL = register("alchemist_chisel",
 			p -> new InscriptionItem(CircleMedium.ENGRAVING, p), new Item.Properties().durability(128));
-	public static final Item CIRCLE_NOTEBOOK = register("circle_notebook",
-			p -> new ScreenItem(ScreenItem.Kind.NOTEBOOK, p),
-			new Item.Properties().stacksTo(1).component(FmabComponents.NOTEBOOK, NotebookContents.EMPTY));
 	public static final Item ALCHEMY_TREATISE = register("alchemy_treatise",
 			p -> new ScreenItem(ScreenItem.Kind.TREATISE, p),
 			new Item.Properties().stacksTo(1));
@@ -58,6 +55,9 @@ public final class FmabItems {
 	/** Tome d'alchimie : enseigne les glyphes de son composant {@link FmabComponents#TOME}. */
 	public static final Item ALCHEMY_TOME = register("alchemy_tome", TomeItem::new,
 			new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
+	/** Notes sur la transmutation humaine : très rares, elles en donnent le cercle. */
+	public static final Item HUMAN_TRANSMUTATION_NOTES = register("human_transmutation_notes",
+			HumanTransmutationNotesItem::new, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
 
 	public static final Item ALCHEMICAL_THREAD = register("alchemical_thread", Item::new, new Item.Properties());
 	public static final Item ALCHEMICAL_INK = register("alchemical_ink", AlchemicalInkItem::new,
@@ -250,8 +250,8 @@ public final class FmabItems {
 				.icon(() -> new ItemStack(ALCHEMY_TREATISE))
 				.displayItems((parameters, output) -> {
 					output.accept(ALCHEMY_TREATISE);
-					output.accept(CIRCLE_NOTEBOOK);
 					Tomes.ALL.forEach(t -> output.accept(Tomes.stack(t)));
+					output.accept(HUMAN_TRANSMUTATION_NOTES);
 					output.accept(CHALK);
 					output.accept(ALCHEMICAL_PAINT);
 					output.accept(ALCHEMIST_CHISEL);

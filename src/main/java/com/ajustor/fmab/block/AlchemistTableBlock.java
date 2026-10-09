@@ -3,9 +3,9 @@ package com.ajustor.fmab.block;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.SoulSeal;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.GloveItem;
-import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabComponents;
@@ -64,9 +64,9 @@ public class AlchemistTableBlock extends Block {
 		if (level.isClientSide()) {
 			return InteractionResult.SUCCESS;
 		}
-		Drawing drawing = InscriptionItem.selectedDrawing(player);
+		Drawing drawing = Notebooks.selected(player);
 		if (drawing.isEmpty()) {
-			player.sendOverlayMessage(Component.translatable("item.fmab.chalk.no_circle"));
+			player.sendOverlayMessage(Notebooks.noCircle());
 			return InteractionResult.FAIL;
 		}
 		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
@@ -93,9 +93,9 @@ public class AlchemistTableBlock extends Block {
 		if (level.isClientSide()) {
 			return InteractionResult.SUCCESS;
 		}
-		Drawing drawing = InscriptionItem.selectedDrawing(player);
+		Drawing drawing = Notebooks.selected(player);
 		if (drawing.isEmpty()) {
-			player.sendOverlayMessage(Component.translatable("item.fmab.chalk.no_circle"));
+			player.sendOverlayMessage(Notebooks.noCircle());
 			return InteractionResult.FAIL;
 		}
 		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
@@ -138,7 +138,7 @@ public class AlchemistTableBlock extends Block {
 		if (level.isClientSide()) {
 			return InteractionResult.SUCCESS;
 		}
-		Drawing selected = InscriptionItem.selectedDrawing(player);
+		Drawing selected = Notebooks.selected(player);
 		Optional<UUID> owner = level.getServer().getPlayerList().getPlayers().stream()
 				.map(Player::getUUID)
 				.filter(id -> SoulSeal.of(id).equals(selected))

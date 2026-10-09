@@ -1,6 +1,7 @@
 package com.ajustor.fmab.transmutation;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.alchemy.ForbiddenCircles;
 import com.ajustor.fmab.alchemy.circle.CircleParser;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.SimpleCircles;
@@ -86,10 +87,11 @@ public final class AlchemyRules {
 				SimpleCircles.sidesFor(element.get(), action.get())));
 	}
 
-	/** La première combinaison simple où figure ce glyphe. */
+	/** La première combinaison simple où figure ce glyphe (les cercles interdits exceptés). */
 	public Optional<Combination> simpleCombinationWith(Glyph glyph) {
 		return combinations.stream()
 				.filter(c -> c.elements().size() == 1)
+				.filter(c -> !c.effect().equals(ForbiddenCircles.HUMAN_TRANSMUTATION_EFFECT))
 				.filter(c -> glyph.layer() == GlyphLayer.ELEMENT ? c.elements().contains(glyph.role())
 						: glyph.layer() == GlyphLayer.ACTION && c.action().equals(glyph.role()))
 				.filter(c -> c.requires().isEmpty())

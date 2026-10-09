@@ -1,5 +1,11 @@
 package com.ajustor.fmab.block;
 
+import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.alchemy.rules.Analysis;
+import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.Notebooks;
+import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Transmutation;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -164,6 +170,11 @@ public class TransmutationCircleBlock extends BaseEntityBlock {
 		if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer
 				&& level.getBlockEntity(pos) instanceof TransmutationCircleBlockEntity circle) {
 			if (player.isShiftKeyDown()) {
+				// Un cercle qu'on n'a pas dans son carnet, on le relève d'abord.
+				if (!circle.drawing().isEmpty() && !Notebooks.contains(player, circle.drawing())) {
+					learn(serverPlayer, circle.drawing());
+					return InteractionResult.SUCCESS;
+				}
 				// Le cercle armé d'un autre ne se dérègle pas.
 				if (circle.trigger() != CircleTrigger.HAND && circle.author().filter(a -> !a.equals(player.getUUID())).isPresent()
 						&& !player.isCreative()) {
@@ -192,6 +203,24 @@ public class TransmutationCircleBlock extends BaseEntityBlock {
 			}
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	/** Relever un cercle dans son carnet, sous le nom de l'effet qu'on y lit (s'il y en a un). */
+	private static void learn(ServerPlayer player, Drawing drawing) {
+		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		Analysis analysis = AlchemyRules.of(player.level().registryAccess()).analyze(drawing, me);
+		String key = analysis.effects().isEmpty() ? "circle.fmab.learned_name"
+				: "effect." + analysis.effects().getFirst().combination().effect().replace(':', '.');
+		switch (Notebooks.add(player, "@" + key, drawing)) {
+			case ADDED -> {
+				player.sendOverlayMessage(Component.translatable("circle.fmab.learned", Component.translatable(key)));
+				player.level().playSound(null, player.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS,
+						0.8f, 1.1f);
+			}
+			case FULL -> player.sendOverlayMessage(Component.translatable("notebook.fmab.full"));
+			case ALREADY_THERE -> {
+			}
+		}
 	}
 
 	/** Le cercle part tout seul, au compte de son auteur, s'il est là pour le payer. */

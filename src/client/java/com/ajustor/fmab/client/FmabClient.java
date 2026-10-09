@@ -1,9 +1,12 @@
 package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.client.render.BossModels;
 import com.ajustor.fmab.client.render.ChimeraBeastRenderer;
 import com.ajustor.fmab.client.render.ChimeraCrawlerRenderer;
+import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.client.render.CornelloRenderer;
 import com.ajustor.fmab.client.render.DrachmaSoldierRenderer;
 import com.ajustor.fmab.client.render.EnvyRenderer;
@@ -31,6 +34,7 @@ import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.render.TruthRenderer;
 import com.ajustor.fmab.client.render.WinryRenderer;
 import com.ajustor.fmab.client.render.WrathRenderer;
+import com.ajustor.fmab.client.screen.CircleWheelScreen;
 import com.ajustor.fmab.client.screen.ExamScreen;
 import com.ajustor.fmab.client.screen.GlovesScreen;
 import com.ajustor.fmab.client.screen.IzumiScreen;
@@ -41,7 +45,10 @@ import com.ajustor.fmab.client.screen.TruthScreen;
 import com.ajustor.fmab.client.screen.WinryScreen;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.gate.BodyPart;
+import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.network.CastGlovesPayload;
 import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.network.OpenExamPayload;
@@ -49,11 +56,13 @@ import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.network.OpenTruthPayload;
 import com.ajustor.fmab.network.OpenWinryPayload;
+import com.ajustor.fmab.network.SelectCirclePayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.stone.Eclipse;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
@@ -68,6 +77,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
@@ -78,10 +88,8 @@ public class FmabClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		Fmab.setClientHooks((kind, hand) -> {
-			Minecraft mc = Minecraft.getInstance();
 			switch (kind) {
-				case NOTEBOOK -> mc.gui.setScreen(new NotebookScreen(hand, mc.player.getItemInHand(hand)));
-				case TREATISE -> mc.gui.setScreen(new TreatiseScreen());
+				case TREATISE -> Minecraft.getInstance().gui.setScreen(new TreatiseScreen());
 			}
 		});
 		KeyMapping.Category category = KeyMapping.Category.register(Fmab.id("alchemy"));
@@ -89,6 +97,15 @@ public class FmabClient implements ClientModInitializer {
 				new KeyMapping("key.fmab.cast_gloves", GLFW.GLFW_KEY_G, category));
 		KeyMapping gloves = KeyMappingHelper.registerKeyMapping(
 				new KeyMapping("key.fmab.gloves", GLFW.GLFW_KEY_H, category));
+		KeyMapping notebook = KeyMappingHelper.registerKeyMapping(
+				new KeyMapping("key.fmab.notebook", GLFW.GLFW_KEY_N, category));
+		KeyMapping wheel = KeyMappingHelper.registerKeyMapping(
+				new KeyMapping("key.fmab.circle_wheel", GLFW.GLFW_KEY_R, category));
+		// Passer d'un cercle à l'autre sans ouvrir la roue : sans touche par défaut.
+		KeyMapping next = KeyMappingHelper.registerKeyMapping(
+				new KeyMapping("key.fmab.next_circle", InputConstants.UNKNOWN.getValue(), category));
+		KeyMapping previous = KeyMappingHelper.registerKeyMapping(
+				new KeyMapping("key.fmab.previous_circle", InputConstants.UNKNOWN.getValue(), category));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 			while (cast.consumeClick()) {
 				// Maj : joindre les mains, les deux gants agissent.
@@ -96,6 +113,18 @@ public class FmabClient implements ClientModInitializer {
 			}
 			while (gloves.consumeClick()) {
 				mc.gui.setScreen(new GlovesScreen());
+			}
+			while (notebook.consumeClick()) {
+				mc.gui.setScreen(new NotebookScreen());
+			}
+			while (wheel.consumeClick()) {
+				CircleWheelScreen.open(wheel);
+			}
+			while (next.consumeClick()) {
+				cycleCircle(mc, 1);
+			}
+			while (previous.consumeClick()) {
+				cycleCircle(mc, -1);
 			}
 		});
 		EntityRendererRegistry.register(FmabEntities.IZUMI, IzumiRenderer::new);
@@ -158,6 +187,49 @@ public class FmabClient implements ClientModInitializer {
 				(graphics, delta) -> eclipse(graphics));
 		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("living_stone"),
 				(graphics, delta) -> livingStone(graphics));
+		HudElementRegistry.attachElementAfter(VanillaHudElements.HOTBAR, Fmab.id("selected_circle"),
+				(graphics, delta) -> selectedCircle(graphics));
+	}
+
+	/** Le cercle suivant (ou précédent) du carnet devient la sélection, sans ouvrir la roue. */
+	private static void cycleCircle(Minecraft mc, int delta) {
+		if (mc.player == null) {
+			return;
+		}
+		NotebookContents contents = Notebooks.of(mc.player);
+		if (contents.pages().isEmpty()) {
+			return;
+		}
+		int index = Math.floorMod(contents.selected() + delta, contents.pages().size());
+		ClientPlayNetworking.send(new SelectCirclePayload(index, false));
+	}
+
+	/**
+	 * Le cercle sélectionné, à gauche de la barre d'objets, quand il sert : craie, peinture ou burin
+	 * en main, ou mains jointes à portée (qui a vu la Porte).
+	 */
+	private static void selectedCircle(GuiGraphicsExtractor graphics) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null) {
+			return;
+		}
+		Drawing drawing = Notebooks.selected(mc.player);
+		if (drawing.isEmpty()) {
+			return;
+		}
+		boolean tracing = mc.player.getMainHandItem().getItem() instanceof InscriptionItem
+				|| mc.player.getOffhandItem().getItem() instanceof InscriptionItem;
+		AlchemistData data = mc.player.getAttached(FmabAttachments.ALCHEMIST);
+		if (!tracing && (data == null || !data.rank().atLeast(Rank.GATE))) {
+			return;
+		}
+		int size = 20;
+		// À gauche de l'emplacement de la main secondaire.
+		int x = graphics.guiWidth() / 2 - 91 - 29 - 6 - size;
+		int y = graphics.guiHeight() - size - 2;
+		graphics.fill(x - 2, y - 2, x + size + 2, y + size + 2, 0x90000000);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(drawing, 0xFFF0E6C8), x, y, 0, 0, size, size,
+				CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE);
 	}
 
 	/**

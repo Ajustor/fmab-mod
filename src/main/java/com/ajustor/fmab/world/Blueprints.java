@@ -654,7 +654,16 @@ public final class Blueprints {
 		public List<Chest> chests(Plot p) {
 			return List.of(
 					new Chest(new BlockPos(2, HALL_FLOOR + 1, 2), Laboratory5::research),
-					new Chest(new BlockPos(p.sizeX() - 3, HALL_FLOOR + 1, 2), Laboratory5::research));
+					new Chest(new BlockPos(p.sizeX() - 3, HALL_FLOOR + 1, 2), Laboratory5::archives));
+		}
+
+		/** Le second coffre garde parfois ce que l'armée a lu de plus interdit. */
+		private static List<ItemStack> archives(Plot p) {
+			List<ItemStack> out = research(p);
+			if (p.noise(16, 0, 0, 12) == 0) {
+				out.add(new ItemStack(FmabItems.HUMAN_TRANSMUTATION_NOTES));
+			}
+			return out;
 		}
 
 		/** Les restes des recherches de l'armée sur la Pierre. */
@@ -1669,7 +1678,16 @@ public final class Blueprints {
 		public List<Chest> chests(Plot p) {
 			int c = p.sizeX() / 2;
 			return List.of(new Chest(new BlockPos(c - 4, 1, c), XerxesRuins::murals),
-					new Chest(new BlockPos(c + 4, 1, c), XerxesRuins::murals));
+					new Chest(new BlockPos(c + 4, 1, c), XerxesRuins::sanctum));
+		}
+
+		/** Xerxès est mort d'une transmutation humaine : ses alchimistes en avaient laissé des notes. */
+		private static List<ItemStack> sanctum(Plot p) {
+			List<ItemStack> out = murals(p);
+			if (p.noise(17, 0, 0, 20) == 0) {
+				out.add(new ItemStack(FmabItems.HUMAN_TRANSMUTATION_NOTES));
+			}
+			return out;
 		}
 
 		/** Deux fragments de fresque, et l'or d'un royaume disparu. */

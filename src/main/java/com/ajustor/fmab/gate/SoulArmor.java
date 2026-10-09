@@ -2,6 +2,7 @@ package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.alchemy.drawing.SoulSeal;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.AlchemyRules;
@@ -74,8 +75,8 @@ public final class SoulArmor {
 	}
 
 	/**
-	 * Ce qu'une âme doit savoir, écrit dans son carnet (ou dans un carnet neuf) : son sceau de sang,
-	 * pour préparer d'autres armures, et le cercle Fer et Réparer qui redresse la sienne.
+	 * Ce qu'une âme doit savoir, écrit dans son carnet : son sceau de sang, pour préparer d'autres
+	 * armures, et le cercle Fer et Réparer qui redresse la sienne.
 	 */
 	public static void giveNotes(ServerPlayer player) {
 		AlchemyRules rules = AlchemyRules.of(player.level().registryAccess());
@@ -87,29 +88,11 @@ public final class SoulArmor {
 				.findFirst()
 				.flatMap(rules::simpleCircle)
 				.ifPresent(d -> pages.add(new NotebookContents.Page("@gate.fmab.page.repair", d)));
-		ItemStack notebook = ItemStack.EMPTY;
-		for (ItemStack stack : player.getInventory()) {
-			if (stack.is(FmabItems.CIRCLE_NOTEBOOK)) {
-				NotebookContents c = stack.getOrDefault(FmabComponents.NOTEBOOK, NotebookContents.EMPTY);
-				if (c.pages().size() + pages.size() <= NotebookContents.MAX_PAGES) {
-					notebook = stack;
-					break;
-				}
-			}
-		}
-		boolean fresh = notebook.isEmpty();
-		if (fresh) {
-			notebook = new ItemStack(FmabItems.CIRCLE_NOTEBOOK);
-		}
-		NotebookContents contents = notebook.getOrDefault(FmabComponents.NOTEBOOK, NotebookContents.EMPTY);
+		boolean full = false;
 		for (NotebookContents.Page page : pages) {
-			contents = contents.withPage(contents.pages().size(), page);
+			full |= Notebooks.add(player, page.name(), page.drawing()) == Notebooks.Added.FULL;
 		}
-		notebook.set(FmabComponents.NOTEBOOK, contents);
-		if (fresh && !player.getInventory().add(notebook)) {
-			player.drop(notebook, false);
-		}
-		player.sendSystemMessage(Component.translatable("gate.fmab.soul.notes"));
+		player.sendSystemMessage(Component.translatable(full ? "gate.fmab.soul.notes_full" : "gate.fmab.soul.notes"));
 	}
 
 	/** L'âme entre dans une armure : chaque pièce prend sa place, ce qui était porté va au sac. */

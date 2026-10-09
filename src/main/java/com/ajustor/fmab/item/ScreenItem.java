@@ -7,10 +7,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 
-/** Objet qui ouvre un écran côté client : le Carnet de cercles et le Traité d'alchimie. */
+/** Objet qui ouvre un écran côté client : le Traité d'alchimie. */
 public class ScreenItem extends Item {
 	public enum Kind {
-		NOTEBOOK,
 		TREATISE
 	}
 

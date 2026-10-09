@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "fmab:item/circle_notebook"
+    "layer0": "fmab:item/human_transmutation_notes"
   }
 }

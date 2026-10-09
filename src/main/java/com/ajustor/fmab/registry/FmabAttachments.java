@@ -6,6 +6,7 @@ import com.ajustor.fmab.data.Automail;
 import com.ajustor.fmab.data.ExamProgress;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Gloves;
+import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.data.TransmutationPose;
@@ -27,6 +28,16 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.syncWith(AlchemistData.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("alchemist"));
+
+	/**
+	 * Le Carnet de cercles : l'alchimiste le garde en tête (touche du carnet) et à sa mort, et le
+	 * client le lit pour la roue des cercles.
+	 */
+	public static final AttachmentType<NotebookContents> NOTEBOOK = AttachmentRegistry.<NotebookContents>builder()
+			.persistent(NotebookContents.CODEC)
+			.copyOnDeath()
+			.syncWith(NotebookContents.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("notebook"));
 
 	/** Les gants portés, à gauche et à droite. */
 	public static final AttachmentType<Gloves> GLOVES = AttachmentRegistry.<Gloves>builder()

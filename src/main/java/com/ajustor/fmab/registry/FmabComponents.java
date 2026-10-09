@@ -3,7 +3,6 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.data.FmabCodecs;
-import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Tome;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -13,14 +12,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.item.ItemStack;
 
 public final class FmabComponents {
-	public static final DataComponentType<NotebookContents> NOTEBOOK = Registry.register(
-			BuiltInRegistries.DATA_COMPONENT_TYPE,
-			Fmab.id("notebook"),
-			DataComponentType.<NotebookContents>builder()
-					.persistent(NotebookContents.CODEC)
-					.networkSynchronized(NotebookContents.STREAM_CODEC)
-					.build());
-
 	/** Cercle brodé ou gravé sur un gant. */
 	public static final DataComponentType<Drawing> GLOVE_CIRCLE = Registry.register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,

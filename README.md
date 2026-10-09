@@ -12,8 +12,8 @@ joueur compose lui-même :
 - **Carnet de cercles** : grille de 32 cases, outils ligne, cercle, polygone, arc et point,
   symétrie, pages nommées, import/export par code. Le carnet lit le cercle en direct : glyphes
   reconnus, effet, complexité, stabilité, coût et verdict.
-- **Craie de transmutation** : trace au sol le cercle sélectionné dans le carnet (tenu dans l'autre
-  main). On l'active paume contre le sol, main vide.
+- **Craie de transmutation** : trace au sol le cercle sélectionné dans le carnet (touche N). On
+  l'active paume contre le sol, main vide.
 - **Traité d'alchimie** : principes, trois étapes, catalogue des glyphes (on les étudie pour les
   comprendre), règles de composition, cercles d'exemple, rebonds, tabous.
 - **10 glyphes** (Terre, Eau, Fer, Cuivre, Fixer, Projeter, Réparer, Décomposer, Direction,
@@ -139,7 +139,13 @@ joueur compose lui-même :
 - **Styles de jeu** : bras de Scar, mines de Kimblee, pistolet et fusil, couteaux de Hughes, épée de
   Xing ; le glyphe **Or** (interdit par la loi d'État) ; les écoles de la Destruction, de la
   Médecine et de la Vie (chimères qui vous obéissent).
-- **Cercles** : déclencheurs (retardement, piège, redstone) et fusion à deux alchimistes.
+- **Cercles** : déclencheurs (retardement, piège, redstone) et fusion à deux alchimistes. Le
+  **carnet** n'est plus un objet : l'alchimiste le garde en tête (touche N, gardé à la mort). La
+  **roue des cercles** (R maintenue) change de cercle d'un geste, et un clic y joint aussitôt les
+  mains pour qui a vu la Porte ; accroupi, main vide, un clic droit sur un cercle inconnu le recopie
+  dans le carnet. Le cercle de la transmutation humaine ne figure plus dans le Traité : de très
+  rares **Notes sur la transmutation humaine** le donnent (Laboratoire 5, ruines de Xerxès,
+  bibliothèques des forts, cités antiques).
 - **Finition** : cinématiques (la Porte, le Jour promis, la chute de Père), éclipse dans le ciel,
   sons propres (CC0), silhouettes des boss, briques amestriennes et de Xing, neige de Briggs.
 
@@ -229,7 +235,11 @@ An advancement tree, cartographer maps and the national circle's blood crests gu
 haunted armors, immortal soldiers and chimeras fill it with fights. New playstyles (Scar's arm,
 Kimblee's mines, firearms, throwing knives, the Xing sword), the forbidden Gold glyph, the schools of
 Destruction, Medicine and Life, circle triggers and two-alchemist fusion, cinematics, an eclipse in
-the sky and the mod's own sounds round it out.
+the sky and the mod's own sounds round it out. The notebook is no longer an item: it opens with a key
+(N) and survives death; the circle wheel (hold R) switches circles in one gesture and, for Gate
+initiates, a click on it joins the hands at once; crouching empty-handed and right-clicking an unknown
+circle copies it into the notebook. The human transmutation circle is no longer in the Treatise:
+very rare Notes on Human Transmutation hand it out.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 
