@@ -20,6 +20,7 @@ import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TattooScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
+import com.ajustor.fmab.client.screen.TruthScreen;
 import com.ajustor.fmab.client.screen.WinryScreen;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
@@ -28,6 +29,7 @@ import com.ajustor.fmab.network.CastGlovesPayload;
 import com.ajustor.fmab.network.OpenExamPayload;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.network.OpenTattooPayload;
+import com.ajustor.fmab.network.OpenTruthPayload;
 import com.ajustor.fmab.network.OpenWinryPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
@@ -87,6 +89,8 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.SLOTH, SlothRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.WRATH, WrathRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.PRIDE, PrideRenderer::new);
+		ClientPlayNetworking.registerGlobalReceiver(OpenTruthPayload.TYPE,
+				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new WinryScreen(payload.entityId())));
 		ClientPlayNetworking.registerGlobalReceiver(OpenTattooPayload.TYPE,

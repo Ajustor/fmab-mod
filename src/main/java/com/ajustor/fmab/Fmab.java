@@ -48,6 +48,7 @@ public class Fmab implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		FmabConfig.load();
 		FmabRegistries.register();
 		FmabComponents.register();
 		FmabAttachments.register();

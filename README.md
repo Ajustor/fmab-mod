@@ -131,6 +131,11 @@ JDK 25 ou plus récent, puis :
 
 Le jar est dans `build/libs/`. Dépendances à l'exécution : Fabric Loader ≥ 0.19.3 et Fabric API.
 
+Configuration du serveur : `config/fmab.json`, créé au premier lancement.
+`restart_wipes_progress` (par défaut `true`) : une âme qui choisit de repartir de zéro devant la
+Vérité perd aussi toute sa progression d'alchimiste (rang, glyphes, maîtrise, épreuves, tatouages,
+karma) ; à `false`, elle ne retrouve que son corps.
+
 Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab forget_all`,
 `/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`.
 
