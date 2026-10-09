@@ -202,7 +202,7 @@ public class FmabClient implements ClientModInitializer {
 		if (mc.level == null || !Eclipse.now(mc.level) || !mc.level.canSeeSky(mc.player.blockPosition())) {
 			return;
 		}
-		graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), 0x7A1A0800);
+		graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), 0x401A0800);
 	}
 
 	/** Le compteur d'âmes d'une Pierre philosophale vivante, au-dessus de la barre de concentration. */

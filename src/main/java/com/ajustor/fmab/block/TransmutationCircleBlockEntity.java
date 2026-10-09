@@ -31,6 +31,8 @@ public class TransmutationCircleBlockEntity extends BlockEntity {
 	/** Dernier départ automatique (piège, redstone), en temps de jeu. */
 	private long lastFired = Long.MIN_VALUE / 2;
 	private boolean powered;
+	/** Dernière fois qu'une créature se tenait sur le cercle (piège). */
+	private long lastOccupied = Long.MIN_VALUE / 2;
 
 	public TransmutationCircleBlockEntity(BlockPos pos, BlockState state) {
 		super(FmabBlockEntities.TRANSMUTATION_CIRCLE, pos, state);
@@ -82,6 +84,17 @@ public class TransmutationCircleBlockEntity extends BlockEntity {
 		}
 		lastFired = now;
 		return true;
+	}
+
+	/**
+	 * Une créature se tient sur le piège.
+	 *
+	 * @return vrai si elle vient d'y entrer (il était vide juste avant)
+	 */
+	public boolean step(long now) {
+		boolean entering = now - lastOccupied > 2;
+		lastOccupied = now;
+		return entering;
 	}
 
 	/** @return vrai si le signal vient d'arriver (front montant) */

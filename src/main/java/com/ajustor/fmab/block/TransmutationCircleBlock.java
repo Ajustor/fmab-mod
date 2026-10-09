@@ -164,6 +164,12 @@ public class TransmutationCircleBlock extends BaseEntityBlock {
 		if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer
 				&& level.getBlockEntity(pos) instanceof TransmutationCircleBlockEntity circle) {
 			if (player.isShiftKeyDown()) {
+				// Le cercle armé d'un autre ne se dérègle pas.
+				if (circle.trigger() != CircleTrigger.HAND && circle.author().filter(a -> !a.equals(player.getUUID())).isPresent()
+						&& !player.isCreative()) {
+					serverPlayer.sendOverlayMessage(Component.translatable("circle.fmab.not_yours"));
+					return InteractionResult.SUCCESS;
+				}
 				// Accroupi : on règle le déclencheur, et on en devient l'auteur.
 				CircleTrigger next = circle.trigger().next();
 				circle.setTrigger(next, player.getUUID());
@@ -197,7 +203,7 @@ public class TransmutationCircleBlock extends BaseEntityBlock {
 					0.3, 0.01);
 			return;
 		}
-		Transmutation.activate(level, pos, state, circle.drawing(), author, circle.size());
+		Transmutation.activateRemotely(level, pos, state, circle.drawing(), author, circle.size());
 	}
 
 	@Override
@@ -218,7 +224,8 @@ public class TransmutationCircleBlock extends BaseEntityBlock {
 				|| circle.author().map(entity.getUUID()::equals).orElse(false)) {
 			return;
 		}
-		if (circle.rearm(server.getGameTime())) {
+		// Il ne part qu'à l'entrée : une créature qui reste dessus ne le relance pas.
+		if (circle.step(server.getGameTime()) && circle.rearm(server.getGameTime())) {
 			fire(server, pos, state, circle);
 		}
 	}

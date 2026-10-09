@@ -24,11 +24,11 @@ public class DublithStructure extends Structure {
 
 	private static final Spot[] LAYOUT = {
 			new Spot(-6, -6, "dublith_square", 13, 13, 0, Rotation.NONE),
-			new Spot(-6, -17, "curtis_butcher", 11, 9, 2, Rotation.NONE),
+			new Spot(-6, -17, "curtis_butcher", 11, 9, 2, Rotation.CLOCKWISE_180),
 			new Spot(10, -7, "dublith_house", 9, 7, 2, Rotation.COUNTERCLOCKWISE_90),
 			new Spot(-18, -5, "dublith_house", 9, 7, 1, Rotation.CLOCKWISE_90),
-			new Spot(-4, 10, "dublith_house", 9, 7, 2, Rotation.CLOCKWISE_180),
-			new Spot(10, 9, "dublith_house", 8, 7, 1, Rotation.CLOCKWISE_180),
+			new Spot(-4, 10, "dublith_house", 9, 7, 2, Rotation.NONE),
+			new Spot(10, 9, "dublith_house", 8, 7, 1, Rotation.NONE),
 	};
 
 	public DublithStructure(StructureSettings settings) {

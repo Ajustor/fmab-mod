@@ -911,5 +911,6 @@
   "circle.fmab.trigger.delay": "delayed (3 seconds after the palm)",
   "circle.fmab.trigger.pressure": "trap (when a creature steps on it)",
   "circle.fmab.trigger.redstone": "redstone signal",
-  "circle.fmab.armed": "The circle is armed: it goes off in three seconds."
+  "circle.fmab.armed": "The circle is armed: it goes off in three seconds.",
+  "circle.fmab.not_yours": "This circle is armed by another alchemist."
 }

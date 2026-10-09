@@ -192,7 +192,8 @@ public final class Alkahestry {
 					continue;
 				}
 				e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, PULSE + 10, 3));
-				DamageSource source = new DamageSource(level.damageSources().damageTypes.getOrThrow(DAMAGE), caster);
+				DamageSource source = caster == null ? level.damageSources().magic()
+						: new DamageSource(level.damageSources().damageTypes.getOrThrow(DAMAGE), caster);
 				e.hurtServer(level, source, e instanceof HomunculusEntity ? HARM * 1.5f : HARM);
 				level.sendParticles(VIOLET, e.getX(), e.getY(0.5), e.getZ(), 8, 0.3, 0.5, 0.3, 0);
 			} else if (!hostile) {

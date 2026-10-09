@@ -911,5 +911,6 @@
   "circle.fmab.trigger.delay": "à retardement (3 secondes après la paume)",
   "circle.fmab.trigger.pressure": "piège (quand une créature marche dessus)",
   "circle.fmab.trigger.redstone": "signal de redstone",
-  "circle.fmab.armed": "Le cercle est armé : il part dans trois secondes."
+  "circle.fmab.armed": "Le cercle est armé : il part dans trois secondes.",
+  "circle.fmab.not_yours": "Ce cercle est armé par un autre alchimiste."
 }

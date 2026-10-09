@@ -114,18 +114,23 @@ public final class Cinematics {
 		}
 	}
 
-	/** Un voile noir qui gagne depuis les bords. */
+	/** Un voile noir qui gagne depuis les bords : des cadres concentriques, du plus sombre au plus clair. */
 	private static void vignette(GuiGraphicsExtractor graphics, int w, int h, float amount) {
-		int step = Math.max(8, Math.max(w, h) / 60);
-		double reach = Math.hypot(w, h) / 2;
-		for (int y = 0; y < h; y += step) {
-			for (int x = 0; x < w; x += step) {
-				double d = Math.hypot(x - w / 2.0, y - h / 2.0) / reach;
-				int alpha = (int) (Mth.clamp((d - 1 + amount) * 2.5, 0, 1) * 235);
-				if (alpha > 0) {
-					graphics.fill(x, y, x + step, y + step, alpha << 24);
-				}
+		int bands = 20;
+		for (int i = 0; i < bands; i++) {
+			// i = 0 : le cadre extérieur ; plus on s'approche du centre, plus il est clair.
+			double d = 1 - (double) i / bands;
+			int alpha = (int) (Mth.clamp((d - 1 + amount) * 2.5, 0, 1) * 235);
+			if (alpha <= 0) {
+				continue;
 			}
+			int x0 = w * i / (2 * bands), y0 = h * i / (2 * bands);
+			int x1 = w * (i + 1) / (2 * bands), y1 = h * (i + 1) / (2 * bands);
+			int color = alpha << 24;
+			graphics.fill(x0, y0, w - x0, y1, color);
+			graphics.fill(x0, h - y1, w - x0, h - y0, color);
+			graphics.fill(x0, y1, x1, h - y1, color);
+			graphics.fill(w - x1, y1, w - x0, h - y1, color);
 		}
 	}
 

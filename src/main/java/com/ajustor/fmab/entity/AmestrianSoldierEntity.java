@@ -73,7 +73,8 @@ public class AmestrianSoldierEntity extends PathfinderMob {
 		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
 				(target, level) -> target instanceof ServerPlayer p && outlaw(p)));
 		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false,
-				(target, level) -> !(target instanceof HomunculusEntity) && !(target instanceof Creeper)));
+				(target, level) -> !(target instanceof HomunculusEntity) && !(target instanceof Creeper)
+						&& !(target instanceof ChimeraBeastEntity chimera && chimera.master().isPresent())));
 	}
 
 	/** Le joueur est-il un criminel aux yeux de l'armée ? */

@@ -18,8 +18,18 @@ public final class BossModels {
 	private BossModels() {
 	}
 
+	/**
+	 * Le squelette humanoïde, avec les membres gauches de la disposition « joueur » (leur propre
+	 * dessin dans la peau) plutôt qu'en miroir des membres droits.
+	 */
 	private static MeshDefinition base() {
-		return HumanoidModel.createMesh(CubeDeformation.NONE, 0);
+		MeshDefinition mesh = HumanoidModel.createMesh(CubeDeformation.NONE, 0);
+		PartDefinition root = mesh.getRoot();
+		root.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(32, 48).addBox(-1, -2, -2, 4, 12, 4),
+				PartPose.offset(5, 2, 0));
+		root.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(16, 48).addBox(-2, 0, -2, 4, 12, 4),
+				PartPose.offset(1.9f, 12, 0));
+		return mesh;
 	}
 
 	private static ModelPart bake(MeshDefinition mesh) {

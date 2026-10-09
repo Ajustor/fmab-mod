@@ -59,9 +59,6 @@ public class MarcohEntity extends PathfinderMob {
 		if (!(player instanceof ServerPlayer p) || !(level() instanceof ServerLevel level)) {
 			return InteractionResult.SUCCESS;
 		}
-		if (!hasHome()) {
-			setHomeTo(blockPosition(), 8);
-		}
 		ItemStack held = p.getItemInHand(hand);
 		if (held.is(FmabItems.CIPHERED_NOTES)) {
 			// Il reconnaît son écriture : la recette de cuisine redevient un traité.
@@ -85,6 +82,15 @@ public class MarcohEntity extends PathfinderMob {
 		line = line % 3 + 1;
 		p.sendSystemMessage(Component.translatable("npc.fmab.marcoh.line" + line));
 		return InteractionResult.SUCCESS;
+	}
+
+	@Override
+	protected void customServerAiStep(ServerLevel level) {
+		super.customServerAiStep(level);
+		// Il ne quitte pas son dispensaire.
+		if (!hasHome()) {
+			setHomeTo(blockPosition(), 8);
+		}
 	}
 
 	@Override

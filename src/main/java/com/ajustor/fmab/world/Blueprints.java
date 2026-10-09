@@ -382,8 +382,9 @@ public final class Blueprints {
 				return xEdge || zEdge ? pal.corner() : pal.floor();
 			}
 			if (xEdge || zEdge) {
-				if (z == 0 && x == sx / 2 && y <= 1) {
-					return door(pal.door(), y, Direction.NORTH);
+				// La porte s'ouvre au niveau du plancher (posé en y = 0) : une marche pour entrer.
+				if (z == 0 && x == sx / 2 && (y == 1 || y == 2)) {
+					return door(pal.door(), y - 1, Direction.NORTH);
 				}
 				int along = zEdge ? x : z;
 				boolean window = (y % 4 == 1 || y % 4 == 2) && along % 2 == 1 && !(z == 0 && Math.abs(x - sx / 2) <= 1);

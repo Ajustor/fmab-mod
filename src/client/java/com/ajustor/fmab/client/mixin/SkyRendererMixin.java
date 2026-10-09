@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * L'éclipse du Jour promis, dans le ciel : la lune nouvelle passe devant le soleil, qui pâlit ; le
- * ciel vire au crépuscule rouge sombre et les étoiles apparaissent en plein midi.
+ * L'éclipse du Jour promis, dans le ciel : le soleil s'éteint presque derrière la lune nouvelle et
+ * les étoiles apparaissent en plein midi. Le ciel, le brouillard et la lumière : voir ClientLevelMixin.
  */
 @Mixin(SkyRenderer.class)
 public abstract class SkyRendererMixin {
@@ -27,10 +27,9 @@ public abstract class SkyRendererMixin {
 		}
 		state.moonAngle = state.sunAngle;
 		state.moonPhase = MoonPhase.NEW_MOON;
-		// Le soleil n'est plus qu'un anneau terne derrière la lune.
-		state.rainBrightness = Math.min(state.rainBrightness, 0.25f);
+		// Le soleil n'est plus qu'une lueur derrière la lune (le ciel, lui, vient de ClientLevelMixin).
+		state.rainBrightness = Math.min(state.rainBrightness, 0.06f);
 		state.starBrightness = Math.max(state.starBrightness, 0.6f);
-		state.skyColor = ARGB.color(255, 46, 14, 18);
 		state.sunriseAndSunsetColor = ARGB.color(140, 160, 30, 20);
 	}
 }

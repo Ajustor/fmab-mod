@@ -61,6 +61,10 @@ public class IzumiEntity extends PathfinderMob {
 	private static final TagKey<Structure> YOCK_MAPS = TagKey.create(Registries.STRUCTURE, Fmab.id("on_yock_island_maps"));
 
 	private UUID student;
+	/** Sa boutique, retenue le temps d'un combat d'entraînement. */
+	private BlockPos shop;
+	/** Pas d'île de Yock à portée : on ne recherche pas avant cette heure. */
+	private long nextMapSearch;
 	private int sparTicks;
 
 	public IzumiEntity(EntityType<? extends PathfinderMob> type, Level level) {
@@ -102,12 +106,18 @@ public class IzumiEntity extends PathfinderMob {
 	 * fois. S'il n'y a pas d'île à portée, elle n'en donne pas (et réessaiera la prochaine fois).
 	 */
 	private void giveIslandMap(ServerPlayer player) {
-		if (Gifts.received(player, ISLAND_MAP) || !(level() instanceof ServerLevel level)) {
+		if (Gifts.received(player, ISLAND_MAP) || !(level() instanceof ServerLevel level)
+				|| level.getGameTime() < nextMapSearch) {
 			return;
 		}
 		ItemStack map = Maps.toStructure(level, blockPosition(), YOCK_MAPS, MapDecorationTypes.RED_X,
 				Component.translatable("filled_map.fmab.yock_island"));
-		if (!map.isEmpty() && Gifts.give(player, ISLAND_MAP, map)) {
+		if (map.isEmpty()) {
+			// La recherche coûte cher : on ne la refait pas avant cinq minutes.
+			nextMapSearch = level.getGameTime() + 20 * 60 * 5;
+			return;
+		}
+		if (Gifts.give(player, ISLAND_MAP, map)) {
 			player.sendSystemMessage(Component.translatable("entity.fmab.izumi.island_map"));
 		}
 	}
@@ -131,9 +141,14 @@ public class IzumiEntity extends PathfinderMob {
 	@Override
 	protected void customServerAiStep(ServerLevel level) {
 		super.customServerAiStep(level);
-		// Elle ne quitte pas sa boutique.
-		if (!hasHome()) {
-			setHomeTo(blockPosition(), 10);
+		// Elle ne quitte pas sa boutique, sauf pour suivre un élève en combat.
+		if (student != null) {
+			if (hasHome()) {
+				shop = getHomePosition();
+				clearHome();
+			}
+		} else if (!hasHome()) {
+			setHomeTo(shop != null ? shop : blockPosition(), 10);
 		}
 		if (student == null) {
 			return;

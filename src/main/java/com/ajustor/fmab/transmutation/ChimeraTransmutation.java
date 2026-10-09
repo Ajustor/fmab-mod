@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
 
@@ -36,7 +37,9 @@ public final class ChimeraTransmutation {
 	private static Effects.Result apply(EffectContext ctx) {
 		ServerLevel level = ctx.level();
 		List<Animal> beasts = level.getEntitiesOfClass(Animal.class, ctx.onCircle().inflate(1, 1, 1),
-				a -> a.isAlive() && !a.isBaby());
+				// Pas les compagnons des autres : ni bête apprivoisée, ni bête nommée, ni bête en laisse.
+				a -> a.isAlive() && !a.isBaby() && !(a instanceof TamableAnimal t && t.isTame()) && !a.hasCustomName()
+						&& !a.isLeashed());
 		if (beasts.size() < 2) {
 			return Effects.Result.NO_TARGET;
 		}

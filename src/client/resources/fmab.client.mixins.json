@@ -5,6 +5,7 @@
 	"client": [
 		"AvatarRenderStateMixin",
 		"AvatarRendererMixin",
+		"ClientLevelMixin",
 		"HudMixin",
 		"PlayerModelMixin",
 		"SkyRendererMixin"

@@ -92,6 +92,12 @@ public class ChimeraBeastEntity extends Monster {
 		return Optional.ofNullable(master);
 	}
 
+	/** Liée à un maître, elle veille sur son sommeil au lieu de l'empêcher. */
+	@Override
+	public boolean isPreventingPlayerRest(ServerLevel level, Player player) {
+		return master == null && super.isPreventingPlayerRest(level, player);
+	}
+
 	@Override
 	public boolean canAttack(LivingEntity target) {
 		return !(master != null && target.getUUID().equals(master)) && super.canAttack(target);

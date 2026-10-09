@@ -12,6 +12,7 @@ import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.LivingStone;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.BlockPos;
@@ -91,6 +92,16 @@ public final class GateOfTruth {
 				CinematicPayload.play(player, CinematicPayload.GATE_PULL, -t);
 			} else if (t >= 0 && t < RETURN) {
 				CinematicPayload.play(player, CinematicPayload.GATE, RETURN + 2 - t);
+				if (t >= KNOWLEDGE && t < TOLL) {
+					CinematicPayload.play(player, CinematicPayload.GATE_KNOWLEDGE, TOLL - t);
+				}
+			}
+		});
+		// Mort pendant qu'on l'aspirait : revenu à la vie, il est de nouveau happé.
+		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, player, alive) -> {
+			GateState gate = player.getAttached(FmabAttachments.GATE);
+			if (gate != null && gate.visit().isPresent() && gate.visit().get().ticks() < -1) {
+				CinematicPayload.play(player, CinematicPayload.GATE_PULL, -gate.visit().get().ticks());
 			}
 		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
