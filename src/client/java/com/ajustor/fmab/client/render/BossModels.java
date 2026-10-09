@@ -32,6 +32,17 @@ public final class BossModels {
 		return mesh;
 	}
 
+	/** Le même squelette aux bras fins (3 pixels), comme le modèle de joueur « slim ». */
+	private static MeshDefinition slimBase() {
+		MeshDefinition mesh = base();
+		PartDefinition root = mesh.getRoot();
+		root.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(40, 16).addBox(-2, -2, -2, 3, 12, 4),
+				PartPose.offset(-5, 2.5f, 0));
+		root.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(32, 48).addBox(-1, -2, -2, 3, 12, 4),
+				PartPose.offset(5, 2.5f, 0));
+		return mesh;
+	}
+
 	private static ModelPart bake(MeshDefinition mesh) {
 		return LayerDefinition.create(mesh, 64, 64).bakeRoot();
 	}
@@ -49,6 +60,30 @@ public final class BossModels {
 		MeshDefinition mesh = base();
 		mesh.getRoot().getChild("body").addOrReplaceChild("shoulders",
 				CubeListBuilder.create().texOffs(0, 32).addBox(-6, -1, -3, 12, 5, 6), PartPose.ZERO);
+		return bake(mesh);
+	}
+
+	/** Lust : une longue chevelure noire qui tombe jusqu'aux reins. */
+	public static ModelPart lust() {
+		MeshDefinition mesh = slimBase();
+		mesh.getRoot().getChild("head").addOrReplaceChild("hair",
+				CubeListBuilder.create().texOffs(0, 32).addBox(-4.5f, -8.3f, 2.4f, 9, 14, 2), PartPose.ZERO);
+		return bake(mesh);
+	}
+
+	/** Envy : la touffe hérissée en palmier, au sommet du crâne. */
+	public static ModelPart envy() {
+		MeshDefinition mesh = base();
+		mesh.getRoot().getChild("head").addOrReplaceChild("spikes",
+				CubeListBuilder.create().texOffs(0, 32).addBox(-4.5f, -10.5f, -4.5f, 9, 3, 9), PartPose.ZERO);
+		return bake(mesh);
+	}
+
+	/** Greed : le col de fourrure de son manteau. */
+	public static ModelPart greed() {
+		MeshDefinition mesh = base();
+		mesh.getRoot().getChild("body").addOrReplaceChild("fur",
+				CubeListBuilder.create().texOffs(0, 32).addBox(-5, -1, -3, 10, 3, 6), PartPose.ZERO);
 		return bake(mesh);
 	}
 

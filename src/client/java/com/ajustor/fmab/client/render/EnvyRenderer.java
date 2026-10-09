@@ -46,6 +46,8 @@ public class EnvyRenderer extends HumanoidMobRenderer<EnvyEntity, EnvyRenderer.S
 		public void setupAnim(State state) {
 			super.setupAnim(state);
 			boolean human = state.form != EnvyEntity.Form.LIZARD;
+			// Sa touffe en palmier n'appartient qu'à sa vraie forme : déguisé, il a la tête d'un autre.
+			head.getChild("spikes").visible = state.form == EnvyEntity.Form.HUMAN;
 			head.visible = human;
 			hat.visible = human;
 			body.visible = human;
@@ -57,7 +59,7 @@ public class EnvyRenderer extends HumanoidMobRenderer<EnvyEntity, EnvyRenderer.S
 	}
 
 	public EnvyRenderer(EntityRendererProvider.Context context) {
-		super(context, new Model(context.bakeLayer(ModelLayers.PLAYER)), 0.5f);
+		super(context, new Model(BossModels.envy()), 0.5f);
 		addLayer(new LizardLayer(this, new SilverfishModel(context.bakeLayer(ModelLayers.SILVERFISH))));
 	}
 
