@@ -33,23 +33,36 @@ public final class TransmutationGestures {
 			lean(model, 0.45f, weight);
 			arms(model, -0.9f + tremble, 0.18f, tremble, weight);
 		} else if (pose == TransmutationPose.Kind.CLAP) {
-			arms(model, -1.45f, -0.42f, 0, weight);
+			arms(model, -1.45f, 0.45f, 0, weight);
 		} else if (pose == TransmutationPose.Kind.REACH) {
 			model.rightArm.xRot = Mth.lerp(weight, model.rightArm.xRot, -1.5f + tremble);
 			model.rightArm.yRot = Mth.lerp(weight, model.rightArm.yRot, -0.1f);
 		}
 	}
 
-	/** Penché en avant, la tête qui regarde le cercle. */
+	/**
+	 * Penché en avant, la tête qui regarde le cercle. Le torse pivote au cou : les hanches reculent et
+	 * remontent, les jambes les suivent et le haut du corps descend pour garder les pieds au sol.
+	 */
 	private static void lean(HumanoidModel<?> model, float angle, float weight) {
-		model.body.xRot = Mth.lerp(weight, model.body.xRot, angle);
+		float before = model.body.xRot;
+		float after = Mth.lerp(weight, before, angle);
+		float back = 12 * (Mth.sin(after) - Mth.sin(before));
+		float drop = 12 * (Mth.cos(before) - Mth.cos(after));
+		model.body.xRot = after;
+		model.rightLeg.z += back;
+		model.leftLeg.z += back;
+		model.body.y += drop;
+		model.head.y += drop;
+		model.rightArm.y += drop;
+		model.leftArm.y += drop;
 		model.head.xRot = Mth.lerp(weight, model.head.xRot, model.head.xRot + angle * 0.6f);
 	}
 
 	/**
 	 * Les deux bras vers l'avant, symétriques.
 	 *
-	 * @param inward rotation qui rapproche les mains (négatif : vers le centre)
+	 * @param inward rotation qui rapproche les mains (positif : vers le centre)
 	 */
 	private static void arms(HumanoidModel<?> model, float forward, float inward, float roll, float weight) {
 		model.rightArm.xRot = Mth.lerp(weight, model.rightArm.xRot, forward);
