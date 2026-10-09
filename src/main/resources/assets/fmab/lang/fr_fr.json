@@ -920,5 +920,8 @@
   "npc.fmab.hohenheim.crest_map": "Hohenheim trace sur une carte l'emplacement d'un point de sang : « Commence par celui-ci. »",
   "exam.fmab.mission": "L'examinateur vous remet une carte : « Votre première mission, Alchimiste d'État : le Laboratoire 5. »",
   "npc.fmab.may.briggs_map": "May Chang ajoute une carte du Nord : « À Briggs, ils tiennent tête à ce qui rôde. Ils pourraient vous aider. »",
-  "treatise.fmab.ch1.places": "Trouver son chemin : les cartographes des villages vendent des cartes vers Central, Resembool, Dublith, Rush Valley et bien d'autres lieux ; Izumi, l'examinateur, May Chang et Hohenheim en donnent aussi. Les progrès (touche L) tracent le chemin de l'alchimiste.\n\nLa concentration grandit avec le rang : 20 pour un Apprenti, 40 pour un Alchimiste, 70 pour un Alchimiste d'État, 120 pour un Initié de la Porte. Accroupi et immobile, on la récupère plus vite."
+  "treatise.fmab.ch1.places": "Trouver son chemin : les cartographes des villages vendent des cartes vers Central, Resembool, Dublith, Rush Valley et bien d'autres lieux ; Izumi, l'examinateur, May Chang et Hohenheim en donnent aussi. Les progrès (touche L) tracent le chemin de l'alchimiste.\n\nLa concentration grandit avec le rang : 20 pour un Apprenti, 40 pour un Alchimiste, 70 pour un Alchimiste d'État, 120 pour un Initié de la Porte. Accroupi et immobile, on la récupère plus vite.",
+  "tag.item.fmab.element.fire": "Combustibles (élément Feu)",
+  "tag.item.fmab.element.iron": "Fer (élément Fer)",
+  "tag.item.fmab.embroiderable": "Brodable"
 }

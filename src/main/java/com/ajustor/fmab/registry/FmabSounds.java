@@ -9,7 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 /**
  * Les sons du mod ({@code assets/fmab/sounds.json}). Tous viennent de banques libres de droits (CC0) :
  * Kenney (Sci-Fi Sounds, Impact Sounds, RPG Audio) et « gunshots » de kurt sur OpenGameArt, retouchés
- * (hauteur, découpe, mixage). Voir {@code assets/fmab/sounds/CREDITS.txt}.
+ * (hauteur, découpe, mixage). Voir {@code assets/fmab/sounds/credits.txt}.
  */
 public final class FmabSounds {
 	public static final SoundEvent CLAP = register("clap");

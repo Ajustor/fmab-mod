@@ -241,11 +241,11 @@ partenaires pour l'anime *Fullmetal Alchemist: Brotherhood*. Ce mod est un proje
 indépendant, gratuit et non officiel, sans lien avec eux ni approbation de leur part. Les visuels
 du mod sont des créations originales ; les glyphes reprennent le symbolisme alchimique historique,
 qui est du domaine public. Les sons dérivent de banques du domaine public (CC0) : Kenney et OpenGameArt
-(voir `assets/fmab/sounds/CREDITS.txt`).
+(voir `assets/fmab/sounds/credits.txt`).
 
 **EN** — Fullmetal Alchemist, its characters, names, places and universe belong to their rights
 holders: Hiromu Arakawa and Square Enix for the manga; Bones, Aniplex and their partners for the
 anime *Fullmetal Alchemist: Brotherhood*. This mod is an independent, free and unofficial fan
 project, not affiliated with or endorsed by them. The mod's visuals are original creations; the
 glyphs draw on historical alchemical symbolism, which is in the public domain. Sounds are derived from public
-domain (CC0) packs by Kenney and from OpenGameArt (see `assets/fmab/sounds/CREDITS.txt`).
+domain (CC0) packs by Kenney and from OpenGameArt (see `assets/fmab/sounds/credits.txt`).

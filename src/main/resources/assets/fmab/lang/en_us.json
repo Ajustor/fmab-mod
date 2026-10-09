@@ -920,5 +920,8 @@
   "npc.fmab.hohenheim.crest_map": "Hohenheim marks a blood crest on a map: \"Start with this one.\"",
   "exam.fmab.mission": "The examiner hands you a map: \"Your first mission, State Alchemist: Laboratory 5.\"",
   "npc.fmab.may.briggs_map": "May Chang adds a map of the North: \"At Briggs, they stand up to whatever prowls. They could help you.\"",
-  "treatise.fmab.ch1.places": "Finding your way: village cartographers sell maps to Central, Resembool, Dublith, Rush Valley and many other places; Izumi, the examiner, May Chang and Hohenheim hand some out too. Advancements (L key) trace the alchemist's path.\n\nConcentration grows with rank: 20 for an Apprentice, 40 for an Alchemist, 70 for a State Alchemist, 120 for a Gate Initiate. Crouching still, you recover it faster."
+  "treatise.fmab.ch1.places": "Finding your way: village cartographers sell maps to Central, Resembool, Dublith, Rush Valley and many other places; Izumi, the examiner, May Chang and Hohenheim hand some out too. Advancements (L key) trace the alchemist's path.\n\nConcentration grows with rank: 20 for an Apprentice, 40 for an Alchemist, 70 for a State Alchemist, 120 for a Gate Initiate. Crouching still, you recover it faster.",
+  "tag.item.fmab.element.fire": "Fuels (Fire element)",
+  "tag.item.fmab.element.iron": "Iron (Iron element)",
+  "tag.item.fmab.embroiderable": "Embroiderable"
 }

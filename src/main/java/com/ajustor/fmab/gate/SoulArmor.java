@@ -35,7 +35,7 @@ public final class SoulArmor {
 	public static final ArmorMaterial MATERIAL = new ArmorMaterial(24,
 			Map.of(ArmorType.BOOTS, 2, ArmorType.LEGGINGS, 5, ArmorType.CHESTPLATE, 6, ArmorType.HELMET, 2,
 					ArmorType.BODY, 5),
-			0, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F, ItemTags.REPAIRS_IRON_ARMOR, EquipmentAssets.IRON);
+			9, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F, ItemTags.REPAIRS_IRON_ARMOR, EquipmentAssets.IRON);
 
 	/** Les emplacements que l'armure occupe, le plastron (le sceau) compris. */
 	public static final List<EquipmentSlot> SLOTS = List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST,
