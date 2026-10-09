@@ -29,6 +29,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
@@ -67,6 +68,7 @@ public class ScarEntity extends PathfinderMob {
 	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
+		goalSelector.addGoal(4, new MoveTowardsRestrictionGoal(this, 0.6));
 		goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.25, true));
 		goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.5));
 		goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 12));
@@ -157,6 +159,15 @@ public class ScarEntity extends PathfinderMob {
 	public void stopSeenByPlayer(ServerPlayer player) {
 		super.stopSeenByPlayer(player);
 		bossEvent.removePlayer(player);
+	}
+
+	@Override
+	protected void customServerAiStep(ServerLevel level) {
+		super.customServerAiStep(level);
+		// Il ne quitte pas son lieu.
+		if (!hasHome()) {
+			setHomeTo(blockPosition(), 16);
+		}
 	}
 
 	@Override

@@ -55,6 +55,14 @@ public final class Eclipse {
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			ServerLevel overworld = server.overworld();
 			long hour = Math.floorMod(overworld.getOverworldClockTime(), 24000L);
+			if (hour == 0 && Math.floorMod(Math.floorDiv(overworld.getOverworldClockTime(), 24000L), PERIOD_DAYS)
+					== PERIOD_DAYS - 1) {
+				// Le matin du jour de l'éclipse, on le sent venir.
+				for (ServerPlayer p : overworld.players()) {
+					p.sendSystemMessage(Component.translatable("eclipse.fmab.today").withStyle(ChatFormatting.GOLD));
+				}
+				return;
+			}
 			if (hour != START && hour != END) {
 				return;
 			}
@@ -67,7 +75,7 @@ public final class Eclipse {
 			NationalCircle circle = NationalCircle.get(server);
 			for (ServerPlayer p : overworld.players()) {
 				p.sendSystemMessage(Component.translatable(starting ? "eclipse.fmab.begins" : "eclipse.fmab.ends"));
-				if (starting && !circle.broken()) {
+				if (starting && !circle.broken() && !circle.fatherFallen()) {
 					// Le Jour promis : le cercle national s'éveille, et Père avec lui.
 					p.sendSystemMessage(Component.translatable("promised.fmab.day_begins",
 							NationalCircle.POINTS - circle.sealedCount()).withStyle(ChatFormatting.DARK_RED));

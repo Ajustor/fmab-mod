@@ -69,6 +69,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.entity.NoopRenderer;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import org.lwjgl.glfw.GLFW;
@@ -128,6 +129,7 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.HOHENHEIM, HohenheimRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.MARCOH, MarcohRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.GATE_HAND, GateHandRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.FATHER_SUN, c -> new ThrownItemRenderer<>(c, 4.0F, true));
 		ClientPlayNetworking.registerGlobalReceiver(CinematicPayload.TYPE, (payload, context) -> Cinematics.start(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> Cinematics.tick());
 		// Une nouvelle connexion (ou un autre monde) repart sans cinématique en cours.
@@ -231,13 +233,13 @@ public class FmabClient implements ClientModInitializer {
 			return;
 		}
 		AlchemistData data = mc.player.getAttached(FmabAttachments.ALCHEMIST);
-		if (data == null || data.concentration() >= AlchemistData.MAX_CONCENTRATION) {
+		if (data == null || data.concentration() >= data.maxConcentration()) {
 			return;
 		}
 		int width = 81;
 		int x = graphics.guiWidth() / 2 + 10;
 		int y = graphics.guiHeight() - 39 - 10 - 4;
-		int filled = Math.round(width * data.concentration() / AlchemistData.MAX_CONCENTRATION);
+		int filled = Math.round(width * data.concentration() / data.maxConcentration());
 		graphics.fill(x - 1, y - 1, x + width + 1, y + 4, 0xC0000000);
 		graphics.fill(x, y, x + filled, y + 3, 0xFF4FA3FF);
 	}

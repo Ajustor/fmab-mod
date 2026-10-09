@@ -10,6 +10,7 @@ import com.ajustor.fmab.entity.CornelloEntity;
 import com.ajustor.fmab.entity.DrachmaSoldierEntity;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.FatherEntity;
+import com.ajustor.fmab.entity.FatherSunEntity;
 import com.ajustor.fmab.entity.GateHandEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
 import com.ajustor.fmab.entity.GreedEntity;
@@ -365,6 +366,16 @@ public final class FmabEntities {
 					.eyeHeight(1.7F)
 					.clientTrackingRange(10)
 					.build(MARCOH_KEY));
+
+	private static final ResourceKey<EntityType<?>> FATHER_SUN_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("father_sun"));
+
+	/** Le petit soleil de Père, qu'on esquive ou qu'on renvoie d'un coup. */
+	public static final EntityType<FatherSunEntity> FATHER_SUN = Registry.register(BuiltInRegistries.ENTITY_TYPE, FATHER_SUN_KEY,
+			EntityType.Builder.<FatherSunEntity>of(FatherSunEntity::new, MobCategory.MISC)
+					.sized(1.0F, 1.0F)
+					.clientTrackingRange(6)
+					.updateInterval(5)
+					.build(FATHER_SUN_KEY));
 
 	private FmabEntities() {
 	}

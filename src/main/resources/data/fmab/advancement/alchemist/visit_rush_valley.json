@@ -1,5 +1,5 @@
 {
-  "parent": "fmab:alchemist/automail",
+  "parent": "fmab:alchemist/root",
   "criteria": {
     "visit_rush_valley": {
       "trigger": "minecraft:location",

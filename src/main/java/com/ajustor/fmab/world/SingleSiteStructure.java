@@ -22,7 +22,7 @@ public class SingleSiteStructure extends Structure {
 			Codec.STRING.fieldOf("piece").forGetter(s -> s.piece),
 			Codec.INT.fieldOf("size").forGetter(s -> s.size),
 			Codec.INT.fieldOf("height").forGetter(s -> s.height),
-			Codec.INT.optionalFieldOf("ground", 1).forGetter(s -> s.ground)
+			Codec.INT.optionalFieldOf("ground", 0).forGetter(s -> s.ground)
 	).apply(i, SingleSiteStructure::new));
 
 	private final String piece;

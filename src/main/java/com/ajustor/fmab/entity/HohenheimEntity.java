@@ -1,14 +1,18 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.Gifts;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.promised.NationalCircle;
 import com.ajustor.fmab.stone.LivingStone;
+import com.ajustor.fmab.world.Maps;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -19,10 +23,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 
 
 /**
@@ -33,6 +41,7 @@ import net.minecraft.world.level.Level;
 public class HohenheimEntity extends PathfinderMob {
 	private static final DustParticleOptions RED = new DustParticleOptions(0xD01020, 0.8f);
 	private int line;
+	private static final TagKey<Structure> CREST_MAPS = TagKey.create(Registries.STRUCTURE, Fmab.id("on_blood_crest_maps"));
 
 	public HohenheimEntity(EntityType<? extends PathfinderMob> type, Level level) {
 		super(type, level);
@@ -48,6 +57,7 @@ public class HohenheimEntity extends PathfinderMob {
 	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
+		goalSelector.addGoal(4, new MoveTowardsRestrictionGoal(this, 0.6));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.4));
 		goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 10));
 		goalSelector.addGoal(7, new RandomLookAroundGoal(this));
@@ -65,8 +75,17 @@ public class HohenheimEntity extends PathfinderMob {
 			p.sendSystemMessage(Component.translatable("npc.fmab.hohenheim.line" + (line + 1)));
 		}
 		NationalCircle circle = NationalCircle.get(level.getServer());
-		p.sendSystemMessage(Component.translatable(circle.broken() ? "npc.fmab.hohenheim.circle_broken"
-				: "npc.fmab.hohenheim.circle", NationalCircle.POINTS - circle.sealedCount()));
+		p.sendSystemMessage(Component.translatable(circle.fatherFallen() ? "npc.fmab.hohenheim.father_fallen"
+				: circle.broken() ? "npc.fmab.hohenheim.circle_broken" : "npc.fmab.hohenheim.circle",
+				NationalCircle.POINTS - circle.sealedCount()));
+		// Il montre aussi où trouver un point de sang.
+		if (!circle.broken() && !circle.fatherFallen() && !Gifts.received(p, "crest_map")) {
+			ItemStack map = Maps.toStructure(level, blockPosition(), CREST_MAPS, MapDecorationTypes.RED_X,
+					Component.translatable("filled_map.fmab.blood_crest"));
+			if (!map.isEmpty() && Gifts.give(p, "crest_map", map)) {
+				p.sendSystemMessage(Component.translatable("npc.fmab.hohenheim.crest_map"));
+			}
+		}
 		if (Gifts.give(p, "hohenheim_notes", Tomes.stack(Tomes.HOHENHEIM))) {
 			p.sendSystemMessage(Component.translatable("npc.fmab.hohenheim.notes"));
 		}
@@ -80,6 +99,15 @@ public class HohenheimEntity extends PathfinderMob {
 		level.sendParticles(RED, getX(), getY(0.5), getZ(), 20, 0.3, 0.5, 0.3, 0);
 		return (source.isCreativePlayer() || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
 				&& super.hurtServer(level, source, damage);
+	}
+
+	@Override
+	protected void customServerAiStep(ServerLevel level) {
+		super.customServerAiStep(level);
+		// Il ne quitte pas son lieu.
+		if (!hasHome()) {
+			setHomeTo(blockPosition(), 10);
+		}
 	}
 
 	@Override

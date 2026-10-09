@@ -49,8 +49,8 @@ public class FortBriggsStructure extends Structure {
 		}
 		BlockPos corner = new BlockPos(cx - wx / 2, y, cz - wz / 2);
 		long seed = context.random().nextLong();
-		// La maçonnerie descend jusqu'au point le plus bas de l'emprise.
-		int ground = y - min + 1;
+		// Le terrain se cale sur le plancher (« beard_box ») : pas de fondation dessous.
+		int ground = 0;
 		return Optional.of(new GenerationStub(new BlockPos(cx, y, cz), builder -> builder.addPiece(
 				new ProceduralPiece("fort_briggs", corner, sx, Blueprints.FortBriggs.SIZE_Y, sz, ground, rotation, seed))));
 	}

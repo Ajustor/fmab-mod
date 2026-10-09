@@ -3,6 +3,7 @@ package com.ajustor.fmab.promised;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.progress.Milestones;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -26,19 +27,33 @@ public final class NationalCircle extends SavedData {
 	/** Les sept points du cercle, comme les sept pointes de l'heptagone. */
 	public static final int POINTS = 7;
 
-	private static final Codec<NationalCircle> CODEC = BlockPos.CODEC.listOf()
-			.xmap(NationalCircle::new, c -> List.copyOf(c.sealed));
+	private static final Codec<NationalCircle> CODEC = RecordCodecBuilder.create(i -> i.group(
+			BlockPos.CODEC.listOf().optionalFieldOf("sealed", List.of()).forGetter(c -> List.copyOf(c.sealed)),
+			Codec.BOOL.optionalFieldOf("father_fallen", false).forGetter(c -> c.fatherFallen)
+	).apply(i, NationalCircle::new));
 	private static final SavedDataType<NationalCircle> TYPE = new SavedDataType<>(Fmab.id("national_circle"),
 			NationalCircle::new, CODEC, DataFixTypes.SAVED_DATA_COMMAND_STORAGE);
 
 	private final Set<BlockPos> sealed;
+	/** Père est tombé : il n'y aura plus de Jour promis. */
+	private boolean fatherFallen;
 
 	public NationalCircle() {
-		this(List.of());
+		this(List.of(), false);
 	}
 
-	private NationalCircle(List<BlockPos> sealed) {
+	private NationalCircle(List<BlockPos> sealed, boolean fatherFallen) {
 		this.sealed = new HashSet<>(sealed);
+		this.fatherFallen = fatherFallen;
+	}
+
+	public boolean fatherFallen() {
+		return fatherFallen;
+	}
+
+	public void fatherFalls() {
+		fatherFallen = true;
+		setDirty();
 	}
 
 	public static NationalCircle get(MinecraftServer server) {

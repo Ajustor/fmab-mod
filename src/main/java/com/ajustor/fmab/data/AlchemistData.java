@@ -18,7 +18,7 @@ import java.util.Set;
  * ce qui déclenche la synchronisation vers le client.
  *
  * @param known         identifiants des glyphes compris
- * @param concentration réserve d'énergie, de 0 à {@link #MAX_CONCENTRATION}
+ * @param concentration réserve d'énergie, de 0 au maximum du rang ({@link #maxConcentration()})
  * @param mastery       maîtrise par école ({@code earth}, {@code metal}...)
  * @param granted       nœuds de savoir accordés par un livre ou un maître, sans attendre la maîtrise
  * @param familiarity   usages de chaque glyphe tracé sans être compris ; à {@link #USES_TO_LEARN},
@@ -26,6 +26,7 @@ import java.util.Set;
  */
 public record AlchemistData(Rank rank, Set<String> known, float concentration, Map<String, Integer> mastery,
 		Set<String> granted, Map<String, Integer> familiarity) {
+	/** La réserve d'un Apprenti, au départ. */
 	public static final float MAX_CONCENTRATION = 20;
 	/** À force de tracer un glyphe qu'on ne comprend pas, on finit par le comprendre. */
 	public static final int USES_TO_LEARN = 5;
@@ -80,8 +81,13 @@ public record AlchemistData(Rank rank, Set<String> known, float concentration, M
 		return new AlchemistData(rank, Set.of(), concentration, mastery, granted, Map.of());
 	}
 
+	/** La réserve de concentration, qui grandit avec le rang. */
+	public float maxConcentration() {
+		return rank.maxConcentration();
+	}
+
 	public AlchemistData withConcentration(float value) {
-		return new AlchemistData(rank, known, Math.clamp(value, 0, MAX_CONCENTRATION), mastery, granted,
+		return new AlchemistData(rank, known, Math.clamp(value, 0, maxConcentration()), mastery, granted,
 				familiarity);
 	}
 

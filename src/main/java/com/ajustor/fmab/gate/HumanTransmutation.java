@@ -93,7 +93,8 @@ public final class HumanTransmutation {
 		boolean severe = sets == 0;
 		int ambition = Math.max(0, sets - 1) + 2 * humans + gate.openings();
 
-		caster.hurtServer(level, level.damageSources().magic(), BLOOD);
+		// Le sang qu'on donne : jamais jusqu'à la mort, la Porte veut son dû vivant.
+		caster.hurtServer(level, level.damageSources().magic(), Math.min(BLOOD, caster.getHealth() - 1));
 		level.sendParticles(ParticleTypes.DAMAGE_INDICATOR, caster.getX(), caster.getY(1), caster.getZ(), 8,
 				0.3, 0.3, 0.3, 0.1);
 		level.sendParticles(ParticleTypes.SQUID_INK, circle.getX() + 0.5, circle.getY() + 0.2, circle.getZ() + 0.5,

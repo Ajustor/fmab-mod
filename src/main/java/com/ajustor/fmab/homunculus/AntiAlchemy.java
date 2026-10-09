@@ -23,6 +23,8 @@ import net.minecraft.world.phys.Vec3;
 public final class AntiAlchemy {
 	/** Rayon de la zone, en blocs. */
 	public static final double RADIUS = 48;
+	/** Hauteur de la zone au-dessus et au-dessous de Père : la salle du trône, pas le tunnel. */
+	private static final double VERTICAL = 14;
 
 	private AntiAlchemy() {
 	}
@@ -37,14 +39,18 @@ public final class AntiAlchemy {
 			return false;
 		}
 		double radius = radius(level, circle);
-		AABB box = new AABB(pos).inflate(radius);
+		// La zone tient au repaire : elle s'étend autour de Père, mais pas vers le tunnel, au-dessus.
+		AABB box = new AABB(pos).inflate(radius, VERTICAL, radius);
 		return !level.getEntitiesOfClass(FatherEntity.class, box,
-				f -> f.isAlive() && f.distanceToSqr(Vec3.atCenterOf(pos)) <= radius * radius).isEmpty();
+				f -> f.isAlive() && Math.hypot(f.getX() - pos.getX(), f.getZ() - pos.getZ()) <= radius).isEmpty();
 	}
 
-	/** Le rayon de la zone, doublé pendant le Jour promis. */
+	/** Le rayon de la zone, qui grandit pendant le Jour promis avec les points de sang encore actifs. */
 	public static double radius(ServerLevel level, NationalCircle circle) {
-		return Eclipse.now(level) && !circle.broken() ? RADIUS * 2 : RADIUS;
+		if (!Eclipse.now(level) || circle.broken()) {
+			return RADIUS;
+		}
+		return RADIUS * (1 + (NationalCircle.POINTS - circle.sealedCount()) / (double) NationalCircle.POINTS);
 	}
 
 	/**

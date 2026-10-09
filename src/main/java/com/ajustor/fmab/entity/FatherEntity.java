@@ -249,16 +249,8 @@ public class FatherEntity extends HomunculusEntity {
 		if (target == null) {
 			return;
 		}
-		// Le soleil file vers la cible, puis éclate.
-		Vec3 to = target.position().add(0, 1, 0);
-		Vec3 step = to.subtract(above);
-		int points = (int) (step.length() * 2);
-		for (int i = 0; i <= points; i++) {
-			Vec3 p = above.add(step.scale((double) i / points));
-			level.sendParticles(ParticleTypes.FLAME, p.x, p.y, p.z, 3, 0.15, 0.15, 0.15, 0);
-		}
-		level.explode(this, to.x, to.y, to.z, phase() == 2 ? 3.5f : 2.5f, Level.ExplosionInteraction.NONE);
-		target.igniteForSeconds(4);
+		// Le soleil part, lentement : on l'esquive en s'abritant, ou on le renvoie d'un coup.
+		FatherSunEntity.launch(level, this, above, target.position().add(0, 1, 0), phase() == 2 ? 3 : 2.2f);
 	}
 
 	/** La forme divine dévore les âmes autour d'elle pour tenir. */
@@ -279,10 +271,11 @@ public class FatherEntity extends HomunculusEntity {
 
 	/** Le Jour promis : pendant l'éclipse, tant que le cercle national tient, il se régénère. */
 	private void promisedDay(ServerLevel level) {
-		if (tickCount % 20 != 0 || !Eclipse.now(level) || NationalCircle.get(level.getServer()).broken()) {
+		NationalCircle circle = NationalCircle.get(level.getServer());
+		if (tickCount % 20 != 0 || !Eclipse.now(level) || circle.broken()) {
 			return;
 		}
-		heal(4);
+		heal(0.6f * (NationalCircle.POINTS - circle.sealedCount()));
 		level.sendParticles(RED, getX(), getY(0.5), getZ(), 20, 0.8, 1.2, 0.8, 0.02);
 	}
 
@@ -336,6 +329,7 @@ public class FatherEntity extends HomunculusEntity {
 			level.playSound(null, blockPosition(), SoundEvents.END_PORTAL_SPAWN, SoundSource.HOSTILE, 2, 0.5f);
 			level.playSound(null, blockPosition(), FmabSounds.GATE_OPEN, SoundSource.HOSTILE, 3, 0.8f);
 			say(level, "homunculus.fmab.father_falls");
+			NationalCircle.get(level.getServer()).fatherFalls();
 			// Des bras noirs jaillissent du sol tout autour et se referment sur lui.
 			for (int i = 0; i < 10; i++) {
 				double a = Math.PI * 2 * i / 10;

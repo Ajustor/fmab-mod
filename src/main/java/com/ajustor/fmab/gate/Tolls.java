@@ -94,8 +94,11 @@ public final class Tolls {
 			}
 			return InteractionResult.PASS;
 		});
+		// Sans bras droit, on ouvre un coffre ou une porte de la main gauche : seul celui qui n'a plus
+		// aucun bras ne peut plus rien manier.
 		UseBlockCallback.EVENT.register((player, level, hand, hit) ->
-				disabled(player, armOf(hand)) ? InteractionResult.FAIL : InteractionResult.PASS);
+				noHands(player) || hand == InteractionHand.OFF_HAND && disabled(player, BodyPart.LEFT_ARM)
+						? InteractionResult.FAIL : InteractionResult.PASS);
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
 			if (!(entity instanceof ServerPlayer player) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 				return true;
@@ -126,6 +129,11 @@ public final class Tolls {
 			}
 			return false;
 		});
+	}
+
+	/** Plus aucun bras pour manier quoi que ce soit. */
+	private static boolean noHands(Player player) {
+		return disabled(player, BodyPart.RIGHT_ARM) && disabled(player, BodyPart.LEFT_ARM);
 	}
 
 	/** La main droite tient l'objet principal ; la gauche, l'autre main. */

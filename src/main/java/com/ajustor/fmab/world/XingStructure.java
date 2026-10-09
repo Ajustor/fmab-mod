@@ -35,7 +35,7 @@ public class XingStructure extends Structure {
 		Rotation rotation = Rotation.values()[context.random().nextInt(4)];
 		long seed = context.random().nextLong();
 		return Optional.of(new GenerationStub(new BlockPos(cx, y, cz), builder -> builder.addPiece(
-				new ProceduralPiece("xing_pavilion", corner, SIZE, 12, SIZE, 1, rotation, seed))));
+				new ProceduralPiece("xing_pavilion", corner, SIZE, 12, SIZE, 0, rotation, seed))));
 	}
 
 	@Override

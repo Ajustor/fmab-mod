@@ -71,7 +71,7 @@ public final class FmabCommands {
 										})))
 						.then(Commands.literal("rest").executes(c -> {
 							ServerPlayer p = c.getSource().getPlayerOrException();
-							update(p, data(p).withConcentration(AlchemistData.MAX_CONCENTRATION));
+							update(p, data(p).withConcentration(data(p).maxConcentration()));
 							return 1;
 						}))));
 	}

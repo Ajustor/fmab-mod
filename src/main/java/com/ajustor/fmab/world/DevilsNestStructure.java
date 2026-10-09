@@ -31,7 +31,7 @@ public class DevilsNestStructure extends Structure {
 		BlockPos origin = new BlockPos(cx, y, cz);
 		Rotation rotation = Rotation.getRandom(context.random());
 		return Optional.of(new GenerationStub(origin, builder -> builder.addPiece(new ProceduralPiece("devils_nest",
-				origin, SIZE_X, Blueprints.houseHeight(1, SIZE_Z), SIZE_Z, 3, rotation, context.random().nextLong()))));
+				origin, SIZE_X, Blueprints.houseHeight(1, SIZE_Z), SIZE_Z, 0, rotation, context.random().nextLong()))));
 	}
 
 	@Override

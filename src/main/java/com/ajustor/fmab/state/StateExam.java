@@ -1,5 +1,6 @@
 package com.ajustor.fmab.state;
 
+import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.Primitive;
 import com.ajustor.fmab.alchemy.drawing.Vec2;
@@ -9,25 +10,30 @@ import com.ajustor.fmab.block.TransmutationCircleBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.ExamProgress;
+import com.ajustor.fmab.data.Gifts;
 import com.ajustor.fmab.entity.StoneGolemEntity;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.world.Maps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
@@ -60,7 +66,7 @@ public final class StateExam {
 	public static List<Requirement> requirements() {
 		return List.of(
 				new Requirement("exam.fmab.req.weapon", Set.of(FmabItems.STONE_LANCE, FmabItems.ARM_BLADE), 1),
-				new Requirement("exam.fmab.req.ice", Set.of(Items.PACKED_ICE), 8),
+				new Requirement("exam.fmab.req.ice", Set.of(Items.PACKED_ICE, Items.ICE, Items.BLUE_ICE, Items.SNOW_BLOCK), 8),
 				new Requirement("exam.fmab.req.fee", Set.of(Items.IRON_INGOT), 4));
 	}
 
@@ -162,6 +168,13 @@ public final class StateExam {
 			if (!player.getInventory().add(reward)) {
 				player.drop(reward, false);
 			}
+		}
+		// Sa première mission : le Laboratoire 5.
+		ItemStack map = Maps.toStructure(player.level(), player.blockPosition(),
+				TagKey.create(Registries.STRUCTURE, Fmab.id("on_laboratory_5_maps")), MapDecorationTypes.RED_X,
+				Component.translatable("filled_map.fmab.laboratory_5"));
+		if (!map.isEmpty() && Gifts.give(player, "lab5_map", map)) {
+			player.sendSystemMessage(Component.translatable("exam.fmab.mission"));
 		}
 		player.sendSystemMessage(Component.translatable("exam.fmab.passed",
 				Component.translatable(Rank.STATE.translationKey())));

@@ -1,0 +1,46 @@
+{
+  "criteria": {
+    "tick": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "requirements": [
+    [
+      "tick"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "fmab:alchemical_ink",
+      "fmab:alchemical_paint",
+      "fmab:alchemical_thread",
+      "fmab:alchemist_chisel",
+      "fmab:alchemist_table",
+      "fmab:alchemy_treatise",
+      "fmab:amestrian_bricks",
+      "fmab:automail_bench",
+      "fmab:briggs_automail_arm",
+      "fmab:briggs_automail_leg",
+      "fmab:briggs_packed_snow",
+      "fmab:cartridge",
+      "fmab:chalk",
+      "fmab:circle_notebook",
+      "fmab:cloth_gloves",
+      "fmab:cloth_gloves_dyed",
+      "fmab:iron_automail_arm",
+      "fmab:iron_automail_leg",
+      "fmab:iron_gauntlets",
+      "fmab:leather_gloves",
+      "fmab:leather_gloves_dyed",
+      "fmab:philosopher_stone",
+      "fmab:pistol",
+      "fmab:rifle",
+      "fmab:rush_valley_automail_arm",
+      "fmab:rush_valley_automail_leg",
+      "fmab:spark_gloves",
+      "fmab:state_gloves",
+      "fmab:throwing_knife",
+      "fmab:xing_bricks"
+    ]
+  }
+}

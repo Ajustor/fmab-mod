@@ -41,13 +41,13 @@ import java.util.Map;
 public final class Blueprints {
 	/** Rayon de Central, du centre à l'extérieur de la muraille. */
 	public static final int CITY_RADIUS = 74;
-	private static final int WALL_INNER = 68;
+	static final int WALL_INNER = 68;
 	private static final int WALL_OUTER = 71;
 	private static final int WALL_HEIGHT = 10;
 	private static final int TOWER_HEIGHT = 14;
-	private static final int AVENUE = 3;
-	private static final int RING_INNER = 46;
-	private static final int RING_OUTER = 51;
+	static final int AVENUE = 3;
+	static final int RING_INNER = 46;
+	static final int RING_OUTER = 51;
 	public static final int PLAZA = 14;
 
 	/**
@@ -321,7 +321,7 @@ public final class Blueprints {
 		public List<Spawn> spawns(Plot p) {
 			// L'examinateur attend dans la cour, face au portail ; la garde se tient au portail et dans la cour.
 			int sx = p.sizeX(), sz = p.sizeZ();
-			return List.of(new Spawn(FmabEntities.STATE_EXAMINER, new BlockPos(sx / 2, 0, 9)),
+			return List.of(new Spawn(FmabEntities.STATE_EXAMINER, new BlockPos(sx / 2, 0, sz - 8)),
 					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(sx / 2 - 2, 0, 2)),
 					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(sx / 2 + 2, 0, 2)),
 					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(8, 0, sz - 9)),
@@ -379,6 +379,9 @@ public final class Blueprints {
 				return pal.corner();
 			}
 			if (y % 4 == 0 && y > 0) {
+				if (h == 8 && y == 4 && x == sx - 2 && z == 1) {
+					return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.WEST);
+				}
 				return xEdge || zEdge ? pal.corner() : pal.floor();
 			}
 			if (xEdge || zEdge) {
@@ -392,6 +395,10 @@ public final class Blueprints {
 			}
 			if (y == 0) {
 				return pal.floor();
+			}
+			// Une échelle dans le coin, près de la porte, jusqu'à l'étage.
+			if (h == 8 && x == sx - 2 && z == 1 && y <= 4) {
+				return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.WEST);
 			}
 			return AIR;
 		}
@@ -725,8 +732,8 @@ public final class Blueprints {
 			if (y == 2 && z == 2 && x % 4 == 2 && x != p.sizeX() / 2) {
 				return b(Blocks.DARK_OAK_PRESSURE_PLATE);
 			}
-			if (y == 3 && x == sx / 2 && z == sz / 2) {
-				return b(Blocks.LANTERN).setValue(LanternBlock.HANGING, true);
+			if (y == 1 && x == 1 && z == 1) {
+				return b(Blocks.LANTERN);
 			}
 			return shell;
 		}
@@ -755,8 +762,13 @@ public final class Blueprints {
 			BlockState shell = house(x, y, z, p, CITY_PALETTES[0]);
 			int sx = p.sizeX(), sz = p.sizeZ();
 			boolean inside = x > 0 && x < sx - 1 && z > 0 && z < sz - 1;
-			if (inside && (y == 3 || y == 7) && x % 5 == 2 && z % 4 == 2) {
-				return b(Blocks.LANTERN).setValue(LanternBlock.HANGING, true);
+			if (inside && x % 5 == 2 && z % 4 == 2) {
+				if (y == 3) {
+					return b(Blocks.LANTERN).setValue(LanternBlock.HANGING, true);
+				}
+				if (y == 5) {
+					return b(Blocks.LANTERN);
+				}
 			}
 			if (inside && y == 1 && z == sz - 2 && x % 3 == 1) {
 				return b(Blocks.BOOKSHELF);
@@ -809,7 +821,7 @@ public final class Blueprints {
 			if (x == shaftX && z == SHAFT_Z && y == CEILING) {
 				return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.NORTH);
 			}
-			if (x == shaftX && z == SHAFT_Z) {
+			if (x == shaftX && z == SHAFT_Z && y > FLOOR) {
 				return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.NORTH);
 			}
 			if (x == shaftX && z == SHAFT_Z + 1) {
@@ -1498,6 +1510,8 @@ public final class Blueprints {
 			if (x < x0 || x > x1 || z < z0 || z > z1 || y > 13) {
 				return null;
 			}
+			// Le plan est dessiné façade au nord ; on le retourne pour qu'elle regarde la place.
+			z = z0 + z1 - z;
 			boolean wall = x == x0 || x == x1 || z == z1;
 			if (y <= 7) {
 				if (z == z0) {
@@ -1536,7 +1550,7 @@ public final class Blueprints {
 		@Override
 		public List<Chest> chests(Plot p) {
 			int c = p.sizeX() / 2;
-			return List.of(new Chest(new BlockPos(c + 4, 1, 9), Liore::offerings));
+			return List.of(new Chest(new BlockPos(c + 4, 1, 3), Liore::offerings));
 		}
 
 		private static List<ItemStack> offerings(Plot p) {
@@ -1552,7 +1566,7 @@ public final class Blueprints {
 		@Override
 		public List<Spawn> spawns(Plot p) {
 			int c = p.sizeX() / 2;
-			return List.of(new Spawn(FmabEntities.CORNELLO, new BlockPos(c, 1, 7)));
+			return List.of(new Spawn(FmabEntities.CORNELLO, new BlockPos(c, 1, 5)));
 		}
 	}
 
@@ -1781,6 +1795,9 @@ public final class Blueprints {
 				return fence(x, z, sx, sz);
 			}
 			return center ? AIR : b(Blocks.WHEAT).setValue(CropBlock.AGE, 3 + p.noise(x, 0, z, 5));
+		}
+		if (y < -1) {
+			return b(Blocks.DIRT);
 		}
 		return y <= 2 ? AIR : null;
 	}

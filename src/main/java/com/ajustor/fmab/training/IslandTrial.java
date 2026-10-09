@@ -17,8 +17,8 @@ import net.minecraft.world.level.levelgen.structure.Structure;
  */
 public final class IslandTrial {
 	public static final ResourceKey<Structure> YOCK = ResourceKey.create(Registries.STRUCTURE, Fmab.id("yock_island"));
-	/** Un jour de Minecraft, en ticks. */
-	public static final int DAY = 24000;
+	/** Dix minutes d'affilée sur l'île, en ticks (une demi-journée). */
+	public static final int DAY = 12000;
 	private static final int PERIOD = 100;
 
 	private IslandTrial() {

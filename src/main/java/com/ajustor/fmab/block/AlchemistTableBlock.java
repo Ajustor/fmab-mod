@@ -7,10 +7,12 @@ import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabTags;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -117,6 +119,21 @@ public class AlchemistTableBlock extends Block {
 	 * (une âme n'en a plus : il lui faut de l'encre). Posé sur un porte-armure, au-dessus d'un cercle
 	 * d'âme, il pourra accueillir l'âme de son propriétaire.
 	 */
+	/**
+	 * Accroupi, un plastron à la main, sur la table : on y trace son sceau. Le jeu saute le bloc quand
+	 * on est accroupi avec un objet ; on passe donc par l'événement d'utilisation, qui vient avant.
+	 */
+	public static void registerSealing() {
+		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+			ItemStack stack = player.getItemInHand(hand);
+			if (!player.isShiftKeyDown() || !stack.is(ItemTags.CHEST_ARMOR) || stack.is(FmabItems.SOUL_CHESTPLATE)
+					|| !level.getBlockState(hit.getBlockPos()).is(FmabBlocks.ALCHEMIST_TABLE)) {
+				return InteractionResult.PASS;
+			}
+			return seal(stack, level, hit.getBlockPos(), player);
+		});
+	}
+
 	private static InteractionResult seal(ItemStack stack, Level level, BlockPos pos, Player player) {
 		if (level.isClientSide()) {
 			return InteractionResult.SUCCESS;

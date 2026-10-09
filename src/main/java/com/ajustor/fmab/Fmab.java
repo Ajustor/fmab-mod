@@ -1,6 +1,8 @@
 package com.ajustor.fmab;
 
 import com.ajustor.fmab.arts.ScarArm;
+import com.ajustor.fmab.block.AlchemistTableBlock;
+import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.GateOfTruth;
@@ -87,6 +89,7 @@ public class Fmab implements ModInitializer {
 		LivingStone.register();
 		Alkahestry.register();
 		Milestones.register();
+		AlchemistTableBlock.registerSealing();
 		ScarArm.register();
 		IslandTrial.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> equip(handler.getPlayer()));
@@ -112,6 +115,12 @@ public class Fmab implements ModInitializer {
 			return;
 		}
 		player.setAttached(FmabAttachments.EQUIPPED, true);
+		// Les rudiments sont acquis : les cercles du carnet de départ ne rebondissent pas pour un rien.
+		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		for (String glyph : Tomes.RUDIMENTS.glyphs()) {
+			data = data.learn(glyph);
+		}
+		player.setAttached(FmabAttachments.ALCHEMIST, data);
 		for (ItemStack stack : new ItemStack[]{new ItemStack(FmabItems.ALCHEMY_TREATISE),
 				Tomes.stack(Tomes.RUDIMENTS), starterNotebook(player), new ItemStack(FmabItems.CHALK)}) {
 			if (!player.getInventory().add(stack)) {

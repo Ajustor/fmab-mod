@@ -1,16 +1,21 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.data.Gifts;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.Karma;
+import com.ajustor.fmab.world.Maps;
 import com.ajustor.fmab.xing.Alkahestry;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,12 +26,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 
 /**
  * May Chang, alkahestriste du clan Chang, dans son pavillon de Xing. Elle se méfie de qui sent le
@@ -57,6 +64,7 @@ public class MayChangEntity extends PathfinderMob {
 	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
+		goalSelector.addGoal(4, new MoveTowardsRestrictionGoal(this, 0.6));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5));
 		goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8));
 		goalSelector.addGoal(7, new RandomLookAroundGoal(this));
@@ -75,6 +83,13 @@ public class MayChangEntity extends PathfinderMob {
 			p.setAttached(FmabAttachments.ALKAHESTRY, true);
 			give(p, new ItemStack(FmabItems.KUNAI, TEACHING_KUNAI));
 			p.sendSystemMessage(Component.translatable("npc.fmab.may.teaches"));
+			// Elle parle aussi du Nord, de Briggs, où l'alchimie d'Amestris tient bon.
+			ItemStack map = Maps.toStructure(level, blockPosition(),
+					TagKey.create(Registries.STRUCTURE, Fmab.id("on_fort_briggs_maps")), MapDecorationTypes.RED_X,
+					Component.translatable("filled_map.fmab.fort_briggs"));
+			if (!map.isEmpty() && Gifts.give(p, "briggs_map", map)) {
+				p.sendSystemMessage(Component.translatable("npc.fmab.may.briggs_map"));
+			}
 			level.playSound(null, blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.NEUTRAL, 1.5f, 1.2f);
 			return InteractionResult.SUCCESS;
 		}
@@ -107,6 +122,15 @@ public class MayChangEntity extends PathfinderMob {
 	public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
 		return (source.isCreativePlayer() || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
 				&& super.hurtServer(level, source, damage);
+	}
+
+	@Override
+	protected void customServerAiStep(ServerLevel level) {
+		super.customServerAiStep(level);
+		// Il ne quitte pas son lieu.
+		if (!hasHome()) {
+			setHomeTo(blockPosition(), 10);
+		}
 	}
 
 	@Override
