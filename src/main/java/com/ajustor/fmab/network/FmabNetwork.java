@@ -10,6 +10,7 @@ import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.gate.Automails;
+import com.ajustor.fmab.gate.BodyMenu;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Rebirth;
 import com.ajustor.fmab.gate.SoulBinding;
@@ -48,12 +49,15 @@ public final class FmabNetwork {
 		PayloadTypeRegistry.serverboundPlay().register(TattooPayload.TYPE, TattooPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(AddToNotebookPayload.TYPE, AddToNotebookPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(SelectCirclePayload.TYPE, SelectCirclePayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(OpenBodyPayload.TYPE, OpenBodyPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenTattooPayload.TYPE, OpenTattooPayload.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
 				(payload, context) -> Notebooks.set(context.player(), payload.contents()));
 		ServerPlayNetworking.registerGlobalReceiver(SelectCirclePayload.TYPE,
 				(payload, context) -> selectCircle(context.player(), payload));
+		ServerPlayNetworking.registerGlobalReceiver(OpenBodyPayload.TYPE,
+				(payload, context) -> BodyMenu.open(context.player()));
 		ServerPlayNetworking.registerGlobalReceiver(CastGlovesPayload.TYPE,
 				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
 		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,

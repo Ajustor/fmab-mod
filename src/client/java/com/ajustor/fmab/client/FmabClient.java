@@ -31,9 +31,11 @@ import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.render.TruthRenderer;
 import com.ajustor.fmab.client.render.WinryRenderer;
 import com.ajustor.fmab.client.render.WrathRenderer;
+import com.ajustor.fmab.client.screen.BodyScreen;
 import com.ajustor.fmab.client.screen.CircleWheelScreen;
 import com.ajustor.fmab.client.screen.ExamScreen;
 import com.ajustor.fmab.client.screen.GlovesScreen;
+import com.ajustor.fmab.client.screen.InventoryTabs;
 import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TattooScreen;
@@ -57,6 +59,7 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.registry.FmabMenus;
 import com.ajustor.fmab.stone.Eclipse;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
@@ -73,6 +76,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
@@ -174,6 +178,8 @@ public class FmabClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(OpenIzumiPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new IzumiScreen(payload)));
 		BlockEntityRendererRegistry.register(FmabBlockEntities.TRANSMUTATION_CIRCLE, TransmutationCircleRenderer::new);
+		MenuScreens.register(FmabMenus.BODY, BodyScreen::new);
+		InventoryTabs.register();
 		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("concentration"),
 				(graphics, delta) -> concentrationBar(graphics));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("lost_sight"),

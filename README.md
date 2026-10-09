@@ -148,8 +148,10 @@ joueur compose lui-même :
   **carnet** n'est plus un objet : l'alchimiste le garde en tête (touche N, gardé à la mort). La
   **roue des cercles** (R maintenue) change de cercle d'un geste, et un clic y joint aussitôt les
   mains pour qui a vu la Porte ; accroupi, main vide, un clic droit sur un cercle inconnu le recopie
-  dans le carnet. Un panneau en haut à gauche montre le cercle sélectionné et, dès qu'un péage est
-  payé, une silhouette du corps (automails et leur usure, membres manquants). Le cercle de la
+  dans le carnet. Le cercle sélectionné s'affiche en haut à gauche quand on peut s'en servir (Porte
+  vue, craie, peinture ou burin en main). Un onglet **Corps** de l'inventaire montre les membres,
+  leurs automails (et leur usure), les organes, la vue et les gants : on y branche un automail sur un
+  membre perdu et on y enfile ses gants ; Winry seule retire un automail. Le cercle de la
   transmutation humaine ne figure plus dans le Traité : de très
   rares **Notes sur la transmutation humaine** le donnent (Laboratoire 5, ruines de Xerxès,
   bibliothèques des forts, cités antiques).
@@ -247,8 +249,10 @@ Destruction, Medicine and Life, circle triggers and two-alchemist fusion, cinema
 the sky and the mod's own sounds round it out. The notebook is no longer an item: it opens with a key
 (N) and survives death; the circle wheel (hold R) switches circles in one gesture and, for Gate
 initiates, a click on it joins the hands at once; crouching empty-handed and right-clicking an unknown
-circle copies it into the notebook. A panel at the top left shows the selected circle and, once a
-toll is paid, a body silhouette (automail and its wear, missing limbs). The human transmutation
+circle copies it into the notebook. The selected circle shows at the top left when it can be used
+(Gate seen, or chalk, paint or chisel in hand). A Body tab on the inventory shows limbs, automail and
+its wear, organs, sight and gloves: automail is fitted there on a lost limb and gloves are put on;
+only Winry removes automail. The human transmutation
 circle is no longer in the Treatise:
 very rare Notes on Human Transmutation hand it out.
 

@@ -21,6 +21,7 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabLoot;
+import com.ajustor.fmab.registry.FmabMenus;
 import com.ajustor.fmab.registry.FmabRegistries;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.Eclipse;
@@ -65,6 +66,7 @@ public class Fmab implements ModInitializer {
 		FmabEntities.register();
 		FmabStructures.register();
 		FmabItems.register();
+		FmabMenus.register();
 		FmabLoot.register();
 		FmabNetwork.register();
 		FmabCommands.register();

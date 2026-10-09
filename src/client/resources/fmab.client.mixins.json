@@ -4,6 +4,7 @@
 	"package": "com.ajustor.fmab.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"AbstractContainerScreenAccessor",
 		"AvatarRenderStateMixin",
 		"AvatarRendererMixin",
 		"ClientLevelMixin",
