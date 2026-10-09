@@ -37,6 +37,9 @@ public class RushValleyStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
+		if (Clearance.nearCentral(context)) {
+			return Optional.empty();
+		}
 		int cx = context.chunkPos().getMiddleBlockX();
 		int cz = context.chunkPos().getMiddleBlockZ();
 		int y = height(context, cx, cz);

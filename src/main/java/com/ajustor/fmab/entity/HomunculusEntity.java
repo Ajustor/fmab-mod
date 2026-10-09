@@ -50,7 +50,10 @@ public abstract class HomunculusEntity extends Monster {
 		setPersistenceRequired();
 	}
 
-	/** La barre de boss se montre-t-elle ? Un homonculus déguisé ne s'annonce pas. */
+	/**
+	 * La barre de boss peut-elle se montrer, une fois le combat engagé ({@link BossBars#engaged}) ?
+	 * Un homonculus déguisé ne s'annonce pas.
+	 */
 	protected boolean showBossBar() {
 		return true;
 	}
@@ -138,8 +141,7 @@ public abstract class HomunculusEntity extends Monster {
 						getBbWidth() * 0.5, getBbHeight() * 0.5, getBbWidth() * 0.5, 0.05);
 			}
 		}
-		bossEvent.setProgress(getHealth() / getMaxHealth());
-		bossEvent.setVisible(showBossBar());
+		BossBars.update(bossEvent, this, showBossBar() && BossBars.engaged(this));
 	}
 
 	@Override
@@ -171,12 +173,6 @@ public abstract class HomunculusEntity extends Monster {
 				p.setAttached(FmabAttachments.SLAIN, Set.copyOf(seen));
 			}
 		}
-	}
-
-	@Override
-	public void startSeenByPlayer(ServerPlayer player) {
-		super.startSeenByPlayer(player);
-		bossEvent.addPlayer(player);
 	}
 
 	@Override

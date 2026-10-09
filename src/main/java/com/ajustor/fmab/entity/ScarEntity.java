@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
@@ -145,14 +144,7 @@ public class ScarEntity extends PathfinderMob {
 	@Override
 	public void aiStep() {
 		super.aiStep();
-		bossEvent.setProgress(getHealth() / getMaxHealth());
-		bossEvent.setVisible(getTarget() instanceof Player);
-	}
-
-	@Override
-	public void startSeenByPlayer(ServerPlayer player) {
-		super.startSeenByPlayer(player);
-		bossEvent.addPlayer(player);
+		BossBars.update(bossEvent, this, BossBars.engaged(this));
 	}
 
 	@Override

@@ -8,10 +8,12 @@ import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
@@ -25,6 +27,8 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BedPart;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.SlabType;
 
@@ -32,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntFunction;
 
 /**
  * Les plans des structures du mod, par sorte. Central : terrassement, muraille, voirie, fontaine,
@@ -62,14 +67,14 @@ public final class Blueprints {
 		}
 		Map<String, Blueprint> out = new HashMap<>();
 		out.put("central_ground", Blueprints::cityGround);
-		out.put("central_walls", Blueprints::cityWalls);
+		out.put("central_walls", new CityWalls());
 		out.put("central_roads", Blueprints::cityRoads);
 		out.put("central_fountain", Blueprints::fountain);
-		out.put("central_house", (x, y, z, p) -> house(x, y, z, p, CITY_PALETTES[p.variant(CITY_PALETTES.length)]));
+		out.put("central_house", new Home(CITY_PALETTES, true));
 		out.put("central_library", Blueprints::library);
 		out.put("central_hq", new Headquarters());
-		out.put("resembool_house", (x, y, z, p) -> house(x, y, z, p, RURAL_PALETTES[p.variant(RURAL_PALETTES.length)]));
-		out.put("rockbell_house", Blueprints::rockbell);
+		out.put("resembool_house", new Home(RURAL_PALETTES, false));
+		out.put("rockbell_house", new RockbellHouse());
 		out.put("resembool_field", Blueprints::field);
 		out.put("elric_house", new ElricHouse());
 		out.put("rush_valley_workshop", new Workshop(false));
@@ -85,7 +90,7 @@ public final class Blueprints {
 		out.put("blood_crest", Blueprints::bloodCrest);
 		out.put("liore", new Liore());
 		out.put("dublith_square", Blueprints::dublithSquare);
-		out.put("dublith_house", (x, y, z, p) -> house(x, y, z, p, DUBLITH_PALETTES[p.variant(DUBLITH_PALETTES.length)]));
+		out.put("dublith_house", new Home(DUBLITH_PALETTES, true));
 		out.put("curtis_butcher", new CurtisButcher());
 		out.put("marcoh_clinic", new MarcohClinic());
 		out.put("ishval_ruins", new IshvalRuins());
@@ -362,14 +367,19 @@ public final class Blueprints {
 		return 4 * floors + (depth + 1) / 2 + 1;
 	}
 
+	/** Hauteur des murs d'une maison : 4 pour un étage, 8 pour deux. */
+	private static int wallHeight(Blueprint.Plot p) {
+		// La pièce mesure les murs, plus le toit ((sz + 1) / 2 rangées) et une marge.
+		return p.sizeY() - (p.sizeZ() + 1) / 2 - 1 <= 4 ? 4 : 8;
+	}
+
 	/**
 	 * Une maison : fondations, murs à pans, fenêtres, porte au milieu de la façade (z = 0), toit à
 	 * deux pans le long de x.
 	 */
 	private static BlockState house(int x, int y, int z, Blueprint.Plot p, Palette pal) {
 		int sx = p.sizeX(), sz = p.sizeZ();
-		// La pièce mesure les murs, plus le toit ((sz + 1) / 2 rangées) et une marge.
-		int h = p.sizeY() - (sz + 1) / 2 - 1 <= 4 ? 4 : 8;
+		int h = wallHeight(p);
 		if (y < 0) {
 			return pal.foundation();
 		}
@@ -422,7 +432,175 @@ public final class Blueprints {
 		return null;
 	}
 
-	/** Maison des Rockbell : une ferme, avec l'atelier d'automail au rez-de-chaussée. */
+	// ---- Habitations meublées et habitants -------------------------------------------------------------
+
+	/**
+	 * Une maison habitée : la coque de {@link #house}, ses meubles ({@link #furnish}) et ses
+	 * habitants, un villageois par étage. Le poste de travail du rez-de-chaussée leur donne un métier.
+	 */
+	private static final class Home implements Blueprint {
+		private final Palette[] palettes;
+		private final boolean town;
+
+		Home(Palette[] palettes, boolean town) {
+			this.palettes = palettes;
+			this.town = town;
+		}
+
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			BlockState shell = house(x, y, z, p, palettes[p.variant(palettes.length)]);
+			if (shell != AIR) {
+				return shell;
+			}
+			BlockState furniture = furnish(x, y, z, p, town);
+			return furniture != null ? furniture : shell;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			int cx = p.sizeX() / 2, cz = p.sizeZ() / 2;
+			return wallHeight(p) == 8
+					? List.of(new Spawn(EntityTypes.VILLAGER, new BlockPos(cx, 1, cz)),
+							new Spawn(EntityTypes.VILLAGER, new BlockPos(cx, 1, cz - 1)))
+					: List.of(new Spawn(EntityTypes.VILLAGER, new BlockPos(cx, 1, cz)));
+		}
+	}
+
+	/**
+	 * Les meubles d'une maison, ou null. En bas : la table et sa chaise, le fourneau, le poste de
+	 * travail au fond à droite ; le lit aussi dans une maison basse. À l'étage : deux lits, une
+	 * bibliothèque, un tapis. Une lanterne par étage, pour qu'aucun monstre n'y naisse. L'axe de la
+	 * porte et le pied de l'échelle restent libres.
+	 *
+	 * @param town meubles de ville (sinon de campagne) : bois, couleurs, métiers
+	 */
+	private static BlockState furnish(int x, int y, int z, Blueprint.Plot p, boolean town) {
+		int sx = p.sizeX(), sz = p.sizeZ();
+		int back = sz - 2, right = sx - 2;
+		boolean twoStoreys = wallHeight(p) == 8;
+		if (x < 1 || x > right || z < 1 || z > back) {
+			return null;
+		}
+		if (y >= 1 && y <= 3) {
+			int dy = y - 1;
+			if (dy == 0 && z == back) {
+				if (x == right) {
+					return workstation(p, town);
+				}
+				if (x == right - 1 && x != sx / 2) {
+					return b(Blocks.FURNACE).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH);
+				}
+				if (!twoStoreys && x <= 2) {
+					return bed(x == 1, p, town);
+				}
+				if (twoStoreys && x == 1) {
+					return b(Blocks.BARREL);
+				}
+				if (twoStoreys && x == 2) {
+					return b(Blocks.CRAFTING_TABLE);
+				}
+			}
+			// La table, et sa lanterne dans une maison basse (l'étage la suspend au plafond).
+			if (x == 1 && z == 2) {
+				if (dy == 0) {
+					return b(town ? Blocks.DARK_OAK_FENCE : Blocks.SPRUCE_FENCE);
+				}
+				if (dy == 1) {
+					return twoStoreys ? b(town ? Blocks.DARK_OAK_PRESSURE_PLATE : Blocks.SPRUCE_PRESSURE_PLATE)
+							: b(Blocks.LANTERN);
+				}
+			}
+			if (x == 2 && z == 2 && dy == 0) {
+				return stairs(town ? Blocks.DARK_OAK_STAIRS : Blocks.SPRUCE_STAIRS, Direction.EAST);
+			}
+			if (twoStoreys && dy == 2 && x == sx / 2 && z == sz / 2) {
+				return b(Blocks.LANTERN).setValue(LanternBlock.HANGING, true);
+			}
+			return null;
+		}
+		if (twoStoreys && y >= 5 && y <= 7) {
+			int dy = y - 5;
+			if (dy == 0 && x <= 2 && (z == back || z == back - 1)) {
+				return bed(x == 1, p, town);
+			}
+			if (x == right && z == back) {
+				return dy == 0 ? b(Blocks.BOOKSHELF) : dy == 1 ? b(Blocks.LANTERN) : null;
+			}
+			if (dy == 0 && (x == sx / 2 || x == sx / 2 - 1) && (z == sz / 2 || z == sz / 2 - 1)) {
+				return b(Blocks.CARPET.pick(colour(p, town, 10)));
+			}
+		}
+		return null;
+	}
+
+	/** Un lit couché le long de x, tête à l'ouest (contre le mur). */
+	private static BlockState bed(boolean head, Blueprint.Plot p, boolean town) {
+		return b(Blocks.BED.pick(colour(p, town, 9))).setValue(BedBlock.FACING, Direction.WEST)
+				.setValue(BedBlock.PART, head ? BedPart.HEAD : BedPart.FOOT);
+	}
+
+	private static DyeColor colour(Blueprint.Plot p, boolean town, int salt) {
+		DyeColor[] colours = town
+				? new DyeColor[]{DyeColor.WHITE, DyeColor.LIGHT_GRAY, DyeColor.BLUE, DyeColor.RED}
+				: new DyeColor[]{DyeColor.RED, DyeColor.YELLOW, DyeColor.GREEN, DyeColor.BROWN};
+		return colours[p.noise(salt, 0, 0, colours.length)];
+	}
+
+	/**
+	 * Le poste de travail qui donne son métier à l'habitant : bibliothécaire, cartographe (il vend
+	 * les cartes des lieux du mod), forgerons... à la ville ; fermiers, bouchers, bergers à la
+	 * campagne.
+	 */
+	private static BlockState workstation(Blueprint.Plot p, boolean town) {
+		Block[] jobs = town
+				? new Block[]{Blocks.LECTERN, Blocks.CARTOGRAPHY_TABLE, Blocks.BREWING_STAND, Blocks.SMITHING_TABLE,
+						Blocks.LOOM, Blocks.STONECUTTER, Blocks.FLETCHING_TABLE, Blocks.BLAST_FURNACE, Blocks.CARTOGRAPHY_TABLE}
+				: new Block[]{Blocks.COMPOSTER, Blocks.COMPOSTER, Blocks.SMOKER, Blocks.LOOM, Blocks.FLETCHING_TABLE,
+						Blocks.CARTOGRAPHY_TABLE, Blocks.BARREL};
+		BlockState state = b(jobs[p.noise(8, 0, 0, jobs.length)]);
+		return state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
+				? state.setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH) : state;
+	}
+
+	/** La muraille de Central, et un garde à chaque porte, côté ville. */
+	private static final class CityWalls implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			return cityWalls(x, y, z, p);
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			int c = p.sizeX() / 2, in = WALL_INNER - 4;
+			return List.of(new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(c + 2, 0, c - in)),
+					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(c - 2, 0, c + in)),
+					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(c + in, 0, c + 2)),
+					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(c - in, 0, c - 2)));
+		}
+	}
+
+	/**
+	 * Maison des Rockbell : une ferme, avec l'atelier d'automail au rez-de-chaussée et les chambres à
+	 * l'étage. Un habitant de Resembool y vit.
+	 */
+	private static final class RockbellHouse implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			BlockState shell = rockbell(x, y, z, p);
+			if (shell == AIR && y > 4) {
+				BlockState furniture = furnish(x, y, z, p, false);
+				return furniture != null ? furniture : shell;
+			}
+			return shell;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			return List.of(new Spawn(EntityTypes.VILLAGER, new BlockPos(p.sizeX() / 2, 1, 2)));
+		}
+	}
+
 	private static BlockState rockbell(int x, int y, int z, Blueprint.Plot p) {
 		BlockState shell = house(x, y, z, p, RURAL_PALETTES[0]);
 		int sx = p.sizeX(), sz = p.sizeZ();
@@ -526,8 +704,9 @@ public final class Blueprints {
 
 		@Override
 		public List<Spawn> spawns(Plot p) {
-			return winry ? List.of(new Spawn(FmabEntities.WINRY, new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2)))
-					: List.of();
+			Spawn resident = new Spawn(winry ? FmabEntities.WINRY : EntityTypes.VILLAGER,
+					new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2));
+			return List.of(resident);
 		}
 	}
 
@@ -1479,6 +1658,31 @@ public final class Blueprints {
 	 * rouge ; sur le parvis, le point de sang de l'émeute.
 	 */
 	static final class Liore implements Blueprint {
+		/** Coins des maisons basses (7 sur 7), selon la taille de la parcelle. */
+		private static final IntFunction<int[][]> HOUSES = s -> new int[][]{{2, 4}, {s - 9, 4}, {2, s - 9}, {s - 9, s - 9}};
+
+		/**
+		 * L'intérieur d'une maison de Liore (coordonnées dans la maison, 1 à 5) : un tonneau et sa
+		 * lanterne près de la porte, un lit au fond à gauche, un poste de travail au fond à droite.
+		 */
+		private static BlockState lioreFurniture(int x, int y, int z, int job) {
+			if (x == 1 && z == 1) {
+				return y == 1 ? b(Blocks.BARREL) : y == 2 ? b(Blocks.LANTERN) : AIR;
+			}
+			if (y == 1 && z == 5 && x <= 2) {
+				return b(Blocks.BED.pick(DyeColor.ORANGE)).setValue(BedBlock.FACING, Direction.WEST)
+						.setValue(BedBlock.PART, x == 1 ? BedPart.HEAD : BedPart.FOOT);
+			}
+			if (y == 1 && z == 5 && x == 5) {
+				Block[] jobs = {Blocks.COMPOSTER, Blocks.CARTOGRAPHY_TABLE, Blocks.SMOKER, Blocks.LOOM,
+						Blocks.BREWING_STAND, Blocks.FLETCHING_TABLE};
+				BlockState state = b(jobs[job]);
+				return state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
+						? state.setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH) : state;
+			}
+			return AIR;
+		}
+
 		@Override
 		public BlockState at(int x, int y, int z, Plot p) {
 			int s = p.sizeX(), c = s / 2;
@@ -1493,14 +1697,14 @@ public final class Blueprints {
 				return temple;
 			}
 			// Des maisons basses de part et d'autre du temple, et aux coins sud.
-			for (int[] h : new int[][]{{2, 4}, {s - 9, 4}, {2, s - 9}, {s - 9, s - 9}}) {
+			for (int[] h : HOUSES.apply(s)) {
 				if (x >= h[0] && x < h[0] + 7 && z >= h[1] && z < h[1] + 7 && y <= 5) {
 					boolean edge = x == h[0] || x == h[0] + 6 || z == h[1] || z == h[1] + 6;
 					if (y == 5) {
 						return b(Blocks.SMOOTH_SANDSTONE_SLAB);
 					}
 					if (!edge) {
-						return y == 1 && x == h[0] + 1 && z == h[1] + 1 ? b(Blocks.BARREL) : AIR;
+						return lioreFurniture(x - h[0], y, z - h[1], p.noise(h[0], 0, h[1], 6));
 					}
 					boolean door = z == h[1] && x == h[0] + 3 && y <= 2;
 					boolean window = y == 3 && (x == h[0] + 3 || z == h[1] + 3);
@@ -1575,7 +1779,13 @@ public final class Blueprints {
 		@Override
 		public List<Spawn> spawns(Plot p) {
 			int c = p.sizeX() / 2;
-			return List.of(new Spawn(FmabEntities.CORNELLO, new BlockPos(c, 1, 5)));
+			int s = p.sizeX();
+			List<Spawn> out = new ArrayList<>();
+			out.add(new Spawn(FmabEntities.CORNELLO, new BlockPos(c, 1, 5)));
+			for (int[] h : HOUSES.apply(s)) {
+				out.add(new Spawn(EntityTypes.VILLAGER, new BlockPos(h[0] + 3, 1, h[1] + 3)));
+			}
+			return out;
 		}
 	}
 

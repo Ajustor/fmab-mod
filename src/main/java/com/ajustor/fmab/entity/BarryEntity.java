@@ -14,7 +14,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -63,14 +62,7 @@ public class BarryEntity extends HauntedArmorEntity {
 	@Override
 	public void aiStep() {
 		super.aiStep();
-		bossEvent.setProgress(getHealth() / getMaxHealth());
-		bossEvent.setVisible(getTarget() instanceof Player || collapsed());
-	}
-
-	@Override
-	public void startSeenByPlayer(ServerPlayer player) {
-		super.startSeenByPlayer(player);
-		bossEvent.addPlayer(player);
+		BossBars.update(bossEvent, this, BossBars.engaged(this) || collapsed());
 	}
 
 	@Override

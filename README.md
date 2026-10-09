@@ -133,9 +133,14 @@ joueur compose lui-même :
   l'éclipse ne devienne le Jour promis).
 - **Lieux** : **Dublith** et la boucherie d'Izumi (elle donne la carte de l'île de Yock), **Liore** et
   Cornello, les ruines d'**Ishval** (Scar) et de **Xerxès** (fresques, Hohenheim), l'**île de Yock**,
-  le dispensaire du docteur **Marcoh** (il déchiffre ses notes de recherche).
+  le dispensaire du docteur **Marcoh** (il déchiffre ses notes de recherche). Les villes sont
+  **habitées** : des villageois dans les maisons de Central, Resembool, Dublith, Liore et dans les
+  ateliers de Rush Valley (leur métier vient du poste de travail de la maison, cartographes
+  compris), des maisons **meublées** (lits, table, fourneau, lanternes) et des gardes aux portes de
+  Central. Aucun lieu ne se pose dans Central.
 - **Créatures** : Barry le Boucher, armures habitées, soldats immortels, chimères, soldats
-  d'Amestris et de Briggs.
+  d'Amestris et de Briggs. Les barres de boss n'apparaissent qu'une fois le combat engagé, aux
+  joueurs présents.
 - **Styles de jeu** : bras de Scar, mines de Kimblee, pistolet et fusil, couteaux de Hughes, épée de
   Xing ; le glyphe **Or** (interdit par la loi d'État) ; les écoles de la Destruction, de la
   Médecine et de la Vie (chimères qui vous obéissent).
@@ -231,8 +236,10 @@ Amestrian alchemy around him. Xing's alkahestry (five kunai planted in a circle,
 Chang) still works there. Fort Briggs, Olivier Armstrong and her Briggs sabre hold the snowy north
 against Drachma's soldiers.
 An advancement tree, cartographer maps and the national circle's blood crests guide the way; Dublith
-(Izumi), Liore, the Ishval and Xerxes ruins, Yock Island and Marcoh's clinic fill the map; Barry,
-haunted armors, immortal soldiers and chimeras fill it with fights. New playstyles (Scar's arm,
+(Izumi), Liore, the Ishval and Xerxes ruins, Yock Island and Marcoh's clinic fill the map, and the
+towns are lived in (villagers whose trade comes from their house's workstation, furnished houses,
+guards at Central's gates); Barry, haunted armors, immortal soldiers and chimeras fill it with fights,
+and boss bars only show once a fight has begun. New playstyles (Scar's arm,
 Kimblee's mines, firearms, throwing knives, the Xing sword), the forbidden Gold glyph, the schools of
 Destruction, Medicine and Life, circle triggers and two-alchemist fusion, cinematics, an eclipse in
 the sky and the mod's own sounds round it out. The notebook is no longer an item: it opens with a key
