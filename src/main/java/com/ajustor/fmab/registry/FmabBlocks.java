@@ -2,6 +2,7 @@ package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.AlchemistTableBlock;
+import com.ajustor.fmab.block.AutomailBenchBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -29,6 +30,38 @@ public final class FmabBlocks {
 					.mapColor(MapColor.WOOD)
 					.strength(2.5f)
 					.sound(SoundType.WOOD));
+
+	/** Le sol de l'Espace blanc : blanc à perte de vue, incassable. */
+	public static final Block WHITE_FLOOR = register("white_floor", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.SNOW)
+					.strength(-1.0f, 3600000.0f)
+					.noLootTable()
+					.sound(SoundType.STONE));
+
+	/** La pierre sculptée de la Porte de la Vérité. */
+	public static final Block GATE_STONE = register("gate_stone", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.STONE)
+					.strength(-1.0f, 3600000.0f)
+					.noLootTable()
+					.sound(SoundType.STONE));
+
+	/** Ce qu'il y a derrière la Porte : du noir, et des yeux. */
+	public static final Block GATE_DARKNESS = register("gate_darkness", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.COLOR_BLACK)
+					.strength(-1.0f, 3600000.0f)
+					.noLootTable()
+					.sound(SoundType.SCULK));
+
+	/** Établi d'automail : on y pose un bras ou une jambe sur un membre perdu. */
+	public static final Block AUTOMAIL_BENCH = register("automail_bench", AutomailBenchBlock::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.METAL)
+					.strength(3.5f)
+					.requiresCorrectToolForDrops()
+					.sound(SoundType.ANVIL));
 
 	private FmabBlocks() {
 	}

@@ -55,9 +55,37 @@ joueur compose lui-même :
   bibliothèque, maisons), et le hameau de Resembool (maison des Rockbell, fermes, champs).
   `/locate structure fmab:central`.
 
-Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/glyph`), combinaisons
-(`data/<ns>/combination`), valeurs d'échange (`data/<ns>/exchange`), éléments visés (tags
-`fmab:element/*`), pages du Traité. Textes en français et en anglais.
+**v0.4 (Porte), en cours :**
+
+- **Savoir** : un glyphe qu'on ne comprend pas fonctionne, avec 25 % de risque de rebond chacun ; on
+  le comprend après cinq usages, ou en lisant un **tome d'alchimie** (Rudiments au départ, tomes
+  vendus par les bibliothécaires des villages, offerts par Izumi et l'examen d'État, notes de
+  Hohenheim à Resembool). Le Traité décrit sans enseigner. Le carnet pose au
+  **tampon** les glyphes compris.
+- **Transmutation humaine** : glyphe Humain et Recomposer, ingrédients d'un corps et sang de
+  l'alchimiste. Elle échoue toujours : une créature difforme naît du cercle, l'alchimiste est happé
+  dans l'**Espace blanc**, devant sa Porte et la Vérité.
+- **Péage** selon l'ambition : un bras (la main ne tient plus rien), une jambe (lent, sans course),
+  les organes (−4 cœurs, toux), la vue (voile sombre). La Vérité est une copie blanche de
+  l'alchimiste : ce qu'elle prend, elle le porte, avec sa peau.
+- **Corps entier** : la première fois, l'âme se réveille dans une armure de fer scellée de son sang
+  (sans faim ni souffle). Les coups usent les pièces, qu'on refait ; si le plastron cède, l'âme erre
+  devant la Porte jusqu'à ce qu'un **cercle d'âme** (Humain + Fixer) l'appelle dans une armure.
+  Chaque joueur a son propre **sceau de sang** (Traité, chapitre VIII) : on le trace dans un plastron
+  à l'encre alchimique ou de son sang, pour soi ou pour un ami. Une âme prévoyante prépare des
+  plastrons scellés sur des porte-armure au-dessus de cercles d'âme, et demande à sa Vérité de l'y
+  rappeler ; elle peut aussi changer d'armure, et se répare en y transmutant son matériau.
+- **Taille des cercles** : 1, 3, 5 ou 7 blocs, de plus en plus puissants et coûteux.
+- **Transmutation sans cercle** pour les Initiés de la Porte : Maj+G joint les mains et lance le
+  cercle sélectionné du carnet.
+- **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : établi d'automail, usure,
+  réparation chez **Winry**, dans la ville de **Rush Valley** (`/locate structure fmab:rush_valley`).
+  À Resembool, la maison des Elric garde les notes de Hohenheim.
+
+Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/fmab/glyph`), combinaisons
+(`data/<ns>/fmab/combination`), valeurs d'échange (`data/<ns>/fmab/exchange`), éléments visés (tags
+`fmab:element/*`), pages du Traité, Espace blanc (`data/fmab/dimension`). Textes en français et en
+anglais.
 
 ### Compiler
 
@@ -92,6 +120,15 @@ engraving), alchemist gloves cast with a key, Izumi's trials and sparring, and a
 against a stone golem bound to its circle, the State Alchemist's watch, embroidered garments and
 ritual tattoos bearing passive circles, and two generated places: the walled Central City and the
 hamlet of Resembool.
+
+**v0.4 (Gate), in progress:** glyphs you do not understand work with a risk of rebound and are
+learned through practice or alchemy tomes, and the notebook stamps the ones you know; human
+transmutation drags the alchemist into the White Space before their Gate and Truth, which takes a
+toll weighed by ambition (an arm, a leg, the organs, the sight), and Truth, a white copy of the
+alchemist, wears what it takes; losing the whole body seals the soul into an iron armor whose pieces
+wear out and can be remade, and a soul whose breastplate breaks wanders before the Gate until a soul
+circle calls it into another armor (prepared seals let it call itself back); Gate initiates transmute without a circle by joining their hands; automail
+(iron, Rush Valley, Briggs) replaces lost limbs and is repaired by Winry in the town of Rush Valley.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 

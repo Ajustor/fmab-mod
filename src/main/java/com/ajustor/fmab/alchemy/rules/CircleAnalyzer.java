@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -49,7 +50,13 @@ public final class CircleAnalyzer {
 
 	/** Problèmes qui empêchent toute réaction. */
 	private static final Set<Kind> INERT = EnumSet.of(Kind.NO_RING, Kind.NO_ACTION, Kind.NO_ELEMENT,
-			Kind.TOO_MANY_ACTIONS, Kind.RANK_TOO_LOW, Kind.GLYPH_NOT_LEARNED, Kind.KNOWLEDGE_MISSING);
+			Kind.TOO_MANY_ACTIONS, Kind.RANK_TOO_LOW, Kind.KNOWLEDGE_MISSING);
+	/**
+	 * Chaque glyphe tracé sans être compris ajoute ce risque de rebond : on peut recopier un cercle
+	 * qu'on ne comprend pas, à ses risques.
+	 */
+	public static final double UNLEARNED_RISK = 0.25;
+	public static final double MAX_UNLEARNED_RISK = 0.75;
 	/** Problèmes qui font rebondir le cercle, avec la gravité d'une combinaison inconnue. */
 	private static final Set<Kind> MISCOMPOSED = EnumSet.of(Kind.UNKNOWN_COMBINATION, Kind.CONFLICTING_LINKS,
 			Kind.FUSION_NEEDS_HEXAGRAM, Kind.SATELLITE_INCOMPLETE);
@@ -83,6 +90,7 @@ public final class CircleAnalyzer {
 		Rank required = Rank.APPRENTICE;
 		double stability = Double.POSITIVE_INFINITY;
 		double severity = 0;
+		Set<String> unlearned = new LinkedHashSet<>();
 
 		for (Stage stage : parsed.stages()) {
 			List<Glyph> written = new ArrayList<>();
@@ -103,8 +111,7 @@ public final class CircleAnalyzer {
 				required = max(required, g.rank());
 			}
 			if (known != null) {
-				written.stream().map(Glyph::id).filter(id -> !known.contains(id)).distinct()
-						.forEach(id -> issues.add(new CircleIssue(Kind.GLYPH_NOT_LEARNED, null, id)));
+				written.stream().map(Glyph::id).filter(id -> !known.contains(id)).forEach(unlearned::add);
 			}
 			complexity += load;
 
@@ -131,6 +138,8 @@ public final class CircleAnalyzer {
 			}
 			concentration = Math.max(1, concentration - (int) discount);
 		}
+		unlearned.forEach(id -> issues.add(new CircleIssue(Kind.GLYPH_NOT_LEARNED, null, id)));
+		double risk = Math.min(MAX_UNLEARNED_RISK, UNLEARNED_RISK * unlearned.size());
 		required = max(required, rankFor(parsed.stages().size(), Rank::maxStages));
 		required = max(required, rankFor(complexity, Rank::complexityCap));
 		required = max(required, rankFor(satelliteCount, Rank::maxSatellites));
@@ -164,7 +173,7 @@ public final class CircleAnalyzer {
 			outcome = Analysis.Outcome.WORKS;
 		}
 		return new Analysis(parsed, complexity, required, stability, concentration, effects, issues, outcome,
-				severity);
+				severity, outcome == Analysis.Outcome.WORKS ? risk : 0);
 	}
 
 	/** L'effet de l'étage, puis ceux de ses satellites complets. */

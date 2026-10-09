@@ -1,21 +1,28 @@
 package com.ajustor.fmab.world;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
+
+import java.util.List;
 
 /**
  * Pièce de structure construite par un {@link Blueprint}. Elle ne garde que de quoi recalculer
@@ -108,10 +115,27 @@ public class ProceduralPiece extends StructurePiece {
 				}
 			}
 		}
+		for (Blueprint.Chest chest : blueprint.chests(plot)) {
+			BlockPos at = toWorld(chest.local());
+			if (chunkBB.isInside(at)) {
+				fill(level, at, chest.contents().apply(plot));
+			}
+		}
 		for (Blueprint.Spawn spawn : blueprint.spawns(plot)) {
 			BlockPos at = toWorld(spawn.local());
 			if (chunkBB.isInside(at)) {
 				spawn(level, spawn, at);
+			}
+		}
+	}
+
+	/** Pose le coffre (tourné vers l'avant du bâtiment) et range son contenu. */
+	private void fill(WorldGenLevel level, BlockPos at, List<ItemStack> contents) {
+		level.setBlock(at, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.NORTH).rotate(rotation),
+				2);
+		if (level.getBlockEntity(at) instanceof ChestBlockEntity chest) {
+			for (int i = 0; i < contents.size() && i < chest.getContainerSize(); i++) {
+				chest.setItem(i, contents.get(i));
 			}
 		}
 	}

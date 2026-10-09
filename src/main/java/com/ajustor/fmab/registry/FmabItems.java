@@ -3,10 +3,14 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.CircleMedium;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.AlchemicalInkItem;
+import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.ScreenItem;
+import com.ajustor.fmab.item.TomeItem;
+import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
@@ -21,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 
 import java.util.function.Function;
 
@@ -37,6 +42,10 @@ public final class FmabItems {
 	public static final Item ALCHEMY_TREATISE = register("alchemy_treatise",
 			p -> new ScreenItem(ScreenItem.Kind.TREATISE, p),
 			new Item.Properties().stacksTo(1));
+
+	/** Tome d'alchimie : enseigne les glyphes de son composant {@link FmabComponents#TOME}. */
+	public static final Item ALCHEMY_TOME = register("alchemy_tome", TomeItem::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
 
 	public static final Item ALCHEMICAL_THREAD = register("alchemical_thread", Item::new, new Item.Properties());
 	public static final Item ALCHEMICAL_INK = register("alchemical_ink", AlchemicalInkItem::new,
@@ -66,9 +75,37 @@ public final class FmabItems {
 	public static final Item ARM_BLADE = register("arm_blade", TransmutedWeaponItem::new,
 			new Item.Properties().sword(ToolMaterial.IRON, 4.0F, -2.2F).durability(60));
 
+	/**
+	 * Le plastron d'âme : il porte le sceau de sang d'une âme qui a perdu son corps. Les autres pièces
+	 * de son armure sont des pièces ordinaires.
+	 */
+	public static final Item SOUL_CHESTPLATE = register("soul_chestplate", Item::new,
+			new Item.Properties().humanoidArmor(SoulArmor.MATERIAL, ArmorType.CHESTPLATE));
+
+	public static final Item AUTOMAIL_BENCH = register("automail_bench",
+			p -> new BlockItem(FmabBlocks.AUTOMAIL_BENCH, p), new Item.Properties().useBlockDescriptionPrefix());
+	public static final Item IRON_AUTOMAIL_ARM = automail("iron_automail_arm", AutomailItem.Model.IRON, true, 400);
+	public static final Item IRON_AUTOMAIL_LEG = automail("iron_automail_leg", AutomailItem.Model.IRON, false, 400);
+	public static final Item RUSH_VALLEY_AUTOMAIL_ARM = automail("rush_valley_automail_arm",
+			AutomailItem.Model.RUSH_VALLEY, true, 260);
+	public static final Item RUSH_VALLEY_AUTOMAIL_LEG = automail("rush_valley_automail_leg",
+			AutomailItem.Model.RUSH_VALLEY, false, 260);
+	public static final Item BRIGGS_AUTOMAIL_ARM = automail("briggs_automail_arm", AutomailItem.Model.BRIGGS, true, 600);
+	public static final Item BRIGGS_AUTOMAIL_LEG = automail("briggs_automail_leg", AutomailItem.Model.BRIGGS, false, 600);
+
+	public static final Item WINRY_SPAWN_EGG = register("winry_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.WINRY));
+
+	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
+
 	public static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Fmab.id("alchemy"));
 
 	private FmabItems() {
+	}
+
+	private static Item automail(String name, AutomailItem.Model model, boolean arm, int durability) {
+		return register(name, p -> new AutomailItem(model, arm, p), new Item.Properties().durability(durability));
 	}
 
 	private static Item glove(String name, GloveItem.Kind kind, int durability) {
@@ -87,6 +124,7 @@ public final class FmabItems {
 				.displayItems((parameters, output) -> {
 					output.accept(ALCHEMY_TREATISE);
 					output.accept(CIRCLE_NOTEBOOK);
+					Tomes.ALL.forEach(t -> output.accept(Tomes.stack(t)));
 					output.accept(CHALK);
 					output.accept(ALCHEMICAL_PAINT);
 					output.accept(ALCHEMIST_CHISEL);
@@ -100,6 +138,15 @@ public final class FmabItems {
 					output.accept(STATE_GLOVES);
 					output.accept(IZUMI_SPAWN_EGG);
 					output.accept(STATE_EXAMINER_SPAWN_EGG);
+					output.accept(AUTOMAIL_BENCH);
+					output.accept(IRON_AUTOMAIL_ARM);
+					output.accept(IRON_AUTOMAIL_LEG);
+					output.accept(RUSH_VALLEY_AUTOMAIL_ARM);
+					output.accept(RUSH_VALLEY_AUTOMAIL_LEG);
+					output.accept(BRIGGS_AUTOMAIL_ARM);
+					output.accept(BRIGGS_AUTOMAIL_LEG);
+					output.accept(WINRY_SPAWN_EGG);
+					output.accept(TRUTH_SPAWN_EGG);
 				})
 				.build());
 	}

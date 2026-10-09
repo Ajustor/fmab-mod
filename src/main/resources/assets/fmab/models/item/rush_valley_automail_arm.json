@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "fmab:item/rush_valley_automail_arm"
+  }
+}

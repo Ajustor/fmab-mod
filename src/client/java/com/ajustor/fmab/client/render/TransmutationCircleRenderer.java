@@ -24,13 +24,12 @@ import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Dessine le cercle comme une décalcomanie de trois blocs de côté posée sur sa surface, dans la
- * couleur de ce qui l'a tracé. Au sol et au plafond, le haut de la page regarde la direction où se
+ * Dessine le cercle comme une décalcomanie posée sur sa surface, de la taille choisie en le traçant
+ * (de un à sept blocs de côté), dans la couleur de ce qui l'a tracé. Au sol et au plafond, le haut de la page regarde la direction où se
  * tenait l'alchimiste ; sur un mur, il regarde le ciel.
  */
 public class TransmutationCircleRenderer
 		implements BlockEntityRenderer<TransmutationCircleBlockEntity, TransmutationCircleRenderer.State> {
-	private static final float HALF = 1.5f;
 	private static final float LIFT = 0.01f;
 	/**
 	 * Demi-tour autour de l'axe (0, 1, −1) : la décalcomanie, définie à plat (normale +Y, haut de
@@ -45,6 +44,7 @@ public class TransmutationCircleRenderer
 		AttachFace face = AttachFace.FLOOR;
 		Direction facing = Direction.NORTH;
 		CircleMedium medium = CircleMedium.CHALK;
+		float half = 1.5f;
 	}
 
 	public TransmutationCircleRenderer(BlockEntityRendererProvider.Context context) {
@@ -64,6 +64,7 @@ public class TransmutationCircleRenderer
 		state.face = block.getValue(TransmutationCircleBlock.FACE);
 		state.facing = block.getValue(TransmutationCircleBlock.FACING);
 		state.medium = block.getValue(TransmutationCircleBlock.MEDIUM);
+		state.half = blockEntity.size().blocks() / 2f;
 	}
 
 	@Override
@@ -89,12 +90,13 @@ public class TransmutationCircleRenderer
 			}
 		}
 		int light = state.lightCoords;
+		float half = state.half;
 		collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, buffer) -> {
 			// Vu de face, −Z est le haut de la page et +X sa droite.
-			vertex(buffer, pose, -HALF, -HALF, 0, 0, light);
-			vertex(buffer, pose, -HALF, HALF, 0, 1, light);
-			vertex(buffer, pose, HALF, HALF, 1, 1, light);
-			vertex(buffer, pose, HALF, -HALF, 1, 0, light);
+			vertex(buffer, pose, -half, -half, 0, 0, light);
+			vertex(buffer, pose, -half, half, 0, 1, light);
+			vertex(buffer, pose, half, half, 1, 1, light);
+			vertex(buffer, pose, half, -half, 1, 0, light);
 		});
 		poseStack.popPose();
 	}

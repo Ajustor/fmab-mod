@@ -1,0 +1,7 @@
+{
+  "type": "fmab:rush_valley",
+  "biomes": "#fmab:has_structure/rush_valley",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none"
+}

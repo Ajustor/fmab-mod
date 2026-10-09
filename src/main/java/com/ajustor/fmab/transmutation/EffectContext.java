@@ -23,9 +23,10 @@ import java.util.List;
  *                   y puisent avant le monde, et y déposent ce qu'ils décomposent
  * @param knowledge  savoir de l'alchimiste, dont certains bonus changent la forme des effets
  * @param rangeBonus portée ajoutée par la montre d'Alchimiste d'État
+ * @param power      multiplicateur de portée et de dégâts : la taille du cercle tracé
  */
 public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame frame, ServerPlayer caster,
-		Analysis.StageEffect stage, List<ItemStack> flow, Knowledge knowledge, int rangeBonus) {
+		Analysis.StageEffect stage, List<ItemStack> flow, Knowledge knowledge, int rangeBonus, double power) {
 	/** Un satellite agit à ce nombre de blocs du centre, du côté de son sommet. */
 	private static final int SATELLITE_OFFSET = 2;
 
@@ -75,7 +76,12 @@ public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame fram
 	}
 
 	public int range() {
-		return Math.max(1, (int) Math.round(stage.range()) + rangeBonus);
+		return Math.max(1, (int) Math.round((stage.range() + rangeBonus) * power));
+	}
+
+	/** Des dégâts à la mesure du cercle. */
+	public float damage(float base) {
+		return (float) (base * power);
 	}
 
 	/** Ce que les satellites d'infusion ajoutent à une créature touchée par l'effet. */

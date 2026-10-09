@@ -96,6 +96,10 @@ public final class AlchemyRules {
 				.findFirst();
 	}
 
+	public Optional<Glyph> glyph(String id) {
+		return glyphs.stream().filter(g -> g.id().equals(id)).findFirst();
+	}
+
 	private Optional<Glyph> glyph(GlyphLayer layer, String role) {
 		return glyphs.stream().filter(g -> g.is(layer, role)).findFirst();
 	}

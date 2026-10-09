@@ -40,6 +40,8 @@ export interface Analysis {
   readonly issues: CircleIssue[];
   readonly outcome: Outcome;
   readonly reboundSeverity: number;
+  /** Probabilité de rebond due aux glyphes tracés sans être compris. */
+  readonly risk: number;
 }
 
 const BARE_RING_CAPACITY = 2;
@@ -48,6 +50,8 @@ const INTENSITY_STEP = 0.5;
 const MIRROR_TOLERANCE = 1.5;
 const UNKNOWN_COMBINATION_SEVERITY = 0.5;
 const UNKNOWN_GLYPH_SEVERITY = 0.3;
+export const UNLEARNED_RISK = 0.25;
+export const MAX_UNLEARNED_RISK = 0.75;
 
 const INERT: ReadonlySet<IssueKind> = new Set<IssueKind>([
   "no_ring",
@@ -55,7 +59,6 @@ const INERT: ReadonlySet<IssueKind> = new Set<IssueKind>([
   "no_element",
   "too_many_actions",
   "rank_too_low",
-  "glyph_not_learned",
   "knowledge_missing",
 ]);
 const MISCOMPOSED: ReadonlySet<IssueKind> = new Set<IssueKind>([
@@ -97,6 +100,7 @@ export class CircleAnalyzer {
     let required = 0;
     let stability = Number.POSITIVE_INFINITY;
     let severity = 0;
+    const unlearned = new Set<string>();
 
     for (const stage of parsed.stages) {
       const written: Glyph[] = stage.glyphs.map((g) => g.glyph);
@@ -112,9 +116,7 @@ export class CircleAnalyzer {
         required = Math.max(required, rankIndex(g.rank));
       }
       if (known !== null) {
-        for (const id of new Set(written.map((g) => g.id))) {
-          if (!known.has(id)) issues.push(issue("glyph_not_learned", null, id));
-        }
+        for (const g of written) if (!known.has(g.id)) unlearned.add(g.id);
       }
       complexity += load;
 
@@ -131,6 +133,8 @@ export class CircleAnalyzer {
       effects.push(...this.effectsOf(stage, issues));
     }
     concentration *= Math.max(1, parsed.stages.length);
+    for (const id of unlearned) issues.push(issue("glyph_not_learned", null, id));
+    const risk = Math.min(MAX_UNLEARNED_RISK, UNLEARNED_RISK * unlearned.size);
     required = Math.max(required, rankFor(parsed.stages.length, (r) => r.maxStages));
     required = Math.max(required, rankFor(complexity, (r) => r.complexityCap));
     required = Math.max(required, rankFor(satelliteCount, (r) => r.maxSatellites));
@@ -168,6 +172,7 @@ export class CircleAnalyzer {
       issues,
       outcome,
       reboundSeverity: severity,
+      risk: outcome === "works" ? risk : 0,
     };
   }
 

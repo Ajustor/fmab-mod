@@ -6,6 +6,9 @@ import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.entity.IzumiEntity;
+import com.ajustor.fmab.entity.WinryEntity;
+import com.ajustor.fmab.gate.Automails;
+import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.state.StateExam;
 import com.ajustor.fmab.tattoo.TattooRitual;
@@ -32,10 +35,11 @@ public final class FmabNetwork {
 
 	public static void register() {
 		PayloadTypeRegistry.serverboundPlay().register(SaveNotebookPayload.TYPE, SaveNotebookPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(LearnGlyphPayload.TYPE, LearnGlyphPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(WinryActionPayload.TYPE, WinryActionPayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(OpenWinryPayload.TYPE, OpenWinryPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenIzumiPayload.TYPE, OpenIzumiPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(ExamActionPayload.TYPE, ExamActionPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenExamPayload.TYPE, OpenExamPayload.CODEC);
@@ -45,12 +49,12 @@ public final class FmabNetwork {
 
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
 				(payload, context) -> saveNotebook(context.player(), payload.hand(), payload.contents()));
-		ServerPlayNetworking.registerGlobalReceiver(LearnGlyphPayload.TYPE,
-				(payload, context) -> learn(context.player(), payload.glyph()));
 		ServerPlayNetworking.registerGlobalReceiver(CastGlovesPayload.TYPE,
 				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
 		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,
 				(payload, context) -> removeGlove(context.player(), payload.left()));
+		ServerPlayNetworking.registerGlobalReceiver(WinryActionPayload.TYPE,
+				(payload, context) -> winry(context.player(), payload));
 		ServerPlayNetworking.registerGlobalReceiver(IzumiActionPayload.TYPE,
 				(payload, context) -> izumi(context.player(), payload.entityId(), payload.action()));
 		ServerPlayNetworking.registerGlobalReceiver(ExamActionPayload.TYPE,
@@ -82,6 +86,28 @@ public final class FmabNetwork {
 			case ExamActionPayload.FIGHT -> StateExam.startFight(examiner, player);
 			default -> {
 			}
+		}
+	}
+
+	/** Winry répare ou retire un automail ; il faut être dans son atelier. */
+	private static void winry(ServerPlayer player, WinryActionPayload payload) {
+		if (!(player.level().getEntity(payload.entityId()) instanceof WinryEntity winry)
+				|| player.distanceToSqr(winry) > 64) {
+			return;
+		}
+		BodyPart part;
+		try {
+			part = BodyPart.fromSerializedName(payload.part());
+		} catch (IllegalArgumentException unknown) {
+			return;
+		}
+		if (!part.limb()) {
+			return;
+		}
+		if (payload.repair()) {
+			Automails.repair(player, part);
+		} else {
+			Automails.remove(player, part);
 		}
 	}
 
@@ -147,32 +173,5 @@ public final class FmabNetwork {
 		if (stack.is(FmabItems.CIRCLE_NOTEBOOK)) {
 			stack.set(FmabComponents.NOTEBOOK, contents);
 		}
-	}
-
-	/**
-	 * On n'apprend un glyphe qu'avec le Traité en main, et seulement s'il est de son rang : le
-	 * serveur reste juge de ce que le joueur sait.
-	 */
-	private static void learn(ServerPlayer player, String glyphId) {
-		boolean holdsTreatise = player.getMainHandItem().is(FmabItems.ALCHEMY_TREATISE)
-				|| player.getOffhandItem().is(FmabItems.ALCHEMY_TREATISE);
-		if (!holdsTreatise) {
-			return;
-		}
-		Optional<Glyph> glyph = AlchemyRules.of(player.level().registryAccess()).glyphs().stream()
-				.filter(g -> g.id().equals(glyphId))
-				.findFirst();
-		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-		if (glyph.isEmpty() || data.known().contains(glyphId)) {
-			return;
-		}
-		if (!data.rank().atLeast(glyph.get().rank())) {
-			player.sendOverlayMessage(Component.translatable("treatise.fmab.rank_too_low",
-					Component.translatable(glyph.get().rank().translationKey())));
-			return;
-		}
-		player.setAttached(FmabAttachments.ALCHEMIST, data.learn(glyphId));
-		player.sendOverlayMessage(Component.translatable("treatise.fmab.learned",
-				Component.translatable(glyph.get().nameKey())));
 	}
 }

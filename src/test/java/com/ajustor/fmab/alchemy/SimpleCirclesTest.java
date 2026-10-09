@@ -2,6 +2,7 @@ package com.ajustor.fmab.alchemy;
 
 import com.ajustor.fmab.alchemy.circle.CircleParser;
 import com.ajustor.fmab.alchemy.drawing.SimpleCircles;
+import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
 import com.ajustor.fmab.alchemy.glyph.GlyphRecognizer;
@@ -41,6 +42,28 @@ class SimpleCirclesTest {
 				assertEquals(Analysis.Outcome.WORKS, a.outcome(), () -> c.id() + " : " + a.issues());
 				assertEquals(c.effect(), a.effects().getFirst().combination().effect());
 			}));
+		}
+		return tests;
+	}
+
+	/** Le tampon du carnet pose des glyphes que le parseur reconnaît, à toutes ses tailles. */
+	@TestFactory
+	List<DynamicTest> stampedGlyphsAreRecognized() {
+		GlyphRecognizer recognizer = new GlyphRecognizer(TestGlyphs.all().values());
+		List<DynamicTest> tests = new ArrayList<>();
+		for (Glyph g : TestGlyphs.all().values()) {
+			if (g.role().equals("intensity")) {
+				continue;
+			}
+			for (int halfSize = 3; halfSize <= 6; halfSize++) {
+				for (int rotation : new int[]{0, 15, -15}) {
+					int size = halfSize;
+					tests.add(DynamicTest.dynamicTest(g.id() + " " + size * 2 + " cases, " + rotation + "°", () -> {
+						var placed = SimpleCircles.place(g, new Vec2(16, 16), size, rotation);
+						assertEquals(g.id(), recognizer.recognize(placed).map(m -> m.glyph().id()).orElse(""));
+					}));
+				}
+			}
 		}
 		return tests;
 	}

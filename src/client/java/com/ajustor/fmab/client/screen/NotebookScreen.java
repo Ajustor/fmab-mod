@@ -6,7 +6,9 @@ import com.ajustor.fmab.alchemy.circle.Stage;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.DrawingCode;
 import com.ajustor.fmab.alchemy.drawing.Primitive;
+import com.ajustor.fmab.alchemy.drawing.SimpleCircles;
 import com.ajustor.fmab.alchemy.drawing.Vec2;
+import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.data.AlchemistData;
@@ -31,6 +33,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,7 +46,9 @@ import java.util.Map;
  */
 public class NotebookScreen extends Screen {
 	private enum Tool {
-		LINE, CIRCLE, POLYGON, ARC, DOT;
+		LINE, CIRCLE, POLYGON, ARC, DOT,
+		/** Pose d'un clic un glyphe compris : pas besoin de le retracer trait par trait. */
+		STAMP;
 
 		Component label() {
 			return Component.translatable("notebook.fmab.tool." + name().toLowerCase(Locale.ROOT));
@@ -92,6 +97,17 @@ public class NotebookScreen extends Screen {
 	private final List<Button> toolButtons = new ArrayList<>();
 	private Button sidesButton;
 	private Button symmetryButton;
+	private Button stampButton;
+	private Button stampSizeButton;
+	/** Glyphe du tampon, parmi ceux que le joueur comprend ; demi-taille et rotation. */
+	private int stampIndex;
+	private int stampHalfSize = 3;
+	/** Tailles du tampon, en demi-largeur : de 6 à 12 cases, assez grand pour être reconnu. */
+	private static final int MIN_STAMP_HALF_SIZE = 3;
+	private static final int MAX_STAMP_HALF_SIZE = 6;
+	private int stampRotation;
+	/** Nombre de traits ajoutés par chaque geste, pour qu'Annuler défasse un tampon d'un coup. */
+	private final ArrayDeque<Integer> gestures = new ArrayDeque<>();
 	/** Ordonnée de la rangée « < page > » et haut du panneau d'analyse. */
 	private int navY;
 	private int panelTop;
@@ -121,6 +137,9 @@ public class NotebookScreen extends Screen {
 		toolButtons.clear();
 		int tx = px;
 		for (Tool t : Tool.values()) {
+			if (t == Tool.STAMP) {
+				continue;
+			}
 			Button b = addRenderableWidget(Button.builder(t.label(), btn -> selectTool(t)).bounds(tx, y, 37, 18).build());
 			toolButtons.add(b);
 			tx += 38;
@@ -135,11 +154,22 @@ public class NotebookScreen extends Screen {
 			refreshLabels();
 		}).bounds(px + 94, y, 96, 18).build());
 		y += 20;
+		// Tampon : < glyphe > et sa taille. La molette le fait tourner.
+		addRenderableWidget(Button.builder(Component.literal("<"), b -> cycleStamp(-1)).bounds(px, y, 20, 18).build());
+		stampButton = addRenderableWidget(Button.builder(Component.empty(), b -> selectTool(Tool.STAMP))
+				.bounds(px + 22, y, 104, 18).build());
+		addRenderableWidget(Button.builder(Component.literal(">"), b -> cycleStamp(1)).bounds(px + 128, y, 20, 18).build());
+		stampSizeButton = addRenderableWidget(Button.builder(Component.empty(), b -> {
+			stampHalfSize = stampHalfSize >= MAX_STAMP_HALF_SIZE ? MIN_STAMP_HALF_SIZE : stampHalfSize + 1;
+			refreshLabels();
+		}).bounds(px + 150, y, 40, 18).build());
+		y += 20;
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.undo"), b -> undo())
 				.bounds(px, y, 62, 18).build());
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.clear"), b -> {
 			strokes.clear();
 			resetGesture();
+			forgetGestures();
 		}).bounds(px + 64, y, 62, 18).build());
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.save"), b -> save(true))
 				.bounds(px + 128, y, 62, 18).build());
@@ -188,6 +218,11 @@ public class NotebookScreen extends Screen {
 			plot(graphics, preview, PREVIEW);
 			if (symmetry) {
 				plot(graphics, mirror(preview), PREVIEW);
+			}
+		}
+		if (tool == Tool.STAMP && insideCanvas(mouseX, mouseY)) {
+			for (Primitive p : stampAt(cursor)) {
+				plot(graphics, p, PREVIEW);
 			}
 		}
 
@@ -258,6 +293,9 @@ public class NotebookScreen extends Screen {
 			out.add(new Line(Component.translatable("notebook.fmab.effect",
 					Component.translatable("effect." + e.combination().effect().replace(':', '.')),
 					String.format(Locale.ROOT, "%.1f", e.range())), EFFECT));
+		}
+		if (a.risk() > 0) {
+			out.add(new Line(Component.translatable("notebook.fmab.risk", Math.round(a.risk() * 100)), WARN));
 		}
 		addIssues(out, a);
 		if (!a.parsed().stages().isEmpty()) {
@@ -378,6 +416,7 @@ public class NotebookScreen extends Screen {
 		setFocused(null);
 		switch (tool) {
 			case DOT -> commit(new Primitive.Dot(p));
+			case STAMP -> commitAll(stampAt(p));
 			case ARC -> {
 				if (arcStart != null) {
 					commit(arc(anchor, arcStart, p));
@@ -447,6 +486,16 @@ public class NotebookScreen extends Screen {
 	}
 
 	@Override
+	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+		if (tool == Tool.STAMP && insideCanvas(x, y) && scrollY != 0) {
+			stampRotation = Math.floorMod(stampRotation + (scrollY > 0 ? 15 : -15), 360);
+			refreshLabels();
+			return true;
+		}
+		return super.mouseScrolled(x, y, scrollX, scrollY);
+	}
+
+	@Override
 	public boolean keyPressed(KeyEvent event) {
 		if (event.key() == GLFW.GLFW_KEY_Z && event.hasControlDown() && !nameBox.isFocused()) {
 			undo();
@@ -479,8 +528,35 @@ public class NotebookScreen extends Screen {
 			case ARC -> arcStart == null
 					? new Primitive.Line(anchor, cursor)
 					: arc(anchor, arcStart, cursor);
-			case DOT -> null;
+			case DOT, STAMP -> null;
 		};
+	}
+
+	/** Les glyphes que le joueur comprend : eux seuls se posent au tampon. */
+	private List<Glyph> stampable() {
+		if (minecraft == null || minecraft.level == null) {
+			return List.of();
+		}
+		AlchemistData me = alchemist();
+		return AlchemyRules.of(minecraft.level.registryAccess()).glyphs().stream()
+				.filter(g -> me.known().contains(g.id()))
+				.toList();
+	}
+
+	private Glyph stampGlyph() {
+		List<Glyph> glyphs = stampable();
+		return glyphs.isEmpty() ? null : glyphs.get(Math.floorMod(stampIndex, glyphs.size()));
+	}
+
+	private void cycleStamp(int delta) {
+		stampIndex += delta;
+		selectTool(Tool.STAMP);
+	}
+
+	/** Le glyphe du tampon posé en {@code at}, ou rien si le joueur n'en comprend aucun. */
+	private List<Primitive> stampAt(Vec2 at) {
+		Glyph g = stampGlyph();
+		return g == null ? List.of() : SimpleCircles.place(g, at, stampHalfSize, stampRotation);
 	}
 
 	/** Polygone régulier de centre {@code c} dont un sommet est en {@code vertex}. */
@@ -516,12 +592,28 @@ public class NotebookScreen extends Screen {
 	}
 
 	private void commit(Primitive p) {
-		if (strokes.size() < Drawing.MAX_PRIMITIVES) {
-			strokes.add(p);
-			Primitive m = mirror(p);
-			if (symmetry && !m.equals(p) && strokes.size() < Drawing.MAX_PRIMITIVES) {
-				strokes.add(m);
+		commitAll(List.of(p));
+	}
+
+	/** Ajoute les traits d'un geste (et leur reflet en symétrie) ; Annuler les retirera ensemble. */
+	private void commitAll(List<Primitive> ps) {
+		int before = strokes.size();
+		List<Primitive> all = new ArrayList<>(ps);
+		if (symmetry) {
+			for (Primitive p : ps) {
+				Primitive m = mirror(p);
+				if (!m.equals(p)) {
+					all.add(m);
+				}
 			}
+		}
+		for (Primitive p : all) {
+			if (strokes.size() < Drawing.MAX_PRIMITIVES) {
+				strokes.add(p);
+			}
+		}
+		if (strokes.size() > before) {
+			gestures.push(strokes.size() - before);
 		}
 		resetGesture();
 	}
@@ -540,12 +632,14 @@ public class NotebookScreen extends Screen {
 		}
 		if (best >= 0) {
 			strokes.remove(best);
+			gestures.clear();
 		}
 	}
 
 	private void undo() {
 		resetGesture();
-		if (!strokes.isEmpty()) {
+		int count = gestures.isEmpty() ? 1 : gestures.pop();
+		for (int i = 0; i < count && !strokes.isEmpty(); i++) {
 			strokes.removeLast();
 		}
 	}
@@ -553,6 +647,11 @@ public class NotebookScreen extends Screen {
 	private void resetGesture() {
 		anchor = null;
 		arcStart = null;
+	}
+
+	/** Le tracé a changé d'un bloc (page, import, effacement) : l'historique des gestes ne vaut plus. */
+	private void forgetGestures() {
+		gestures.clear();
 	}
 
 	private void selectTool(Tool t) {
@@ -565,6 +664,11 @@ public class NotebookScreen extends Screen {
 		for (int i = 0; i < toolButtons.size(); i++) {
 			toolButtons.get(i).active = Tool.values()[i] != tool;
 		}
+		Glyph g = stampGlyph();
+		stampButton.active = tool != Tool.STAMP && g != null;
+		stampButton.setMessage(g == null ? Component.translatable("notebook.fmab.stamp.none")
+				: Component.translatable("notebook.fmab.stamp", Component.translatable(g.nameKey())));
+		stampSizeButton.setMessage(Component.translatable("notebook.fmab.stamp.size", stampHalfSize * 2));
 		sidesButton.setMessage(Component.translatable("notebook.fmab.sides", sides));
 		symmetryButton.setMessage(Component.translatable(symmetry ? "notebook.fmab.symmetry.on" : "notebook.fmab.symmetry.off"));
 	}
@@ -617,6 +721,7 @@ public class NotebookScreen extends Screen {
 		strokes = new ArrayList<>();
 		nameBox.setValue(defaultName(page));
 		resetGesture();
+		forgetGestures();
 	}
 
 	private void turn(int delta) {
@@ -629,6 +734,7 @@ public class NotebookScreen extends Screen {
 		strokes = new ArrayList<>(contents.pages().get(page).drawing().primitives());
 		nameBox.setValue(currentName());
 		resetGesture();
+		forgetGestures();
 	}
 
 	private void deletePage() {
@@ -637,6 +743,7 @@ public class NotebookScreen extends Screen {
 		}
 		page = Math.max(0, Math.min(page, contents.pages().size() - 1));
 		strokes = new ArrayList<>(contents.pages().isEmpty() ? List.of() : contents.pages().get(page).drawing().primitives());
+		forgetGestures();
 		nameBox.setValue(currentName());
 		resetGesture();
 	}
@@ -650,6 +757,7 @@ public class NotebookScreen extends Screen {
 		try {
 			Drawing d = DrawingCode.decode(Minecraft.getInstance().keyboardHandler.getClipboard());
 			strokes = new ArrayList<>(d.primitives());
+			forgetGestures();
 			resetGesture();
 			status = Component.translatable("notebook.fmab.imported");
 		} catch (RuntimeException e) {

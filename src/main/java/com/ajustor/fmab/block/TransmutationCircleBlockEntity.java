@@ -20,6 +20,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  */
 public class TransmutationCircleBlockEntity extends BlockEntity {
 	private Drawing drawing = Drawing.EMPTY;
+	private CircleSize size = CircleSize.NORMAL;
 
 	public TransmutationCircleBlockEntity(BlockPos pos, BlockState state) {
 		super(FmabBlockEntities.TRANSMUTATION_CIRCLE, pos, state);
@@ -37,16 +38,30 @@ public class TransmutationCircleBlockEntity extends BlockEntity {
 		}
 	}
 
+	public CircleSize size() {
+		return size;
+	}
+
+	public void setSize(CircleSize size) {
+		this.size = size;
+		setChanged();
+		if (level != null) {
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+		}
+	}
+
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.store("drawing", FmabCodecs.DRAWING, drawing);
+		output.putInt("size", size.blocks());
 	}
 
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		drawing = input.read("drawing", FmabCodecs.DRAWING).orElse(Drawing.EMPTY);
+		size = CircleSize.ofBlocks(input.getIntOr("size", CircleSize.NORMAL.blocks()));
 	}
 
 	@Override

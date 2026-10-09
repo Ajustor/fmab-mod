@@ -1682,6 +1682,279 @@
      "text": "treatise.fmab.ch7.p1"
     }
    ]
+  },
+  {
+   "title": "treatise.fmab.ch8.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.ch8.p1"
+    },
+    {
+     "text": "treatise.fmab.ch8.human",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         30
+        ],
+        [
+         4,
+         9
+        ],
+        [
+         28,
+         9
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        13.0
+       ],
+       "radius": 1.0
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        14.0
+       ],
+       "to": [
+        16.0,
+        15.5
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.0,
+        14.5
+       ],
+       "to": [
+        18.0,
+        14.5
+       ]
+      },
+      {
+       "type": "polyline",
+       "points": [
+        [
+         14.5,
+         17.0
+        ],
+        [
+         16.0,
+         15.5
+        ],
+        [
+         17.5,
+         17.0
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         14.5,
+         21.5
+        ],
+        [
+         18.0,
+         21.5
+        ],
+        [
+         18.0,
+         25.0
+        ],
+        [
+         14.5,
+         25.0
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.5,
+        21.5
+       ],
+       "to": [
+        18.0,
+        25.0
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        18.0,
+        21.5
+       ],
+       "to": [
+        14.5,
+        25.0
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.ch8.p2"
+    },
+    {
+     "text": "treatise.fmab.ch8.p3"
+    },
+    {
+     "text": "treatise.fmab.ch8.p4"
+    },
+    {
+     "text": "treatise.fmab.ch8.p5"
+    },
+    {
+     "text": "treatise.fmab.ch8.soul",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         28,
+         9
+        ],
+        [
+         28,
+         23
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         4,
+         23
+        ],
+        [
+         4,
+         9
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        9.5
+       ],
+       "radius": 1.0
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        10.5
+       ],
+       "to": [
+        16.0,
+        12.0
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.0,
+        11.0
+       ],
+       "to": [
+        18.0,
+        11.0
+       ]
+      },
+      {
+       "type": "polyline",
+       "points": [
+        [
+         14.5,
+         13.5
+        ],
+        [
+         16.0,
+         12.0
+        ],
+        [
+         17.5,
+         13.5
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        21.0
+       ],
+       "radius": 2.0
+      },
+      {
+       "type": "line",
+       "from": [
+        14.0,
+        21.0
+       ],
+       "to": [
+        18.0,
+        21.0
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.ch8.seal",
+     "seal": true
+    }
+   ]
   }
  ]
 }

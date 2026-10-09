@@ -10,6 +10,7 @@ import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.ExamProgress;
 import com.ajustor.fmab.entity.StoneGolemEntity;
+import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
@@ -143,7 +144,10 @@ public final class StateExam {
 		player.sendSystemMessage(Component.translatable("exam.fmab.fight_start"));
 	}
 
-	/** Le golem est tombé : le candidat devient Alchimiste d'État et reçoit sa montre. */
+	/**
+	 * Le golem est tombé : le candidat devient Alchimiste d'État et reçoit sa montre, avec les notes
+	 * sur la combustion des archives de l'armée.
+	 */
 	public static void pass(ServerPlayer player) {
 		ExamProgress exam = player.getAttachedOrCreate(FmabAttachments.EXAM);
 		if (exam.passed() || !exam.itemsGiven()) {
@@ -154,9 +158,10 @@ public final class StateExam {
 		if (!me.rank().atLeast(Rank.STATE)) {
 			player.setAttached(FmabAttachments.ALCHEMIST, me.withRank(Rank.STATE));
 		}
-		ItemStack watch = new ItemStack(FmabItems.STATE_WATCH);
-		if (!player.getInventory().add(watch)) {
-			player.drop(watch, false);
+		for (ItemStack reward : new ItemStack[]{new ItemStack(FmabItems.STATE_WATCH), Tomes.stack(Tomes.FLAME)}) {
+			if (!player.getInventory().add(reward)) {
+				player.drop(reward, false);
+			}
 		}
 		player.sendSystemMessage(Component.translatable("exam.fmab.passed",
 				Component.translatable(Rank.STATE.translationKey())));
