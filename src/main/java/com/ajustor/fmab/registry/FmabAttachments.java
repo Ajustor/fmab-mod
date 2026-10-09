@@ -94,6 +94,12 @@ public final class FmabAttachments {
 			.syncWith(ByteBufCodecs.VAR_INT, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("living_stone"));
 
+	/** L'alkahestry de Xing, apprise de May Chang : gardée à la mort. */
+	public static final AttachmentType<Boolean> ALKAHESTRY = AttachmentRegistry.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("alkahestry"));
+
 	/** Les homonculus qu'on a vus tomber : la clé du sceau de Père. Gardés à la mort. */
 	public static final AttachmentType<Set<String>> SLAIN = AttachmentRegistry.<Set<String>>builder()
 			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))

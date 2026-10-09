@@ -6,7 +6,9 @@ import com.ajustor.fmab.client.render.FatherRenderer;
 import com.ajustor.fmab.client.render.GluttonyRenderer;
 import com.ajustor.fmab.client.render.GreedRenderer;
 import com.ajustor.fmab.client.render.IzumiRenderer;
+import com.ajustor.fmab.client.render.KunaiRenderer;
 import com.ajustor.fmab.client.render.LustRenderer;
+import com.ajustor.fmab.client.render.MayChangRenderer;
 import com.ajustor.fmab.client.render.PrideRenderer;
 import com.ajustor.fmab.client.render.SlothRenderer;
 import com.ajustor.fmab.client.render.StateExaminerRenderer;
@@ -91,6 +93,8 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.WRATH, WrathRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.PRIDE, PrideRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.FATHER, FatherRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.KUNAI, KunaiRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.MAY_CHANG, MayChangRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(OpenTruthPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,

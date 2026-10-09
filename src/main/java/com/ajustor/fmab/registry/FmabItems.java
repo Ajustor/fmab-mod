@@ -9,6 +9,7 @@ import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
+import com.ajustor.fmab.item.KunaiItem;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.item.ScreenItem;
 import com.ajustor.fmab.item.TomeItem;
@@ -134,6 +135,11 @@ public final class FmabItems {
 	public static final Item FATHER_PIPE = register("father_pipe",
 			p -> new BlockItem(FmabBlocks.FATHER_PIPE, p), new Item.Properties().useBlockDescriptionPrefix());
 
+	/** Le kunaï d'alkahestry : cinq plantés en cercle soignent ou piègent, même chez Père. */
+	public static final Item KUNAI = register("kunai", KunaiItem::new, new Item.Properties().stacksTo(16));
+	public static final Item MAY_CHANG_SPAWN_EGG = register("may_chang_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.MAY_CHANG));
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -197,6 +203,8 @@ public final class FmabItems {
 					output.accept(PRIDE_SPAWN_EGG);
 					output.accept(FATHER_SPAWN_EGG);
 					output.accept(FATHER_PIPE);
+					output.accept(KUNAI);
+					output.accept(MAY_CHANG_SPAWN_EGG);
 				})
 				.build());
 	}

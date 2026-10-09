@@ -39,6 +39,15 @@ public final class FmabComponents {
 					.networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(FmabCodecs.DRAWING))
 					.build());
 
+	/** Ce que dessinent les kunaï d'alkahestry : vrai pour un piège, faux pour un soin. */
+	public static final DataComponentType<Boolean> KUNAI_TRAP = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("kunai_trap"),
+			DataComponentType.<Boolean>builder()
+					.persistent(Codec.BOOL)
+					.networkSynchronized(ByteBufCodecs.BOOL)
+					.build());
+
 	/** Heure de jeu (ticks) à laquelle une arme transmutée se défait. */
 	public static final DataComponentType<Long> EXPIRES = Registry.register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,

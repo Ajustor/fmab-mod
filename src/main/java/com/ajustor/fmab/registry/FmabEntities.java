@@ -6,7 +6,9 @@ import com.ajustor.fmab.entity.FatherEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
 import com.ajustor.fmab.entity.GreedEntity;
 import com.ajustor.fmab.entity.IzumiEntity;
+import com.ajustor.fmab.entity.KunaiEntity;
 import com.ajustor.fmab.entity.LustEntity;
+import com.ajustor.fmab.entity.MayChangEntity;
 import com.ajustor.fmab.entity.PrideEntity;
 import com.ajustor.fmab.entity.SlothEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
@@ -153,6 +155,26 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(FATHER_KEY));
 
+	private static final ResourceKey<EntityType<?>> KUNAI_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("kunai"));
+
+	/** Un kunaï d'alkahestry lancé, qui se plante comme une flèche. */
+	public static final EntityType<KunaiEntity> KUNAI = Registry.register(BuiltInRegistries.ENTITY_TYPE, KUNAI_KEY,
+			EntityType.Builder.<KunaiEntity>of(KunaiEntity::new, MobCategory.MISC)
+					.sized(0.4F, 0.4F)
+					.clientTrackingRange(4)
+					.updateInterval(20)
+					.build(KUNAI_KEY));
+
+	private static final ResourceKey<EntityType<?>> MAY_CHANG_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("may_chang"));
+
+	/** May Chang, alkahestriste de Xing, dans son pavillon ; petite (attribut d'échelle). */
+	public static final EntityType<MayChangEntity> MAY_CHANG = Registry.register(BuiltInRegistries.ENTITY_TYPE, MAY_CHANG_KEY,
+			EntityType.Builder.<MayChangEntity>of(MayChangEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.8F)
+					.eyeHeight(1.62F)
+					.clientTrackingRange(10)
+					.build(MAY_CHANG_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -170,5 +192,6 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(WRATH, WrathEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(PRIDE, PrideEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(FATHER, FatherEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(MAY_CHANG, MayChangEntity.createAttributes());
 	}
 }

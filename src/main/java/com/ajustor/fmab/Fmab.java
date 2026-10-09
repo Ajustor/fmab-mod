@@ -27,6 +27,7 @@ import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Passives;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.world.FmabStructures;
+import com.ajustor.fmab.xing.Alkahestry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -73,6 +74,7 @@ public class Fmab implements ModInitializer {
 		Eclipse.register();
 		PhilosopherStones.register();
 		LivingStone.register();
+		Alkahestry.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> equip(handler.getPlayer()));
 		// Gantelets : frapper un bloc, main libre, y lance leur cercle au lieu de commencer à le casser.
 		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
