@@ -1,12 +1,9 @@
 package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
-import com.ajustor.fmab.alchemy.drawing.Drawing;
-import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.client.render.BossModels;
 import com.ajustor.fmab.client.render.ChimeraBeastRenderer;
 import com.ajustor.fmab.client.render.ChimeraCrawlerRenderer;
-import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.client.render.CornelloRenderer;
 import com.ajustor.fmab.client.render.DrachmaSoldierRenderer;
 import com.ajustor.fmab.client.render.EnvyRenderer;
@@ -48,7 +45,6 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.gate.BodyPart;
-import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.network.CastGlovesPayload;
 import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.network.OpenExamPayload;
@@ -77,7 +73,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
@@ -187,8 +182,8 @@ public class FmabClient implements ClientModInitializer {
 				(graphics, delta) -> eclipse(graphics));
 		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("living_stone"),
 				(graphics, delta) -> livingStone(graphics));
-		HudElementRegistry.attachElementAfter(VanillaHudElements.HOTBAR, Fmab.id("selected_circle"),
-				(graphics, delta) -> selectedCircle(graphics));
+		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("alchemist_panel"),
+				(graphics, delta) -> AlchemyHud.draw(graphics));
 	}
 
 	/** Le cercle suivant (ou précédent) du carnet devient la sélection, sans ouvrir la roue. */
@@ -202,34 +197,6 @@ public class FmabClient implements ClientModInitializer {
 		}
 		int index = Math.floorMod(contents.selected() + delta, contents.pages().size());
 		ClientPlayNetworking.send(new SelectCirclePayload(index, false));
-	}
-
-	/**
-	 * Le cercle sélectionné, à gauche de la barre d'objets, quand il sert : craie, peinture ou burin
-	 * en main, ou mains jointes à portée (qui a vu la Porte).
-	 */
-	private static void selectedCircle(GuiGraphicsExtractor graphics) {
-		Minecraft mc = Minecraft.getInstance();
-		if (mc.player == null) {
-			return;
-		}
-		Drawing drawing = Notebooks.selected(mc.player);
-		if (drawing.isEmpty()) {
-			return;
-		}
-		boolean tracing = mc.player.getMainHandItem().getItem() instanceof InscriptionItem
-				|| mc.player.getOffhandItem().getItem() instanceof InscriptionItem;
-		AlchemistData data = mc.player.getAttached(FmabAttachments.ALCHEMIST);
-		if (!tracing && (data == null || !data.rank().atLeast(Rank.GATE))) {
-			return;
-		}
-		int size = 20;
-		// À gauche de l'emplacement de la main secondaire.
-		int x = graphics.guiWidth() / 2 - 91 - 29 - 6 - size;
-		int y = graphics.guiHeight() - size - 2;
-		graphics.fill(x - 2, y - 2, x + size + 2, y + size + 2, 0x90000000);
-		graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(drawing, 0xFFF0E6C8), x, y, 0, 0, size, size,
-				CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE);
 	}
 
 	/**
