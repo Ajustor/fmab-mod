@@ -100,3 +100,14 @@ jar {
 		rename { "${it}_$projectName" }
 	}
 }
+
+// Visite guidée des rendus en captures d'écran (./gradlew runClientGameTest) : voir RenderShowcase.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = 'fmab-gametest'
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}

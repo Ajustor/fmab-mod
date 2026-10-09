@@ -1,0 +1,15 @@
+{
+	"schemaVersion": 1,
+	"id": "fmab-gametest",
+	"version": "1.0.0",
+	"name": "FMAB render showcase",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"com.ajustor.fmab.gametest.RenderShowcase"
+		]
+	},
+	"depends": {
+		"fmab": "*"
+	}
+}

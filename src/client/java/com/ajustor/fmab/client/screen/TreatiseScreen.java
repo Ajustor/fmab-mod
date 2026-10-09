@@ -81,10 +81,14 @@ public class TreatiseScreen extends Screen {
 		contentsButtons.add(addRenderableWidget(Button.builder(Component.translatable("knowledge.fmab.title"),
 				b -> minecraft.gui.setScreen(new KnowledgeScreen(this)))
 				.bounds(left + BOOK_WIDTH - 90, top + 6, 80, 16).build()));
+		// Deux colonnes : le sommaire tient au-dessus des flèches du bas, même avec beaucoup de chapitres.
+		int rows = (treatise.chapters().size() + 1) / 2;
+		int column = (BOOK_WIDTH - 24) / 2;
 		for (int c = 0; c < treatise.chapters().size(); c++) {
 			int chapter = c;
+			int x = left + 10 + (c / rows) * (column + 4);
 			Button b = addRenderableWidget(Button.builder(Component.translatable(treatise.chapters().get(c).titleKey()),
-					btn -> go(firstPageOf(chapter))).bounds(left + 30, top + 26 + c * 19, BOOK_WIDTH - 60, 17).build());
+					btn -> go(firstPageOf(chapter))).bounds(x, top + 26 + (c % rows) * 19, column, 17).build());
 			contentsButtons.add(b);
 		}
 		go(index);
