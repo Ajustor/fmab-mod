@@ -3,6 +3,7 @@ package com.ajustor.fmab.gate;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -12,7 +13,6 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
@@ -285,8 +285,7 @@ public final class Tolls {
 		if (!player.isCreative()) {
 			material.shrink(1);
 		}
-		player.level().sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY(1), player.getZ(), 16,
-				0.3, 0.4, 0.3, 0.05);
+		TransmutationLightning.discharge(player.level(), player.blockPosition(), 0.7, 0.5);
 		player.level().playSound(null, player.blockPosition(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.5f, 1.6f);
 		return true;
 	}

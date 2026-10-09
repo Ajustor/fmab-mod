@@ -16,10 +16,13 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FarmlandBlock;
+import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.LanternBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.SlabType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,6 +71,8 @@ public final class Blueprints {
 		out.put("rush_valley_workshop", new Workshop(false));
 		out.put("rush_valley_shop", new Workshop(true));
 		out.put("rush_valley_square", Blueprints::square);
+		out.put("laboratory_5", new Laboratory5());
+		out.put("devils_nest", new DevilsNest());
 		plans = out;
 		return plans;
 	}
@@ -490,6 +495,206 @@ public final class Blueprints {
 		public List<Spawn> spawns(Plot p) {
 			return winry ? List.of(new Spawn(FmabEntities.WINRY, new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2)))
 					: List.of();
+		}
+	}
+
+	/**
+	 * Le Laboratoire 5 : en surface, un poste de garde en ruine ; un puits à échelle descend dans une
+	 * grande salle souterraine. Des cellules le long du mur du fond, un cercle tracé au sang au milieu
+	 * du sol, des coffres de recherche, et ses gardiens : Lust et Gluttony.
+	 *
+	 * <p>Coordonnées : le poste occupe x 8..16, z 0..8 en surface (y ≥ 0) ; le puits descend en
+	 * (12, z 4) ; la salle couvre toute la parcelle, sol en y = −18, plafond en y = −12.
+	 */
+	static final class Laboratory5 implements Blueprint {
+		static final int HALL_FLOOR = -18;
+		static final int HALL_CEILING = -12;
+		private static final int SHAFT_X = 12;
+		private static final int SHAFT_Z = 4;
+
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			if (y >= HALL_FLOOR && y <= HALL_CEILING) {
+				return hall(x, y, z, p);
+			}
+			if (y > HALL_CEILING && y < 0) {
+				return shaft(x, y, z);
+			}
+			return guardhouse(x, y, z, p);
+		}
+
+		private BlockState hall(int x, int y, int z, Plot p) {
+			int sx = p.sizeX(), sz = p.sizeZ();
+			boolean wall = x == 0 || x == sx - 1 || z == 0 || z == sz - 1;
+			if (y == HALL_FLOOR) {
+				double d = Math.hypot(x - sx / 2.0 + 0.5, z - 9);
+				if (Math.abs(d - 5) < 0.6 || (d < 5 && (x == sx / 2 || z == 9))) {
+					return b(Blocks.CONCRETE.pick(DyeColor.RED));
+				}
+				return (x + z) % 2 == 0 ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.STONE_BRICKS);
+			}
+			if (y == HALL_CEILING) {
+				return x == SHAFT_X && z == SHAFT_Z ? ladder() : b(Blocks.STONE_BRICKS);
+			}
+			if (wall) {
+				return p.noise(x, y, z, 7) == 0 ? b(Blocks.CRACKED_STONE_BRICKS) : b(Blocks.STONE_BRICKS);
+			}
+			// Le puits continue jusqu'au sol, son échelle contre un pilier.
+			if (x == SHAFT_X && z == SHAFT_Z) {
+				return ladder();
+			}
+			if (x == SHAFT_X && z == SHAFT_Z + 1) {
+				return b(Blocks.STONE_BRICKS);
+			}
+			// Les cellules : des barreaux, des murs tous les cinq blocs.
+			if (z == sz - 5) {
+				return x % 5 == 0 ? b(Blocks.STONE_BRICKS) : y < HALL_CEILING - 1 ? ironBars(x, sx) : b(Blocks.STONE_BRICKS);
+			}
+			if (z > sz - 5 && x % 5 == 0) {
+				return b(Blocks.STONE_BRICKS);
+			}
+			// Lanternes d'âmes aux coins, chaînes qui pendent du plafond.
+			if (y == HALL_FLOOR + 1 && (x == 1 || x == sx - 2) && (z == 1 || z == sz - 6)) {
+				return b(Blocks.SOUL_LANTERN);
+			}
+			if (y == HALL_CEILING - 1 && x % 6 == 3 && z % 6 == 3) {
+				return b(Blocks.IRON_CHAIN);
+			}
+			return AIR;
+		}
+
+		private static BlockState ironBars(int x, int sx) {
+			return b(Blocks.IRON_BARS).setValue(CrossCollisionBlock.WEST, x % 5 != 1).setValue(CrossCollisionBlock.EAST,
+					x % 5 != 4);
+		}
+
+		private BlockState shaft(int x, int y, int z) {
+			if (Math.abs(x - SHAFT_X) > 1 || Math.abs(z - SHAFT_Z) > 1) {
+				return null;
+			}
+			if (x == SHAFT_X && z == SHAFT_Z) {
+				return ladder();
+			}
+			return b(Blocks.STONE_BRICKS);
+		}
+
+		private static BlockState ladder() {
+			// Tournée vers le nord : elle s'appuie sur le bloc au sud.
+			return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.NORTH);
+		}
+
+		/** Le poste de garde : quatre murs à moitié écroulés, un toit percé, la trappe du puits. */
+		private BlockState guardhouse(int x, int y, int z, Plot p) {
+			if (x < 8 || x > 16 || z > 8) {
+				return null;
+			}
+			boolean edge = x == 8 || x == 16 || z == 0 || z == 8;
+			if (y == -1) {
+				return x == SHAFT_X && z == SHAFT_Z ? ladder() : b(Blocks.STONE_BRICKS);
+			}
+			if (x == SHAFT_X && z == SHAFT_Z + 1 && y <= 1) {
+				return b(Blocks.STONE_BRICKS);
+			}
+			if (x == SHAFT_X && z == SHAFT_Z && y == 0) {
+				return ladder();
+			}
+			if (y <= 3) {
+				if (!edge) {
+					return AIR;
+				}
+				if (z == 0 && x == 12 && y <= 1) {
+					return AIR;
+				}
+				// La ruine : plus on monte, plus il manque de pierres.
+				if (p.noise(x, y, z, 6) < y - 1) {
+					return AIR;
+				}
+				return p.noise(x, y, z, 3) == 0 ? b(Blocks.CRACKED_STONE_BRICKS) : b(Blocks.MOSSY_STONE_BRICKS);
+			}
+			if (y == 4) {
+				return p.noise(x, y, z, 3) == 0 ? b(Blocks.STONE_BRICK_SLAB) : AIR;
+			}
+			return null;
+		}
+
+		@Override
+		public List<Chest> chests(Plot p) {
+			return List.of(
+					new Chest(new BlockPos(2, HALL_FLOOR + 1, 2), Laboratory5::research),
+					new Chest(new BlockPos(p.sizeX() - 3, HALL_FLOOR + 1, 2), Laboratory5::research));
+		}
+
+		/** Les restes des recherches de l'armée sur la Pierre. */
+		private static List<ItemStack> research(Plot p) {
+			List<ItemStack> out = new ArrayList<>();
+			out.add(new ItemStack(Items.PAPER, 2 + p.noise(7, 0, 0, 6)));
+			out.add(new ItemStack(Items.REDSTONE, 3 + p.noise(8, 0, 0, 8)));
+			out.add(new ItemStack(Items.GOLD_INGOT, 1 + p.noise(9, 0, 0, 3)));
+			out.add(new ItemStack(FmabItems.ALCHEMICAL_INK, 1 + p.noise(10, 0, 0, 2)));
+			if (p.noise(11, 0, 0, 2) == 0) {
+				out.add(Tomes.stack(Tomes.FORMS));
+			}
+			return out;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			return List.of(
+					new Spawn(FmabEntities.LUST, new BlockPos(p.sizeX() / 2 + 3, HALL_FLOOR + 1, 12)),
+					new Spawn(FmabEntities.GLUTTONY, new BlockPos(p.sizeX() / 2 - 4, HALL_FLOOR + 1, 10)));
+		}
+	}
+
+	private static final Palette DEVILS_NEST_PALETTE = new Palette(b(Blocks.DARK_OAK_PLANKS), b(Blocks.DARK_OAK_LOG),
+			b(Blocks.SPRUCE_PLANKS), b(Blocks.COBBLESTONE), Blocks.DARK_OAK_STAIRS, b(Blocks.DARK_OAK_PLANKS),
+			Blocks.DARK_OAK_DOOR);
+
+	/**
+	 * Le Devil's Nest, le bar de Greed à Dublith : un comptoir le long du mur du fond, des tonneaux,
+	 * des tables, une lanterne au plafond, et la réserve d'or du patron.
+	 */
+	static final class DevilsNest implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			BlockState shell = house(x, y, z, p, DEVILS_NEST_PALETTE);
+			int sx = p.sizeX(), sz = p.sizeZ();
+			boolean inside = x > 0 && x < sx - 1 && z > 0 && z < sz - 1;
+			if (!inside) {
+				return shell;
+			}
+			if (y == 1) {
+				// Le comptoir : des tonneaux contre le mur, le zinc devant.
+				if (z == sz - 2) {
+					return x % 3 == 0 ? b(Blocks.BREWING_STAND) : b(Blocks.BARREL);
+				}
+				if (z == sz - 3 && x > 1 && x < sx - 2) {
+					return b(Blocks.DARK_OAK_SLAB).setValue(SlabBlock.TYPE, SlabType.TOP);
+				}
+				// Les tables : un piquet et un plateau.
+				if (z == 2 && x % 4 == 2) {
+					return b(Blocks.DARK_OAK_FENCE);
+				}
+			}
+			if (y == 2 && z == 2 && x % 4 == 2) {
+				return b(Blocks.DARK_OAK_PRESSURE_PLATE);
+			}
+			if (y == 3 && x == sx / 2 && z == sz / 2) {
+				return b(Blocks.LANTERN).setValue(LanternBlock.HANGING, true);
+			}
+			return shell;
+		}
+
+		@Override
+		public List<Chest> chests(Plot p) {
+			return List.of(new Chest(new BlockPos(1, 1, p.sizeZ() - 2), plot -> List.of(
+					new ItemStack(Items.GOLD_INGOT, 6 + plot.noise(1, 0, 0, 10)),
+					new ItemStack(Items.EMERALD, 2 + plot.noise(2, 0, 0, 6)),
+					new ItemStack(Items.GLASS_BOTTLE, 3 + plot.noise(3, 0, 0, 5)))));
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			return List.of(new Spawn(FmabEntities.GREED, new BlockPos(p.sizeX() / 2, 1, p.sizeZ() - 4)));
 		}
 	}
 

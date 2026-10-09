@@ -1,0 +1,7 @@
+{
+  "type": "fmab:laboratory_5",
+  "biomes": "#fmab:has_structure/laboratory_5",
+  "spawn_overrides": {},
+  "step": "underground_structures",
+  "terrain_adaptation": "none"
+}

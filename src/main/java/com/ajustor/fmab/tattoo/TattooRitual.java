@@ -6,8 +6,8 @@ import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -56,8 +56,7 @@ public final class TattooRitual {
 		player.setAttached(FmabAttachments.TATTOOS, tattoos.with(slot, drawing));
 		level.removeBlock(circle, false);
 		player.hurtServer(level, level.damageSources().magic(), PAIN);
-		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + 1, player.getZ(), 30, 0.4, 0.6,
-				0.4, 0.1);
+		TransmutationLightning.discharge(level, player.blockPosition(), 1.5, 1);
 		level.playSound(null, player.blockPosition(), SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 0.6f);
 		player.sendSystemMessage(Component.translatable("tattoo.fmab.done", Component.translatable(slot.translationKey())));
 	}

@@ -63,6 +63,21 @@ public final class FmabBlocks {
 					.requiresCorrectToolForDrops()
 					.sound(SoundType.ANVIL));
 
+	/** Le sol du Ventre de Gluttony : une chair sombre, incassable. */
+	public static final Block BELLY_FLESH = register("belly_flesh", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.COLOR_RED)
+					.strength(-1.0f, 3600000.0f)
+					.noLootTable()
+					.sound(SoundType.SLIME_BLOCK));
+
+	/** Du sang figé en cristal : les mares du Ventre, et les restes d'une Pierre mal faite. */
+	public static final Block CRYSTALLIZED_BLOOD = register("crystallized_blood", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.CRIMSON_NYLIUM)
+					.strength(1.5f)
+					.sound(SoundType.AMETHYST));
+
 	private FmabBlocks() {
 	}
 

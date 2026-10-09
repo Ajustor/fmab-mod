@@ -10,6 +10,7 @@ import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.homunculus.Belly;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.training.Trainings;
 import net.minecraft.core.BlockPos;
@@ -154,16 +155,17 @@ public final class Transmutation {
 		}
 		dropAll(level, circle, flow);
 		if (anything) {
-			sparks(level, circle, 40);
+			TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 1);
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 1.4f);
 			practice(caster, rules, knowledge, practiced);
 			Trainings.onTransmutation(caster, analysis, frame, inscribed, done);
+			Belly.transmuted(caster);
 			return Result.DONE;
 		}
 		caster.sendOverlayMessage(Component.translatable(last == Effects.Result.NO_MATERIAL
 				? "transmutation.fmab.no_material"
 				: "transmutation.fmab.no_target"));
-		sparks(level, circle, 8);
+		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.3);
 		return Result.NOTHING;
 	}
 
@@ -259,9 +261,4 @@ public final class Transmutation {
 		flow.clear();
 	}
 
-	/** Les éclairs bleus de la transmutation. */
-	private static void sparks(ServerLevel level, BlockPos circle, int count) {
-		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, circle.getX() + 0.5, circle.getY() + 0.1,
-				circle.getZ() + 0.5, count, 1.2, 0.2, 1.2, 0.05);
-	}
 }

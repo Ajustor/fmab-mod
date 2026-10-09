@@ -1,7 +1,11 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.entity.EnvyEntity;
+import com.ajustor.fmab.entity.GluttonyEntity;
+import com.ajustor.fmab.entity.GreedEntity;
 import com.ajustor.fmab.entity.IzumiEntity;
+import com.ajustor.fmab.entity.LustEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.StoneGolemEntity;
 import com.ajustor.fmab.entity.TruthEntity;
@@ -64,6 +68,47 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(WINRY_KEY));
 
+	private static final ResourceKey<EntityType<?>> LUST_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("lust"));
+	private static final ResourceKey<EntityType<?>> GLUTTONY_KEY =
+			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("gluttony"));
+
+	/** Lust (Luxure), gardienne du Laboratoire 5. */
+	public static final EntityType<LustEntity> LUST = Registry.register(BuiltInRegistries.ENTITY_TYPE, LUST_KEY,
+			EntityType.Builder.<LustEntity>of(LustEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(LUST_KEY));
+
+	/** Gluttony (Gourmandise), gardien du Laboratoire 5 ; sa taille vient de son attribut d'échelle. */
+	public static final EntityType<GluttonyEntity> GLUTTONY = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+			GLUTTONY_KEY,
+			EntityType.Builder.<GluttonyEntity>of(GluttonyEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.8F)
+					.eyeHeight(1.62F)
+					.clientTrackingRange(10)
+					.build(GLUTTONY_KEY));
+
+	private static final ResourceKey<EntityType<?>> ENVY_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("envy"));
+
+	/** Envy (Envie) : erre déguisé ; sa taille change avec sa forme (attribut d'échelle). */
+	public static final EntityType<EnvyEntity> ENVY = Registry.register(BuiltInRegistries.ENTITY_TYPE, ENVY_KEY,
+			EntityType.Builder.<EnvyEntity>of(EnvyEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.8F)
+					.eyeHeight(1.62F)
+					.clientTrackingRange(10)
+					.build(ENVY_KEY));
+
+	private static final ResourceKey<EntityType<?>> GREED_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("greed"));
+
+	/** Greed (Avarice), dans son bar du Devil's Nest. */
+	public static final EntityType<GreedEntity> GREED = Registry.register(BuiltInRegistries.ENTITY_TYPE, GREED_KEY,
+			EntityType.Builder.<GreedEntity>of(GreedEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(GREED_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -73,5 +118,9 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(STONE_GOLEM, StoneGolemEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(TRUTH, TruthEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(WINRY, WinryEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(LUST, LustEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(GLUTTONY, GluttonyEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(ENVY, EnvyEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(GREED, GreedEntity.createAttributes());
 	}
 }

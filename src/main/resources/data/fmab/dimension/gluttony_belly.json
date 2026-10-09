@@ -1,0 +1,18 @@
+{
+  "type": "fmab:gluttony_belly",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "fmab:gluttony_belly",
+      "features": false,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "fmab:belly_flesh",
+          "height": 1
+        }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

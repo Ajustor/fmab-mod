@@ -5,9 +5,9 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabTags;
 import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.training.Trial;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -129,8 +129,7 @@ public class IzumiEntity extends PathfinderMob {
 		BlockPos feet = player.blockPosition();
 		BlockPos ground = feet.below();
 		BlockState earth = level.getBlockState(ground);
-		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, feet.getX() + 0.5, feet.getY() + 0.1, feet.getZ() + 0.5, 20,
-				0.6, 0.1, 0.6, 0.05);
+		TransmutationLightning.discharge(level, feet, 1.5, 0.8);
 		if (!earth.is(FmabTags.elementBlocks("earth")) || earth.hasBlockEntity()
 				|| !level.getBlockState(feet).canBeReplaced()) {
 			return;

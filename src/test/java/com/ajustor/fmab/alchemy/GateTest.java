@@ -2,6 +2,7 @@ package com.ajustor.fmab.alchemy;
 
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.gate.BodyPart;
+import com.ajustor.fmab.gate.Restoration;
 import com.ajustor.fmab.gate.TollChooser;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
@@ -74,6 +75,27 @@ class GateTest {
 		assertFalse(adrift.inArmor());
 		assertTrue(adrift.lost(BodyPart.ORGANS));
 		assertTrue(adrift.withAdrift(false).inArmor());
+	}
+
+	@Test
+	void aFullStoneGivesBackABodyAndASight() {
+		GateState soul = GateState.NONE.pay(BodyPart.SIGHT).pay(BodyPart.BODY).payWithSeal();
+		Restoration.Plan plan = Restoration.plan(soul.lost(), Restoration.STONE_SOULS);
+		assertEquals(Set.of(BodyPart.BODY, BodyPart.SIGHT), plan.restored());
+		assertEquals(90, plan.souls());
+		GateState healed = soul.restore(plan.restored());
+		assertTrue(healed.lost().isEmpty());
+		assertFalse(healed.adrift(), "le corps rendu, l'âme n'erre plus");
+		assertEquals(soul.openings(), healed.openings(), "les ouvertures passées comptent toujours");
+	}
+
+	@Test
+	void aWeakStoneGivesBackTheWorstFirst() {
+		Set<BodyPart> lost = EnumSet.of(BodyPart.ORGANS, BodyPart.LEFT_ARM, BodyPart.SIGHT);
+		Restoration.Plan plan = Restoration.plan(lost, 40);
+		assertEquals(Set.of(BodyPart.SIGHT), plan.restored(), "la vue d'abord, et il ne reste pas de quoi rendre le bras");
+		assertEquals(30, plan.souls());
+		assertTrue(Restoration.plan(lost, 10).restored().isEmpty());
 	}
 
 	@Test

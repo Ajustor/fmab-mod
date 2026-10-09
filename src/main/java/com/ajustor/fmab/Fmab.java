@@ -6,6 +6,8 @@ import com.ajustor.fmab.gate.GateOfTruth;
 import com.ajustor.fmab.gate.HumanTransmutation;
 import com.ajustor.fmab.gate.SoulBinding;
 import com.ajustor.fmab.gate.Tolls;
+import com.ajustor.fmab.homunculus.Belly;
+import com.ajustor.fmab.homunculus.EnvySpawner;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.network.FmabNetwork;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -19,6 +21,7 @@ import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Passives;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.world.FmabStructures;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -53,11 +56,14 @@ public class Fmab implements ModInitializer {
 		FmabCommands.register();
 		Concentration.register();
 		Passives.register();
+		TransmutationLightning.register();
 		HumanTransmutation.register();
 		GateOfTruth.register();
 		Tolls.register();
 		Automails.register();
 		SoulBinding.register();
+		Belly.register();
+		EnvySpawner.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> equip(handler.getPlayer()));
 		// Gantelets : frapper un bloc, main libre, y lance leur cercle au lieu de commencer à le casser.
 		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {

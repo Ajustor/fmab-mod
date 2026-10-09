@@ -3,11 +3,13 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.CircleMedium;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.gate.Restoration;
 import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
+import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.item.ScreenItem;
 import com.ajustor.fmab.item.TomeItem;
 import com.ajustor.fmab.item.Tomes;
@@ -96,6 +98,28 @@ public final class FmabItems {
 	public static final Item WINRY_SPAWN_EGG = register("winry_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.WINRY));
 
+	/**
+	 * Le noyau de Pierre philosophale d'un homonculus détruit. Une ressource de l'endgame : la
+	 * Pierre elle-même viendra plus tard.
+	 */
+	public static final Item PHILOSOPHER_STONE_CORE = register("philosopher_stone_core", Item::new,
+			new Item.Properties().stacksTo(16).rarity(Rarity.EPIC));
+	/** La Pierre philosophale : fondue de quatre noyaux, elle rend son corps à une âme. */
+	public static final Item PHILOSOPHER_STONE = register("philosopher_stone", PhilosopherStoneItem::new,
+			new Item.Properties().durability(Restoration.STONE_SOULS).rarity(Rarity.EPIC));
+	public static final Item CRYSTALLIZED_BLOOD = register("crystallized_blood",
+			p -> new BlockItem(FmabBlocks.CRYSTALLIZED_BLOOD, p), new Item.Properties().useBlockDescriptionPrefix());
+	public static final Item LUST_SPAWN_EGG = register("lust_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.LUST));
+	public static final Item GLUTTONY_SPAWN_EGG = register("gluttony_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.GLUTTONY));
+
+	public static final Item ENVY_SPAWN_EGG = register("envy_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.ENVY));
+
+	public static final Item GREED_SPAWN_EGG = register("greed_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.GREED));
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -147,6 +171,13 @@ public final class FmabItems {
 					output.accept(BRIGGS_AUTOMAIL_LEG);
 					output.accept(WINRY_SPAWN_EGG);
 					output.accept(TRUTH_SPAWN_EGG);
+					output.accept(PHILOSOPHER_STONE_CORE);
+					output.accept(PHILOSOPHER_STONE);
+					output.accept(CRYSTALLIZED_BLOOD);
+					output.accept(LUST_SPAWN_EGG);
+					output.accept(GLUTTONY_SPAWN_EGG);
+					output.accept(ENVY_SPAWN_EGG);
+					output.accept(GREED_SPAWN_EGG);
 				})
 				.build());
 	}
