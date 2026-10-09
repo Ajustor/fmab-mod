@@ -2,6 +2,7 @@ package com.ajustor.fmab.data;
 
 import com.ajustor.fmab.alchemy.exchange.Family;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.Map;
@@ -15,7 +16,13 @@ import java.util.Map;
  * }</pre>
  */
 public record ExchangeGroup(Family family, Map<String, Integer> values) {
-	public static final Codec<Family> FAMILY = Codec.STRING.xmap(Family::fromSerializedName, Family::serializedName);
+	public static final Codec<Family> FAMILY = Codec.STRING.comapFlatMap(name -> {
+		try {
+			return DataResult.success(Family.fromSerializedName(name));
+		} catch (IllegalArgumentException e) {
+			return DataResult.error(() -> "Unknown exchange family: " + name);
+		}
+	}, Family::serializedName);
 
 	public static final Codec<ExchangeGroup> CODEC = RecordCodecBuilder.create(i -> i.group(
 			FAMILY.fieldOf("family").forGetter(ExchangeGroup::family),

@@ -27,10 +27,13 @@ public final class NationalCircle extends SavedData {
 	/** Les sept points du cercle, comme les sept pointes de l'heptagone. */
 	public static final int POINTS = 7;
 
-	private static final Codec<NationalCircle> CODEC = RecordCodecBuilder.create(i -> i.group(
-			BlockPos.CODEC.listOf().optionalFieldOf("sealed", List.of()).forGetter(c -> List.copyOf(c.sealed)),
-			Codec.BOOL.optionalFieldOf("father_fallen", false).forGetter(c -> c.fatherFallen)
-	).apply(i, NationalCircle::new));
+	private static final Codec<NationalCircle> CODEC = Codec.withAlternative(
+			RecordCodecBuilder.create(i -> i.group(
+					BlockPos.CODEC.listOf().optionalFieldOf("sealed", List.of()).forGetter(c -> List.copyOf(c.sealed)),
+					Codec.BOOL.optionalFieldOf("father_fallen", false).forGetter(c -> c.fatherFallen)
+			).apply(i, NationalCircle::new)),
+			// Format d'avant : la liste des points scellés, seule.
+			BlockPos.CODEC.listOf().xmap(sealed -> new NationalCircle(sealed, false), c -> List.copyOf(c.sealed)));
 	private static final SavedDataType<NationalCircle> TYPE = new SavedDataType<>(Fmab.id("national_circle"),
 			NationalCircle::new, CODEC, DataFixTypes.SAVED_DATA_COMMAND_STORAGE);
 

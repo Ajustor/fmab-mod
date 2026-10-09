@@ -37,7 +37,9 @@ public final class FmabNetwork {
 	}
 
 	public static void register() {
-		PayloadTypeRegistry.serverboundPlay().register(SaveNotebookPayload.TYPE, SaveNotebookPayload.CODEC);
+		// Le carnet entier (seize pages) dépasse vite la taille d'un paquet ordinaire.
+		PayloadTypeRegistry.serverboundPlay().registerLarge(SaveNotebookPayload.TYPE, SaveNotebookPayload.CODEC,
+				1 << 20);
 		PayloadTypeRegistry.serverboundPlay().register(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
