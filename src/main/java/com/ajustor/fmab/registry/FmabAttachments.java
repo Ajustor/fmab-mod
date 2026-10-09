@@ -16,6 +16,9 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.network.codec.ByteBufCodecs;
 
+import java.util.List;
+import java.util.Set;
+
 public final class FmabAttachments {
 	/** Rang, savoir et concentration du joueur ; gardés à la mort, visibles de lui seul. */
 	public static final AttachmentType<AlchemistData> ALCHEMIST = AttachmentRegistry.<AlchemistData>builder()
@@ -90,6 +93,13 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.syncWith(ByteBufCodecs.VAR_INT, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("living_stone"));
+
+	/** Les homonculus qu'on a vus tomber : la clé du sceau de Père. Gardés à la mort. */
+	public static final AttachmentType<Set<String>> SLAIN = AttachmentRegistry.<Set<String>>builder()
+			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))
+			.initializer(Set::of)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("slain"));
 
 	/** Le geste de transmutation en cours : éphémère, visible de tous pour animer le joueur. */
 	public static final AttachmentType<TransmutationPose> POSE = AttachmentRegistry.<TransmutationPose>builder()

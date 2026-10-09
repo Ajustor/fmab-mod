@@ -2,6 +2,7 @@ package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.client.render.EnvyRenderer;
+import com.ajustor.fmab.client.render.FatherRenderer;
 import com.ajustor.fmab.client.render.GluttonyRenderer;
 import com.ajustor.fmab.client.render.GreedRenderer;
 import com.ajustor.fmab.client.render.IzumiRenderer;
@@ -89,6 +90,7 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.SLOTH, SlothRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.WRATH, WrathRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.PRIDE, PrideRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.FATHER, FatherRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(OpenTruthPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,

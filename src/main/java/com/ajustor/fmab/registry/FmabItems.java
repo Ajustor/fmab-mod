@@ -127,6 +127,13 @@ public final class FmabItems {
 	public static final Item PRIDE_SPAWN_EGG = register("pride_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.PRIDE));
 
+	public static final Item FATHER_SPAWN_EGG = register("father_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.FATHER));
+	public static final Item FATHER_SEAL = register("father_seal",
+			p -> new BlockItem(FmabBlocks.FATHER_SEAL, p), new Item.Properties().useBlockDescriptionPrefix());
+	public static final Item FATHER_PIPE = register("father_pipe",
+			p -> new BlockItem(FmabBlocks.FATHER_PIPE, p), new Item.Properties().useBlockDescriptionPrefix());
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -188,6 +195,8 @@ public final class FmabItems {
 					output.accept(SLOTH_SPAWN_EGG);
 					output.accept(WRATH_SPAWN_EGG);
 					output.accept(PRIDE_SPAWN_EGG);
+					output.accept(FATHER_SPAWN_EGG);
+					output.accept(FATHER_PIPE);
 				})
 				.build());
 	}

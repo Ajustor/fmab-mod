@@ -15,7 +15,7 @@ import java.util.Optional;
  * Central City : une grande ville circulaire et fortifiée, posée sur un plateau aplani. Muraille à
  * quatre portes, avenues en croix, boulevard circulaire, place et fontaine ; au nord de la place le
  * quartier général et son arène, à l'est la bibliothèque, à l'ouest la résidence Bradley ; des
- * maisons partout ailleurs. Sous la ville, le tunnel de Sloth.
+ * maisons partout ailleurs. Sous la ville, le tunnel de Sloth, et plus bas le repaire de Père.
  */
 public class CentralStructure extends Structure {
 	public static final MapCodec<CentralStructure> CODEC = simpleCodec(CentralStructure::new);
@@ -76,6 +76,10 @@ public class CentralStructure extends Structure {
 		int depth = -Blueprints.SlothTunnel.FLOOR;
 		builder.addPiece(new ProceduralPiece("sloth_tunnel", new BlockPos(cx - R, y, cz + 30), size, depth + 1, 7, depth,
 				Rotation.NONE, seed));
+		// Plus bas encore, derrière une porte scellée de la paroi sud du tunnel : le repaire de Père.
+		builder.addPiece(new ProceduralPiece("father_lair",
+				new BlockPos(cx + Blueprints.SlothTunnel.FATHER_DOOR - 16, y, cz + 36), 33, 1, 41,
+				-Blueprints.FatherLair.ROOM_FLOOR, Rotation.NONE, seed));
 		for (int gx = -R + 6; gx < R - 6; gx += LOT) {
 			for (int gz = -R + 6; gz < R - 6; gz += LOT) {
 				if (!buildable(gx, gz)) {

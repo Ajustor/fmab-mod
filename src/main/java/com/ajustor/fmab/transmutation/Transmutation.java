@@ -11,6 +11,7 @@ import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.TransmutationPose;
+import com.ajustor.fmab.homunculus.AntiAlchemy;
 import com.ajustor.fmab.homunculus.Belly;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.stone.Karma;
@@ -85,6 +86,10 @@ public final class Transmutation {
 	 */
 	public static Result activate(ServerLevel level, BlockPos circle, CircleFrame frame, Drawing drawing,
 			ServerPlayer caster, boolean inscribed, int maxStages, CircleSize size) {
+		// Père capte l'énergie tectonique : autour de lui, rien ne s'allume.
+		if (AntiAlchemy.blocks(level, circle, caster)) {
+			return Result.INERT;
+		}
 		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Knowledge knowledge = rules.knowledge(alchemist);
@@ -227,6 +232,10 @@ public final class Transmutation {
 		if (channel == null || !channel.circle().equals(circle) || now - channel.last() > CHANNEL_GAP) {
 			CHANNELS.remove(caster.getUUID());
 			return false;
+		}
+		if (AntiAlchemy.blocks(level, circle, caster)) {
+			CHANNELS.remove(caster.getUUID());
+			return true;
 		}
 		if (channel.growth() >= MAX_GROWTH) {
 			return true;

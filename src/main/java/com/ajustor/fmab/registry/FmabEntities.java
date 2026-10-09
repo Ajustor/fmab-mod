@@ -2,6 +2,7 @@ package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.EnvyEntity;
+import com.ajustor.fmab.entity.FatherEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
 import com.ajustor.fmab.entity.GreedEntity;
 import com.ajustor.fmab.entity.IzumiEntity;
@@ -142,6 +143,16 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(PRIDE_KEY));
 
+	private static final ResourceKey<EntityType<?>> FATHER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("father"));
+
+	/** Père, l'Homonculus originel, sur son trône sous Central ; sa forme divine grandit (échelle). */
+	public static final EntityType<FatherEntity> FATHER = Registry.register(BuiltInRegistries.ENTITY_TYPE, FATHER_KEY,
+			EntityType.Builder.<FatherEntity>of(FatherEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(FATHER_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -158,5 +169,6 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(SLOTH, SlothEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(WRATH, WrathEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(PRIDE, PrideEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(FATHER, FatherEntity.createAttributes());
 	}
 }

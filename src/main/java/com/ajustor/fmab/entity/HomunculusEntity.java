@@ -1,8 +1,10 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
@@ -20,6 +22,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Un homonculus : un être artificiel dont le cœur est une Pierre philosophale. Tant que la Pierre
@@ -79,11 +84,18 @@ public abstract class HomunculusEntity extends Monster {
 		setTarget(null);
 		getNavigation().stop();
 		level.playSound(null, blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.HOSTILE, 1, 0.6f);
-		Component name = getDisplayName();
-		for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(32))) {
-			p.sendSystemMessage(Component.translatable("homunculus.fmab.reconstitutes", name));
+		if (announcesReconstitution()) {
+			Component name = getDisplayName();
+			for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(32))) {
+				p.sendSystemMessage(Component.translatable("homunculus.fmab.reconstitutes", name));
+			}
 		}
 		onReconstitute(level);
+	}
+
+	/** Le message ordinaire de reconstitution ; Père annonce lui-même ses métamorphoses. */
+	protected boolean announcesReconstitution() {
+		return true;
 	}
 
 	/** Ce qui change quand l'homonculus se reconstitue (Envy change de forme, par exemple). */
@@ -136,8 +148,13 @@ public abstract class HomunculusEntity extends Monster {
 		super.die(source);
 		if (level() instanceof ServerLevel level) {
 			Component name = getDisplayName();
-			for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(32))) {
+			String slain = BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath();
+			for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(48))) {
 				p.sendSystemMessage(Component.translatable("homunculus.fmab.destroyed", name));
+				// Tous ceux qui étaient là l'ont vu tomber : le sceau de Père les reconnaîtra.
+				Set<String> seen = new HashSet<>(p.getAttachedOrCreate(FmabAttachments.SLAIN));
+				seen.add(slain);
+				p.setAttached(FmabAttachments.SLAIN, Set.copyOf(seen));
 			}
 		}
 	}
