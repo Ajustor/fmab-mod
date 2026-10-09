@@ -10,15 +10,15 @@ import com.ajustor.fmab.client.render.PrideRenderer;
 import com.ajustor.fmab.client.render.SlothRenderer;
 import com.ajustor.fmab.client.render.StateExaminerRenderer;
 import com.ajustor.fmab.client.render.StoneGolemRenderer;
+import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.render.TruthRenderer;
 import com.ajustor.fmab.client.render.WinryRenderer;
 import com.ajustor.fmab.client.render.WrathRenderer;
-import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.screen.ExamScreen;
-import com.ajustor.fmab.client.screen.TattooScreen;
 import com.ajustor.fmab.client.screen.GlovesScreen;
 import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
+import com.ajustor.fmab.client.screen.TattooScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
 import com.ajustor.fmab.client.screen.WinryScreen;
 import com.ajustor.fmab.data.AlchemistData;
@@ -33,9 +33,10 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.stone.Eclipse;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
@@ -104,6 +105,10 @@ public class FmabClient implements ClientModInitializer {
 				(graphics, delta) -> concentrationBar(graphics));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("lost_sight"),
 				(graphics, delta) -> lostSight(graphics));
+		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("eclipse"),
+				(graphics, delta) -> eclipse(graphics));
+		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("living_stone"),
+				(graphics, delta) -> livingStone(graphics));
 	}
 
 	/**
@@ -143,6 +148,30 @@ public class FmabClient implements ClientModInitializer {
 				}
 			}
 		}
+	}
+
+	/** Pendant l'éclipse, le jour se teinte d'un crépuscule orangé et sombre. */
+	private static void eclipse(GuiGraphicsExtractor graphics) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.level == null || !Eclipse.now(mc.level) || !mc.level.canSeeSky(mc.player.blockPosition())) {
+			return;
+		}
+		graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), 0x7A1A0800);
+	}
+
+	/** Le compteur d'âmes d'une Pierre philosophale vivante, au-dessus de la barre de concentration. */
+	private static void livingStone(GuiGraphicsExtractor graphics) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null) {
+			return;
+		}
+		Integer souls = mc.player.getAttached(FmabAttachments.LIVING_STONE);
+		if (souls == null || souls <= 0) {
+			return;
+		}
+		int x = graphics.guiWidth() / 2 + 10;
+		int y = graphics.guiHeight() - 39 - 10 - 16;
+		graphics.text(mc.font, Component.translatable("hud.fmab.living_stone", souls), x, y, 0xFFE0303A, true);
 	}
 
 	/**

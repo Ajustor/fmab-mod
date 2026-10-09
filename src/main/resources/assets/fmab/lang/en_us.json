@@ -394,6 +394,12 @@
   "treatise.fmab.ch9.p5": "Greed runs the Devil's Nest. His Ultimate Shield makes him invulnerable, except when he lowers it to strike. He does not look for a fight: offer him gold, emeralds or diamonds, or beat him twice, and he will fight at your side, as long as you pay him every day.",
   "treatise.fmab.ch9.p6": "Sloth digs an endless tunnel under Central. The strongest and fastest of them, but so lazy: he sighs, then rushes straight ahead, smashing through rock. After his charge, he catches his breath: strike then.",
   "treatise.fmab.ch9.p7": "Führer King Bradley is Wrath. He has only one life, but his Ultimate Eye sees blows coming: he dodges arrows and half the blows struck from the front. Hit him in the back, or while he strikes.\n\nHis son Selim is Pride. His shadows cut and devour, but live only with light: plunge the room into total darkness, or flood it with light, and he is just a child.",
+
+  "treatise.fmab.ch10.title": "X. The Philosopher's Stone",
+  "treatise.fmab.ch10.p1": "Held in hand, the Stone amplifies any transmutation: range and damage half again, no concentration, and the circle no longer rebounds from instability or misunderstood glyphs. Each transmutation costs it a soul, plus one per stage.\n\nBut it can be seen from afar: its bearer glows, and the monsters around come running.",
+  "treatise.fmab.ch10.p2": "There is only one way to make a Stone: lives. On a human transmutation circle, lay crystallized blood: the circle consumes everything alive in its area and condenses their souls. A villager is worth twelve souls, a beast three.\n\nIt is the absolute taboo.",
+  "treatise.fmab.ch10.p3": "Karma keeps track of what you do. Sacrificing and killing villagers lower it; destroying homunculi, defending villagers and repairing raise it. Villagers talk about it: low karma raises their prices and sets their golems on you; very low, the homunculi come to recruit you.",
+  "treatise.fmab.ch10.p4": "Every eight days, around noon, the moon passes before the sun. During this eclipse, a Gate initiate holding a full Stone in each hand, on a human transmutation circle, becomes a Living Stone, like Hohenheim: two hundred souls, no more toll, no more concentration, and they rise from every death. Each death costs twenty souls, each great transmutation one; at zero, it all ends. And the homunculi hunt them.",
   "treatise.fmab.ch8.p5": "The first time Truth takes the whole body, the soul at once finds itself in an iron armor, bound by a blood seal drawn inside the breastplate. The armor is hollow: only it can be seen. The soul neither hungers nor breathes, and does not eat. Blows wear the pieces: a piece that gives way can be made again (without a helm you see poorly, without greaves you walk poorly). Crouching, the soul transmutes the material it holds into its armor (an iron ingot for iron) and mends it.\n\nIf the breastplate gives way, the seal is erased: the soul goes back to wander before its Gate.",
 
   "block.fmab.white_floor": "White Space floor",
@@ -525,5 +531,27 @@
   "homunculus.fmab.swallowed": "Gluttony swallows you. It is dark, and it smells of blood…",
   "homunculus.fmab.belly_gate": "Your transmutation tears the Belly open: you get out.",
   "homunculus.fmab.belly_cleared": "Nothing moves in the Belly anymore. Gluttony spits you out.",
-  "homunculus.fmab.spat_out": "Gluttony has a stomachache: he spits you out."
+  "homunculus.fmab.spat_out": "Gluttony has a stomachache: he spits you out.",
+
+  "karma.fmab.falls": "Your karma darkens.",
+  "karma.fmab.rises": "Your karma brightens.",
+  "karma.fmab.damned": "damned",
+  "karma.fmab.dark": "dark",
+  "karma.fmab.neutral": "neutral",
+  "karma.fmab.good": "good",
+  "karma.fmab.noble": "noble",
+  "knowledge.fmab.karma": "Karma: %s (%s)",
+  "eclipse.fmab.begins": "The moon passes before the sun. It is the eclipse: the Promised Day.",
+  "eclipse.fmab.ends": "The sun reappears.",
+  "hud.fmab.living_stone": "Souls: %s",
+  "stone.fmab.sacrifice_too_few": "Not enough lives in the circle: it takes at least %s souls.",
+  "stone.fmab.sacrifice_done": "The circle closes on the souls. A Philosopher's Stone of %s souls lies at its center.",
+  "stone.fmab.ritual_needs_eclipse": "The Living Stone ritual can only be performed during the eclipse.",
+  "stone.fmab.ritual_needs_gate": "You must have seen the Gate to become a Living Stone.",
+  "stone.fmab.became_living_stone": "The souls of both Stones melt into you. You are a living Philosopher's Stone (%s souls).",
+  "stone.fmab.resurrected": "A soul burns away: you rise again. %s remain.",
+  "stone.fmab.living_stone_spent": "Your last soul fades. You are no longer a Stone.",
+  "stone.fmab.hunted_lust": "Lust: \"A walking Stone… Father will be delighted.\"",
+  "stone.fmab.hunted_envy": "Someone who looks exactly like you is watching from afar…",
+  "truth.fmab.toll.living_stone": "\"You have already paid everything, with other people's souls.\""
 }

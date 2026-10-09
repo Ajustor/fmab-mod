@@ -100,6 +100,16 @@ joueur compose lui-même :
   pendant qu'il frappe.
 - **Pride** (Selim) : ses ombres tranchent, dévorent et parent les coups, mais ne vivent qu'avec de
   la lumière ; dans le noir complet ou une lumière intense, il n'est qu'un enfant vulnérable.
+
+**v0.7 (Pierre), en cours :**
+
+- La **Pierre philosophale** tenue en main amplifie les transmutations (×1,5, sans concentration ni
+  rebond d'instabilité) au prix d'âmes, et attire les monstres. On la fabrique par **sacrifice** :
+  sang cristallisé sur un cercle de transmutation humaine, qui consume les vies de son aire.
+- Le **karma** (−100 à +100) suit vos actes ; les villageois en parlent (prix, golems), et les
+  homonculus recrutent les âmes noires.
+- Tous les huit jours, l'**éclipse** ; c'est là qu'un Initié, une Pierre pleine dans chaque main,
+  devient une **Pierre vivante** : plus de péage, résurrection sur place tant qu'il reste des âmes.
 - **Transmutation sans cercle** pour les Initiés de la Porte : Maj+G joint les mains et lance le
   cercle sélectionné du carnet.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : établi d'automail, usure,
@@ -163,6 +173,10 @@ can be hired as an ally; the Philosopher's Stone gives back what the Gate took, 
 then rests; Wrath (King Bradley) dodges with his Ultimate Eye unless struck from behind or while
 attacking; Pride's shadows only live with light, so total darkness or intense light leaves him a
 vulnerable child.
+
+**v0.7 (Stone), in progress:** the Philosopher's Stone amplifies transmutations and draws monsters,
+and is made by sacrificing lives on a human transmutation circle; karma tracks your deeds; every
+eighth day an eclipse lets a Gate initiate holding two full Stones become a Living Stone.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 

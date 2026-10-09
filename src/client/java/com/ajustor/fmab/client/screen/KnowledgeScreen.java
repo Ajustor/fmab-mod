@@ -75,6 +75,7 @@ public class KnowledgeScreen extends Screen {
 						Knowledge.ALCHEMIST_MASTERY)
 				: Component.translatable("knowledge.fmab.rank", rank, knowledge.totalMastery());
 		graphics.centeredText(font, status, width / 2, top + 18, FADED);
+		graphics.text(font, karmaLine(), left + 8, top + 6, FADED, false);
 
 		hovers.clear();
 		int x = left + 10;
@@ -123,5 +124,14 @@ public class KnowledgeScreen extends Screen {
 	@Override
 	public boolean isPauseScreen() {
 		return false;
+	}
+
+	/** Le karma, en toutes lettres : il se sent plus qu'il ne se compte. */
+	private Component karmaLine() {
+		Integer karma = minecraft == null || minecraft.player == null ? null
+				: minecraft.player.getAttached(FmabAttachments.KARMA);
+		int k = karma == null ? 0 : karma;
+		String step = k <= -60 ? "damned" : k <= -25 ? "dark" : k < 25 ? "neutral" : k < 60 ? "good" : "noble";
+		return Component.translatable("knowledge.fmab.karma", Component.translatable("karma.fmab." + step), k);
 	}
 }

@@ -8,6 +8,7 @@ import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.stone.LivingStone;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -240,6 +241,11 @@ public final class GateOfTruth {
 	 * dans une armure de fer ; à une âme déjà dans une armure, elle prend le sceau, et l'âme erre.
 	 */
 	private static GateState toll(ServerLevel space, ServerPlayer player, GateState gate, GateState.Visit visit) {
+		if (LivingStone.souls(player) > 0) {
+			// Une Pierre vivante a déjà tout payé.
+			say(player, "truth.fmab.toll.living_stone");
+			return gate;
+		}
 		BodyPart part = TollChooser.choose(gate.lost(), visit.ambition(), visit.severe(), player.getRandom().nextDouble());
 		GateState paid;
 		if (part == BodyPart.BODY && gate.soulBound()) {
