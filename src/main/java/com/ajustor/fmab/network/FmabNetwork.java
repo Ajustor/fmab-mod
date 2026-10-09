@@ -6,19 +6,22 @@ import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.entity.IzumiEntity;
+import com.ajustor.fmab.entity.StateExaminerEntity;
+import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyPart;
-import com.ajustor.fmab.entity.StateExaminerEntity;
-import com.ajustor.fmab.state.StateExam;
-import com.ajustor.fmab.tattoo.TattooRitual;
-import com.ajustor.fmab.tattoo.TattooSlot;
+import com.ajustor.fmab.gate.Rebirth;
+import com.ajustor.fmab.gate.SoulBinding;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
-import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.state.StateExam;
+import com.ajustor.fmab.tattoo.TattooRitual;
+import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.training.Trial;
+import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -39,6 +42,8 @@ public final class FmabNetwork {
 		PayloadTypeRegistry.serverboundPlay().register(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(WinryActionPayload.TYPE, WinryActionPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(TruthChoicePayload.TYPE, TruthChoicePayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(OpenTruthPayload.TYPE, OpenTruthPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenWinryPayload.TYPE, OpenWinryPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenIzumiPayload.TYPE, OpenIzumiPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(ExamActionPayload.TYPE, ExamActionPayload.CODEC);
@@ -53,6 +58,8 @@ public final class FmabNetwork {
 				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
 		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,
 				(payload, context) -> removeGlove(context.player(), payload.left()));
+		ServerPlayNetworking.registerGlobalReceiver(TruthChoicePayload.TYPE,
+				(payload, context) -> truth(context.player(), payload));
 		ServerPlayNetworking.registerGlobalReceiver(WinryActionPayload.TYPE,
 				(payload, context) -> winry(context.player(), payload));
 		ServerPlayNetworking.registerGlobalReceiver(IzumiActionPayload.TYPE,
@@ -86,6 +93,20 @@ public final class FmabNetwork {
 			case ExamActionPayload.FIGHT -> StateExam.startFight(examiner, player);
 			default -> {
 			}
+		}
+	}
+
+	/** L'âme errante répond à sa Vérité : il faut que ce soit bien la sienne, et qu'elle erre. */
+	private static void truth(ServerPlayer player, TruthChoicePayload payload) {
+		if (!(player.level().getEntity(payload.entityId()) instanceof TruthEntity truth)
+				|| truth.owner().filter(player.getUUID()::equals).isEmpty() || player.distanceToSqr(truth) > 100
+				|| !player.getAttachedOrCreate(FmabAttachments.GATE).adrift()) {
+			return;
+		}
+		if (payload.restart()) {
+			Rebirth.restart(player);
+		} else {
+			SoulBinding.recall(player);
 		}
 	}
 

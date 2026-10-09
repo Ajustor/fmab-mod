@@ -1,9 +1,11 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.FmabConfig;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.gate.BodyPart;
-import com.ajustor.fmab.gate.SoulBinding;
+import com.ajustor.fmab.network.OpenTruthPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -98,7 +100,8 @@ public class TruthEntity extends PathfinderMob {
 		if (player instanceof ServerPlayer server && owner().filter(server.getUUID()::equals).isPresent()) {
 			GateState gate = server.getAttachedOrCreate(FmabAttachments.GATE);
 			if (gate.adrift()) {
-				SoulBinding.recall(server);
+				// Être rappelée dans un sceau, ou repartir de zéro : l'âme choisit.
+				ServerPlayNetworking.send(server, new OpenTruthPayload(getId(), FmabConfig.get().restartWipesProgress()));
 			}
 		}
 		return InteractionResult.SUCCESS;

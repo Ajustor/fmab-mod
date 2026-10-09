@@ -8,11 +8,13 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.data.Training;
+import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.homunculus.Belly;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.minecraft.network.codec.ByteBufCodecs;
 
 public final class FmabAttachments {
 	/** Rang, savoir et concentration du joueur ; gardés à la mort, visibles de lui seul. */
@@ -73,6 +75,26 @@ public final class FmabAttachments {
 	public static final AttachmentType<Belly.Swallowed> SWALLOWED = AttachmentRegistry.<Belly.Swallowed>builder()
 			.persistent(Belly.Swallowed.CODEC)
 			.buildAndRegister(Fmab.id("swallowed"));
+
+	/** Le karma, de −100 à +100 : gardé à la mort, visible du joueur. */
+	public static final AttachmentType<Integer> KARMA = AttachmentRegistry.<Integer>builder()
+			.persistent(Codec.INT)
+			.initializer(() -> 0)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.VAR_INT, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("karma"));
+
+	/** Les âmes d'une Pierre philosophale vivante ; absent pour qui n'en est pas une. */
+	public static final AttachmentType<Integer> LIVING_STONE = AttachmentRegistry.<Integer>builder()
+			.persistent(Codec.INT)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.VAR_INT, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("living_stone"));
+
+	/** Le geste de transmutation en cours : éphémère, visible de tous pour animer le joueur. */
+	public static final AttachmentType<TransmutationPose> POSE = AttachmentRegistry.<TransmutationPose>builder()
+			.syncWith(TransmutationPose.STREAM_CODEC, AttachmentSyncPredicate.all())
+			.buildAndRegister(Fmab.id("pose"));
 
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()

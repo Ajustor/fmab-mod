@@ -8,6 +8,7 @@ import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.stone.LivingStone;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -62,6 +63,9 @@ public final class GateOfTruth {
 	private static final int KNOWLEDGE = 250;
 	private static final int TOLL = 330;
 	private static final int RETURN = 400;
+	/** Une âme errante entend la Vérité se moquer d'elle toutes les minutes. */
+	private static final int MOCKERY_PERIOD = 1200;
+	private static final int MOCKERIES = 5;
 
 	private GateOfTruth() {
 	}
@@ -108,9 +112,11 @@ public final class GateOfTruth {
 			return;
 		}
 		int t = visit.ticks();
+		// Ce qu'elle dit dépend de combien de fois on est déjà venu la voir.
+		String tier = familiarity(gate.openings());
 		switch (t) {
-			case GREETING -> say(player, "truth.fmab.greeting");
-			case PRESENTATION -> say(player, "truth.fmab.presentation");
+			case GREETING -> say(player, "truth.fmab.greeting." + tier);
+			case PRESENTATION -> say(player, "truth.fmab.presentation." + tier);
 			case OPENING -> open(space, player);
 			case KNOWLEDGE -> knowledge(space, player);
 			case TOLL -> gate = toll(space, player, gate, visit);
@@ -125,7 +131,7 @@ public final class GateOfTruth {
 			player.setAttached(FmabAttachments.GATE, gate.withVisit(null));
 			if (gate.adrift()) {
 				SoulBinding.drift(player);
-				say(player, "truth.fmab.adrift");
+				mock(player);
 			} else {
 				leaveTruth(player);
 				sendHome(server, player, visit);
@@ -135,15 +141,38 @@ public final class GateOfTruth {
 		player.setAttached(FmabAttachments.GATE, gate.withVisit(visit.tick()));
 	}
 
-	/** Une âme sans armure attend devant sa Porte, face à sa Vérité. */
+	/** Une âme sans armure attend devant sa Porte, face à sa Vérité, qui ne se prive pas de s'en moquer. */
 	private static void drift(MinecraftServer server, ServerPlayer player, GateState gate) {
 		ServerLevel space = server.getLevel(WHITE_SPACE);
-		if (space == null || player.level() == space) {
+		if (space == null) {
+			return;
+		}
+		if (player.level() == space) {
+			if (player.tickCount % MOCKERY_PERIOD == 0) {
+				mock(player);
+			}
 			return;
 		}
 		arrive(space, player, gate);
 		SoulBinding.drift(player);
-		say(player, "truth.fmab.adrift");
+		mock(player);
+	}
+
+	/** Plus on revient, plus la Vérité devient familière. */
+	private static String familiarity(int openings) {
+		if (openings == 0) {
+			return "first";
+		}
+		if (openings == 1) {
+			return "again";
+		}
+		return openings < 4 ? "regular" : "friend";
+	}
+
+	/** Une âme sans corps qui revient devant sa Porte : la Vérité trouve ça très drôle. */
+	private static void mock(ServerPlayer player) {
+		say(player, "truth.fmab.mock." + (1 + player.getRandom().nextInt(MOCKERIES)));
+		player.sendSystemMessage(Component.translatable("truth.fmab.mock_hint").withStyle(s -> s.withColor(0x707070)));
 	}
 
 	private static void arrive(ServerLevel space, ServerPlayer player, GateState gate) {
@@ -240,6 +269,11 @@ public final class GateOfTruth {
 	 * dans une armure de fer ; à une âme déjà dans une armure, elle prend le sceau, et l'âme erre.
 	 */
 	private static GateState toll(ServerLevel space, ServerPlayer player, GateState gate, GateState.Visit visit) {
+		if (LivingStone.souls(player) > 0) {
+			// Une Pierre vivante a déjà tout payé.
+			say(player, "truth.fmab.toll.living_stone");
+			return gate;
+		}
 		BodyPart part = TollChooser.choose(gate.lost(), visit.ambition(), visit.severe(), player.getRandom().nextDouble());
 		GateState paid;
 		if (part == BodyPart.BODY && gate.soulBound()) {
@@ -250,7 +284,7 @@ public final class GateOfTruth {
 			say(player, "truth.fmab.toll.seal");
 		} else {
 			paid = gate.pay(part);
-			say(player, "truth.fmab.toll");
+			say(player, "truth.fmab.toll." + familiarity(gate.openings()));
 			player.sendSystemMessage(Component.translatable("gate.fmab.toll_taken",
 					Component.translatable(part.translationKey())).withStyle(s -> s.withColor(0xB0201A)));
 			if (part == BodyPart.BODY) {

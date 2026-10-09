@@ -24,9 +24,12 @@ import java.util.List;
  * @param knowledge  savoir de l'alchimiste, dont certains bonus changent la forme des effets
  * @param rangeBonus portée ajoutée par la montre d'Alchimiste d'État
  * @param power      multiplicateur de portée et de dégâts : la taille du cercle tracé
+ * @param growth     combien de fois l'alchimiste a prolongé la transmutation en gardant la main sur
+ *                   le cercle (0 au premier contact)
  */
 public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame frame, ServerPlayer caster,
-		Analysis.StageEffect stage, List<ItemStack> flow, Knowledge knowledge, int rangeBonus, double power) {
+		Analysis.StageEffect stage, List<ItemStack> flow, Knowledge knowledge, int rangeBonus, double power,
+		int growth) {
 	/** Un satellite agit à ce nombre de blocs du centre, du côté de son sommet. */
 	private static final int SATELLITE_OFFSET = 2;
 
@@ -77,6 +80,11 @@ public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame fram
 
 	public int range() {
 		return Math.max(1, (int) Math.round((stage.range() + rangeBonus) * power));
+	}
+
+	/** Une hauteur qui grandit tant que l'alchimiste garde la main sur le cercle. */
+	public int grown(int base) {
+		return base + growth;
 	}
 
 	/** Des dégâts à la mesure du cercle. */

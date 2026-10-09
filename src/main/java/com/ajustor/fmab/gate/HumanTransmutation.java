@@ -2,6 +2,9 @@ package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.stone.LivingStone;
+import com.ajustor.fmab.stone.Sacrifice;
 import com.ajustor.fmab.transmutation.EffectContext;
 import com.ajustor.fmab.transmutation.Effects;
 import net.minecraft.core.BlockPos;
@@ -73,8 +76,14 @@ public final class HumanTransmutation {
 		if (gate.visit().isPresent()) {
 			return Effects.Result.NO_TARGET;
 		}
+		if (LivingStone.tryRitual(caster, circle)) {
+			return Effects.Result.DONE;
+		}
 		AABB area = new AABB(circle).inflate(REACH, 1, REACH);
 		List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, area, ItemEntity::isAlive);
+		if (items.stream().anyMatch(e -> e.getItem().is(FmabItems.CRYSTALLIZED_BLOOD))) {
+			return Sacrifice.perform(level, caster, circle, area, items);
+		}
 		int sets = sets(items);
 		consume(level, items, sets, Vec3.atCenterOf(circle));
 
