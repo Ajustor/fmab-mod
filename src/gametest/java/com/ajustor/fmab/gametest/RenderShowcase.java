@@ -144,6 +144,13 @@ public class RenderShowcase implements FabricClientGameTest {
 		onPlayer(context, sp, p -> TransmutationPose.strike(p, TransmutationPose.Kind.NONE, 0));
 		sideCamera(context, sp, true);
 		context.takeScreenshot("body_04_full_iron_side");
+		// Une animation vanilla que l'automail ne joue pas lui-même : il doit la recopier du squelette.
+		context.getInput().holdKey(options -> options.keyShift);
+		context.waitTicks(5);
+		sideCamera(context, sp, true);
+		context.takeScreenshot("body_04_crouch_side");
+		context.getInput().releaseKey(options -> options.keyShift);
+		context.waitTicks(5);
 		onPlayer(context, sp, p -> {
 			p.setAttached(FmabAttachments.GATE, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_LEG));
 			p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE);

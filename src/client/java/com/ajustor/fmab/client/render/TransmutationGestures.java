@@ -8,8 +8,8 @@ import net.minecraft.util.Mth;
 /**
  * Les gestes de l'alchimiste, par-dessus l'animation ordinaire : penché, les paumes plaquées sur le
  * cercle ; les mains tenues qui tremblent sous l'énergie ; les mains jointes ; le bras tendu vers une
- * âme qu'on arrache. Le geste retombe en douceur à sa fin. Le joueur et ses automails les jouent
- * ensemble.
+ * âme qu'on arrache. Le geste retombe en douceur à sa fin. Joués sur le modèle du joueur seulement :
+ * ses automails en recopient la pose (voir {@link AutomailLayer}).
  */
 public final class TransmutationGestures {
 	/** Les dernières ticks d'un geste, il se relâche vers la pose ordinaire. */
