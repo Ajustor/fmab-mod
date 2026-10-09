@@ -24,7 +24,8 @@ public class WinryScreen extends Screen {
 	private static final List<BodyPart> LIMBS = List.of(BodyPart.RIGHT_ARM, BodyPart.LEFT_ARM, BodyPart.RIGHT_LEG,
 			BodyPart.LEFT_LEG);
 	private static final int WIDTH = 320;
-	private static final int ROW = 24;
+	/** Une ligne par membre : son nom et les boutons, puis son état en dessous (le nom d'une pièce est long). */
+	private static final int ROW = 32;
 	private static final int PAPER = 0xFFEDE3C8;
 	private static final int EDGE = 0xFF4A5560;
 	private static final int INK = 0xFF2B2B40;
@@ -133,7 +134,7 @@ public class WinryScreen extends Screen {
 				status = Component.translatable("entity.fmab.winry.intact");
 				color = FADED;
 			}
-			graphics.text(font, status, left + 80, y, color, false);
+			graphics.text(font, status, left + 18, y + 16, color, false);
 			y += ROW;
 		}
 		super.extractRenderState(graphics, mouseX, mouseY, a);
