@@ -207,6 +207,27 @@ public class WheelchairScenes implements FabricClientGameTest {
 		context.waitTicks(5);
 		Vec3 after = clientPosition(context);
 		check(after.distanceTo(before) > 1, "poussé par un villageois, le fauteuil devrait avancer : " + after);
+
+		// C'est l'occupant qui choisit où l'on va : il regarde vers l'ouest, le fauteuil y part, et le
+		// villageois suit derrière.
+		context.runOnClient(mc -> mc.player.setYRot(90));
+		context.waitTicks(2);
+		Vec3 turned = clientPosition(context);
+		context.getInput().holdKey(options -> options.keyUp);
+		context.waitTicks(20);
+		context.runOnClient(mc -> mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT));
+		context.waitTicks(2);
+		context.takeScreenshot("wheelchair_08_rider_steers_villager_follows");
+		context.getInput().releaseKey(options -> options.keyUp);
+		context.runOnClient(mc -> mc.options.setCameraType(CameraType.THIRD_PERSON_BACK));
+		context.waitTicks(5);
+		Vec3 west = clientPosition(context);
+		check(turned.x - west.x > 1 && Math.abs(west.z - turned.z) < 0.5,
+				"tourné vers l'ouest, le fauteuil devrait y aller : " + turned + " -> " + west);
+		Vec3 villager = sp.getServer().computeOnServer(server -> server.overworld()
+				.getEntitiesOfClass(Villager.class, server.getPlayerList().getPlayers().getFirst().getBoundingBox().inflate(4))
+				.getFirst().position());
+		check(villager.x > west.x + 0.5, "le villageois devrait suivre derrière (à l'est) : " + villager + " / " + west);
 	}
 
 	/**
