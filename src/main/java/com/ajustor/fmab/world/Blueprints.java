@@ -647,6 +647,10 @@ public final class Blueprints {
 			if (p.noise(11, 0, 0, 2) == 0) {
 				out.add(Tomes.stack(Tomes.FORMS));
 			}
+			// Kimblee y a fait ses recherches avant sa prison.
+			if (p.noise(12, 0, 0, 4) == 0) {
+				out.add(new ItemStack(FmabItems.CRIMSON_SEALS));
+			}
 			return out;
 		}
 
@@ -1088,6 +1092,9 @@ public final class Blueprints {
 			out.add(new ItemStack(Items.EMERALD, 2 + p.noise(2, 0, 0, 4)));
 			out.add(new ItemStack(Items.BAMBOO, 4 + p.noise(3, 0, 0, 8)));
 			out.add(new ItemStack(Items.PAPER, 2 + p.noise(4, 0, 0, 4)));
+			if (p.noise(5, 0, 0, 2) == 0) {
+				out.add(new ItemStack(FmabItems.XING_SWORD));
+			}
 			return out;
 		}
 

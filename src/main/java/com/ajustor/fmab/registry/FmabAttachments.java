@@ -112,6 +112,13 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("wanted"));
 
+	/** Le bras droit de Scar, tatoué : gardé à la mort, connu du client (il ne mine plus à mains nues). */
+	public static final AttachmentType<Boolean> SCAR_ARM = AttachmentRegistry.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.BOOL, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("scar_arm"));
+
 	/** Les homonculus qu'on a vus tomber : la clé du sceau de Père. Gardés à la mort. */
 	public static final AttachmentType<Set<String>> SLAIN = AttachmentRegistry.<Set<String>>builder()
 			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))

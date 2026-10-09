@@ -1,5 +1,6 @@
 package com.ajustor.fmab;
 
+import com.ajustor.fmab.arts.ScarArm;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.GateOfTruth;
@@ -77,6 +78,7 @@ public class Fmab implements ModInitializer {
 		LivingStone.register();
 		Alkahestry.register();
 		Milestones.register();
+		ScarArm.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> equip(handler.getPlayer()));
 		// Gantelets : frapper un bloc, main libre, y lance leur cercle au lieu de commencer à le casser.
 		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {

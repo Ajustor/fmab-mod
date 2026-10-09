@@ -8,14 +8,19 @@ import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.item.BriggsSabreItem;
+import com.ajustor.fmab.item.CrimsonSealsItem;
+import com.ajustor.fmab.item.FirearmItem;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.item.InscriptionItem;
+import com.ajustor.fmab.item.IshvalTattooItem;
 import com.ajustor.fmab.item.KunaiItem;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.item.ScreenItem;
+import com.ajustor.fmab.item.ThrowingKnifeItem;
 import com.ajustor.fmab.item.TomeItem;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
+import com.ajustor.fmab.item.XingSwordItem;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -167,6 +172,26 @@ public final class FmabItems {
 	public static final Item CHIMERA_CRAWLER_SPAWN_EGG = register("chimera_crawler_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.CHIMERA_CRAWLER));
 
+	/** Les notes du frère de Scar : le tatouage du bras droit, la décomposition à mains nues. */
+	public static final Item ISHVAL_TATTOO = register("ishval_tattoo", IshvalTattooItem::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
+	/** Les cercles écarlates de Kimblee : des mines alchimiques. */
+	public static final Item CRIMSON_SEALS = register("crimson_seals", CrimsonSealsItem::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
+	/** Le pistolet de l'armée : 7 dégâts, 40 blocs. */
+	public static final Item PISTOL = register("pistol", p -> new FirearmItem(7, 40, 10, 0.02f, p),
+			new Item.Properties().durability(400));
+	/** Le fusil de précision de Hawkeye : 16 dégâts, 96 blocs, lent. */
+	public static final Item RIFLE = register("rifle", p -> new FirearmItem(16, 96, 40, 0.002f, p),
+			new Item.Properties().durability(250));
+	public static final Item CARTRIDGE = register("cartridge", Item::new, new Item.Properties());
+	/** Les couteaux de lancer de Hughes. */
+	public static final Item THROWING_KNIFE = register("throwing_knife", ThrowingKnifeItem::new,
+			new Item.Properties().stacksTo(16));
+	/** L'épée de Xing de Ling Yao : rapide, en enchaînements, et la perception du qi. */
+	public static final Item XING_SWORD = register("xing_sword", XingSwordItem::new,
+			new Item.Properties().sword(ToolMaterial.IRON, 2.5F, -1.6F).durability(500));
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -243,6 +268,13 @@ public final class FmabItems {
 					output.accept(BARRY_SPAWN_EGG);
 					output.accept(CHIMERA_BEAST_SPAWN_EGG);
 					output.accept(CHIMERA_CRAWLER_SPAWN_EGG);
+					output.accept(ISHVAL_TATTOO);
+					output.accept(CRIMSON_SEALS);
+					output.accept(PISTOL);
+					output.accept(RIFLE);
+					output.accept(CARTRIDGE);
+					output.accept(THROWING_KNIFE);
+					output.accept(XING_SWORD);
 				})
 				.build());
 	}

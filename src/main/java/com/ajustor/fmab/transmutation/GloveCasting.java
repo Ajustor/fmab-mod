@@ -1,9 +1,9 @@
 package com.ajustor.fmab.transmutation;
 
-import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.Gloves;
+import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Tolls;
 import com.ajustor.fmab.item.GloveItem;
@@ -14,6 +14,7 @@ import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Lancer le cercle d'un gant : sur la surface visée, à portée de main (ou à distance pour les gants
@@ -192,8 +194,21 @@ public final class GloveCasting {
 			face = block.getDirection();
 		}
 		if (item.kind().reach() > 0) {
-			// Le claquement de doigts : l'étincelle part du gant.
+			// Mouillé, le gant ne fait pas d'étincelle : Mustang sous la pluie est inutile.
+			if (player.isInWaterOrRain()) {
+				player.sendOverlayMessage(Component.translatable("transmutation.fmab.glove_wet"));
+				level.playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5f, 1.6f);
+				return false;
+			}
+			// Le claquement de doigts : l'étincelle part du gant et file jusqu'à la cible.
 			level.playSound(null, player.blockPosition(), SoundEvents.FLINTANDSTEEL_USE, SoundSource.PLAYERS, 1, 1.4f);
+			Vec3 from = player.getEyePosition().add(player.getLookAngle().scale(0.6)).subtract(0, 0.3, 0);
+			Vec3 step = Vec3.atCenterOf(target).subtract(from);
+			int points = (int) (step.length() * 2);
+			for (int i = 0; i <= points; i++) {
+				Vec3 at = from.add(step.scale((double) i / Math.max(1, points)));
+				level.sendParticles(ParticleTypes.SMALL_FLAME, at.x, at.y, at.z, 1, 0.02, 0.02, 0.02, 0);
+			}
 		}
 		Drawing drawing = glove.get(FmabComponents.GLOVE_CIRCLE);
 		Transmutation.Result result = Transmutation.activate(level, target.relative(face),

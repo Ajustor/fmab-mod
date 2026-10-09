@@ -1,6 +1,7 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.entity.AlchemicalMineEntity;
 import com.ajustor.fmab.entity.AmestrianSoldierEntity;
 import com.ajustor.fmab.entity.BarryEntity;
 import com.ajustor.fmab.entity.ChimeraBeastEntity;
@@ -21,6 +22,7 @@ import com.ajustor.fmab.entity.PrideEntity;
 import com.ajustor.fmab.entity.SlothEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.StoneGolemEntity;
+import com.ajustor.fmab.entity.ThrowingKnifeEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.entity.WrathEntity;
@@ -281,6 +283,29 @@ public final class FmabEntities {
 					.eyeHeight(1.7F)
 					.clientTrackingRange(10)
 					.build(BRIGGS_SOLDIER_KEY));
+
+	private static final ResourceKey<EntityType<?>> ALCHEMICAL_MINE_KEY =
+			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("alchemical_mine"));
+
+	/** Une mine alchimique de Kimblee, posée sur un bloc. */
+	public static final EntityType<AlchemicalMineEntity> ALCHEMICAL_MINE = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+			ALCHEMICAL_MINE_KEY,
+			EntityType.Builder.<AlchemicalMineEntity>of(AlchemicalMineEntity::new, MobCategory.MISC)
+					.sized(0.5F, 0.5F)
+					.clientTrackingRange(4)
+					.build(ALCHEMICAL_MINE_KEY));
+
+	private static final ResourceKey<EntityType<?>> THROWING_KNIFE_KEY =
+			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("throwing_knife"));
+
+	/** Un couteau de lancer de Hughes. */
+	public static final EntityType<ThrowingKnifeEntity> THROWING_KNIFE = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+			THROWING_KNIFE_KEY,
+			EntityType.Builder.<ThrowingKnifeEntity>of(ThrowingKnifeEntity::new, MobCategory.MISC)
+					.sized(0.4F, 0.4F)
+					.clientTrackingRange(4)
+					.updateInterval(20)
+					.build(THROWING_KNIFE_KEY));
 
 	private FmabEntities() {
 	}

@@ -20,6 +20,7 @@ import com.ajustor.fmab.client.render.SlothRenderer;
 import com.ajustor.fmab.client.render.SoldierRenderer;
 import com.ajustor.fmab.client.render.StateExaminerRenderer;
 import com.ajustor.fmab.client.render.StoneGolemRenderer;
+import com.ajustor.fmab.client.render.ThrowingKnifeRenderer;
 import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.render.TruthRenderer;
 import com.ajustor.fmab.client.render.WinryRenderer;
@@ -59,6 +60,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import org.lwjgl.glfw.GLFW;
@@ -111,6 +113,8 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.BARRY, c -> new HauntedArmorRenderer<>(c, "barry"));
 		EntityRendererRegistry.register(FmabEntities.CHIMERA_BEAST, ChimeraBeastRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.CHIMERA_CRAWLER, ChimeraCrawlerRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.ALCHEMICAL_MINE, NoopRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.THROWING_KNIFE, ThrowingKnifeRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(OpenTruthPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,
