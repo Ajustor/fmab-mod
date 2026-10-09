@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.1 — 2026-10-09
+
+### New features
+
+- Automail and lost limbs now show on the player's body, to everyone
+
+### Fixes
+
+- In first person, a lost arm is no longer drawn and automail replaces the skin
+- Clapped hands now actually meet, and the body leaning over a circle stays in one piece
+- The Treatise contents fit in the book; at Winry's, automail names and wear are no longer hidden by the buttons
+- Father now has the same body as Hohenheim, whom he copied
 ## 1.0.0 — 2026-10-09
 
 ### New features

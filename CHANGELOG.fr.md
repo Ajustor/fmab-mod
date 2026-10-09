@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## 1.0.1 — 2026-10-09
+
+### Nouveautés
+
+- Les automails et les membres perdus se voient sur le corps du joueur, pour lui comme pour les autres
+
+### Corrections
+
+- À la première personne, le bras perdu n'est plus dessiné et l'automail remplace la peau
+- Les mains jointes se rejoignent bien, et le corps penché sur un cercle reste d'un seul tenant
+- Le sommaire du Traité tient dans le livre ; chez Winry, le nom et l'usure des automails ne sont plus cachés par les boutons
+- Père a le même corps que Hohenheim, qu'il a copié
 ## 1.0.0 — 2026-10-09
 
 ### Nouveautés
