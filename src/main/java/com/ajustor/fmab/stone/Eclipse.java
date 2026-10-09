@@ -18,6 +18,8 @@ public final class Eclipse {
 	/** De onze heures à quatorze heures, à peu près (midi = 6000). */
 	private static final int START = 5000;
 	private static final int END = 8000;
+	/** La montée et la descente de l'éclipse, en ticks. */
+	private static final int RAMP = 200;
 
 	private Eclipse() {
 	}
@@ -28,6 +30,18 @@ public final class Eclipse {
 			return false;
 		}
 		return at(level.getOverworldClockTime());
+	}
+
+	/**
+	 * L'intensité de l'éclipse, de 0 à 1 : elle monte pendant ses dix premières secondes et
+	 * redescend pendant ses dix dernières (pour que le ciel s'assombrisse en douceur).
+	 */
+	public static float strength(Level level) {
+		if (!now(level)) {
+			return 0;
+		}
+		long hour = Math.floorMod(level.getOverworldClockTime(), 24000L);
+		return Math.min(1, Math.min(hour - START, END - hour) / (float) RAMP);
 	}
 
 	/** L'éclipse a-t-elle lieu à cette heure de l'horloge du monde (en ticks depuis le premier jour) ? */

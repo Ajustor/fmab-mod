@@ -19,6 +19,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
@@ -49,6 +50,7 @@ public class MarcohEntity extends PathfinderMob {
 	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
+		goalSelector.addGoal(4, new MoveTowardsRestrictionGoal(this, 0.6));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.4));
 		goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8));
 		goalSelector.addGoal(7, new RandomLookAroundGoal(this));

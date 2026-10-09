@@ -29,6 +29,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
@@ -38,6 +39,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.UUID;
 
@@ -85,6 +88,8 @@ public class IzumiEntity extends PathfinderMob {
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.2, true));
+		// Après un combat, elle rentre à sa boutique.
+		goalSelector.addGoal(4, new MoveTowardsRestrictionGoal(this, 0.8));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5));
 		goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8));
 		goalSelector.addGoal(7, new RandomLookAroundGoal(this));
@@ -136,6 +141,24 @@ public class IzumiEntity extends PathfinderMob {
 		setHealth(getMaxHealth());
 		setTarget(player);
 		player.sendSystemMessage(Component.translatable("entity.fmab.izumi.spar_start"));
+	}
+
+	@Override
+	protected void addAdditionalSaveData(ValueOutput output) {
+		super.addAdditionalSaveData(output);
+		if (shop != null) {
+			output.store("shop", BlockPos.CODEC, shop);
+		}
+	}
+
+	@Override
+	protected void readAdditionalSaveData(ValueInput input) {
+		super.readAdditionalSaveData(input);
+		// Rechargée en plein combat : le combat est fini, la boutique redevient sa maison.
+		shop = input.read("shop", BlockPos.CODEC).orElse(null);
+		if (shop != null && !hasHome()) {
+			setHomeTo(shop, 10);
+		}
 	}
 
 	@Override

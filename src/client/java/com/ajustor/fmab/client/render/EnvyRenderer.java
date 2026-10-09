@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.Identifier;
 
@@ -38,8 +39,12 @@ public class EnvyRenderer extends HumanoidMobRenderer<EnvyEntity, EnvyRenderer.S
 
 	/** Le corps humain d'Envy ; invisible quand il n'est plus qu'un lézard. */
 	public static class Model extends HumanoidModel<State> {
+		/** Sa touffe en palmier, sur le modèle de sa vraie forme seulement. */
+		private final ModelPart spikes;
+
 		Model(ModelPart root) {
 			super(root);
+			spikes = head.hasChild("spikes") ? head.getChild("spikes") : null;
 		}
 
 		@Override
@@ -47,7 +52,9 @@ public class EnvyRenderer extends HumanoidMobRenderer<EnvyEntity, EnvyRenderer.S
 			super.setupAnim(state);
 			boolean human = state.form != EnvyEntity.Form.LIZARD;
 			// Sa touffe en palmier n'appartient qu'à sa vraie forme : déguisé, il a la tête d'un autre.
-			head.getChild("spikes").visible = state.form == EnvyEntity.Form.HUMAN;
+			if (spikes != null) {
+				spikes.visible = state.form == EnvyEntity.Form.HUMAN;
+			}
 			head.visible = human;
 			hat.visible = human;
 			body.visible = human;
@@ -58,14 +65,29 @@ public class EnvyRenderer extends HumanoidMobRenderer<EnvyEntity, EnvyRenderer.S
 		}
 	}
 
+	/** Sa vraie forme (et le géant), avec sa touffe. */
+	private final Model own;
+	/** Déguisé : le modèle complet d'un joueur, seconde couche de peau comprise. */
+	private final Model disguise;
+
 	public EnvyRenderer(EntityRendererProvider.Context context) {
 		super(context, new Model(BossModels.envy()), 0.5f);
+		own = model;
+		disguise = new Model(context.bakeLayer(ModelLayers.PLAYER));
 		addLayer(new LizardLayer(this, new SilverfishModel(context.bakeLayer(ModelLayers.SILVERFISH))));
 	}
 
 	@Override
 	public State createRenderState() {
 		return new State();
+	}
+
+	@Override
+	public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+		boolean disguised = state.form == EnvyEntity.Form.DISGUISED_PLAYER
+				|| state.form == EnvyEntity.Form.DISGUISED_CITIZEN;
+		model = disguised ? disguise : own;
+		super.submit(state, poseStack, collector, camera);
 	}
 
 	@Override

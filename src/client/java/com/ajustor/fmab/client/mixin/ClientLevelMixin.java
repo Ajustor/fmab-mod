@@ -24,10 +24,10 @@ public abstract class ClientLevelMixin {
 			CallbackInfoReturnable<EnvironmentAttributeSystem.Builder> cir) {
 		ClientLevel self = (ClientLevel) (Object) this;
 		builder.addTimeBasedLayer(EnvironmentAttributes.SKY_COLOR,
-				(color, tick) -> Eclipse.now(self) ? ARGB.srgbLerp(0.85f, color, DUSK) : color);
+				(color, tick) -> ARGB.srgbLerp(0.85f * Eclipse.strength(self), color, DUSK));
 		builder.addTimeBasedLayer(EnvironmentAttributes.FOG_COLOR,
-				(color, tick) -> Eclipse.now(self) ? ARGB.srgbLerp(0.75f, color, DUSK) : color);
+				(color, tick) -> ARGB.srgbLerp(0.75f * Eclipse.strength(self), color, DUSK));
 		builder.addTimeBasedLayer(EnvironmentAttributes.SKY_LIGHT_FACTOR,
-				(factor, tick) -> Eclipse.now(self) ? factor * 0.4f : factor);
+				(factor, tick) -> factor * (1 - 0.6f * Eclipse.strength(self)));
 	}
 }

@@ -33,10 +33,13 @@ public class FortBriggsStructure extends Structure {
 			return Optional.empty();
 		}
 		int sx = Blueprints.FortBriggs.SIZE_X, sz = Blueprints.FortBriggs.SIZE_Z;
+		Rotation rotation = Rotation.values()[context.random().nextInt(4)];
+		boolean turned = rotation == Rotation.CLOCKWISE_90 || rotation == Rotation.COUNTERCLOCKWISE_90;
+		int wx = turned ? sz : sx, wz = turned ? sx : sz;
 		// Un col assez régulier : sur une arête trop accidentée, la muraille flotterait ou s'enterrerait.
 		int min = y, max = y;
 		for (int[] d : new int[][]{{-1, -1}, {1, -1}, {-1, 1}, {1, 1}}) {
-			int h = context.chunkGenerator().getFirstFreeHeight(cx + d[0] * sx / 2, cz + d[1] * sz / 2,
+			int h = context.chunkGenerator().getFirstFreeHeight(cx + d[0] * wx / 2, cz + d[1] * wz / 2,
 					Heightmap.Types.WORLD_SURFACE_WG, context.heightAccessor(), context.randomState());
 			min = Math.min(min, h);
 			max = Math.max(max, h);
@@ -44,11 +47,12 @@ public class FortBriggsStructure extends Structure {
 		if (max - min > MAX_RELIEF) {
 			return Optional.empty();
 		}
-		BlockPos corner = new BlockPos(cx - sx / 2, y, cz - sz / 2);
-		Rotation rotation = Rotation.values()[context.random().nextInt(4)];
+		BlockPos corner = new BlockPos(cx - wx / 2, y, cz - wz / 2);
 		long seed = context.random().nextLong();
+		// La maçonnerie descend jusqu'au point le plus bas de l'emprise.
+		int ground = y - min + 1;
 		return Optional.of(new GenerationStub(new BlockPos(cx, y, cz), builder -> builder.addPiece(
-				new ProceduralPiece("fort_briggs", corner, sx, Blueprints.FortBriggs.SIZE_Y, sz, 1, rotation, seed))));
+				new ProceduralPiece("fort_briggs", corner, sx, Blueprints.FortBriggs.SIZE_Y, sz, ground, rotation, seed))));
 	}
 
 	@Override

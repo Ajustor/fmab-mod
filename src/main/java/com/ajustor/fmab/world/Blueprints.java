@@ -717,12 +717,12 @@ public final class Blueprints {
 				if (z == sz - 3 && x > 1 && x < sx - 2) {
 					return b(Blocks.DARK_OAK_SLAB).setValue(SlabBlock.TYPE, SlabType.TOP);
 				}
-				// Les tables : un piquet et un plateau.
-				if (z == 2 && x % 4 == 2) {
+				// Les tables : un piquet et un plateau (pas dans l'axe de la porte).
+				if (z == 2 && x % 4 == 2 && x != sx / 2) {
 					return b(Blocks.DARK_OAK_FENCE);
 				}
 			}
-			if (y == 2 && z == 2 && x % 4 == 2) {
+			if (y == 2 && z == 2 && x % 4 == 2 && x != p.sizeX() / 2) {
 				return b(Blocks.DARK_OAK_PRESSURE_PLATE);
 			}
 			if (y == 3 && x == sx / 2 && z == sz / 2) {

@@ -107,11 +107,12 @@ public final class Transmutation {
 	/** Un cercle armé qui part tout seul, au compte de son auteur, sans que celui-ci bouge. */
 	public static Result activateRemotely(ServerLevel level, BlockPos circle, BlockState state, Drawing drawing,
 			ServerPlayer author, CircleSize size) {
+		boolean before = remote;
 		remote = true;
 		try {
 			return activate(level, circle, state, drawing, author, size);
 		} finally {
-			remote = false;
+			remote = before;
 		}
 	}
 
@@ -248,7 +249,8 @@ public final class Transmutation {
 			TransmutationPose.strike(caster, TransmutationPose.Kind.PALM, 14);
 		}
 		if (anything) {
-			if (inscribed) {
+			// Un cercle parti tout seul ne se tient pas : l'auteur n'a pas la main dessus.
+			if (inscribed && !remote) {
 				CHANNELS.put(caster.getUUID(), new Channel(circle, level.getGameTime(), 0));
 			}
 			TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 1);
