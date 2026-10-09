@@ -1,267 +1,236 @@
 # FMAB — Alchemy of Amestris
 
 Mod Minecraft (Fabric, Java Edition 26.2) inspiré de *Fullmetal Alchemist: Brotherhood* : échange
-équivalent, cercles de transmutation dessinés par le joueur, et à terme la Porte de la Vérité.
-*English below.*
+équivalent, cercles de transmutation dessinés par le joueur, la Porte de la Vérité, les homonculus
+et le Jour promis. Site : <https://ajustor.github.io/fmab-mod/> (éditeur de cercles en ligne,
+versions, changelog). *English below.*
 
 ## Français
 
-**État : v0.1 en développement (socle).** Le cœur du mod est la transmutation par cercles que le
-joueur compose lui-même :
+**État : v1.0, tout le contenu prévu est en place.** La première version publiée sortira avec le
+premier tag `v1.0.0`.
 
-- **Carnet de cercles** : grille de 32 cases, outils ligne, cercle, polygone, arc et point,
-  symétrie, pages nommées, import/export par code. Le carnet lit le cercle en direct : glyphes
-  reconnus, effet, complexité, stabilité, coût et verdict.
-- **Craie de transmutation** : trace au sol le cercle sélectionné dans le carnet (touche N). On
-  l'active paume contre le sol, main vide.
-- **Traité d'alchimie** : principes, trois étapes, catalogue des glyphes (on les étudie pour les
-  comprendre), règles de composition, cercles d'exemple, rebonds, tabous.
-- **10 glyphes** (Terre, Eau, Fer, Cuivre, Fixer, Projeter, Réparer, Décomposer, Direction,
-  Intensité) et **6 combinaisons** : mur et pique de pierre, lame de fer, plateforme de glace,
-  décomposition, réparation.
-- **Échange équivalent** : la matière transmutée vient du monde (un mur est fait de la terre
-  creusée devant lui) ou des objets posés sur le cercle ; jamais de changement de famille, jamais
-  plus de masse produite que donnée.
-- Rangs, concentration (se recharge au repos), rebond proportionnel à l'erreur.
+### Installation
 
-**v0.2 (Alchimiste), en cours :**
+Minecraft 26.2, [Fabric Loader](https://fabricmc.net/) ≥ 0.19.3, [Fabric API](https://modrinth.com/mod/fabric-api)
+≥ 0.161.0 et Java 25. Posez le jar du mod dans `mods/`. Les jars de chaque version sont sur la page
+[Releases](https://github.com/Ajustor/fmab-mod/releases) ; chaque build de `master` en produit un
+aussi, dans les artefacts de l'onglet Actions.
 
-- **Cercles complexes** : plusieurs étages reliés par un trait simple (série : la matière produite
-  passe à l'étage suivant), double (parallèle) ou brisé (conditionnel) ; satellites sur les sommets
-  (infusion d'un élément ou effet propre) ; fusion de deux éléments dans un hexagramme ; polygones
-  superposés.
-- **Glyphes** Feu, Air et Recomposer : jet de flammes, rafale, fonte, combustion amplifiée, lance de
-  pierre et lame-bras temporaires.
-- **Savoir** : maîtrise par école gagnée en pratiquant, nœuds qui donnent des bonus, rang Alchimiste
-  atteint par la pratique.
-- **Supports** : sol, murs et plafonds ; craie, peinture alchimique, gravure au burin.
-- **Gants** brodés ou gravés à la table d'alchimiste, lancés d'une touche (G, Maj+G pour joindre les
-  mains, H pour l'écran des gants).
-- **Izumi** : épreuves récompensées en savoir et combats d'entraînement.
-- **Éditeur web** (`web/`) : même parseur, porté en TypeScript, vérifié contre le Java par des
-  cercles de test communs (`testdata/circles`). `cd web && npm install && npm run dev`.
+### Touches
 
-**v0.3 (État), en cours :**
+Toutes réglables dans Options → Commandes → Touches, catégorie « Alchimie ».
 
-- **Écoles** du Feu, de la Glace (piques et murs de glace) et de l'Explosion (Feu + Air +
-  Décomposer), avec leurs arbres de savoir.
-- **Examen d'Alchimiste d'État** : un examinateur de l'armée demande des objets, puis l'épreuve
-  oppose le candidat à un golem de pierre lié à un cercle gravé. Récompense : le rang d'État et la
-  montre d'Alchimiste d'État (+1 de portée, −20 % de concentration).
-- **Cercles portés** : vêtements de cuir brodés, tatouages par rituel (encre alchimique sur un
-  cercle tracé au sol). Ils donnent des passifs : renfort, protection contre le feu, vitesse,
-  régénération, épines. Une paume tatouée se lance comme un gant.
-- **Structures** : Central City, grande ville circulaire fortifiée (quartier général et arène,
-  bibliothèque, maisons), et le hameau de Resembool (maison des Rockbell, fermes, champs).
-  `/locate structure fmab:central`.
+| Touche | Action |
+|---|---|
+| N | Ouvrir le Carnet de cercles |
+| R (maintenue) | Roue des cercles : pointer un cercle et relâcher ; 1 à 9 pour choisir sans viser ; un clic gauche joint aussitôt les mains (Initiés de la Porte) |
+| G / Maj+G | Lancer le cercle des gants / joindre les mains (les deux gants, ou sans cercle pour un Initié) |
+| H | Écran des gants |
+| — | Cercle suivant / précédent (sans touche par défaut) |
 
-**v0.4 (Porte), en cours :**
+Dans l'inventaire de survie, l'onglet **Corps** montre les membres, les automails et les gants.
 
-- **Savoir** : un glyphe qu'on ne comprend pas fonctionne, avec 25 % de risque de rebond chacun ; on
-  le comprend après cinq usages, ou en lisant un **tome d'alchimie** (Rudiments au départ, tomes
-  vendus par les bibliothécaires des villages, offerts par Izumi et l'examen d'État, notes de
-  Hohenheim à Resembool). Le Traité décrit sans enseigner. Le carnet pose au
-  **tampon** les glyphes compris.
-- **Transmutation humaine** : glyphe Humain et Recomposer, ingrédients d'un corps et sang de
-  l'alchimiste. Elle échoue toujours : une créature difforme naît du cercle, l'alchimiste est happé
-  dans l'**Espace blanc**, devant sa Porte et la Vérité.
-- **Péage** selon l'ambition : un bras (la main ne tient plus rien), une jambe (lent, sans course),
-  les organes (−4 cœurs, toux), la vue (voile sombre). La Vérité est une copie blanche de
-  l'alchimiste : ce qu'elle prend, elle le porte, avec sa peau.
-- **Corps entier** : la première fois, l'âme se réveille dans une armure de fer scellée de son sang
-  (sans faim ni souffle). Les coups usent les pièces, qu'on refait ; si le plastron cède, l'âme erre
-  devant la Porte jusqu'à ce qu'un **cercle d'âme** (Humain + Fixer) l'appelle dans une armure.
-  Chaque joueur a son propre **sceau de sang** (Traité, chapitre VIII) : on le trace dans un plastron
-  à l'encre alchimique ou de son sang, pour soi ou pour un ami. Une âme prévoyante prépare des
-  plastrons scellés sur des porte-armure au-dessus de cercles d'âme, et demande à sa Vérité de l'y
-  rappeler ; elle peut aussi changer d'armure, et se répare en y transmutant son matériau.
-- **Taille des cercles** : 1, 3, 5 ou 7 blocs, de plus en plus puissants et coûteux.
-- **Éclairs bleus** de la réaction alchimique à chaque transmutation.
+### Premiers pas
 
-**v0.5 (Homonculus), en cours :**
+Chaque joueur commence avec le **Traité d'alchimie**, le tome des **Rudiments** et de la **craie** ;
+son **carnet** contient déjà un mur, une pique et une plateforme de glace. Choisissez un cercle (N ou
+R), tracez-le au sol à la craie (clic droit), puis posez la paume dessus (clic droit, main vide). Le
+Traité explique le reste, et les progrès (touche L) tracent le chemin : Izumi à Dublith, l'examen
+d'État à Central, la Porte, les homonculus, puis Père.
 
-- Les **homonculus** se reconstituent sur place tant que leur Pierre philosophale a des âmes ; à la
-  dernière, ils laissent un noyau de Pierre.
-- **Lust** (doigts-lames qui ignorent les boucliers, craint le feu) et **Gluttony** (aspire et avale
-  dans son **Ventre**, une dimension noyée de sang) gardent le **Laboratoire 5**
-  (`/locate structure fmab:laboratory_5`).
-- **Envy** erre déguisé (un joueur, un habitant), se révèle, devient un monstre géant puis un lézard.
-- **Greed** et son Bouclier ultime tiennent le **Devil's Nest** ; un pacte (or, émeraudes, diamants,
-  ou le battre) en fait un allié payé à la journée.
-- La **Pierre philosophale** (quatre noyaux autour de sang cristallisé, cent âmes) rend ce que la
-  Porte a pris, chaque partie coûtant des âmes selon sa gravité.
+### Contenu
 
-**v0.6 (Derniers homonculus), en cours :**
-
-- **Sloth** creuse le grand tunnel sous Central : charges dévastatrices en ligne droite à travers la
-  roche, puis une pause épuisée où il encaisse davantage.
-- **Wrath** (King Bradley), dans la résidence Bradley à Central : une seule vie, mais son Œil
-  ultime esquive les flèches et une bonne part des coups de face ; on le touche dans le dos ou
-  pendant qu'il frappe.
-- **Pride** (Selim) : ses ombres tranchent, dévorent et parent les coups, mais ne vivent qu'avec de
-  la lumière ; dans le noir complet ou une lumière intense, il n'est qu'un enfant vulnérable.
-
-**v0.7 (Pierre), en cours :**
-
-- La **Pierre philosophale** tenue en main amplifie les transmutations (×1,5, sans concentration ni
-  rebond d'instabilité) au prix d'âmes, et attire les monstres. On la fabrique par **sacrifice** :
-  sang cristallisé sur un cercle de transmutation humaine, qui consume les vies de son aire.
-- Le **karma** (−100 à +100) suit vos actes ; les villageois en parlent (prix, golems), et les
-  homonculus recrutent les âmes noires.
-- Tous les huit jours, l'**éclipse** ; c'est là qu'un Initié, une Pierre pleine dans chaque main,
-  devient une **Pierre vivante** : plus de péage, résurrection sur place tant qu'il reste des âmes.
-- **Transmutation sans cercle** pour les Initiés de la Porte : Maj+G joint les mains et lance le
-  cercle sélectionné du carnet.
-- **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : établi d'automail, usure,
-  réparation chez **Winry**, dans la ville de **Rush Valley** (`/locate structure fmab:rush_valley`).
-  À Resembool, la maison des Elric garde les notes de Hohenheim.
-
-**v1.0 (Jour promis), en cours :**
-
-- **Père**, l'Homonculus originel, sous Central : un sceau d'Ouroboros au fond du tunnel de Sloth ne
-  cède qu'à qui a vu tomber Sloth, Wrath et Pride. Trois formes (le vieillard, la forme sans visage
-  et son petit soleil, la forme divine instable qui dévore les âmes). Autour de lui, une **zone
-  anti-alchimie** : aucune transmutation d'Amestris ne s'allume.
-- L'**alkahestry de Xing** marche partout, même chez Père : cinq **kunaï** plantés autour d'une
-  zone y dessinent un cercle de soin ou de piège. **May Chang** l'enseigne dans son pavillon des
-  jungles et cerisaies (`/locate structure fmab:xing`).
-- **Fort Briggs** dans les montagnes enneigées (`/locate structure fmab:fort_briggs`) : la générale
-  **Olivier Armstrong** confie aux alliés de bon karma un **sabre de Briggs** (×1,5 contre les
-  homonculus) ; les **soldats de Drachma** rôdent la nuit au pied du mur.
-- **Fil conducteur** : un arbre de progrès « Fullmetal Alchemist », des cartes de tous les lieux chez
-  les cartographes, et la quête des **points de sang** du cercle national (sept à sceller avant que
-  l'éclipse ne devienne le Jour promis).
-- **Lieux** : **Dublith** et la boucherie d'Izumi (elle donne la carte de l'île de Yock), **Liore** et
-  Cornello, les ruines d'**Ishval** (Scar) et de **Xerxès** (fresques, Hohenheim), l'**île de Yock**,
-  le dispensaire du docteur **Marcoh** (il déchiffre ses notes de recherche). Les villes sont
-  **habitées** : des villageois dans les maisons de Central, Resembool, Dublith, Liore et dans les
-  ateliers de Rush Valley (leur métier vient du poste de travail de la maison, cartographes
-  compris), des maisons **meublées** (lits, table, fourneau, lanternes) et des gardes aux portes de
-  Central. Aucun lieu ne se pose dans Central.
-- **Créatures** : Barry le Boucher, armures habitées, soldats immortels, chimères, soldats
-  d'Amestris et de Briggs. Les barres de boss n'apparaissent qu'une fois le combat engagé, aux
-  joueurs présents.
-- **Styles de jeu** : bras de Scar, mines de Kimblee, pistolet et fusil, couteaux de Hughes, épée de
-  Xing ; le glyphe **Or** (interdit par la loi d'État) ; les écoles de la Destruction, de la
-  Médecine et de la Vie (chimères qui vous obéissent).
-- **Cercles** : déclencheurs (retardement, piège, redstone) et fusion à deux alchimistes. Le
-  **carnet** n'est plus un objet : l'alchimiste le garde en tête (touche N, gardé à la mort). La
-  **roue des cercles** (R maintenue) change de cercle d'un geste, et un clic y joint aussitôt les
-  mains pour qui a vu la Porte ; accroupi, main vide, un clic droit sur un cercle inconnu le recopie
-  dans le carnet. Le cercle sélectionné s'affiche en haut à gauche quand on peut s'en servir (Porte
-  vue, craie, peinture ou burin en main). Un onglet **Corps** de l'inventaire montre les membres,
-  leurs automails (et leur usure), les organes, la vue et les gants : on y branche un automail sur un
-  membre perdu et on y enfile ses gants ; Winry seule retire un automail. Le cercle de la
-  transmutation humaine ne figure plus dans le Traité : de très
-  rares **Notes sur la transmutation humaine** le donnent (Laboratoire 5, ruines de Xerxès,
-  bibliothèques des forts, cités antiques).
+- **Cercles composés par le joueur** : grille de 32 cases, outils ligne, cercle, polygone, arc, point
+  et tampon (glyphes compris), symétrie, pages nommées et rangées, import/export par code. Le carnet
+  lit le cercle en direct : glyphes, effet, complexité, stabilité, coût, verdict.
+- **15 glyphes et 19 combinaisons** : Terre, Eau, Fer, Cuivre, Feu, Air, Or, Humain ; Fixer,
+  Projeter, Réparer, Décomposer, Recomposer ; Direction, Intensité. Étages reliés en série, en
+  parallèle ou en condition, satellites, fusion de deux éléments, polygones superposés.
+- **Échange équivalent** : la matière vient du monde ou des objets posés sur le cercle ; jamais de
+  changement de famille, jamais plus de masse produite que donnée.
+- **Supports** : sol, murs et plafonds ; craie, peinture, gravure au burin ; cercles de 1 à 7 blocs ;
+  déclencheurs (retardement, piège, redstone) ; fusion à deux alchimistes. Accroupi, main vide, un
+  clic droit sur un cercle inconnu le recopie dans le carnet.
+- **Rangs et savoir** : Apprenti, Alchimiste (par la pratique), Alchimiste d'État (examen contre un
+  golem), Initié de la Porte. La concentration grandit avec le rang. Maîtrise par école (Terre, Métal,
+  Eau, Feu, Explosion, Destruction, Médecine, Vie) ; un glyphe non compris marche avec un risque de
+  rebond, et s'apprend par l'usage ou par les tomes.
+- **Cercles portés** : gants brodés ou gravés (dont les gants à silex de Mustang et les gantelets),
+  vêtements brodés, tatouages par rituel, aux passifs permanents.
+- **La Porte** : la transmutation humaine échoue toujours et happe l'alchimiste dans l'Espace blanc,
+  où la Vérité prend son péage (un bras, une jambe, les organes, la vue... ou le corps entier : l'âme
+  vit alors dans une armure scellée de son sang). En échange, l'Initié transmute sans cercle. Le cercle
+  n'est dans aucun traité : on le recompose soi-même, ou on trouve de très rares **Notes sur la
+  transmutation humaine**.
+- **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : à l'établi ou dans l'onglet Corps,
+  usure, réparation et retrait chez **Winry**.
+- **Pierre philosophale** : elle rend ce que la Porte a pris, amplifie les transmutations, se fabrique
+  par sacrifice. **Karma**, **éclipse** tous les huit jours, **Pierre vivante**.
+- **Homonculus** qui se reconstituent tant que leur Pierre a des âmes : Lust, Gluttony (et son Ventre),
+  Envy le déguisé, Greed (allié possible), Sloth, Wrath, Pride ; enfin **Père** et sa zone
+  anti-alchimie, au bout de la quête des sept **points de sang**. Barres de boss une fois le combat
+  engagé.
+- **Autres arts et armes** : alkahestry de Xing (kunaï, May Chang), bras de Scar, mines de Kimblee,
+  pistolet et fusil, couteaux, sabre de Briggs, épée de Xing.
+- **Villes habitées** : villageois (leur métier vient du poste de travail de leur maison), maisons
+  meublées, gardes aux portes de Central ; les cartographes vendent les cartes des lieux du mod.
 - **Finition** : cinématiques (la Porte, le Jour promis, la chute de Père), éclipse dans le ciel,
-  sons propres (CC0), silhouettes des boss, briques amestriennes et de Xing, neige de Briggs.
+  sons propres (CC0), modèles des boss, textes en français et en anglais.
+
+### Lieux
+
+`/locate structure fmab:<id>` pour en trouver un.
+
+| Lieu | `id` | Où |
+|---|---|---|
+| Central City (QG et examen d'État, bibliothèque, résidence Bradley, tunnel de Sloth, repaire de Père) | `central` | plaines, savanes, prairies |
+| Resembool (Rockbell, maison des Elric) | `resembool` | plaines, prairies, forêts fleuries |
+| Dublith (boucherie d'Izumi) | `dublith` | plaines, forêts, prairies |
+| Rush Valley (Winry, ateliers d'automail) | `rush_valley` | désert, savanes, badlands |
+| Liore (Cornello) | `liore` | désert |
+| Ruines d'Ishval (Scar) | `ishval_ruins` | désert, badlands |
+| Ruines de Xerxès (Hohenheim) | `xerxes_ruins` | désert, badlands |
+| Dispensaire de Marcoh | `marcoh_clinic` | taïga, forêts, plaines |
+| Laboratoire 5 (Barry, Lust, Gluttony) | `laboratory_5` | plaines, forêts, taïga, savanes |
+| Devil's Nest (Greed) | `devils_nest` | savanes, plaines, désert |
+| Pavillon de Xing (May Chang) | `xing` | jungles, cerisaies |
+| Fort Briggs (Olivier Armstrong) | `fort_briggs` | montagnes et plaines enneigées |
+| Points de sang | `blood_crest` | partout |
+| Île de Yock (épreuve d'Izumi) | `yock_island` | océans |
+
+### Données
 
 Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/fmab/glyph`), combinaisons
-(`data/<ns>/fmab/combination`), valeurs d'échange (`data/<ns>/fmab/exchange`), éléments visés (tags
-`fmab:element/*`), pages du Traité, Espace blanc (`data/fmab/dimension`). Textes en français et en
-anglais.
-
-### Compiler
-
-JDK 25 ou plus récent, puis :
-
-```sh
-./gradlew build
-```
-
-Le jar est dans `build/libs/`. Dépendances à l'exécution : Fabric Loader ≥ 0.19.3 et Fabric API.
+(`data/<ns>/fmab/combination`), nœuds de savoir (`data/<ns>/fmab/knowledge`), valeurs d'échange
+(`data/<ns>/fmab/exchange`), éléments visés (tags `fmab:element/*`), pages du Traité, lieux
+(`data/fmab/worldgen`), Espace blanc et Ventre (`data/fmab/dimension`).
 
 Configuration du serveur : `config/fmab.json`, créé au premier lancement.
-`restart_wipes_progress` (par défaut `true`) : une âme qui choisit de repartir de zéro devant la
-Vérité perd aussi toute sa progression d'alchimiste (rang, glyphes, maîtrise, épreuves, tatouages,
-karma) ; à `false`, elle ne retrouve que son corps.
+`restart_wipes_progress` (par défaut `true`) : une âme qui repart de zéro devant la Vérité perd aussi
+toute sa progression d'alchimiste ; à `false`, elle ne retrouve que son corps.
 
 Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab forget_all`,
 `/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`.
 
-Les cercles de test partagés se régénèrent depuis l'implémentation Java, qui fait référence :
-`./gradlew test -PwriteFixtures=true`.
+### Développement
+
+JDK 25 ou plus récent :
+
+```sh
+./gradlew build        # jar dans build/libs/, tests compris
+./gradlew runClient    # lancer le jeu de développement
+```
+
+L'**éditeur de cercles** (`web/`) porte le même parseur en TypeScript, vérifié contre le Java sur
+des cercles de test communs (`testdata/circles`) : `cd web && npm install && npm run dev`. Ces
+cercles se régénèrent depuis le Java, qui fait référence : `./gradlew test -PwriteFixtures=true`.
+
+Chaque pull request et chaque push sur `master` construisent le mod et l'éditeur
+(`.github/workflows/build.yml`) ; le jar est téléchargeable dans les artefacts du build. Le travail
+arrive sur `master` par petites pull requests. Les commits suivent la convention
+`type(portée): sujet` ; chaque `feat:`, `fix:` ou `perf:` porte les lignes `Changelog-fr:` et
+`Changelog-en:`, que le check `commits` vérifie.
 
 ### Publier une version
 
-Pousser un tag `vX.Y.Z` (ou `vX.Y.Z-beta`, publié en préversion) lance `.github/workflows/release.yml` :
-jar à la version du tag, GitHub Release avec le changelog français et anglais (git-cliff,
-`cliff.fr.toml` et `cliff.toml`), `CHANGELOG.fr.md` et `CHANGELOG.md` recommités sur `master`, puis
-le site (pages Versions, Changelog et Installation, générées par `site/build.py`). Chaque commit
-`feat:`, `fix:` ou `perf:` porte les lignes `Changelog-fr:` et `Changelog-en:` ; le check `commits`
-des pull requests refuse ceux qui les oublient.
+Pousser un tag `vX.Y.Z` (ou `vX.Y.Z-beta`, publié en préversion) lance
+`.github/workflows/release.yml` : jar à la version du tag, GitHub Release avec le changelog français
+et anglais (git-cliff, `cliff.fr.toml` et `cliff.toml`), `CHANGELOG.fr.md` et `CHANGELOG.md`
+recommités sur `master`, puis le site (pages Versions, Changelog et Installation).
+
+```sh
+git tag v1.0.0 && git push origin v1.0.0
+```
 
 La version du mod suit les tags : sur `v1.2.3`, le jar est en `1.2.3` ; après lui, en
-`1.2.4-dev.N` (N commits depuis le tag) ; sans tag, celle de `gradle.properties`. Chaque pull
-request et chaque push sur `master` construisent aussi le jar (`.github/workflows/build.yml`),
-téléchargeable dans les artefacts du build.
+`1.2.4-dev.N` (N commits depuis le tag) ; sans tag, celle de `gradle.properties`.
 
 ## English
 
-**Status: v0.1 in development (foundation).** The heart of the mod is transmutation through
-circles the player designs: a Circle Notebook to draw them on a 32-cell grid with live analysis,
-Transmutation Chalk to draw them on the ground, and an Alchemy Treatise that teaches the glyphs and
-the rules. 10 glyphs, 6 combinations, strict equivalent exchange, ranks, concentration and
-rebounds. Everything that can be data-driven is. Texts in English and French.
+**Status: v1.0, all planned content is in.** The first published version comes with the first
+`v1.0.0` tag. Website: <https://ajustor.github.io/fmab-mod/> (online circle editor, versions,
+changelog).
 
-**v0.2 (Alchemist), in progress:** multi-stage circles with links and satellites, Fire, Air and
-Recompose glyphs, a practice-based knowledge tree, circles on walls and ceilings (chalk, paint,
-engraving), alchemist gloves cast with a key, Izumi's trials and sparring, and a web circle editor
-(`web/`) running a TypeScript port of the parser checked against the Java one on shared test circles.
+### Installation
 
-**v0.3 (State), in progress:** Fire, Ice and Explosion schools, the State Alchemist examination
-against a stone golem bound to its circle, the State Alchemist's watch, embroidered garments and
-ritual tattoos bearing passive circles, and two generated places: the walled Central City and the
-hamlet of Resembool.
+Minecraft 26.2, Fabric Loader ≥ 0.19.3, Fabric API ≥ 0.161.0 and Java 25. Drop the mod jar into
+`mods/`. Jars are on the [Releases](https://github.com/Ajustor/fmab-mod/releases) page; every
+`master` build also produces one in the Actions artifacts.
 
-**v0.4 (Gate), in progress:** glyphs you do not understand work with a risk of rebound and are
-learned through practice or alchemy tomes, and the notebook stamps the ones you know; human
-transmutation drags the alchemist into the White Space before their Gate and Truth, which takes a
-toll weighed by ambition (an arm, a leg, the organs, the sight), and Truth, a white copy of the
-alchemist, wears what it takes; losing the whole body seals the soul into an iron armor whose pieces
-wear out and can be remade, and a soul whose breastplate breaks wanders before the Gate until a soul
-circle calls it into another armor (prepared seals let it call itself back); Gate initiates transmute without a circle by joining their hands; automail
-(iron, Rush Valley, Briggs) replaces lost limbs and is repaired by Winry in the town of Rush Valley.
+### Controls
 
-**v0.5 (Homunculi), in progress:** homunculi reconstitute while their Philosopher's Stone holds
-souls; Lust and Gluttony (who swallows into his Belly) guard Laboratory 5; Envy roams in disguise,
-then turns into a giant monster and a lizard; Greed and his Ultimate Shield run the Devil's Nest and
-can be hired as an ally; the Philosopher's Stone gives back what the Gate took, for souls.
+All rebindable under Options → Controls → Key Binds, "Alchemy" category.
 
-**v0.6 (Last homunculi), in progress:** Sloth charges through the rock of his tunnel under Central,
-then rests; Wrath (King Bradley) dodges with his Ultimate Eye unless struck from behind or while
-attacking; Pride's shadows only live with light, so total darkness or intense light leaves him a
-vulnerable child.
+| Key | Action |
+|---|---|
+| N | Open the Circle Notebook |
+| R (hold) | Circle wheel: point at a circle and release; 1 to 9 to pick without aiming; a left click joins the hands at once (Gate initiates) |
+| G / Shift+G | Cast the gloves' circle / join hands (both gloves, or no circle for an initiate) |
+| H | Gloves screen |
+| — | Next / previous circle (unbound by default) |
 
-**v0.7 (Stone), in progress:** the Philosopher's Stone amplifies transmutations and draws monsters,
-and is made by sacrificing lives on a human transmutation circle; karma tracks your deeds; every
-eighth day an eclipse lets a Gate initiate holding two full Stones become a Living Stone.
+In the survival inventory, the **Body** tab shows limbs, automail and gloves.
 
-**v1.0 (Promised Day), in progress:** Father waits beneath Central behind an Ouroboros seal that
-yields only to those who saw Sloth, Wrath and Pride fall; he fights in three forms and blocks all
-Amestrian alchemy around him. Xing's alkahestry (five kunai planted in a circle, taught by May
-Chang) still works there. Fort Briggs, Olivier Armstrong and her Briggs sabre hold the snowy north
-against Drachma's soldiers.
-An advancement tree, cartographer maps and the national circle's blood crests guide the way; Dublith
-(Izumi), Liore, the Ishval and Xerxes ruins, Yock Island and Marcoh's clinic fill the map, and the
-towns are lived in (villagers whose trade comes from their house's workstation, furnished houses,
-guards at Central's gates); Barry, haunted armors, immortal soldiers and chimeras fill it with fights,
-and boss bars only show once a fight has begun. New playstyles (Scar's arm,
-Kimblee's mines, firearms, throwing knives, the Xing sword), the forbidden Gold glyph, the schools of
-Destruction, Medicine and Life, circle triggers and two-alchemist fusion, cinematics, an eclipse in
-the sky and the mod's own sounds round it out. The notebook is no longer an item: it opens with a key
-(N) and survives death; the circle wheel (hold R) switches circles in one gesture and, for Gate
-initiates, a click on it joins the hands at once; crouching empty-handed and right-clicking an unknown
-circle copies it into the notebook. The selected circle shows at the top left when it can be used
-(Gate seen, or chalk, paint or chisel in hand). A Body tab on the inventory shows limbs, automail and
-its wear, organs, sight and gloves: automail is fitted there on a lost limb and gloves are put on;
-only Winry removes automail. The human transmutation
-circle is no longer in the Treatise:
-very rare Notes on Human Transmutation hand it out.
+### Getting started
 
-Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
+Every player starts with the **Alchemy Treatise**, the **Rudiments** tome and **chalk**; their
+**notebook** already holds a wall, a spike and an ice platform. Pick a circle (N or R), draw it on
+the ground with chalk (right-click), then lay your palm on it (right-click, empty hand). The Treatise
+explains the rest, and advancements (L key) trace the path: Izumi in Dublith, the State exam in
+Central, the Gate, the homunculi, then Father.
+
+### Content
+
+- **Player-designed circles**: a 32-cell grid with line, circle, polygon, arc, dot and stamp tools,
+  symmetry, named and ordered pages, import/export codes, and live analysis (glyphs, effect,
+  complexity, stability, cost, verdict).
+- **15 glyphs and 19 combinations**, multi-stage circles linked in series, parallel or condition,
+  satellites, two-element fusion, layered polygons.
+- **Equivalent exchange**: matter comes from the world or from items laid on the circle; never a
+  change of family, never more mass out than in.
+- **Media**: floors, walls and ceilings; chalk, paint, chisel engraving; 1 to 7-block circles;
+  triggers (delay, trap, redstone); two-alchemist fusion. Crouching empty-handed, right-click an
+  unknown circle to copy it into the notebook.
+- **Ranks and knowledge**: Apprentice, Alchemist (through practice), State Alchemist (exam against a
+  golem), Gate initiate; concentration grows with rank; mastery per school (Earth, Metal, Water, Fire, Explosion, Destruction,
+  Medicine, Life); unknown glyphs work with
+  a rebound risk and are learned through use or tomes.
+- **Worn circles**: embroidered or engraved gloves (including Mustang's spark gloves and
+  gauntlets), embroidered clothes, ritual tattoos with permanent passives.
+- **The Gate**: human transmutation always fails and drags the alchemist into the White Space, where
+  Truth takes its toll (an arm, a leg, the organs, the sight... or the whole body, leaving the soul in
+  a blood-sealed armor). In exchange, initiates transmute without a circle. The circle is in no
+  treatise: work it out yourself, or find very rare **Notes on Human Transmutation**.
+- **Automail** (iron, Rush Valley, Briggs) on lost limbs: fitted at the bench or in the Body tab,
+  wears out, repaired and removed by **Winry**.
+- **Philosopher's Stone**: restores what the Gate took, amplifies transmutations, made by sacrifice.
+  **Karma**, an **eclipse** every eighth day, the **Living Stone**.
+- **Homunculi** that reconstitute while their Stone holds souls: Lust, Gluttony (and his Belly),
+  Envy in disguise, Greed (a possible ally), Sloth, Wrath, Pride; finally **Father** and his
+  anti-alchemy zone, at the end of the quest for the seven **blood crests**. Boss bars only show once
+  a fight has begun.
+- **Other arts and weapons**: Xing alkahestry (kunai, May Chang), Scar's arm, Kimblee's mines,
+  pistol and rifle, throwing knives, Briggs sabre, Xing sword.
+- **Lived-in towns**: villagers whose trade comes from their house's workstation, furnished houses,
+  guards at Central's gates; cartographers sell maps to the mod's places.
+- **Polish**: cinematics (the Gate, the Promised Day, Father's fall), an eclipse in the sky, the mod's
+  own sounds (CC0), boss models, texts in French and English.
+
+### Places
+
+Use `/locate structure fmab:<id>`: `central`, `resembool`, `dublith`, `rush_valley`, `liore`,
+`ishval_ruins`, `xerxes_ruins`, `marcoh_clinic`, `laboratory_5`, `devils_nest`, `xing`,
+`fort_briggs`, `blood_crest`, `yock_island` (see the French table above for who lives where).
+
+### Development and releases
+
+Build with JDK 25+ (`./gradlew build`, jar in `build/libs/`; `./gradlew runClient` to play). The web
+circle editor (`web/`) ports the parser to TypeScript and is checked against the Java one on shared
+test circles. Every pull request and push on `master` builds the mod and the editor; the jar is in
+the build artifacts. Pushing a `vX.Y.Z` tag (`vX.Y.Z-beta` for a pre-release) publishes a GitHub
+Release with the French and English changelog, and the mod version follows the tags (`1.2.3` on
+`v1.2.3`, `1.2.4-dev.N` after it). Server settings live in `config/fmab.json`.
 
 ## Mention des ayants droit / Rights holders
 
