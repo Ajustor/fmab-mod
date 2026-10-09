@@ -112,6 +112,8 @@ public final class Transmutation {
 		Optional<ItemStack> stone = PhilosopherStones.held(caster);
 		boolean living = LivingStone.souls(caster) > 0;
 		boolean amplified = stone.isPresent() || living;
+		// Une pierre rouge impure amplifie, mais ne tient rien : le cercle rebondit comme sans elle.
+		boolean steady = living || stone.filter(PhilosopherStones::pure).isPresent();
 		int cost = amplified ? 0 : (int) Math.ceil(StateWatch.cost(analysis.concentration(), watch) * size.cost());
 		if (alchemist.concentration() < cost) {
 			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired",
@@ -123,12 +125,12 @@ public final class Transmutation {
 		// L'énergie est partie : quoi qu'il arrive, on s'est familiarisé avec les glyphes tracés.
 		practiceGlyphs(caster, rules, analysis);
 
-		if (analysis.outcome() == Analysis.Outcome.REBOUND && !(amplified && PhilosopherStones.steadies(analysis))) {
+		if (analysis.outcome() == Analysis.Outcome.REBOUND && !(steady && PhilosopherStones.steadies(analysis))) {
 			rebound(level, circle, frame, caster, analysis.reboundSeverity(), inscribed);
 			return Result.REBOUND;
 		}
 		// Un glyphe qu'on ne comprend pas peut tout faire basculer (sauf si la Pierre le tient).
-		if (!amplified && analysis.risk() > 0 && caster.getRandom().nextDouble() < analysis.risk()) {
+		if (!steady && analysis.risk() > 0 && caster.getRandom().nextDouble() < analysis.risk()) {
 			caster.sendSystemMessage(Component.translatable("transmutation.fmab.misunderstood"));
 			rebound(level, circle, frame, caster, analysis.risk(), inscribed);
 			return Result.REBOUND;

@@ -107,6 +107,15 @@ public final class FmabBlocks {
 					.lightLevel(state -> state.getValue(BloodCrestBlock.SEALED) ? 0 : 6)
 					.sound(SoundType.DEEPSLATE_TILES));
 
+	/** Le minerai de pierre rouge, sous le temple de Liore : des éclats de Pierre impure. */
+	public static final Block RED_STONE_ORE = register("red_stone_ore", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.SAND)
+					.strength(3.0f, 3.0f)
+					.requiresCorrectToolForDrops()
+					.lightLevel(state -> 3)
+					.sound(SoundType.AMETHYST));
+
 	private FmabBlocks() {
 	}
 

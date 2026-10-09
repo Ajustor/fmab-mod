@@ -26,7 +26,9 @@ public enum Trial {
 	/** Réussir une transmutation avec un gant, sans rien tracer. */
 	GLOVES(Map.of(), List.of("fmab:metal/docile_iron"), Tomes.FORMS),
 	/** Tenir tête à Izumi en combat d'entraînement. */
-	SPAR(Map.of(), List.of("fmab:earth/stone_lance", "fmab:metal/arm_blade"), null);
+	SPAR(Map.of(), List.of("fmab:earth/stone_lance", "fmab:metal/arm_blade"), null),
+	/** Survivre un jour entier sur l'île de Yock, sans la quitter : un est tout, tout est un. */
+	ISLAND(Map.of("earth", 20, "metal", 20, "fire", 10), List.of(), null);
 
 	private final Map<String, Integer> mastery;
 	private final List<String> nodes;

@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 905517321,
+    "separation": 18,
+    "spacing": 56
+  },
+  "structures": [
+    {
+      "structure": "fmab:xerxes_ruins",
+      "weight": 1
+    }
+  ]
+}

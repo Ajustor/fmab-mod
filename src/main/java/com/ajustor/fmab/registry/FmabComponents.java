@@ -48,6 +48,15 @@ public final class FmabComponents {
 					.networkSynchronized(ByteBufCodecs.BOOL)
 					.build());
 
+	/** Le numéro d'un fragment de fresque de Xerxès. */
+	public static final DataComponentType<Integer> MURAL = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("mural"),
+			DataComponentType.<Integer>builder()
+					.persistent(Codec.INT)
+					.networkSynchronized(ByteBufCodecs.VAR_INT)
+					.build());
+
 	/** Heure de jeu (ticks) à laquelle une arme transmutée se défait. */
 	public static final DataComponentType<Long> EXPIRES = Registry.register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,

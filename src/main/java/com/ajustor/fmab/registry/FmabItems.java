@@ -15,11 +15,13 @@ import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.IshvalTattooItem;
 import com.ajustor.fmab.item.KunaiItem;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
+import com.ajustor.fmab.item.RedStoneShardItem;
 import com.ajustor.fmab.item.ScreenItem;
 import com.ajustor.fmab.item.ThrowingKnifeItem;
 import com.ajustor.fmab.item.TomeItem;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
+import com.ajustor.fmab.item.XerxesMuralItem;
 import com.ajustor.fmab.item.XingSwordItem;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
@@ -192,6 +194,21 @@ public final class FmabItems {
 	public static final Item XING_SWORD = register("xing_sword", XingSwordItem::new,
 			new Item.Properties().sword(ToolMaterial.IRON, 2.5F, -1.6F).durability(500));
 
+	public static final Item RED_STONE_ORE = register("red_stone_ore",
+			p -> new BlockItem(FmabBlocks.RED_STONE_ORE, p), new Item.Properties().useBlockDescriptionPrefix());
+	/** Un éclat de pierre rouge impure : il amplifie, mais ne tient rien. */
+	public static final Item RED_STONE_SHARD = register("red_stone_shard", RedStoneShardItem::new,
+			new Item.Properties().durability(12).rarity(Rarity.UNCOMMON));
+	/** Un fragment de fresque des ruines de Xerxès. */
+	public static final Item XERXES_MURAL = register("xerxes_mural", XerxesMuralItem::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
+	public static final Item CORNELLO_SPAWN_EGG = register("cornello_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.CORNELLO));
+	public static final Item SCAR_SPAWN_EGG = register("scar_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.SCAR));
+	public static final Item HOHENHEIM_SPAWN_EGG = register("hohenheim_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.HOHENHEIM));
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -275,6 +292,12 @@ public final class FmabItems {
 					output.accept(CARTRIDGE);
 					output.accept(THROWING_KNIFE);
 					output.accept(XING_SWORD);
+					output.accept(RED_STONE_ORE);
+					output.accept(RED_STONE_SHARD);
+					output.accept(XERXES_MURAL);
+					output.accept(CORNELLO_SPAWN_EGG);
+					output.accept(SCAR_SPAWN_EGG);
+					output.accept(HOHENHEIM_SPAWN_EGG);
 				})
 				.build());
 	}

@@ -1,6 +1,7 @@
 package com.ajustor.fmab.world;
 
 import com.ajustor.fmab.item.Tomes;
+import com.ajustor.fmab.item.XerxesMuralItem;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
@@ -81,6 +82,10 @@ public final class Blueprints {
 		out.put("xing_pavilion", new XingPavilion());
 		out.put("fort_briggs", new FortBriggs());
 		out.put("blood_crest", Blueprints::bloodCrest);
+		out.put("liore", new Liore());
+		out.put("ishval_ruins", new IshvalRuins());
+		out.put("xerxes_ruins", new XerxesRuins());
+		out.put("yock_island", new YockIsland());
 		plans = out;
 		return plans;
 	}
@@ -1307,6 +1312,278 @@ public final class Blueprints {
 			}
 		}
 		return AIR;
+	}
+
+	/**
+	 * Liore, ville du désert : une place de grès, des maisons basses autour, et au nord le temple de
+	 * Leto, colonnes et dôme d'or, où le père Cornello fait ses « miracles ». Sous l'autel, la pierre
+	 * rouge ; sur le parvis, le point de sang de l'émeute.
+	 */
+	static final class Liore implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			int s = p.sizeX(), c = s / 2;
+			if (y < 0) {
+				return b(Blocks.SANDSTONE);
+			}
+			if (y == 0) {
+				return Math.abs(x - c) <= 2 || Math.abs(z - c) <= 2 ? b(Blocks.SMOOTH_SANDSTONE) : b(Blocks.SAND);
+			}
+			BlockState temple = temple(x, y, z, c);
+			if (temple != null) {
+				return temple;
+			}
+			// Des maisons basses de part et d'autre du temple, et aux coins sud.
+			for (int[] h : new int[][]{{2, 4}, {s - 9, 4}, {2, s - 9}, {s - 9, s - 9}}) {
+				if (x >= h[0] && x < h[0] + 7 && z >= h[1] && z < h[1] + 7 && y <= 5) {
+					boolean edge = x == h[0] || x == h[0] + 6 || z == h[1] || z == h[1] + 6;
+					if (y == 5) {
+						return b(Blocks.SMOOTH_SANDSTONE_SLAB);
+					}
+					if (!edge) {
+						return y == 1 && x == h[0] + 1 && z == h[1] + 1 ? b(Blocks.BARREL) : AIR;
+					}
+					boolean door = z == h[1] && x == h[0] + 3 && y <= 2;
+					boolean window = y == 3 && (x == h[0] + 3 || z == h[1] + 3);
+					return door || window ? AIR : b(Blocks.SANDSTONE);
+				}
+			}
+			if (y == 1 && x == c && z == c + 4) {
+				return b(FmabBlocks.BLOOD_CREST);
+			}
+			return y <= 8 ? AIR : null;
+		}
+
+		/** Le temple de Leto : 13 de large, 11 de profond, colonnes, autel, dôme d'or. */
+		private static BlockState temple(int x, int y, int z, int c) {
+			int x0 = c - 6, x1 = c + 6, z0 = 1, z1 = 11;
+			if (x < x0 || x > x1 || z < z0 || z > z1 || y > 13) {
+				return null;
+			}
+			boolean wall = x == x0 || x == x1 || z == z1;
+			if (y <= 7) {
+				if (z == z0) {
+					// La façade : des colonnes, la porte au milieu.
+					return (x - x0) % 3 == 0 ? b(Blocks.CUT_SANDSTONE) : AIR;
+				}
+				if (y == 7) {
+					return b(Blocks.SMOOTH_SANDSTONE);
+				}
+				if (wall) {
+					return y == 4 && (x - x0) % 3 == 1 ? b(Blocks.STAINED_GLASS.pick(DyeColor.RED)) : b(Blocks.SMOOTH_SANDSTONE);
+				}
+				// L'autel, la statue de Leto, la pierre rouge cachée dessous.
+				if (z == z1 - 2 && Math.abs(x - c) <= 1) {
+					if (y == 1) {
+						return b(Blocks.CHISELED_SANDSTONE);
+					}
+					if (y == 2 && x == c) {
+						return b(Blocks.GOLD_BLOCK);
+					}
+					if (y == 3 && x == c) {
+						return b(Blocks.GOLD_BLOCK);
+					}
+				}
+				if (y == 1 && Math.abs(x - c) <= 1 && z == z1 - 1) {
+					return b(FmabBlocks.RED_STONE_ORE);
+				}
+				return AIR;
+			}
+			// Le dôme d'or.
+			double d = Math.hypot(x - c, (z - (z0 + z1) / 2.0) * 1.2);
+			double r = 6 - (y - 8) * 1.2;
+			return r > 0 && d <= r && d > r - 1.2 ? b(Blocks.GOLD_BLOCK) : null;
+		}
+
+		@Override
+		public List<Chest> chests(Plot p) {
+			int c = p.sizeX() / 2;
+			return List.of(new Chest(new BlockPos(c + 4, 1, 9), Liore::offerings));
+		}
+
+		private static List<ItemStack> offerings(Plot p) {
+			List<ItemStack> out = new ArrayList<>();
+			out.add(new ItemStack(Items.GOLD_INGOT, 2 + p.noise(1, 0, 0, 5)));
+			out.add(new ItemStack(Items.CANDLE, 3 + p.noise(2, 0, 0, 4)));
+			if (p.noise(3, 0, 0, 2) == 0) {
+				out.add(new ItemStack(FmabItems.RED_STONE_SHARD));
+			}
+			return out;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			int c = p.sizeX() / 2;
+			return List.of(new Spawn(FmabEntities.CORNELLO, new BlockPos(c, 1, 7)));
+		}
+	}
+
+	/**
+	 * Les ruines d'Ishval : des maisons de terre écroulées, un temple au toit effondré, et au centre le
+	 * point de sang de la guerre d'extermination. Scar y erre.
+	 */
+	static final class IshvalRuins implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			int s = p.sizeX(), c = s / 2;
+			if (y < 0) {
+				return b(Blocks.SANDSTONE);
+			}
+			if (y == 0) {
+				int n = p.noise(x, 0, z, 6);
+				return n == 0 ? b(Blocks.COARSE_DIRT) : n == 1 ? b(Blocks.RED_SAND) : b(Blocks.SAND);
+			}
+			if (y == 1 && x == c && z == c) {
+				return b(FmabBlocks.BLOOD_CREST);
+			}
+			// Le temple au centre : des murs à hauteur variable, sans toit.
+			int dx = Math.abs(x - c), dz = Math.abs(z - c);
+			if (Math.max(dx, dz) == 5 && y <= 2 + p.noise(x, 7, z, 5) && !(dz == 5 && dx <= 1 && z > c)) {
+				return p.noise(x, y, z, 3) == 0 ? b(Blocks.CRACKED_STONE_BRICKS) : b(Blocks.CUT_RED_SANDSTONE);
+			}
+			// Les maisons de terre, en ruine, en cercle autour.
+			for (int k = 0; k < 6; k++) {
+				double a = Math.PI / 3 * k + 0.3;
+				int hx = c + (int) Math.round(Math.cos(a) * 11), hz = c + (int) Math.round(Math.sin(a) * 11);
+				int ex = Math.abs(x - hx), ez = Math.abs(z - hz);
+				if (Math.max(ex, ez) == 2 && y <= 1 + p.noise(x, k, z, 4)) {
+					return p.noise(x, y, z, 4) == 0 ? b(Blocks.PACKED_MUD) : b(Blocks.TERRACOTTA);
+				}
+			}
+			if (y == 1 && p.noise(x, 3, z, 40) == 0) {
+				return b(Blocks.DEAD_BUSH);
+			}
+			return y <= 6 ? AIR : null;
+		}
+
+		@Override
+		public List<Chest> chests(Plot p) {
+			int c = p.sizeX() / 2;
+			return List.of(new Chest(new BlockPos(c + 3, 1, c - 3), IshvalRuins::remains));
+		}
+
+		private static List<ItemStack> remains(Plot p) {
+			List<ItemStack> out = new ArrayList<>();
+			out.add(new ItemStack(Items.BONE, 3 + p.noise(1, 0, 0, 5)));
+			out.add(new ItemStack(Items.CLAY_BALL, 2 + p.noise(2, 0, 0, 4)));
+			out.add(new ItemStack(Items.PAPER, 1 + p.noise(3, 0, 0, 3)));
+			return out;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			int c = p.sizeX() / 2;
+			return List.of(new Spawn(FmabEntities.SCAR, new BlockPos(c - 2, 1, c + 2)));
+		}
+	}
+
+	/**
+	 * Les ruines de Xerxès : un parvis de grès à demi enfoui, gravé du grand cercle qui a dévoré le
+	 * royaume en une nuit, et une forêt de colonnes brisées. Des fresques racontent la chute ;
+	 * Hohenheim, le seul survivant, y revient.
+	 */
+	static final class XerxesRuins implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			int s = p.sizeX(), c = s / 2;
+			double d = Math.hypot(x - c, z - c);
+			if (y < 0) {
+				return b(Blocks.SANDSTONE);
+			}
+			if (y == 0) {
+				if (d > c) {
+					return null;
+				}
+				double a = Math.atan2(z - c, x - c);
+				boolean ring = Math.abs(d - 14) < 0.6 || Math.abs(d - 9) < 0.5;
+				boolean star = d < 14 && d > 3 && Math.abs(Math.sin(2.5 * a)) < 0.06;
+				if (ring || star) {
+					return b(Blocks.CUT_RED_SANDSTONE);
+				}
+				return p.noise(x, 0, z, 5) == 0 ? b(Blocks.SAND) : b(Blocks.SMOOTH_SANDSTONE);
+			}
+			// Les colonnes brisées, sur deux anneaux.
+			boolean column = (Math.abs(d - 16) < 0.8 || Math.abs(d - 6) < 0.6) && p.noise(x, 0, z, 3) == 0;
+			if (column && y <= 2 + p.noise(x, 1, z, 9)) {
+				return y % 4 == 0 ? b(Blocks.CHISELED_SANDSTONE) : b(Blocks.CUT_SANDSTONE);
+			}
+			return d <= c && y <= 12 ? AIR : null;
+		}
+
+		@Override
+		public List<Chest> chests(Plot p) {
+			int c = p.sizeX() / 2;
+			return List.of(new Chest(new BlockPos(c - 4, 1, c), XerxesRuins::murals),
+					new Chest(new BlockPos(c + 4, 1, c), XerxesRuins::murals));
+		}
+
+		/** Deux fragments de fresque, et l'or d'un royaume disparu. */
+		private static List<ItemStack> murals(Plot p) {
+			List<ItemStack> out = new ArrayList<>();
+			int first = 1 + p.noise(4, 0, 0, XerxesMuralItem.COUNT);
+			out.add(XerxesMuralItem.of(FmabItems.XERXES_MURAL, first));
+			out.add(XerxesMuralItem.of(FmabItems.XERXES_MURAL, 1 + first % XerxesMuralItem.COUNT));
+			out.add(new ItemStack(Items.GOLD_NUGGET, 4 + p.noise(5, 0, 0, 10)));
+			return out;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			int c = p.sizeX() / 2;
+			return List.of(new Spawn(FmabEntities.HOHENHEIM, new BlockPos(c, 1, c + 2)));
+		}
+	}
+
+	/**
+	 * L'île de Yock : un cône de roche et de sable surgi de la mer (y = 0 au niveau de l'eau), une
+	 * plage, de l'herbe, quelques arbres, la cabane des naufragés et un feu de camp.
+	 */
+	static final class YockIsland implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			int c = p.sizeX() / 2;
+			double d = Math.hypot(x - c, z - c);
+			if (y < 0) {
+				// Sous l'eau, le cône s'élargit vers le fond.
+				double r = 10 + Math.min(2, -y * 0.25);
+				return d <= r ? y > -3 ? b(Blocks.SAND) : b(Blocks.STONE) : null;
+			}
+			if (y == 0) {
+				return d <= 10 ? d <= 7 ? b(Blocks.DIRT) : b(Blocks.SAND) : null;
+			}
+			if (y == 1) {
+				if (d <= 7) {
+					return b(Blocks.GRASS_BLOCK);
+				}
+				return d <= 9 ? b(Blocks.SAND) : null;
+			}
+			// La cabane : 5 sur 5, planches et toit de chaume (foin).
+			int hx = c - 5, hz = c - 2;
+			if (x >= hx && x < hx + 5 && z >= hz && z < hz + 5 && y >= 2 && y <= 5) {
+				boolean edge = x == hx || x == hx + 4 || z == hz || z == hz + 4;
+				if (y == 5) {
+					return b(Blocks.HAY_BLOCK);
+				}
+				if (!edge) {
+					return AIR;
+				}
+				return z == hz + 4 && x == hx + 2 && y <= 3 ? AIR : b(Blocks.OAK_PLANKS);
+			}
+			if (y == 2 && x == c + 2 && z == c + 2) {
+				return b(Blocks.CAMPFIRE);
+			}
+			// Trois arbres.
+			for (int[] t : new int[][]{{c + 4, c - 3}, {c - 1, c + 5}, {c + 5, c + 3}}) {
+				double td = Math.hypot(x - t[0], z - t[1]);
+				if (x == t[0] && z == t[1] && y >= 2 && y <= 5) {
+					return b(Blocks.OAK_LOG);
+				}
+				if (y >= 5 && y <= 7 && td <= 2.5 - (y - 5) * 0.6 && !(x == t[0] && z == t[1] && y == 5)) {
+					return b(Blocks.OAK_LEAVES).setValue(LeavesBlock.PERSISTENT, true);
+				}
+			}
+			return d <= 9 && y <= 8 ? AIR : null;
+		}
 	}
 
 	/** La place de Rush Valley : un dallage de grès, des lanternes aux coins, un puits au centre. */

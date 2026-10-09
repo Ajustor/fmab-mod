@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "fmab:cartographer/map_central",
-    "fmab:cartographer/map_rush_valley"
+    "fmab:cartographer/map_rush_valley",
+    "fmab:cartographer/map_liore",
+    "fmab:cartographer/map_yock_island"
   ]
 }

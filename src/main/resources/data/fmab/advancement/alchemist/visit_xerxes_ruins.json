@@ -1,0 +1,38 @@
+{
+  "parent": "fmab:alchemist/root",
+  "criteria": {
+    "visit_xerxes_ruins": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "minecraft:location": {
+                "structures": "fmab:xerxes_ruins"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:chiseled_sandstone"
+    },
+    "frame": "task",
+    "title": {
+      "translate": "advancements.fmab.visit_xerxes_ruins.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.visit_xerxes_ruins.description"
+    }
+  },
+  "requirements": [
+    [
+      "visit_xerxes_ruins"
+    ]
+  ]
+}

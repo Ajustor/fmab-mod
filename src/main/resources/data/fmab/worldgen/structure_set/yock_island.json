@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 220913870,
+    "separation": 20,
+    "spacing": 64
+  },
+  "structures": [
+    {
+      "structure": "fmab:yock_island",
+      "weight": 1
+    }
+  ]
+}

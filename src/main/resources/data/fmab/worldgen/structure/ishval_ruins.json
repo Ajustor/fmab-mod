@@ -1,0 +1,11 @@
+{
+  "type": "fmab:single_site",
+  "biomes": "#fmab:has_structure/ishval_ruins",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "piece": "ishval_ruins",
+  "size": 31,
+  "height": 10,
+  "ground": 3
+}

@@ -6,12 +6,14 @@ import com.ajustor.fmab.entity.AmestrianSoldierEntity;
 import com.ajustor.fmab.entity.BarryEntity;
 import com.ajustor.fmab.entity.ChimeraBeastEntity;
 import com.ajustor.fmab.entity.ChimeraCrawlerEntity;
+import com.ajustor.fmab.entity.CornelloEntity;
 import com.ajustor.fmab.entity.DrachmaSoldierEntity;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.FatherEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
 import com.ajustor.fmab.entity.GreedEntity;
 import com.ajustor.fmab.entity.HauntedArmorEntity;
+import com.ajustor.fmab.entity.HohenheimEntity;
 import com.ajustor.fmab.entity.ImmortalSoldierEntity;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.KunaiEntity;
@@ -19,6 +21,7 @@ import com.ajustor.fmab.entity.LustEntity;
 import com.ajustor.fmab.entity.MayChangEntity;
 import com.ajustor.fmab.entity.OlivierEntity;
 import com.ajustor.fmab.entity.PrideEntity;
+import com.ajustor.fmab.entity.ScarEntity;
 import com.ajustor.fmab.entity.SlothEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.StoneGolemEntity;
@@ -307,6 +310,36 @@ public final class FmabEntities {
 					.updateInterval(20)
 					.build(THROWING_KNIFE_KEY));
 
+	private static final ResourceKey<EntityType<?>> CORNELLO_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("cornello"));
+
+	/** Le père Cornello, faux prophète de Liore. */
+	public static final EntityType<CornelloEntity> CORNELLO = Registry.register(BuiltInRegistries.ENTITY_TYPE, CORNELLO_KEY,
+			EntityType.Builder.<CornelloEntity>of(CornelloEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(CORNELLO_KEY));
+
+	private static final ResourceKey<EntityType<?>> SCAR_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("scar"));
+
+	/** Scar, l'Ishvalien au bras tatoué, dans les ruines d'Ishval. */
+	public static final EntityType<ScarEntity> SCAR = Registry.register(BuiltInRegistries.ENTITY_TYPE, SCAR_KEY,
+			EntityType.Builder.<ScarEntity>of(ScarEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(SCAR_KEY));
+
+	private static final ResourceKey<EntityType<?>> HOHENHEIM_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("hohenheim"));
+
+	/** Van Hohenheim, dans les ruines de Xerxès. */
+	public static final EntityType<HohenheimEntity> HOHENHEIM = Registry.register(BuiltInRegistries.ENTITY_TYPE, HOHENHEIM_KEY,
+			EntityType.Builder.<HohenheimEntity>of(HohenheimEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(HOHENHEIM_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -333,6 +366,9 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(BARRY, BarryEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(CHIMERA_BEAST, ChimeraBeastEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(CHIMERA_CRAWLER, ChimeraCrawlerEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(CORNELLO, CornelloEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(SCAR, ScarEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(HOHENHEIM, HohenheimEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(BRIGGS_SOLDIER, AmestrianSoldierEntity.createAttributes());
 		// Les chimères rôdent la nuit, comme tout monstre ; on en croise un peu partout.
 		SpawnPlacements.register(CHIMERA_BEAST, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,

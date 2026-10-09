@@ -23,6 +23,7 @@ import com.ajustor.fmab.stone.Eclipse;
 import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
+import com.ajustor.fmab.training.IslandTrial;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
@@ -79,6 +80,7 @@ public class Fmab implements ModInitializer {
 		Alkahestry.register();
 		Milestones.register();
 		ScarArm.register();
+		IslandTrial.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> equip(handler.getPlayer()));
 		// Gantelets : frapper un bloc, main libre, y lance leur cercle au lieu de commencer à le casser.
 		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {

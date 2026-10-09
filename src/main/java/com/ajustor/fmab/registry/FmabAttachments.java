@@ -119,6 +119,11 @@ public final class FmabAttachments {
 			.syncWith(ByteBufCodecs.BOOL, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("scar_arm"));
 
+	/** Le temps passé d'affilée sur l'île de Yock, en ticks (l'épreuve d'Izumi). */
+	public static final AttachmentType<Integer> ISLAND_TIME = AttachmentRegistry.<Integer>builder()
+			.persistent(Codec.INT)
+			.buildAndRegister(Fmab.id("island_time"));
+
 	/** Les homonculus qu'on a vus tomber : la clé du sceau de Père. Gardés à la mort. */
 	public static final AttachmentType<Set<String>> SLAIN = AttachmentRegistry.<Set<String>>builder()
 			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))

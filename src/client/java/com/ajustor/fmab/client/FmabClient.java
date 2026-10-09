@@ -3,12 +3,14 @@ package com.ajustor.fmab.client;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.client.render.ChimeraBeastRenderer;
 import com.ajustor.fmab.client.render.ChimeraCrawlerRenderer;
+import com.ajustor.fmab.client.render.CornelloRenderer;
 import com.ajustor.fmab.client.render.DrachmaSoldierRenderer;
 import com.ajustor.fmab.client.render.EnvyRenderer;
 import com.ajustor.fmab.client.render.FatherRenderer;
 import com.ajustor.fmab.client.render.GluttonyRenderer;
 import com.ajustor.fmab.client.render.GreedRenderer;
 import com.ajustor.fmab.client.render.HauntedArmorRenderer;
+import com.ajustor.fmab.client.render.HohenheimRenderer;
 import com.ajustor.fmab.client.render.ImmortalSoldierRenderer;
 import com.ajustor.fmab.client.render.IzumiRenderer;
 import com.ajustor.fmab.client.render.KunaiRenderer;
@@ -16,6 +18,7 @@ import com.ajustor.fmab.client.render.LustRenderer;
 import com.ajustor.fmab.client.render.MayChangRenderer;
 import com.ajustor.fmab.client.render.OlivierRenderer;
 import com.ajustor.fmab.client.render.PrideRenderer;
+import com.ajustor.fmab.client.render.ScarRenderer;
 import com.ajustor.fmab.client.render.SlothRenderer;
 import com.ajustor.fmab.client.render.SoldierRenderer;
 import com.ajustor.fmab.client.render.StateExaminerRenderer;
@@ -115,6 +118,9 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.CHIMERA_CRAWLER, ChimeraCrawlerRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.ALCHEMICAL_MINE, NoopRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.THROWING_KNIFE, ThrowingKnifeRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.CORNELLO, CornelloRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.SCAR, ScarRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.HOHENHEIM, HohenheimRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(OpenTruthPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,
