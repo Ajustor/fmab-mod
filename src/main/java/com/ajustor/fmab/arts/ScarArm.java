@@ -1,8 +1,10 @@
 package com.ajustor.fmab.arts;
 
+import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
+import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
@@ -31,6 +33,8 @@ import java.util.UUID;
  * de Père : il puise aussi au flux du dragon.
  */
 public final class ScarArm {
+	/** L'école de savoir que le bras fait progresser. */
+	private static final String SCHOOL = "destruction";
 	private static final float BLOCK_COST = 1;
 	private static final float ENTITY_COST = 2;
 	private static final float ENTITY_DAMAGE = 7;
@@ -104,18 +108,23 @@ public final class ScarArm {
 		return true;
 	}
 
-	/** Le bras puise dans la concentration, comme toute transmutation. */
+	/**
+	 * Le bras puise dans la concentration, comme toute transmutation, et fait progresser l'école de la
+	 * Destruction, qui le rend moins coûteux.
+	 */
 	private static boolean pay(ServerPlayer player, float cost) {
-		if (player.isCreative()) {
-			return true;
-		}
 		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-		if (data.concentration() < cost) {
-			player.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) cost,
-					(int) data.concentration()));
-			return false;
+		Knowledge knowledge = AlchemyRules.of(player.level().registryAccess()).knowledge(data);
+		cost = (float) Math.max(0.5, cost - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
+		if (!player.isCreative()) {
+			if (data.concentration() < cost) {
+				player.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) Math.ceil(cost),
+						(int) data.concentration()));
+				return false;
+			}
+			data = data.withConcentration(data.concentration() - cost);
 		}
-		player.setAttached(FmabAttachments.ALCHEMIST, data.withConcentration(data.concentration() - cost));
+		player.setAttached(FmabAttachments.ALCHEMIST, data.addMastery(SCHOOL, 1));
 		return true;
 	}
 }

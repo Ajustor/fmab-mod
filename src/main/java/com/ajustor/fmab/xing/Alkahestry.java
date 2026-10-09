@@ -1,11 +1,13 @@
 package com.ajustor.fmab.xing;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.KunaiEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
+import com.ajustor.fmab.transmutation.AlchemyRules;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -38,6 +40,9 @@ import java.util.UUID;
  * les ennemis, quelques secondes durant. Il faut l'avoir apprise d'une maîtresse de Xing.
  */
 public final class Alkahestry {
+	/** L'école de savoir que l'alkahestry fait progresser. */
+	public static final String SCHOOL = "medicine";
+	private static final int MASTERY = 2;
 	public static final ResourceKey<DamageType> DAMAGE =
 			ResourceKey.create(Registries.DAMAGE_TYPE, Fmab.id("alkahestry"));
 	/** Rayon dans lequel on cherche les kunaï d'un même cercle autour du dernier planté. */
@@ -87,17 +92,23 @@ public final class Alkahestry {
 			return;
 		}
 		AlchemistData alchemist = thrower.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		// L'école de la Médecine : moins cher, plus large, plus long à mesure qu'on la pratique.
+		Knowledge knowledge = AlchemyRules.of(level.registryAccess()).knowledge(alchemist);
+		float cost = (float) Math.max(1, COST - knowledge.perk(SCHOOL, "concentration_discount"));
 		if (!thrower.isCreative()) {
-			if (alchemist.concentration() < COST) {
-				thrower.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) COST,
+			if (alchemist.concentration() < cost) {
+				thrower.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) cost,
 						(int) alchemist.concentration()));
 				return;
 			}
-			thrower.setAttached(FmabAttachments.ALCHEMIST, alchemist.withConcentration(alchemist.concentration() - COST));
+			alchemist = alchemist.withConcentration(alchemist.concentration() - cost);
 		}
+		thrower.setAttached(FmabAttachments.ALCHEMIST, alchemist.addMastery(SCHOOL, MASTERY));
 		ring.forEach(KunaiEntity::spend);
 		boolean trap = kunai.trap();
-		CIRCLES.add(new Circle(level, center, radius + 0.5, trap, thrower.getUUID(), level.getGameTime() + DURATION));
+		double reach = radius + 0.5 + knowledge.perk(SCHOOL, "range_bonus");
+		long duration = DURATION + (long) (knowledge.perk(SCHOOL, "duration_bonus") * 100);
+		CIRCLES.add(new Circle(level, center, reach, trap, thrower.getUUID(), level.getGameTime() + duration));
 		level.playSound(null, kunai.blockPosition(), FmabSounds.ALKAHESTRY, SoundSource.PLAYERS, 1.5f,
 				trap ? 0.6f : 1.4f);
 		thrower.sendOverlayMessage(Component.translatable(trap ? "alkahestry.fmab.trap" : "alkahestry.fmab.heal"));

@@ -26,6 +26,7 @@ import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
 import com.ajustor.fmab.training.IslandTrial;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.ChimeraTransmutation;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.GoldTransmutation;
@@ -71,6 +72,7 @@ public class Fmab implements ModInitializer {
 		TransmutationLightning.register();
 		HumanTransmutation.register();
 		GoldTransmutation.register();
+		ChimeraTransmutation.register();
 		GateOfTruth.register();
 		Tolls.register();
 		Automails.register();
