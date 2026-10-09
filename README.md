@@ -193,6 +193,11 @@ le site (pages Versions, Changelog et Installation, générées par `site/build.
 `feat:`, `fix:` ou `perf:` porte les lignes `Changelog-fr:` et `Changelog-en:` ; le check `commits`
 des pull requests refuse ceux qui les oublient.
 
+La version du mod suit les tags : sur `v1.2.3`, le jar est en `1.2.3` ; après lui, en
+`1.2.4-dev.N` (N commits depuis le tag) ; sans tag, celle de `gradle.properties`. Chaque pull
+request et chaque push sur `master` construisent aussi le jar (`.github/workflows/build.yml`),
+téléchargeable dans les artefacts du build.
+
 ## English
 
 **Status: v0.1 in development (foundation).** The heart of the mod is transmutation through
