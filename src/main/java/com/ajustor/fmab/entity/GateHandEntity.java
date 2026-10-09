@@ -79,6 +79,8 @@ public class GateHandEntity extends Entity {
 			Vec3 toward = position().subtract(target.position()).normalize().scale(pull);
 			target.setDeltaMovement(target.getDeltaMovement().scale(0.6).add(toward));
 			target.hurtMarked = true;
+			// Tenu, il ne tombe pas : pas de chute à payer quand le bras le lâche.
+			target.resetFallDistance();
 		}
 	}
 
@@ -98,7 +100,6 @@ public class GateHandEntity extends Entity {
 
 	@Override
 	protected void readAdditionalSaveData(ValueInput input) {
-		// Une cinématique ne survit pas à un rechargement.
-		discard();
+		// Jamais appelé : le type n'est pas sauvegardé (une cinématique ne survit pas à un rechargement).
 	}
 }

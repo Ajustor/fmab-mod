@@ -22,7 +22,7 @@ public class SingleSiteStructure extends Structure {
 			Codec.STRING.fieldOf("piece").forGetter(s -> s.piece),
 			Codec.INT.fieldOf("size").forGetter(s -> s.size),
 			Codec.INT.fieldOf("height").forGetter(s -> s.height),
-			Codec.INT.optionalFieldOf("ground", 3).forGetter(s -> s.ground)
+			Codec.INT.optionalFieldOf("ground", 1).forGetter(s -> s.ground)
 	).apply(i, SingleSiteStructure::new));
 
 	private final String piece;
@@ -50,7 +50,7 @@ public class SingleSiteStructure extends Structure {
 		BlockPos corner = new BlockPos(cx - size / 2, y, cz - size / 2);
 		Rotation rotation = Rotation.values()[context.random().nextInt(4)];
 		long seed = context.random().nextLong();
-		return Optional.of(new GenerationStub(corner, builder -> builder.addPiece(
+		return Optional.of(new GenerationStub(new BlockPos(cx, y, cz), builder -> builder.addPiece(
 				new ProceduralPiece(piece, corner, size, height, size, ground, rotation, seed))));
 	}
 

@@ -669,10 +669,11 @@ public final class Blueprints {
 					new Spawn(FmabEntities.GLUTTONY, new BlockPos(sx / 2 - 4, HALL_FLOOR + 1, 10)),
 					new Spawn(FmabEntities.HAUNTED_ARMOR, new BlockPos(4, HALL_FLOOR + 1, 6)),
 					new Spawn(FmabEntities.HAUNTED_ARMOR, new BlockPos(sx - 5, HALL_FLOOR + 1, 6)),
-					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(sx / 2, HALL_FLOOR + 1, 4)),
+					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(sx / 2, HALL_FLOOR + 1, 7)),
 					// Dans les cellules, les essais ratés de l'armée.
 					new Spawn(FmabEntities.CHIMERA_CRAWLER, new BlockPos(2, HALL_FLOOR + 1, sz - 3)),
-					new Spawn(FmabEntities.CHIMERA_BEAST, new BlockPos(sx / 2 + 2, HALL_FLOOR + 1, sz - 3)),
+					// Au milieu d'une cellule : la bête est large.
+					new Spawn(FmabEntities.CHIMERA_BEAST, new BlockPos(12, HALL_FLOOR + 1, sz - 3)),
 					new Spawn(FmabEntities.CHIMERA_CRAWLER, new BlockPos(sx - 3, HALL_FLOOR + 1, sz - 3)));
 		}
 	}
@@ -830,7 +831,7 @@ public final class Blueprints {
 	static final class FatherLair implements Blueprint {
 		static final int ROOM_FLOOR = -58;
 		static final int ROOM_CEILING = -44;
-		private static final int DOOR_X = 16;
+		static final int DOOR_X = 16;
 		private static final int SHAFT_Z = 4;
 		private static final int ROOM_Z = 2;
 		private static final int CIRCLE_Z = 22;
@@ -989,7 +990,7 @@ public final class Blueprints {
 			}
 			if (y == 0) {
 				boolean path = Math.abs(x - s / 2) <= 1 && z < Z0;
-				return path ? b(Blocks.MUD_BRICKS) : p.noise(x, y, z, 4) == 0 ? b(Blocks.MOSS_BLOCK) : b(Blocks.PACKED_MUD);
+				return path ? b(Blocks.MUD_BRICKS) : p.noise(x, y, z, 4) == 0 ? b(Blocks.GRAVEL) : b(Blocks.PACKED_MUD);
 			}
 			BlockState wall = wall(x, y, z, s);
 			if (wall != null) {
@@ -1124,7 +1125,8 @@ public final class Blueprints {
 		private static final int WALL_TOP = 20;
 		private static final int KEEP_Z1 = 30;
 		private static final int KEEP_TOP = 18;
-		private static final int LADDER_X = 3;
+		/** Hors des tours (x ≤ 4), contre la muraille. */
+		private static final int LADDER_X = 5;
 		private static final int MID = SIZE_X / 2;
 
 		@Override

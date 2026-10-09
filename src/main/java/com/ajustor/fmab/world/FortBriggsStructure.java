@@ -34,8 +34,8 @@ public class FortBriggsStructure extends Structure {
 		BlockPos corner = new BlockPos(cx - sx / 2, y, cz - sz / 2);
 		Rotation rotation = Rotation.values()[context.random().nextInt(4)];
 		long seed = context.random().nextLong();
-		return Optional.of(new GenerationStub(corner, builder -> builder.addPiece(
-				new ProceduralPiece("fort_briggs", corner, sx, Blueprints.FortBriggs.SIZE_Y, sz, 6, rotation, seed))));
+		return Optional.of(new GenerationStub(new BlockPos(cx, y, cz), builder -> builder.addPiece(
+				new ProceduralPiece("fort_briggs", corner, sx, Blueprints.FortBriggs.SIZE_Y, sz, 1, rotation, seed))));
 	}
 
 	@Override

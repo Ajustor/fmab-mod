@@ -35,6 +35,8 @@ public class GateHandRenderer extends EntityRenderer<GateHandEntity, GateHandRen
 		Vec3 toward = new Vec3(0, RISE, 0);
 		float reach;
 		float age;
+		/** Longueur visible du bras, en blocs. */
+		float length;
 	}
 
 	/** Le bras (un cube d'un bloc qu'on étire) et la main, en pixels. */
@@ -52,6 +54,23 @@ public class GateHandRenderer extends EntityRenderer<GateHandEntity, GateHandRen
 			}
 		}
 
+		/**
+		 * La pose se règle ici : le rendu remet le modèle à zéro juste avant de l'animer, toute pose
+		 * posée ailleurs serait perdue.
+		 */
+		@Override
+		public void setupAnim(State state) {
+			super.setupAnim(state);
+			arm.zScale = state.length;
+			hand.z = state.length * 16;
+			boolean holding = state.reach >= 1;
+			for (int i = 0; i < fingers.length; i++) {
+				// Écartés en approchant, refermés une fois la proie saisie.
+				fingers[i].xRot = holding ? 1.1f : -0.25f + Mth.sin(state.age * 0.5f + i) * 0.15f;
+				fingers[i].yRot = holding ? 0 : (i - 1.5f) * 0.25f;
+			}
+		}
+
 		static LayerDefinition layer() {
 			MeshDefinition mesh = new MeshDefinition();
 			PartDefinition root = mesh.getRoot();
@@ -63,7 +82,7 @@ public class GateHandRenderer extends EntityRenderer<GateHandEntity, GateHandRen
 				hand.addOrReplaceChild("finger" + i, CubeListBuilder.create().texOffs(20, 20).addBox(-0.5f, -0.5f, 0, 1,
 						1, 5), PartPose.offset(-1.8f + i * 1.2f, 0, 3.5f));
 			}
-			return LayerDefinition.create(mesh, 64, 32);
+			return LayerDefinition.create(mesh, 64, 64);
 		}
 	}
 
@@ -88,6 +107,7 @@ public class GateHandRenderer extends EntityRenderer<GateHandEntity, GateHandRen
 				: target.getPosition(partialTicks).add(0, target.getBbHeight() * 0.6, 0).subtract(from);
 		state.reach = entity.reach(partialTicks);
 		state.age = entity.tickCount + partialTicks;
+		state.length = (float) (state.toward.length() * state.reach);
 	}
 
 	@Override
@@ -97,8 +117,7 @@ public class GateHandRenderer extends EntityRenderer<GateHandEntity, GateHandRen
 
 	@Override
 	public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-		double length = state.toward.length() * state.reach;
-		if (length < 0.05) {
+		if (state.length < 0.05f) {
 			return;
 		}
 		float yaw = (float) Mth.atan2(state.toward.x, state.toward.z);
@@ -108,14 +127,6 @@ public class GateHandRenderer extends EntityRenderer<GateHandEntity, GateHandRen
 		poseStack.pushPose();
 		poseStack.mulPose(Axis.YP.rotation(yaw + sway));
 		poseStack.mulPose(Axis.XP.rotation(-pitch + sway * 0.5f));
-		model.arm.zScale = (float) length;
-		model.hand.z = (float) length * 16;
-		boolean holding = state.reach >= 1;
-		for (int i = 0; i < model.fingers.length; i++) {
-			// Écartés en approchant, refermés une fois la proie saisie.
-			model.fingers[i].xRot = holding ? 1.1f : -0.25f + Mth.sin(state.age * 0.5f + i) * 0.15f;
-			model.fingers[i].yRot = holding ? 0 : (i - 1.5f) * 0.25f;
-		}
 		collector.submitModel(model, state, poseStack, TEXTURE, 0xF000F0, OverlayTexture.NO_OVERLAY, state.outlineColor,
 				null);
 		poseStack.popPose();

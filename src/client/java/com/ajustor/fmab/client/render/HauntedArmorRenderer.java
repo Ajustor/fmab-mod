@@ -36,8 +36,6 @@ public class HauntedArmorRenderer<T extends HauntedArmorEntity>
 				// En morceaux : la tête décrochée, les bras de travers.
 				head.x += 6;
 				head.y += 2;
-				hat.x = head.x;
-				hat.y = head.y;
 				rightArm.zRot = 1.2f;
 				leftArm.zRot = -0.4f;
 				rightLeg.xRot = 0.5f;

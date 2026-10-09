@@ -35,7 +35,7 @@ public class YockIslandStructure extends Structure {
 		}
 		BlockPos corner = new BlockPos(cx - SIZE / 2, sea, cz - SIZE / 2);
 		long seed = context.random().nextLong();
-		return Optional.of(new GenerationStub(corner, builder -> builder.addPiece(
+		return Optional.of(new GenerationStub(new BlockPos(cx, sea, cz), builder -> builder.addPiece(
 				new ProceduralPiece("yock_island", corner, SIZE, 10, SIZE, depth + 1, Rotation.NONE, seed))));
 	}
 

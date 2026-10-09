@@ -124,6 +124,13 @@ public final class FmabAttachments {
 			.persistent(Codec.INT)
 			.buildAndRegister(Fmab.id("island_time"));
 
+	/** Les cadeaux uniques déjà reçus des PNJ (notes de Hohenheim, de Scar…) : gardés à la mort. */
+	public static final AttachmentType<Set<String>> GIFTS = AttachmentRegistry.<Set<String>>builder()
+			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))
+			.initializer(Set::of)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("gifts"));
+
 	/** Les homonculus qu'on a vus tomber : la clé du sceau de Père. Gardés à la mort. */
 	public static final AttachmentType<Set<String>> SLAIN = AttachmentRegistry.<Set<String>>builder()
 			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))

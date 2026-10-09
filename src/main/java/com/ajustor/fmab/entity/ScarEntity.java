@@ -1,6 +1,7 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.alchemy.glyph.Rank;
+import com.ajustor.fmab.data.Gifts;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabSounds;
@@ -37,8 +38,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * Scar, l'Ishvalien au bras tatoué, dans les ruines de son peuple. Il traque les Alchimistes d'État,
@@ -49,7 +48,7 @@ public class ScarEntity extends PathfinderMob {
 	private static final float DECOMPOSE = 6;
 	private final ServerBossEvent bossEvent = new ServerBossEvent(Mth.createInsecureUUID(random), getDisplayName(),
 			BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.PROGRESS);
-	private boolean gave;
+	private static final String GIFT = "scar_notes";
 
 	public ScarEntity(EntityType<? extends PathfinderMob> type, Level level) {
 		super(type, level);
@@ -122,15 +121,12 @@ public class ScarEntity extends PathfinderMob {
 			setTarget(p);
 			return InteractionResult.SUCCESS;
 		}
+		boolean gave = Gifts.received(p, GIFT);
 		if (gave || Karma.of(p) < 0) {
 			p.sendSystemMessage(Component.translatable(gave ? "npc.fmab.scar.silent" : "npc.fmab.scar.distrust"));
 			return InteractionResult.SUCCESS;
 		}
-		gave = true;
-		ItemStack notes = new ItemStack(FmabItems.ISHVAL_TATTOO);
-		if (!p.getInventory().add(notes)) {
-			p.drop(notes, false);
-		}
+		Gifts.give(p, GIFT, new ItemStack(FmabItems.ISHVAL_TATTOO));
 		p.sendSystemMessage(Component.translatable("npc.fmab.scar.gives"));
 		return InteractionResult.SUCCESS;
 	}
@@ -138,8 +134,9 @@ public class ScarEntity extends PathfinderMob {
 	@Override
 	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean killedByPlayer) {
 		super.dropCustomDeathLoot(level, source, killedByPlayer);
-		if (!gave) {
-			spawnAtLocation(level, new ItemStack(FmabItems.ISHVAL_TATTOO));
+		// Le carnet tombe pour qui l'a vaincu sans l'avoir reçu.
+		if (source.getEntity() instanceof ServerPlayer killer && !Gifts.received(killer, GIFT)) {
+			Gifts.give(killer, GIFT, new ItemStack(FmabItems.ISHVAL_TATTOO));
 		}
 	}
 
@@ -167,15 +164,4 @@ public class ScarEntity extends PathfinderMob {
 		return false;
 	}
 
-	@Override
-	protected void addAdditionalSaveData(ValueOutput output) {
-		super.addAdditionalSaveData(output);
-		output.putBoolean("gave", gave);
-	}
-
-	@Override
-	protected void readAdditionalSaveData(ValueInput input) {
-		super.readAdditionalSaveData(input);
-		gave = input.getBooleanOr("gave", false);
-	}
 }

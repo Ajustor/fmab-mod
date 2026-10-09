@@ -3,6 +3,7 @@ package com.ajustor.fmab.arts;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
+import com.ajustor.fmab.transmutation.GloveCasting;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.core.BlockPos;
@@ -46,7 +47,9 @@ public final class ScarArm {
 
 	public static void register() {
 		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
-			if (hand != InteractionHand.MAIN_HAND || !armed(player) || player.isSpectator()) {
+			// Un gantelet gravé frappe avec son propre cercle : il passe avant le bras.
+			if (hand != InteractionHand.MAIN_HAND || !armed(player) || player.isSpectator()
+					|| GloveCasting.canStrike(player)) {
 				return InteractionResult.PASS;
 			}
 			if (player instanceof ServerPlayer p && level instanceof ServerLevel server) {
@@ -73,6 +76,11 @@ public final class ScarArm {
 
 	private static void decompose(ServerPlayer player, ServerLevel level, BlockPos pos) {
 		BlockState state = level.getBlockState(pos);
+		// Ni en mode aventure, ni sur la protection du point d'apparition, ni hors de portée.
+		if (!player.mayInteract(level, pos) || player.blockActionRestricted(level, pos, player.gameMode())
+				|| !player.isWithinBlockInteractionRange(pos, 1)) {
+			return;
+		}
 		if (state.isAir() || state.getDestroySpeed(level, pos) < 0 || !ready(player, level)) {
 			return;
 		}

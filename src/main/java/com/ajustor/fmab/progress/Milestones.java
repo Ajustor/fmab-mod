@@ -5,6 +5,7 @@ import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Training;
+import com.ajustor.fmab.promised.NationalCircle;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.training.Trial;
@@ -94,6 +95,9 @@ public final class Milestones {
 		}
 		if (slain.containsAll(SINS)) {
 			reach(p, "seven_sins");
+		}
+		if (NationalCircle.get(p.level().getServer()).broken()) {
+			reach(p, "circle_broken");
 		}
 	}
 }

@@ -13,6 +13,7 @@ import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.LivingStone;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -76,6 +77,20 @@ public final class GateOfTruth {
 	}
 
 	public static void register() {
+		// Revenu en pleine visite : la cinématique reprend là où elle en était.
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			ServerPlayer player = handler.getPlayer();
+			GateState gate = player.getAttached(FmabAttachments.GATE);
+			if (gate == null || gate.visit().isEmpty()) {
+				return;
+			}
+			int t = gate.visit().get().ticks();
+			if (t < -1) {
+				CinematicPayload.play(player, CinematicPayload.GATE_PULL, -t);
+			} else if (t >= 0 && t < RETURN) {
+				CinematicPayload.play(player, CinematicPayload.GATE, RETURN + 2 - t);
+			}
+		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				GateState gate = player.getAttached(FmabAttachments.GATE);
@@ -101,6 +116,10 @@ public final class GateOfTruth {
 	}
 
 	private static void step(MinecraftServer server, ServerPlayer player, GateState gate, GateState.Visit visit) {
+		// Mort pendant qu'on l'aspire : la Porte attend qu'il revienne à la vie.
+		if (!player.isAlive()) {
+			return;
+		}
 		ServerLevel space = server.getLevel(WHITE_SPACE);
 		if (space == null) {
 			Fmab.LOGGER.error("Dimension {} introuvable : la Porte ne peut pas s'ouvrir", WHITE_SPACE.identifier());
@@ -119,8 +138,9 @@ public final class GateOfTruth {
 				// Revenu d'ailleurs au milieu de la visite : on la reprend au début.
 				visit = new GateState.Visit(visit.dimension(), visit.origin(), visit.ambition(), visit.severe(), -1);
 			}
-			arrive(space, player, gate);
-			player.setAttached(FmabAttachments.GATE, gate.withVisit(visit.tick()));
+			if (arrive(space, player, gate)) {
+				player.setAttached(FmabAttachments.GATE, gate.withVisit(visit.tick()));
+			}
 			return;
 		}
 		int t = visit.ticks();
@@ -187,10 +207,13 @@ public final class GateOfTruth {
 		player.sendSystemMessage(Component.translatable("truth.fmab.mock_hint").withStyle(s -> s.withColor(0x707070)));
 	}
 
-	private static void arrive(ServerLevel space, ServerPlayer player, GateState gate) {
+	/** @return vrai si l'alchimiste est bien arrivé devant sa Porte */
+	private static boolean arrive(ServerLevel space, ServerPlayer player, GateState gate) {
 		build(space, player);
-		player.teleport(new TeleportTransition(space, at(player, ARRIVAL), Vec3.ZERO, 180, 0,
-				TeleportTransition.DO_NOTHING));
+		if (player.teleport(new TeleportTransition(space, at(player, ARRIVAL), Vec3.ZERO, 180, 0,
+				TeleportTransition.DO_NOTHING)) == null) {
+			return false;
+		}
 		truth(space, player).ifPresentOrElse(t -> t.mirror(player, gate.lost()), () -> {
 			TruthEntity truth = FmabEntities.TRUTH.create(space, EntitySpawnReason.TRIGGERED);
 			if (truth != null) {
@@ -203,6 +226,7 @@ public final class GateOfTruth {
 		space.playSound(null, BlockPos.containing(at(player, ARRIVAL)), SoundEvents.AMETHYST_BLOCK_RESONATE,
 				SoundSource.PLAYERS, 1, 0.5f);
 		CinematicPayload.play(player, CinematicPayload.GATE, RETURN + 2);
+		return true;
 	}
 
 	/** La Vérité de ce joueur, devant sa Porte. */
@@ -256,7 +280,8 @@ public final class GateOfTruth {
 		// Les bras noirs sortent des ténèbres derrière la Porte et viennent le chercher.
 		for (int i = 0; i < 8; i++) {
 			double x = o.getX() + 0.5 + (space.getRandom().nextDouble() - 0.5) * 2 * (GATE_HALF_WIDTH - 1.5);
-			double y = o.getY() + 2 + space.getRandom().nextDouble() * (GATE_HEIGHT - 4);
+			// À hauteur d'homme : ils le tirent vers la Porte, pas vers le ciel.
+			double y = o.getY() + 1.2 + space.getRandom().nextDouble() * 2.5;
 			GateHandEntity.reach(space, new Vec3(x, y, o.getZ() + GATE_Z - 0.5), player, TOLL - OPENING + 20, 0.035);
 		}
 	}

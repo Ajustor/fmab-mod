@@ -39,7 +39,7 @@ public class BarryEntity extends HauntedArmorEntity {
 		return HauntedArmorEntity.createAttributes()
 				.add(Attributes.MAX_HEALTH, 70)
 				.add(Attributes.MOVEMENT_SPEED, 0.3)
-				.add(Attributes.ATTACK_DAMAGE, 9)
+				.add(Attributes.ATTACK_DAMAGE, 2)
 				.add(Attributes.SCALE, 1.15);
 	}
 

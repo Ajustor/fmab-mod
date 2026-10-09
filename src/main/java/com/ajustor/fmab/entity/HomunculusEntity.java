@@ -154,9 +154,18 @@ public abstract class HomunculusEntity extends Monster {
 		if (level() instanceof ServerLevel level) {
 			Component name = getDisplayName();
 			String slain = BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath();
-			for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(48))) {
+			// Tous ceux qui étaient là l'ont vu tomber, et son tueur aussi, même de loin (un fusil, un arc) :
+			// le sceau de Père les reconnaîtra.
+			Set<ServerPlayer> witnesses = new HashSet<>(level.getEntitiesOfClass(ServerPlayer.class,
+					getBoundingBox().inflate(48)));
+			if (source.getEntity() instanceof ServerPlayer killer) {
+				witnesses.add(killer);
+			}
+			if (getLastHurtByPlayer() instanceof ServerPlayer last) {
+				witnesses.add(last);
+			}
+			for (ServerPlayer p : witnesses) {
 				p.sendSystemMessage(Component.translatable("homunculus.fmab.destroyed", name));
-				// Tous ceux qui étaient là l'ont vu tomber : le sceau de Père les reconnaîtra.
 				Set<String> seen = new HashSet<>(p.getAttachedOrCreate(FmabAttachments.SLAIN));
 				seen.add(slain);
 				p.setAttached(FmabAttachments.SLAIN, Set.copyOf(seen));

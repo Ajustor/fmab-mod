@@ -36,7 +36,8 @@ public final class IslandTrial {
 	}
 
 	private static void check(ServerPlayer player) {
-		if (!player.getAttachedOrCreate(FmabAttachments.TRAINING).met()) {
+		var training = player.getAttachedOrCreate(FmabAttachments.TRAINING);
+		if (!training.met() || training.achieved().contains(Trial.ISLAND.id())) {
 			return;
 		}
 		ServerLevel level = player.level();

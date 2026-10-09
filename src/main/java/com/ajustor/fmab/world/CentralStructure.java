@@ -78,7 +78,7 @@ public class CentralStructure extends Structure {
 				Rotation.NONE, seed));
 		// Plus bas encore, derrière une porte scellée de la paroi sud du tunnel : le repaire de Père.
 		builder.addPiece(new ProceduralPiece("father_lair",
-				new BlockPos(cx + Blueprints.SlothTunnel.FATHER_DOOR - 16, y, cz + 36), 33, 1, 41,
+				new BlockPos(cx + Blueprints.SlothTunnel.FATHER_DOOR - Blueprints.FatherLair.DOOR_X, y, cz + 36), 33, 1, 41,
 				-Blueprints.FatherLair.ROOM_FLOOR, Rotation.NONE, seed));
 		for (int gx = -R + 6; gx < R - 6; gx += LOT) {
 			for (int gz = -R + 6; gz < R - 6; gz += LOT) {

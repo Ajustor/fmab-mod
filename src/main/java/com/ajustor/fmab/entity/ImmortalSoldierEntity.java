@@ -51,7 +51,17 @@ public class ImmortalSoldierEntity extends Monster {
 	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
-		goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0, false));
+		goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0, false) {
+			@Override
+			public boolean canUse() {
+				return !down() && super.canUse();
+			}
+
+			@Override
+			public boolean canContinueToUse() {
+				return !down() && super.canContinueToUse();
+			}
+		});
 		goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.6));
 		goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 12));
 		goalSelector.addGoal(8, new RandomLookAroundGoal(this));
@@ -97,6 +107,7 @@ public class ImmortalSoldierEntity extends Monster {
 		}
 		if (down > 0) {
 			down--;
+			setTarget(null);
 			getNavigation().stop();
 			setDeltaMovement(getDeltaMovement().multiply(0, 1, 0));
 			level.sendParticles(FLESH, getX(), getY(0.3), getZ(), 2, 0.3, 0.2, 0.3, 0);
@@ -114,11 +125,13 @@ public class ImmortalSoldierEntity extends Monster {
 	protected void addAdditionalSaveData(ValueOutput output) {
 		super.addAdditionalSaveData(output);
 		output.putBoolean("risen", risen);
+		output.putInt("down", down);
 	}
 
 	@Override
 	protected void readAdditionalSaveData(ValueInput input) {
 		super.readAdditionalSaveData(input);
 		risen = input.getBooleanOr("risen", false);
+		down = input.getIntOr("down", 0);
 	}
 }

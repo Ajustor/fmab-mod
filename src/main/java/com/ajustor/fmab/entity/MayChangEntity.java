@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -104,7 +105,8 @@ public class MayChangEntity extends PathfinderMob {
 
 	@Override
 	public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
-		return source.isCreativePlayer() && super.hurtServer(level, source, damage);
+		return (source.isCreativePlayer() || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
+				&& super.hurtServer(level, source, damage);
 	}
 
 	@Override

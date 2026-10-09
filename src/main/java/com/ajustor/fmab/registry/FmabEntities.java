@@ -30,8 +30,6 @@ import com.ajustor.fmab.entity.ThrowingKnifeEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.entity.WrathEntity;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.tags.BlockTags;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -40,11 +38,14 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BiomeTags;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 public final class FmabEntities {
@@ -348,6 +349,7 @@ public final class FmabEntities {
 	/** Un bras noir de la Porte, le temps d'une cinématique. */
 	public static final EntityType<GateHandEntity> GATE_HAND = Registry.register(BuiltInRegistries.ENTITY_TYPE, GATE_HAND_KEY,
 			EntityType.Builder.<GateHandEntity>of(GateHandEntity::new, MobCategory.MISC)
+					.noSave()
 					.sized(0.4F, 0.4F)
 					.clientTrackingRange(10)
 					.updateInterval(2)
@@ -390,14 +392,18 @@ public final class FmabEntities {
 				Monster::checkMonsterSpawnRules);
 		SpawnPlacements.register(IMMORTAL_SOLDIER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 				Monster::checkMonsterSpawnRules);
-		BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OVERWORLD), MobCategory.MONSTER, CHIMERA_BEAST, 6, 1, 1);
-		BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OVERWORLD), MobCategory.MONSTER, CHIMERA_CRAWLER, 10, 1, 2);
+		// Partout où rôdent les monstres : pas dans les îles champignons ni au fond des grottes profondes.
+		var chimeraLands = BiomeSelectors.tag(BiomeTags.IS_OVERWORLD)
+				.and(BiomeSelectors.excludeByKey(Biomes.MUSHROOM_FIELDS, Biomes.DEEP_DARK));
+		BiomeModifications.addSpawn(chimeraLands, MobCategory.MONSTER, CHIMERA_BEAST, 6, 1, 1);
+		BiomeModifications.addSpawn(chimeraLands, MobCategory.MONSTER, CHIMERA_CRAWLER, 10, 1, 2);
 		// Les soldats de Drachma n'apparaissent que dans le noir, comme tout monstre.
 		// Ils rôdent au pied du mur, pas dans le fort : jamais sur un sol bâti.
 		SpawnPlacements.register(DRACHMA_SOLDIER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 				(type, level, reason, pos, random) -> Monster.checkMonsterSpawnRules(type, level, reason, pos, random)
 						&& !level.getBlockState(pos.below()).is(BlockTags.STONE_BRICKS)
 						&& !level.getBlockState(pos.below()).is(BlockTags.PLANKS)
-						&& !level.getBlockState(pos.below()).is(Blocks.POLISHED_ANDESITE));
+						&& !level.getBlockState(pos.below()).is(Blocks.POLISHED_ANDESITE)
+						&& !level.getBlockState(pos.below()).is(Blocks.SMOOTH_STONE));
 	}
 }

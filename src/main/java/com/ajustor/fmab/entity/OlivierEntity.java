@@ -47,7 +47,7 @@ public class OlivierEntity extends PathfinderMob {
 		return Monster.createMonsterAttributes()
 				.add(Attributes.MAX_HEALTH, 80)
 				.add(Attributes.MOVEMENT_SPEED, 0.3)
-				.add(Attributes.ATTACK_DAMAGE, 10)
+				.add(Attributes.ATTACK_DAMAGE, 3)
 				.add(Attributes.ARMOR, 8)
 				.add(Attributes.FOLLOW_RANGE, 24);
 	}
@@ -60,7 +60,7 @@ public class OlivierEntity extends PathfinderMob {
 		goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 10));
 		goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 		targetSelector.addGoal(1, new HurtByTargetGoal(this));
-		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, DrachmaSoldierEntity.class, false));
+		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, DrachmaSoldierEntity.class, true));
 	}
 
 	@Override
@@ -89,6 +89,21 @@ public class OlivierEntity extends PathfinderMob {
 		}
 		p.sendSystemMessage(Component.translatable(ally ? "npc.fmab.olivier.orders" : "npc.fmab.olivier.prove"));
 		return InteractionResult.SUCCESS;
+	}
+
+	@Override
+	public void aiStep() {
+		super.aiStep();
+		if (level().isClientSide()) {
+			return;
+		}
+		// Elle tient son fort : elle n'en sort pas, et s'y remet vite de ses blessures.
+		if (!hasHome()) {
+			setHomeTo(blockPosition(), 24);
+		}
+		if (tickCount % 20 == 0 && getHealth() < getMaxHealth()) {
+			heal(getTarget() == null ? 2 : 0.5f);
+		}
 	}
 
 	@Override

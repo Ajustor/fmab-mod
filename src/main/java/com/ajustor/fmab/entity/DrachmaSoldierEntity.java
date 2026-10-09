@@ -36,7 +36,7 @@ public class DrachmaSoldierEntity extends Monster {
 		return Monster.createMonsterAttributes()
 				.add(Attributes.MAX_HEALTH, 26)
 				.add(Attributes.MOVEMENT_SPEED, 0.28)
-				.add(Attributes.ATTACK_DAMAGE, 4)
+				.add(Attributes.ATTACK_DAMAGE, 1)
 				.add(Attributes.ARMOR, 3)
 				.add(Attributes.FOLLOW_RANGE, 28);
 	}
@@ -50,7 +50,7 @@ public class DrachmaSoldierEntity extends Monster {
 		goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 		targetSelector.addGoal(1, new HurtByTargetGoal(this));
 		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
-		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, OlivierEntity.class, true));
+		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AmestrianSoldierEntity.class, true));
 	}
 
 	@Override

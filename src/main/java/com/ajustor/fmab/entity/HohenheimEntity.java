@@ -1,5 +1,6 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.data.Gifts;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.promised.NationalCircle;
 import com.ajustor.fmab.stone.LivingStone;
@@ -7,6 +8,7 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -20,12 +22,8 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Van Hohenheim, Pierre philosophale vivante depuis la chute de Xerxès, dans les ruines de son
@@ -34,7 +32,6 @@ import java.util.UUID;
  */
 public class HohenheimEntity extends PathfinderMob {
 	private static final DustParticleOptions RED = new DustParticleOptions(0xD01020, 0.8f);
-	private final Set<UUID> told = new HashSet<>();
 	private int line;
 
 	public HohenheimEntity(EntityType<? extends PathfinderMob> type, Level level) {
@@ -70,11 +67,7 @@ public class HohenheimEntity extends PathfinderMob {
 		NationalCircle circle = NationalCircle.get(level.getServer());
 		p.sendSystemMessage(Component.translatable(circle.broken() ? "npc.fmab.hohenheim.circle_broken"
 				: "npc.fmab.hohenheim.circle", NationalCircle.POINTS - circle.sealedCount()));
-		if (told.add(p.getUUID())) {
-			ItemStack notes = Tomes.stack(Tomes.HOHENHEIM);
-			if (!p.getInventory().add(notes)) {
-				p.drop(notes, false);
-			}
+		if (Gifts.give(p, "hohenheim_notes", Tomes.stack(Tomes.HOHENHEIM))) {
 			p.sendSystemMessage(Component.translatable("npc.fmab.hohenheim.notes"));
 		}
 		level.sendParticles(RED, getX(), getY(0.6), getZ(), 8, 0.3, 0.4, 0.3, 0);
@@ -85,7 +78,8 @@ public class HohenheimEntity extends PathfinderMob {
 	public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
 		// Une Pierre vivante : la blessure se referme aussitôt.
 		level.sendParticles(RED, getX(), getY(0.5), getZ(), 20, 0.3, 0.5, 0.3, 0);
-		return source.isCreativePlayer() && super.hurtServer(level, source, damage);
+		return (source.isCreativePlayer() || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
+				&& super.hurtServer(level, source, damage);
 	}
 
 	@Override

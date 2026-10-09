@@ -32,8 +32,8 @@ public class BloodCrestStructure extends Structure {
 		}
 		BlockPos corner = new BlockPos(cx - SIZE / 2, y, cz - SIZE / 2);
 		long seed = context.random().nextLong();
-		return Optional.of(new GenerationStub(corner, builder -> builder.addPiece(
-				new ProceduralPiece("blood_crest", corner, SIZE, 6, SIZE, 2, Rotation.NONE, seed))));
+		return Optional.of(new GenerationStub(new BlockPos(cx, y, cz), builder -> builder.addPiece(
+				new ProceduralPiece("blood_crest", corner, SIZE, 6, SIZE, 1, Rotation.NONE, seed))));
 	}
 
 	@Override

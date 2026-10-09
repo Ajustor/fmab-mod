@@ -10,8 +10,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 
 /**
- * Les cinématiques, jouées à l'écran par-dessus le monde et l'interface : bandes noires de cinéma, fondus, et des
- * images dessinées à la main (l'œil de la Vérité, le torrent du savoir, le titre du Jour promis).
+ * Les cinématiques, jouées à l'écran par-dessus le monde et l'interface (voir {@code HudMixin}) :
+ * bandes noires de cinéma, fondus, et des images dessinées à la main (l'œil de la Vérité, le torrent du savoir, le titre du Jour promis).
  * Le serveur met en scène le reste (bras noirs, sons, mouvements).
  */
 public final class Cinematics {
@@ -19,65 +19,89 @@ public final class Cinematics {
 	private static final String SYMBOLS = "☉☽♂♀☿♃♄△▽✡⚗∞Ω∴⊕⊗☯✶";
 	private static final int BAR = 28;
 
+	/** Le plan en cours (l'aspiration, le savoir, un titre), ou null. */
 	private static String kind;
 	private static int length;
 	private static int age;
+	/** Le fond : les bandes noires de la visite de la Porte, sous les autres plans. */
+	private static int backgroundLength;
+	private static int backgroundAge;
 
 	private Cinematics() {
 	}
 
 	public static void start(CinematicPayload payload) {
+		if (CinematicPayload.GATE.equals(payload.kind())) {
+			backgroundLength = payload.ticks();
+			backgroundAge = 0;
+			return;
+		}
 		kind = payload.kind();
 		length = payload.ticks();
 		age = 0;
 	}
 
+	public static boolean active() {
+		return kind != null || backgroundAge < backgroundLength;
+	}
+
+	/** Le temps des cinématiques s'arrête avec le jeu : la pause ne les fait pas filer. */
 	public static void tick() {
-		if (kind == null) {
+		if (Minecraft.getInstance().isPaused()) {
 			return;
 		}
-		if (++age > length) {
-			stop();
+		if (backgroundAge < backgroundLength) {
+			backgroundAge++;
+		}
+		if (kind != null && ++age > length) {
+			kind = null;
 		}
 	}
 
 	public static void stop() {
 		kind = null;
+		backgroundLength = 0;
+		backgroundAge = 0;
 	}
 
 	/** Le dessin d'une image de la cinématique en cours. */
 	public static void render(GuiGraphicsExtractor graphics, DeltaTracker delta) {
-		if (kind == null) {
-			return;
-		}
-		float t = age + delta.getGameTimeDeltaPartialTick(false);
+		float partial = delta.getGameTimeDeltaPartialTick(false);
 		int w = graphics.guiWidth(), h = graphics.guiHeight();
-		switch (kind) {
-			case CinematicPayload.GATE_PULL -> {
-				// Le monde s'assombrit par les bords, puis tout devient noir.
-				vignette(graphics, w, h, Mth.clamp(t / length, 0, 1));
-				fade(graphics, w, h, 0xFF000000, Mth.clamp((t - (length - 15)) / 15, 0, 1));
-			}
-			case CinematicPayload.GATE_KNOWLEDGE -> knowledge(graphics, w, h, t);
-			case CinematicPayload.PROMISED_DAY -> {
-				fade(graphics, w, h, 0xFF600008, 0.35f * pulse(t));
-				title(graphics, w, h, t, Component.translatable("cinematic.fmab.promised_day"),
-						Component.translatable("cinematic.fmab.promised_day.sub"), 0xFFE02030);
-			}
-			case CinematicPayload.FATHER_FALL -> {
-				fade(graphics, w, h, 0xFFFFFFFF, Mth.clamp(1 - Math.abs(t - 20) / 20, 0, 1));
-				title(graphics, w, h, t, Component.translatable("cinematic.fmab.father_fall"),
-						Component.translatable("cinematic.fmab.father_fall.sub"), 0xFFF0E0B0);
-			}
-			default -> {
+		if (kind != null) {
+			float t = age + partial;
+			switch (kind) {
+				case CinematicPayload.GATE_PULL -> {
+					// Le monde s'assombrit par les bords, puis tout devient noir.
+					vignette(graphics, w, h, Mth.clamp(t / length, 0, 1));
+					fade(graphics, w, h, 0xFF000000, Mth.clamp((t - (length - 15)) / 15, 0, 1));
+				}
+				case CinematicPayload.GATE_KNOWLEDGE -> knowledge(graphics, w, h, t);
+				case CinematicPayload.PROMISED_DAY -> {
+					fade(graphics, w, h, 0xFF600008, 0.35f * pulse(t));
+					title(graphics, w, h, t, Component.translatable("cinematic.fmab.promised_day"),
+							Component.translatable("cinematic.fmab.promised_day.sub"), 0xFFE02030);
+				}
+				case CinematicPayload.FATHER_FALL -> {
+					fade(graphics, w, h, 0xFFFFFFFF, Mth.clamp(1 - Math.abs(t - 20) / 20, 0, 1));
+					title(graphics, w, h, t, Component.translatable("cinematic.fmab.father_fall"),
+							Component.translatable("cinematic.fmab.father_fall.sub"), 0xFFF0E0B0);
+				}
+				default -> {
+				}
 			}
 		}
-		bars(graphics, w, h, t);
+		// Les bandes suivent le fond s'il y en a un, sinon le plan en cours.
+		if (backgroundAge < backgroundLength) {
+			bars(graphics, w, h, backgroundAge + partial, backgroundLength);
+		} else if (kind != null) {
+			bars(graphics, w, h, age + partial, length);
+		}
 	}
 
 	/** Les bandes noires, qui glissent en entrant et en sortant. */
-	private static void bars(GuiGraphicsExtractor graphics, int w, int h, float t) {
-		float in = Mth.clamp(t / 10, 0, 1) * Mth.clamp((length - t) / 10, 0, 1);
+	private static void bars(GuiGraphicsExtractor graphics, int w, int h, float t, int span) {
+		float in = Mth.clamp(t / 10, 0, 1) * Mth.clamp((span - t) / 10, 0, 1);
 		int bar = (int) (BAR * in);
 		graphics.fill(0, 0, w, bar, 0xFF000000);
 		graphics.fill(0, h - bar, w, h, 0xFF000000);
@@ -92,7 +116,7 @@ public final class Cinematics {
 
 	/** Un voile noir qui gagne depuis les bords. */
 	private static void vignette(GuiGraphicsExtractor graphics, int w, int h, float amount) {
-		int step = 8;
+		int step = Math.max(8, Math.max(w, h) / 60);
 		double reach = Math.hypot(w, h) / 2;
 		for (int y = 0; y < h; y += step) {
 			for (int x = 0; x < w; x += step) {

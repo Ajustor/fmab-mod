@@ -56,7 +56,7 @@ public class HauntedArmorEntity extends Monster {
 		return Monster.createMonsterAttributes()
 				.add(Attributes.MAX_HEALTH, 34)
 				.add(Attributes.MOVEMENT_SPEED, 0.24)
-				.add(Attributes.ATTACK_DAMAGE, 6)
+				.add(Attributes.ATTACK_DAMAGE, 2)
 				.add(Attributes.ARMOR, 10)
 				.add(Attributes.KNOCKBACK_RESISTANCE, 0.6)
 				.add(Attributes.FOLLOW_RANGE, 24);

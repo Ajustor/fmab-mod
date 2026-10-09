@@ -22,6 +22,7 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -51,7 +52,7 @@ public class AmestrianSoldierEntity extends PathfinderMob {
 		return Monster.createMonsterAttributes()
 				.add(Attributes.MAX_HEALTH, 26)
 				.add(Attributes.MOVEMENT_SPEED, 0.3)
-				.add(Attributes.ATTACK_DAMAGE, 5)
+				.add(Attributes.ATTACK_DAMAGE, 2)
 				.add(Attributes.ARMOR, 4)
 				.add(Attributes.FOLLOW_RANGE, 24);
 	}
@@ -72,7 +73,7 @@ public class AmestrianSoldierEntity extends PathfinderMob {
 		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
 				(target, level) -> target instanceof ServerPlayer p && outlaw(p)));
 		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false,
-				(target, level) -> !(target instanceof HomunculusEntity)));
+				(target, level) -> !(target instanceof HomunculusEntity) && !(target instanceof Creeper)));
 	}
 
 	/** Le joueur est-il un criminel aux yeux de l'armée ? */
@@ -100,6 +101,15 @@ public class AmestrianSoldierEntity extends PathfinderMob {
 					: briggs() ? "npc.fmab.soldier.briggs" : "npc.fmab.soldier.salute"));
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	@Override
+	public void aiStep() {
+		super.aiStep();
+		// Hors combat, un soldat panse ses blessures.
+		if (!level().isClientSide() && getTarget() == null && tickCount % 40 == 0 && getHealth() < getMaxHealth()) {
+			heal(1);
+		}
 	}
 
 	@Override
