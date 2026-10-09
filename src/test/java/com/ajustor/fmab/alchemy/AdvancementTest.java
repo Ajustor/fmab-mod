@@ -19,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * déclenche, chaque icône du mod existe, chaque titre et description est traduit.
  */
 class AdvancementTest {
-	/** Les étapes que le mod déclenche (voir Milestones, NationalCircle, FatherSealBlock). */
+	/** Les étapes que le mod déclenche (voir Milestones, NationalCircle, FatherSealBlock, Transmutation). */
 	private static final Set<String> MILESTONES = Set.of("transmuted", "rank_alchemist", "rank_state", "rank_gate",
 			"izumi_met", "izumi_done", "soul_armor", "automail", "living_stone", "alkahestry", "briggs_ally",
 			"seven_sins", "seal_opened", "crest_sealed", "circle_broken", "slain_lust", "slain_gluttony",
-			"slain_envy", "slain_greed", "slain_sloth", "slain_wrath", "slain_pride", "slain_father");
+			"slain_envy", "slain_greed", "slain_sloth", "slain_wrath", "slain_pride", "slain_father", "fused");
 
 	private static Map<String, JsonObject> load() throws IOException {
 		Path dir = TestGlyphs.resources().resolve("data/fmab/advancement/alchemist");

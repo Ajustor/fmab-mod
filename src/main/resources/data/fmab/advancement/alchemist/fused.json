@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/transmuted",
+  "criteria": {
+    "fused": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "fused"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:end_rod"
+    },
+    "frame": "task",
+    "title": {
+      "translate": "advancements.fmab.fused.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.fused.description"
+    }
+  },
+  "requirements": [
+    [
+      "fused"
+    ]
+  ]
+}

@@ -69,6 +69,8 @@ public final class GateOfTruth {
 	private static final int RETURN = 400;
 	/** Le temps que les bras noirs mettent à tirer l'alchimiste dans la Porte, depuis son cercle. */
 	public static final int PULL = 50;
+	/** Une âme errante qui s'éloigne plus loin que ça de sa Porte se fait rattraper. */
+	private static final double STRAY = 16;
 	/** Une âme errante entend la Vérité se moquer d'elle toutes les minutes. */
 	private static final int MOCKERY_PERIOD = 1200;
 	private static final int MOCKERIES = 5;
@@ -183,11 +185,29 @@ public final class GateOfTruth {
 			if (player.tickCount % MOCKERY_PERIOD == 0) {
 				mock(player);
 			}
+			reclaim(space, player);
 			return;
 		}
 		arrive(space, player, gate);
 		SoulBinding.drift(player);
 		mock(player);
+	}
+
+	/**
+	 * Le piège de l'Espace blanc : une âme errante qui s'éloigne de sa Porte voit des bras noirs en
+	 * jaillir et la ramener devant elle. On n'échappe pas à la Vérité.
+	 */
+	private static void reclaim(ServerLevel space, ServerPlayer player) {
+		if (player.tickCount % 20 != 0 || player.position().distanceTo(at(player, ARRIVAL)) < STRAY) {
+			return;
+		}
+		BlockPos o = origin(player);
+		for (int i = 0; i < 3; i++) {
+			double x = o.getX() + 0.5 + (space.getRandom().nextDouble() - 0.5) * 2 * (GATE_HALF_WIDTH - 1.5);
+			GateHandEntity.reach(space, new Vec3(x, o.getY() + 1.5, o.getZ() + GATE_Z - 0.5), player, 50, 0.12);
+		}
+		space.playSound(null, player.blockPosition(), FmabSounds.GATE_HANDS, SoundSource.PLAYERS, 1.5f, 0.7f);
+		say(player, "truth.fmab.reclaim");
 	}
 
 	/** Plus on revient, plus la Vérité devient familière. */

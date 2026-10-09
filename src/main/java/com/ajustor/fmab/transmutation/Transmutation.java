@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.alchemy.circle.CircleIssue;
 import com.ajustor.fmab.alchemy.circle.LinkKind;
 import com.ajustor.fmab.alchemy.circle.Stage;
@@ -67,6 +68,38 @@ public final class Transmutation {
 	 * Un cercle inscrit sur une surface : en cas de rebond, c'est lui qui brûle. Sa taille règle la
 	 * puissance et le coût.
 	 */
+	/** Deux alchimistes qui posent les paumes sur le même cercle à moins de ce délai fusionnent. */
+	private static final int FUSION_WINDOW = 30;
+	private static final double FUSION_POWER = 1.75;
+	/** Le dernier à avoir touché chaque cercle inscrit, et quand. */
+	private record Touch(UUID player, long time) {
+	}
+
+	private static final Map<BlockPos, Touch> TOUCHES = new HashMap<>();
+
+	/**
+	 * Un autre alchimiste vient-il de poser ses paumes sur ce cercle ? Alors leurs énergies se
+	 * mêlent. Note ce contact pour le suivant.
+	 */
+	private static boolean fuses(ServerLevel level, BlockPos circle, ServerPlayer caster) {
+		long now = level.getGameTime();
+		TOUCHES.values().removeIf(t -> now - t.time() > FUSION_WINDOW);
+		Touch before = TOUCHES.put(circle.immutable(), new Touch(caster.getUUID(), now));
+		if (before == null || before.player().equals(caster.getUUID())) {
+			return false;
+		}
+		ServerPlayer partner = level.getServer().getPlayerList().getPlayer(before.player());
+		Vec3 c = Vec3.atCenterOf(circle);
+		level.sendParticles(ParticleTypes.END_ROD, c.x, c.y + 0.3, c.z, 40, 1, 0.2, 1, 0.05);
+		caster.sendOverlayMessage(Component.translatable("transmutation.fmab.fused"));
+		if (partner != null) {
+			partner.sendOverlayMessage(Component.translatable("transmutation.fmab.fused"));
+			Milestones.reach(partner, "fused");
+		}
+		Milestones.reach(caster, "fused");
+		return true;
+	}
+
 	public static Result activate(ServerLevel level, BlockPos circle, BlockState state, Drawing drawing,
 			ServerPlayer caster, CircleSize size) {
 		return activate(level, circle, CircleFrame.of(state), drawing, caster, true, Integer.MAX_VALUE, size);
@@ -115,7 +148,11 @@ public final class Transmutation {
 		boolean amplified = stone.isPresent() || living;
 		// Une pierre rouge impure amplifie, mais ne tient rien : le cercle rebondit comme sans elle.
 		boolean steady = living || stone.filter(PhilosopherStones::pure).isPresent();
-		int cost = amplified ? 0 : (int) Math.ceil(StateWatch.cost(analysis.concentration(), watch) * size.cost());
+		// À deux sur le même cercle, les énergies se mêlent : plus fort, moitié moins cher.
+		boolean fused = inscribed && fuses(level, circle, caster);
+		double fusion = fused ? FUSION_POWER : 1;
+		int cost = amplified ? 0 : (int) Math.ceil(StateWatch.cost(analysis.concentration(), watch) * size.cost()
+				* (fused ? 0.5 : 1));
 		if (alchemist.concentration() < cost) {
 			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired",
 					cost, (int) alchemist.concentration()));
@@ -159,7 +196,7 @@ public final class Transmutation {
 			for (Analysis.StageEffect effect : effects) {
 				EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, flow, knowledge,
 						watch ? StateWatch.RANGE_BONUS : 0,
-						size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1), 0);
+						size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1) * fusion, 0);
 				Effects.Result result = Effects.get(effect.combination().effect())
 						.map(e -> e.apply(ctx))
 						.orElse(Effects.Result.NO_TARGET);
