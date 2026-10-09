@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   release:
@@ -90,7 +88,16 @@ jobs:
           git diff --cached --quiet || git commit -m "docs: changelog ${{ github.ref_name }}"
           git push origin master
 
-  # Un push fait avec le jeton du workflow ne relance pas d'autre workflow : on appelle le site ici.
+  # Le site se déploie depuis master (l'environnement github-pages refuse les tags), et un push fait
+  # avec le jeton du workflow ne relance pas d'autre workflow : on le relance par workflow_dispatch,
+  # le seul événement que ce jeton peut déclencher.
   pages:
     needs: release
-    uses: ./.github/workflows/pages.yml
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+    steps:
+      - name: republish the site from master
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "${{ github.repository }}" --ref master
