@@ -115,15 +115,30 @@ public final class Automails {
 					: "automail.fmab.no_lost_leg"));
 			return false;
 		}
-		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
-		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(part.get(), held.copyWithCount(1)));
+		fitTo(player, part.get(), held.copyWithCount(1));
 		held.shrink(1);
+		return true;
+	}
+
+	/**
+	 * Branche une pièce sur ce membre (la page du corps le fait aussi). À l'appelant de vérifier que
+	 * le membre est perdu et libre, et que la pièce lui va.
+	 */
+	public static void fitTo(ServerPlayer player, BodyPart part, ItemStack piece) {
+		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
+		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(part, piece));
 		// Brancher les nerfs fait mal : Ed s'en souvient.
 		player.hurtServer(player.level(), player.level().damageSources().generic(), 2);
 		player.level().playSound(null, player.blockPosition(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.8f, 1.2f);
-		player.sendSystemMessage(Component.translatable("automail.fmab.fitted",
-				Component.translatable(part.get().translationKey())));
-		return true;
+		player.sendSystemMessage(Component.translatable("automail.fmab.fitted", Component.translatable(part.translationKey())));
+	}
+
+	/** Ce membre peut-il recevoir cette pièce : perdu, libre, et la pièce est faite pour lui ? */
+	public static boolean canFit(Player player, BodyPart part, ItemStack piece) {
+		GateState gate = player.getAttached(FmabAttachments.GATE);
+		Automail automail = player.getAttached(FmabAttachments.AUTOMAIL);
+		return piece.getItem() instanceof AutomailItem item && item.fits(part) && gate != null && !gate.soulBound()
+				&& gate.lost(part) && (automail == null || automail.get(part).isEmpty());
 	}
 
 	/** Retire la pièce d'un membre ; elle revient dans l'inventaire. */

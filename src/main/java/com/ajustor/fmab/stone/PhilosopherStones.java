@@ -36,7 +36,10 @@ public final class PhilosopherStones {
 	private PhilosopherStones() {
 	}
 
-	/** La Pierre tenue en main (l'une ou l'autre), s'il lui reste des âmes. */
+	/**
+	 * La Pierre tenue en main (l'une ou l'autre), s'il lui reste des âmes : une vraie Pierre d'abord,
+	 * sinon un éclat de pierre rouge impure.
+	 */
 	public static Optional<ItemStack> held(ServerPlayer player) {
 		for (InteractionHand hand : InteractionHand.values()) {
 			ItemStack stack = player.getItemInHand(hand);
@@ -44,7 +47,18 @@ public final class PhilosopherStones {
 				return Optional.of(stack);
 			}
 		}
+		for (InteractionHand hand : InteractionHand.values()) {
+			ItemStack stack = player.getItemInHand(hand);
+			if (stack.is(FmabItems.RED_STONE_SHARD) && PhilosopherStoneItem.souls(stack) > 0) {
+				return Optional.of(stack);
+			}
+		}
 		return Optional.empty();
+	}
+
+	/** Une vraie Pierre, et non un éclat de pierre rouge impure. */
+	public static boolean pure(ItemStack stone) {
+		return stone.is(FmabItems.PHILOSOPHER_STONE);
 	}
 
 	/** La Pierre empêche-t-elle ce cercle de rebondir ? Seulement si ce qui cloche, c'est sa tenue. */

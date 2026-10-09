@@ -3,7 +3,6 @@ package com.ajustor.fmab.client.render;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.GluttonyEntity;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
@@ -14,7 +13,7 @@ public class GluttonyRenderer extends HumanoidMobRenderer<GluttonyEntity, Humano
 	private static final Identifier TEXTURE = Fmab.id("textures/entity/gluttony.png");
 
 	public GluttonyRenderer(EntityRendererProvider.Context context) {
-		super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), 0.5f);
+		super(context, new HumanoidModel<>(BossModels.gluttony()), 0.5f);
 	}
 
 	@Override

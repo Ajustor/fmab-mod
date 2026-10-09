@@ -13,24 +13,23 @@ import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.network.SaveNotebookPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
-import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayDeque;
@@ -41,8 +40,9 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Carnet de cercles : on y trace ses cercles sur une grille de 32 cases, on les nomme, on les
- * enregistre, et le carnet dit ce qu'il lit avant qu'on aille les tracer à la craie.
+ * Carnet de cercles (sa touche l'ouvre) : on y trace ses cercles sur une grille de 32 cases, on les
+ * nomme, on les range (l'ordre des pages est celui de la roue des cercles), et le carnet dit ce qu'il
+ * lit avant qu'on aille les tracer à la craie.
  */
 public class NotebookScreen extends Screen {
 	private enum Tool {
@@ -72,7 +72,6 @@ public class NotebookScreen extends Screen {
 	private static final int PANEL_BG = 0xB0101018;
 	private static final int PANEL_WIDTH = 190;
 
-	private final InteractionHand hand;
 	private NotebookContents contents;
 	private int page;
 	private List<Primitive> strokes;
@@ -116,10 +115,10 @@ public class NotebookScreen extends Screen {
 	private record Line(Component text, int color) {
 	}
 
-	public NotebookScreen(InteractionHand hand, ItemStack stack) {
-		super(Component.translatable("item.fmab.circle_notebook"));
-		this.hand = hand;
-		this.contents = stack.getOrDefault(FmabComponents.NOTEBOOK, NotebookContents.EMPTY);
+	public NotebookScreen() {
+		super(Component.translatable("key.fmab.notebook"));
+		Player player = Minecraft.getInstance().player;
+		this.contents = player == null ? NotebookContents.EMPTY : Notebooks.of(player);
 		this.page = contents.selected();
 		this.strokes = new ArrayList<>(contents.pages().isEmpty() ? List.of() : contents.pages().get(page).drawing().primitives());
 	}
@@ -187,9 +186,18 @@ public class NotebookScreen extends Screen {
 				.bounds(px + 128, y, 62, 18).build());
 		y += 20;
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.export"), b -> exportCode())
-				.bounds(px, y, 94, 18).build());
+				.tooltip(Tooltip.create(Component.translatable("notebook.fmab.export.tooltip")))
+				.bounds(px, y, 66, 18).build());
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.import"), b -> importCode())
-				.bounds(px + 96, y, 94, 18).build());
+				.tooltip(Tooltip.create(Component.translatable("notebook.fmab.import.tooltip")))
+				.bounds(px + 68, y, 66, 18).build());
+		// Ranger la page : son rang dans le carnet est sa place sur la roue des cercles.
+		addRenderableWidget(Button.builder(Component.literal("«"), b -> move(-1))
+				.tooltip(Tooltip.create(Component.translatable("notebook.fmab.move_earlier")))
+				.bounds(px + 136, y, 26, 18).build());
+		addRenderableWidget(Button.builder(Component.literal("»"), b -> move(1))
+				.tooltip(Tooltip.create(Component.translatable("notebook.fmab.move_later")))
+				.bounds(px + 164, y, 26, 18).build());
 		panelTop = y + 26;
 		refreshLabels();
 	}
@@ -705,7 +713,7 @@ public class NotebookScreen extends Screen {
 	private void save(boolean announce) {
 		store();
 		contents = contents.select(Math.min(page, Math.max(0, contents.pages().size() - 1)));
-		ClientPlayNetworking.send(new SaveNotebookPayload(hand, contents));
+		ClientPlayNetworking.send(new SaveNotebookPayload(contents));
 		if (announce) {
 			status = Component.translatable("notebook.fmab.saved");
 		}
@@ -735,6 +743,16 @@ public class NotebookScreen extends Screen {
 		nameBox.setValue(currentName());
 		resetGesture();
 		forgetGestures();
+	}
+
+	/** Avance ou recule la page d'un rang ; elle reste ouverte. */
+	private void move(int delta) {
+		store();
+		if (page >= contents.pages().size()) {
+			return;
+		}
+		contents = contents.moved(page, delta);
+		page = contents.selected();
 	}
 
 	private void deletePage() {

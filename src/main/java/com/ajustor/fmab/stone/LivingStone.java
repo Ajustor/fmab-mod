@@ -1,8 +1,8 @@
 package com.ajustor.fmab.stone;
 
-import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.LustEntity;
@@ -85,8 +85,14 @@ public final class LivingStone {
 	public static boolean tryRitual(ServerPlayer player, BlockPos circle) {
 		ItemStack main = player.getItemInHand(InteractionHand.MAIN_HAND);
 		ItemStack off = player.getItemInHand(InteractionHand.OFF_HAND);
-		if (!full(main) || !full(off) || souls(player) > 0) {
+		if (!main.is(FmabItems.PHILOSOPHER_STONE) || !off.is(FmabItems.PHILOSOPHER_STONE) || souls(player) > 0) {
 			return false;
+		}
+		if (!full(main) || !full(off)) {
+			// Deux Pierres en main sur ce cercle : c'est un rituel, raté, pas une transmutation humaine.
+			player.sendSystemMessage(Component.translatable("stone.fmab.ritual_needs_full",
+					PhilosopherStoneItem.souls(main), PhilosopherStoneItem.souls(off), main.getMaxDamage()));
+			return true;
 		}
 		if (!Eclipse.now(player.level())) {
 			player.sendSystemMessage(Component.translatable("stone.fmab.ritual_needs_eclipse"));
@@ -133,7 +139,7 @@ public final class LivingStone {
 	public static void register() {
 		UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
 			if (!(player instanceof ServerPlayer absorber) || hand != InteractionHand.MAIN_HAND
-					|| !player.getMainHandItem().isEmpty() || souls(absorber) <= 0
+					|| !player.getMainHandItem().isEmpty() || souls(absorber) <= 0 || !player.isShiftKeyDown()
 					|| !(entity instanceof LivingEntity target) || entity instanceof TruthEntity) {
 				return InteractionResult.PASS;
 			}

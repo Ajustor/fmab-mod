@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_blood_crest",
+  "criteria": {
+    "crest_sealed": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "crest_sealed"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:kunai"
+    },
+    "title": {
+      "translate": "advancements.fmab.crest_sealed.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.crest_sealed.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "crest_sealed"
+    ]
+  ]
+}

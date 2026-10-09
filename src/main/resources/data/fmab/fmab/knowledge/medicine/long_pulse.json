@@ -1,0 +1,13 @@
+{
+  "school": "medicine",
+  "mastery": 50,
+  "parent": "fmab:medicine/wide_circle",
+  "perks": [
+    {
+      "type": "duration_bonus",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.medicine.long_pulse",
+  "description_key": "knowledge.fmab.medicine.long_pulse.desc"
+}

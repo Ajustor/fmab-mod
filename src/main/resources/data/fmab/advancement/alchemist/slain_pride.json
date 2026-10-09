@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_central",
+  "criteria": {
+    "slain_pride": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "slain_pride"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:black_dye"
+    },
+    "title": {
+      "translate": "advancements.fmab.slain_pride.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.slain_pride.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "slain_pride"
+    ]
+  ]
+}

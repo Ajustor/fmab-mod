@@ -8,13 +8,17 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -22,6 +26,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -99,6 +104,7 @@ public class ProceduralPiece extends StructurePiece {
 		int minY = Math.max(boundingBox.minY(), chunkBB.minY());
 		int maxY = Math.min(boundingBox.maxY(), chunkBB.maxY());
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		List<BlockPos> connected = new ArrayList<>();
 		for (int wx = minX; wx <= maxX; wx++) {
 			for (int wz = minZ; wz <= maxZ; wz++) {
 				int[] local = toLocal(wx - boundingBox.minX(), wz - boundingBox.minZ());
@@ -112,8 +118,16 @@ public class ProceduralPiece extends StructurePiece {
 					if (level.getBlockState(pos) != placed) {
 						level.setBlock(pos, placed, 2);
 					}
+					if (placed.getBlock() instanceof CrossCollisionBlock || placed.getBlock() instanceof WallBlock) {
+						connected.add(pos.immutable());
+					}
 				}
 			}
+		}
+		// Une fois tout posé, ce qui se raccorde à ses voisins (vitres, barreaux, clôtures) les regarde.
+		for (BlockPos at : connected) {
+			BlockState shaped = Block.updateFromNeighbourShapes(level.getBlockState(at), level, at);
+			level.setBlock(at, shaped, 2);
 		}
 		for (Blueprint.Chest chest : blueprint.chests(plot)) {
 			BlockPos at = toWorld(chest.local());
@@ -147,6 +161,10 @@ public class ProceduralPiece extends StructurePiece {
 			return;
 		}
 		entity.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0, 0);
+		if (entity instanceof Villager villager) {
+			// Le type de son biome (désert, plaine, taïga...) ; il prendra le métier du poste voisin.
+			villager.finalizeSpawn(level, level.getCurrentDifficultyAt(at), EntitySpawnReason.STRUCTURE, null);
+		}
 		if (entity instanceof Mob mob) {
 			mob.setPersistenceRequired();
 		}

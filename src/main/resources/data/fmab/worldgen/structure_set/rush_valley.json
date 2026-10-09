@@ -3,7 +3,11 @@
     "type": "minecraft:random_spread",
     "salt": 742911305,
     "separation": 16,
-    "spacing": 44
+    "spacing": 44,
+    "exclusion_zone": {
+      "other_set": "fmab:liore",
+      "chunk_count": 6
+    }
   },
   "structures": [
     {

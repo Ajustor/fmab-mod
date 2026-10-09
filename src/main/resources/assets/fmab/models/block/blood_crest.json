@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "fmab:block/blood_crest",
+    "side": "fmab:block/blood_crest_side",
+    "bottom": "minecraft:block/deepslate_tiles"
+  }
+}

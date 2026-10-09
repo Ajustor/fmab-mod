@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_devils_nest",
+  "criteria": {
+    "slain_greed": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "slain_greed"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:diamond"
+    },
+    "title": {
+      "translate": "advancements.fmab.slain_greed.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.slain_greed.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "slain_greed"
+    ]
+  ]
+}

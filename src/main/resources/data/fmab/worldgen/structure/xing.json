@@ -1,0 +1,7 @@
+{
+  "type": "fmab:xing",
+  "biomes": "#fmab:has_structure/xing",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

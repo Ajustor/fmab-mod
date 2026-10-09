@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/rank_state",
+  "criteria": {
+    "slain_envy": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "slain_envy"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:slime_ball"
+    },
+    "title": {
+      "translate": "advancements.fmab.slain_envy.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.slain_envy.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "slain_envy"
+    ]
+  ]
+}

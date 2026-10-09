@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/philosopher_stone",
+  "criteria": {
+    "living_stone": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "living_stone"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:crystallized_blood"
+    },
+    "title": {
+      "translate": "advancements.fmab.living_stone.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.living_stone.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "living_stone"
+    ]
+  ]
+}

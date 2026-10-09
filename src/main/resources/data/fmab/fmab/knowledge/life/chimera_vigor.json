@@ -1,0 +1,13 @@
+{
+  "school": "life",
+  "mastery": 40,
+  "parent": "fmab:life/steady_hand",
+  "perks": [
+    {
+      "type": "chimera_vigor",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.life.chimera_vigor",
+  "description_key": "knowledge.fmab.life.chimera_vigor.desc"
+}

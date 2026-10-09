@@ -15,7 +15,7 @@ import java.util.Optional;
  * Central City : une grande ville circulaire et fortifiée, posée sur un plateau aplani. Muraille à
  * quatre portes, avenues en croix, boulevard circulaire, place et fontaine ; au nord de la place le
  * quartier général et son arène, à l'est la bibliothèque, à l'ouest la résidence Bradley ; des
- * maisons partout ailleurs. Sous la ville, le tunnel de Sloth.
+ * maisons partout ailleurs. Sous la ville, le tunnel de Sloth, et plus bas le repaire de Père.
  */
 public class CentralStructure extends Structure {
 	public static final MapCodec<CentralStructure> CODEC = simpleCodec(CentralStructure::new);
@@ -23,7 +23,9 @@ public class CentralStructure extends Structure {
 	private static final int R = Blueprints.CITY_RADIUS;
 	/** Écart de hauteur toléré sur l'emprise : au-delà, le relief est trop accidenté pour une ville. */
 	private static final int MAX_RELIEF = 16;
-	private static final int LOT = 12;
+	private static final int LOT = 11;
+	/** Demi-emprise d'une maison (jusqu'à 9 sur 8, tournée). */
+	private static final int HALF_HOUSE = 5;
 
 	public CentralStructure(StructureSettings settings) {
 		super(settings);
@@ -76,8 +78,12 @@ public class CentralStructure extends Structure {
 		int depth = -Blueprints.SlothTunnel.FLOOR;
 		builder.addPiece(new ProceduralPiece("sloth_tunnel", new BlockPos(cx - R, y, cz + 30), size, depth + 1, 7, depth,
 				Rotation.NONE, seed));
-		for (int gx = -R + 6; gx < R - 6; gx += LOT) {
-			for (int gz = -R + 6; gz < R - 6; gz += LOT) {
+		// Plus bas encore, derrière une porte scellée de la paroi sud du tunnel : le repaire de Père.
+		builder.addPiece(new ProceduralPiece("father_lair",
+				new BlockPos(cx + Blueprints.SlothTunnel.FATHER_DOOR - Blueprints.FatherLair.DOOR_X, y, cz + 36), 33, 1, 41,
+				-Blueprints.FatherLair.ROOM_FLOOR, Rotation.NONE, seed));
+		for (int gx = -R + 8; gx < R - 8; gx += LOT) {
+			for (int gz = -R + 8; gz < R - 8; gz += LOT) {
 				if (!buildable(gx, gz)) {
 					continue;
 				}
@@ -94,14 +100,18 @@ public class CentralStructure extends Structure {
 
 	/** Une parcelle de maison : ni sur la voirie, ni sur la place, ni contre la muraille, ni sur un monument. */
 	static boolean buildable(int gx, int gz) {
-		double r = Math.hypot(gx, gz);
-		if (r > 58 || r < Blueprints.PLAZA + 8) {
+		// L'emprise de la maison : son point le plus proche et son coin le plus loin du centre.
+		int ax = Math.abs(gx), az = Math.abs(gz);
+		double near = Math.hypot(Math.max(0, ax - HALF_HOUSE), Math.max(0, az - HALF_HOUSE));
+		double far = Math.hypot(ax + HALF_HOUSE, az + HALF_HOUSE);
+		if (far > Blueprints.WALL_INNER - 1 || near < Blueprints.PLAZA + 4) {
 			return false;
 		}
-		if (Math.abs(gx) <= 9 || Math.abs(gz) <= 9) {
+		// Ni sur une avenue (et ses lampadaires), ni sur le boulevard circulaire.
+		if (ax - HALF_HOUSE <= Blueprints.AVENUE + 2 || az - HALF_HOUSE <= Blueprints.AVENUE + 2) {
 			return false;
 		}
-		if (r > 40 && r < 57) {
+		if (far >= Blueprints.RING_INNER - 1 && near <= Blueprints.RING_OUTER + 1) {
 			return false;
 		}
 		boolean headquarters = Math.abs(gx) <= 21 && gz >= -50 && gz <= -16;

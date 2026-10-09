@@ -1,7 +1,9 @@
 package com.ajustor.fmab.homunculus;
 
+import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.gate.GateOfTruth;
+import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabEntities;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
@@ -44,7 +46,8 @@ public final class EnvySpawner {
 	private static void tryNear(MinecraftServer server, ServerPlayer player) {
 		ServerLevel level = player.level();
 		RandomSource random = level.getRandom();
-		if (player.isCreative() || player.isSpectator() || level.dimension() == GateOfTruth.WHITE_SPACE
+		if (!player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.ALCHEMIST)
+				|| player.isCreative() || player.isSpectator() || level.dimension() == GateOfTruth.WHITE_SPACE
 				|| level.dimension() == Belly.BELLY || random.nextInt(CHANCE) != 0) {
 			return;
 		}

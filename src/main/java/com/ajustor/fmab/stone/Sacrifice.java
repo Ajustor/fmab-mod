@@ -1,5 +1,6 @@
 package com.ajustor.fmab.stone;
 
+import com.ajustor.fmab.entity.ChimeraBeastEntity;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.Effects;
@@ -12,6 +13,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.animal.golem.AbstractGolem;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
@@ -40,7 +44,9 @@ public final class Sacrifice {
 	public static Effects.Result perform(ServerLevel level, ServerPlayer caster, BlockPos circle, AABB area,
 			List<ItemEntity> items) {
 		List<LivingEntity> victims = level.getEntitiesOfClass(LivingEntity.class, area, e -> e.isAlive()
-				&& !(e instanceof Player) && !(e instanceof HomunculusEntity));
+				&& !(e instanceof Player) && !(e instanceof HomunculusEntity) && !(e instanceof ArmorStand)
+				&& !(e instanceof AbstractGolem) && !(e instanceof OwnableEntity o && o.getOwnerReference() != null)
+				&& !(e instanceof ChimeraBeastEntity c && c.master().isPresent()));
 		int villagers = 0;
 		int beasts = 0;
 		for (LivingEntity victim : victims) {

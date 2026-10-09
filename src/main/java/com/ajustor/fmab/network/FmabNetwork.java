@@ -1,59 +1,63 @@
 package com.ajustor.fmab.network;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
-import com.ajustor.fmab.alchemy.glyph.Glyph;
-import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.gate.Automails;
+import com.ajustor.fmab.gate.BodyMenu;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Rebirth;
 import com.ajustor.fmab.gate.SoulBinding;
 import com.ajustor.fmab.registry.FmabAttachments;
-import com.ajustor.fmab.registry.FmabComponents;
-import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.state.StateExam;
 import com.ajustor.fmab.tattoo.TattooRitual;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.training.Trial;
-import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.Optional;
 
 public final class FmabNetwork {
 	private FmabNetwork() {
 	}
 
 	public static void register() {
-		PayloadTypeRegistry.serverboundPlay().register(SaveNotebookPayload.TYPE, SaveNotebookPayload.CODEC);
+		// Le carnet entier (seize pages) dépasse vite la taille d'un paquet ordinaire.
+		PayloadTypeRegistry.serverboundPlay().registerLarge(SaveNotebookPayload.TYPE, SaveNotebookPayload.CODEC,
+				1 << 20);
 		PayloadTypeRegistry.serverboundPlay().register(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(WinryActionPayload.TYPE, WinryActionPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(TruthChoicePayload.TYPE, TruthChoicePayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenTruthPayload.TYPE, OpenTruthPayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(CinematicPayload.TYPE, CinematicPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenWinryPayload.TYPE, OpenWinryPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenIzumiPayload.TYPE, OpenIzumiPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(ExamActionPayload.TYPE, ExamActionPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenExamPayload.TYPE, OpenExamPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(TattooPayload.TYPE, TattooPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(AddToNotebookPayload.TYPE, AddToNotebookPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(SelectCirclePayload.TYPE, SelectCirclePayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(OpenBodyPayload.TYPE, OpenBodyPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenTattooPayload.TYPE, OpenTattooPayload.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
-				(payload, context) -> saveNotebook(context.player(), payload.hand(), payload.contents()));
+				(payload, context) -> Notebooks.set(context.player(), payload.contents()));
+		ServerPlayNetworking.registerGlobalReceiver(SelectCirclePayload.TYPE,
+				(payload, context) -> selectCircle(context.player(), payload));
+		ServerPlayNetworking.registerGlobalReceiver(OpenBodyPayload.TYPE,
+				(payload, context) -> BodyMenu.open(context.player()));
 		ServerPlayNetworking.registerGlobalReceiver(CastGlovesPayload.TYPE,
 				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
 		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,
@@ -162,37 +166,25 @@ public final class FmabNetwork {
 		}
 	}
 
-	/** Le carnet de la main secondaire, sinon le premier de l'inventaire, reçoit une page de plus. */
+	/** Le Traité recopie un cercle dans le carnet. */
 	private static void addToNotebook(ServerPlayer player, String name, Drawing drawing) {
-		ItemStack notebook = player.getOffhandItem().is(FmabItems.CIRCLE_NOTEBOOK) ? player.getOffhandItem() : null;
-		if (notebook == null) {
-			for (ItemStack stack : player.getInventory()) {
-				if (stack.is(FmabItems.CIRCLE_NOTEBOOK)) {
-					notebook = stack;
-					break;
-				}
-			}
-		}
-		if (notebook == null) {
-			player.sendOverlayMessage(Component.translatable("treatise.fmab.no_notebook"));
-			return;
-		}
-		NotebookContents contents = notebook.getOrDefault(FmabComponents.NOTEBOOK, NotebookContents.EMPTY);
-		if (contents.pages().size() >= NotebookContents.MAX_PAGES) {
-			player.sendOverlayMessage(Component.translatable("notebook.fmab.full"));
-			return;
-		}
-		String page = name.length() > NotebookContents.MAX_NAME_LENGTH ? name.substring(0, NotebookContents.MAX_NAME_LENGTH)
-				: name;
-		notebook.set(FmabComponents.NOTEBOOK,
-				contents.withPage(contents.pages().size(), new NotebookContents.Page(page, drawing)));
-		player.sendOverlayMessage(Component.translatable("treatise.fmab.added"));
+		player.sendOverlayMessage(Component.translatable(switch (Notebooks.add(player, name, drawing)) {
+			case ADDED -> "treatise.fmab.added";
+			case ALREADY_THERE -> "notebook.fmab.already";
+			case FULL -> "notebook.fmab.full";
+		}));
 	}
 
-	private static void saveNotebook(ServerPlayer player, InteractionHand hand, NotebookContents contents) {
-		ItemStack stack = player.getItemInHand(hand);
-		if (stack.is(FmabItems.CIRCLE_NOTEBOOK)) {
-			stack.set(FmabComponents.NOTEBOOK, contents);
+	/** La roue des cercles : une page devient la sélection, et l'Initié peut joindre aussitôt les mains. */
+	private static void selectCircle(ServerPlayer player, SelectCirclePayload payload) {
+		if (!Notebooks.select(player, payload.index())) {
+			return;
+		}
+		NotebookContents contents = Notebooks.of(player);
+		player.sendOverlayMessage(Component.translatable("circle.fmab.selected",
+				Notebooks.pageName(contents.pages().get(contents.selected()))));
+		if (payload.clap() && player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.GATE)) {
+			GloveCasting.cast(player, true);
 		}
 	}
 }

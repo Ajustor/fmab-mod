@@ -1,0 +1,14 @@
+{
+  "type": "fmab:single_site",
+  "biomes": "#fmab:has_structure/xerxes_ruins",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "piece": "xerxes_ruins",
+  "size": 35,
+  "height": 14,
+  "ground": 0,
+  "avoid": [
+    "fmab:ishval_ruins"
+  ]
+}

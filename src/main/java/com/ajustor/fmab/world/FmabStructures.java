@@ -22,6 +22,12 @@ public final class FmabStructures {
 	public static final StructureType<Laboratory5Structure> LABORATORY_5 = type("laboratory_5",
 			Laboratory5Structure.CODEC);
 	public static final StructureType<DevilsNestStructure> DEVILS_NEST = type("devils_nest", DevilsNestStructure.CODEC);
+	public static final StructureType<XingStructure> XING = type("xing", XingStructure.CODEC);
+	public static final StructureType<FortBriggsStructure> FORT_BRIGGS = type("fort_briggs", FortBriggsStructure.CODEC);
+	public static final StructureType<BloodCrestStructure> BLOOD_CREST = type("blood_crest", BloodCrestStructure.CODEC);
+	public static final StructureType<DublithStructure> DUBLITH = type("dublith", DublithStructure.CODEC);
+	public static final StructureType<SingleSiteStructure> SINGLE_SITE = type("single_site", SingleSiteStructure.CODEC);
+	public static final StructureType<YockIslandStructure> YOCK_ISLAND = type("yock_island", YockIslandStructure.CODEC);
 
 	private FmabStructures() {
 	}

@@ -93,7 +93,8 @@ public final class HumanTransmutation {
 		boolean severe = sets == 0;
 		int ambition = Math.max(0, sets - 1) + 2 * humans + gate.openings();
 
-		caster.hurtServer(level, level.damageSources().magic(), BLOOD);
+		// Le sang qu'on donne : jamais jusqu'à la mort, la Porte veut son dû vivant.
+		caster.hurtServer(level, level.damageSources().magic(), Math.min(BLOOD, caster.getHealth() - 1));
 		level.sendParticles(ParticleTypes.DAMAGE_INDICATOR, caster.getX(), caster.getY(1), caster.getZ(), 8,
 				0.3, 0.3, 0.3, 0.1);
 		level.sendParticles(ParticleTypes.SQUID_INK, circle.getX() + 0.5, circle.getY() + 0.2, circle.getZ() + 0.5,
@@ -102,10 +103,11 @@ public final class HumanTransmutation {
 		if (!severe) {
 			spawnCreature(level, circle);
 		}
-		caster.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60, 0, false, false));
 		caster.sendSystemMessage(Component.translatable(severe ? "gate.fmab.pulled_severe" : "gate.fmab.pulled"));
+		// Des bras noirs jaillissent du cercle et agrippent l'alchimiste : la Porte l'appelle.
+		GateOfTruth.pullFromCircle(level, circle, caster);
 		caster.setAttached(FmabAttachments.GATE, gate.withVisit(new GateState.Visit(
-				level.dimension().identifier().toString(), circle, ambition, severe, -1)));
+				level.dimension().identifier().toString(), circle, ambition, severe, -GateOfTruth.PULL)));
 		return Effects.Result.DONE;
 	}
 

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "BS",
+    "SB"
+  ],
+  "key": {
+    "B": "minecraft:bricks",
+    "S": "minecraft:stone_bricks"
+  },
+  "result": {
+    "id": "fmab:amestrian_bricks",
+    "count": 4
+  }
+}

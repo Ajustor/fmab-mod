@@ -6,6 +6,7 @@ import com.ajustor.fmab.data.Automail;
 import com.ajustor.fmab.data.ExamProgress;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Gloves;
+import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.data.TransmutationPose;
@@ -16,6 +17,9 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.network.codec.ByteBufCodecs;
 
+import java.util.List;
+import java.util.Set;
+
 public final class FmabAttachments {
 	/** Rang, savoir et concentration du joueur ; gardés à la mort, visibles de lui seul. */
 	public static final AttachmentType<AlchemistData> ALCHEMIST = AttachmentRegistry.<AlchemistData>builder()
@@ -24,6 +28,16 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.syncWith(AlchemistData.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("alchemist"));
+
+	/**
+	 * Le Carnet de cercles : l'alchimiste le garde en tête (touche du carnet) et à sa mort, et le
+	 * client le lit pour la roue des cercles.
+	 */
+	public static final AttachmentType<NotebookContents> NOTEBOOK = AttachmentRegistry.<NotebookContents>builder()
+			.persistent(NotebookContents.CODEC)
+			.copyOnDeath()
+			.syncWith(NotebookContents.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("notebook"));
 
 	/** Les gants portés, à gauche et à droite. */
 	public static final AttachmentType<Gloves> GLOVES = AttachmentRegistry.<Gloves>builder()
@@ -90,6 +104,50 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.syncWith(ByteBufCodecs.VAR_INT, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("living_stone"));
+
+	/** L'alkahestry de Xing, apprise de May Chang : gardée à la mort. */
+	public static final AttachmentType<Boolean> ALKAHESTRY = AttachmentRegistry.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("alkahestry"));
+
+	/** Reconnu allié de Briggs par Olivier Armstrong : gardé à la mort. */
+	public static final AttachmentType<Boolean> BRIGGS_ALLY = AttachmentRegistry.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("briggs_ally"));
+
+	/** Recherché par l'armée jusqu'à cette heure de jeu, pour avoir frappé un soldat. */
+	public static final AttachmentType<Long> WANTED = AttachmentRegistry.<Long>builder()
+			.persistent(Codec.LONG)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("wanted"));
+
+	/** Le bras droit de Scar, tatoué : gardé à la mort, connu du client (il ne mine plus à mains nues). */
+	public static final AttachmentType<Boolean> SCAR_ARM = AttachmentRegistry.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.BOOL, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("scar_arm"));
+
+	/** Le temps passé d'affilée sur l'île de Yock, en ticks (l'épreuve d'Izumi). */
+	public static final AttachmentType<Integer> ISLAND_TIME = AttachmentRegistry.<Integer>builder()
+			.persistent(Codec.INT)
+			.buildAndRegister(Fmab.id("island_time"));
+
+	/** Les cadeaux uniques déjà reçus des PNJ (notes de Hohenheim, de Scar…) : gardés à la mort. */
+	public static final AttachmentType<Set<String>> GIFTS = AttachmentRegistry.<Set<String>>builder()
+			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))
+			.initializer(Set::of)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("gifts"));
+
+	/** Les homonculus qu'on a vus tomber : la clé du sceau de Père. Gardés à la mort. */
+	public static final AttachmentType<Set<String>> SLAIN = AttachmentRegistry.<Set<String>>builder()
+			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))
+			.initializer(Set::of)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("slain"));
 
 	/** Le geste de transmutation en cours : éphémère, visible de tous pour animer le joueur. */
 	public static final AttachmentType<TransmutationPose> POSE = AttachmentRegistry.<TransmutationPose>builder()

@@ -12,8 +12,8 @@ joueur compose lui-même :
 - **Carnet de cercles** : grille de 32 cases, outils ligne, cercle, polygone, arc et point,
   symétrie, pages nommées, import/export par code. Le carnet lit le cercle en direct : glyphes
   reconnus, effet, complexité, stabilité, coût et verdict.
-- **Craie de transmutation** : trace au sol le cercle sélectionné dans le carnet (tenu dans l'autre
-  main). On l'active paume contre le sol, main vide.
+- **Craie de transmutation** : trace au sol le cercle sélectionné dans le carnet (touche N). On
+  l'active paume contre le sol, main vide.
 - **Traité d'alchimie** : principes, trois étapes, catalogue des glyphes (on les étudie pour les
   comprendre), règles de composition, cercles d'exemple, rebonds, tabous.
 - **10 glyphes** (Terre, Eau, Fer, Cuivre, Fixer, Projeter, Réparer, Décomposer, Direction,
@@ -116,6 +116,48 @@ joueur compose lui-même :
   réparation chez **Winry**, dans la ville de **Rush Valley** (`/locate structure fmab:rush_valley`).
   À Resembool, la maison des Elric garde les notes de Hohenheim.
 
+**v1.0 (Jour promis), en cours :**
+
+- **Père**, l'Homonculus originel, sous Central : un sceau d'Ouroboros au fond du tunnel de Sloth ne
+  cède qu'à qui a vu tomber Sloth, Wrath et Pride. Trois formes (le vieillard, la forme sans visage
+  et son petit soleil, la forme divine instable qui dévore les âmes). Autour de lui, une **zone
+  anti-alchimie** : aucune transmutation d'Amestris ne s'allume.
+- L'**alkahestry de Xing** marche partout, même chez Père : cinq **kunaï** plantés autour d'une
+  zone y dessinent un cercle de soin ou de piège. **May Chang** l'enseigne dans son pavillon des
+  jungles et cerisaies (`/locate structure fmab:xing`).
+- **Fort Briggs** dans les montagnes enneigées (`/locate structure fmab:fort_briggs`) : la générale
+  **Olivier Armstrong** confie aux alliés de bon karma un **sabre de Briggs** (×1,5 contre les
+  homonculus) ; les **soldats de Drachma** rôdent la nuit au pied du mur.
+- **Fil conducteur** : un arbre de progrès « Fullmetal Alchemist », des cartes de tous les lieux chez
+  les cartographes, et la quête des **points de sang** du cercle national (sept à sceller avant que
+  l'éclipse ne devienne le Jour promis).
+- **Lieux** : **Dublith** et la boucherie d'Izumi (elle donne la carte de l'île de Yock), **Liore** et
+  Cornello, les ruines d'**Ishval** (Scar) et de **Xerxès** (fresques, Hohenheim), l'**île de Yock**,
+  le dispensaire du docteur **Marcoh** (il déchiffre ses notes de recherche). Les villes sont
+  **habitées** : des villageois dans les maisons de Central, Resembool, Dublith, Liore et dans les
+  ateliers de Rush Valley (leur métier vient du poste de travail de la maison, cartographes
+  compris), des maisons **meublées** (lits, table, fourneau, lanternes) et des gardes aux portes de
+  Central. Aucun lieu ne se pose dans Central.
+- **Créatures** : Barry le Boucher, armures habitées, soldats immortels, chimères, soldats
+  d'Amestris et de Briggs. Les barres de boss n'apparaissent qu'une fois le combat engagé, aux
+  joueurs présents.
+- **Styles de jeu** : bras de Scar, mines de Kimblee, pistolet et fusil, couteaux de Hughes, épée de
+  Xing ; le glyphe **Or** (interdit par la loi d'État) ; les écoles de la Destruction, de la
+  Médecine et de la Vie (chimères qui vous obéissent).
+- **Cercles** : déclencheurs (retardement, piège, redstone) et fusion à deux alchimistes. Le
+  **carnet** n'est plus un objet : l'alchimiste le garde en tête (touche N, gardé à la mort). La
+  **roue des cercles** (R maintenue) change de cercle d'un geste, et un clic y joint aussitôt les
+  mains pour qui a vu la Porte ; accroupi, main vide, un clic droit sur un cercle inconnu le recopie
+  dans le carnet. Le cercle sélectionné s'affiche en haut à gauche quand on peut s'en servir (Porte
+  vue, craie, peinture ou burin en main). Un onglet **Corps** de l'inventaire montre les membres,
+  leurs automails (et leur usure), les organes, la vue et les gants : on y branche un automail sur un
+  membre perdu et on y enfile ses gants ; Winry seule retire un automail. Le cercle de la
+  transmutation humaine ne figure plus dans le Traité : de très
+  rares **Notes sur la transmutation humaine** le donnent (Laboratoire 5, ruines de Xerxès,
+  bibliothèques des forts, cités antiques).
+- **Finition** : cinématiques (la Porte, le Jour promis, la chute de Père), éclipse dans le ciel,
+  sons propres (CC0), silhouettes des boss, briques amestriennes et de Xing, neige de Briggs.
+
 Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/fmab/glyph`), combinaisons
 (`data/<ns>/fmab/combination`), valeurs d'échange (`data/<ns>/fmab/exchange`), éléments visés (tags
 `fmab:element/*`), pages du Traité, Espace blanc (`data/fmab/dimension`). Textes en français et en
@@ -141,6 +183,15 @@ Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab 
 
 Les cercles de test partagés se régénèrent depuis l'implémentation Java, qui fait référence :
 `./gradlew test -PwriteFixtures=true`.
+
+### Publier une version
+
+Pousser un tag `vX.Y.Z` (ou `vX.Y.Z-beta`, publié en préversion) lance `.github/workflows/release.yml` :
+jar à la version du tag, GitHub Release avec le changelog français et anglais (git-cliff,
+`cliff.fr.toml` et `cliff.toml`), `CHANGELOG.fr.md` et `CHANGELOG.md` recommités sur `master`, puis
+le site (pages Versions, Changelog et Installation, générées par `site/build.py`). Chaque commit
+`feat:`, `fix:` ou `perf:` porte les lignes `Changelog-fr:` et `Changelog-en:` ; le check `commits`
+des pull requests refuse ceux qui les oublient.
 
 ## English
 
@@ -183,6 +234,28 @@ vulnerable child.
 and is made by sacrificing lives on a human transmutation circle; karma tracks your deeds; every
 eighth day an eclipse lets a Gate initiate holding two full Stones become a Living Stone.
 
+**v1.0 (Promised Day), in progress:** Father waits beneath Central behind an Ouroboros seal that
+yields only to those who saw Sloth, Wrath and Pride fall; he fights in three forms and blocks all
+Amestrian alchemy around him. Xing's alkahestry (five kunai planted in a circle, taught by May
+Chang) still works there. Fort Briggs, Olivier Armstrong and her Briggs sabre hold the snowy north
+against Drachma's soldiers.
+An advancement tree, cartographer maps and the national circle's blood crests guide the way; Dublith
+(Izumi), Liore, the Ishval and Xerxes ruins, Yock Island and Marcoh's clinic fill the map, and the
+towns are lived in (villagers whose trade comes from their house's workstation, furnished houses,
+guards at Central's gates); Barry, haunted armors, immortal soldiers and chimeras fill it with fights,
+and boss bars only show once a fight has begun. New playstyles (Scar's arm,
+Kimblee's mines, firearms, throwing knives, the Xing sword), the forbidden Gold glyph, the schools of
+Destruction, Medicine and Life, circle triggers and two-alchemist fusion, cinematics, an eclipse in
+the sky and the mod's own sounds round it out. The notebook is no longer an item: it opens with a key
+(N) and survives death; the circle wheel (hold R) switches circles in one gesture and, for Gate
+initiates, a click on it joins the hands at once; crouching empty-handed and right-clicking an unknown
+circle copies it into the notebook. The selected circle shows at the top left when it can be used
+(Gate seen, or chalk, paint or chisel in hand). A Body tab on the inventory shows limbs, automail and
+its wear, organs, sight and gloves: automail is fitted there on a lost limb and gloves are put on;
+only Winry removes automail. The human transmutation
+circle is no longer in the Treatise:
+very rare Notes on Human Transmutation hand it out.
+
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 
 ## Mention des ayants droit / Rights holders
@@ -192,10 +265,12 @@ leurs ayants droit : Hiromu Arakawa et Square Enix pour le manga ; Bones, Aniple
 partenaires pour l'anime *Fullmetal Alchemist: Brotherhood*. Ce mod est un projet de fan
 indépendant, gratuit et non officiel, sans lien avec eux ni approbation de leur part. Les visuels
 du mod sont des créations originales ; les glyphes reprennent le symbolisme alchimique historique,
-qui est du domaine public.
+qui est du domaine public. Les sons dérivent de banques du domaine public (CC0) : Kenney et OpenGameArt
+(voir `assets/fmab/sounds/credits.txt`).
 
 **EN** — Fullmetal Alchemist, its characters, names, places and universe belong to their rights
 holders: Hiromu Arakawa and Square Enix for the manga; Bones, Aniplex and their partners for the
 anime *Fullmetal Alchemist: Brotherhood*. This mod is an independent, free and unofficial fan
 project, not affiliated with or endorsed by them. The mod's visuals are original creations; the
-glyphs draw on historical alchemical symbolism, which is in the public domain.
+glyphs draw on historical alchemical symbolism, which is in the public domain. Sounds are derived from public
+domain (CC0) packs by Kenney and from OpenGameArt (see `assets/fmab/sounds/credits.txt`).

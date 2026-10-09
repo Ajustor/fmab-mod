@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/crest_sealed",
+  "criteria": {
+    "circle_broken": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "circle_broken"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:clock"
+    },
+    "title": {
+      "translate": "advancements.fmab.circle_broken.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.circle_broken.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "circle_broken"
+    ]
+  ]
+}

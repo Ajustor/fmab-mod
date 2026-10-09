@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 466180923,
+    "separation": 14,
+    "spacing": 40,
+    "exclusion_zone": {
+      "other_set": "fmab:resembool",
+      "chunk_count": 6
+    }
+  },
+  "structures": [
+    {
+      "structure": "fmab:dublith",
+      "weight": 1
+    }
+  ]
+}

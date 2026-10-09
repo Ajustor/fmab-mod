@@ -39,7 +39,7 @@ import java.util.Set;
  * frapper.
  */
 public class SlothEntity extends HomunculusEntity {
-	private static final int SOULS = 8;
+	private static final int SOULS = 5;
 	private static final double CHARGE_SPEED = 1.5;
 	private static final int CHARGE_LENGTH = 26;
 	private static final float CHARGE_DAMAGE = 18;
@@ -225,7 +225,9 @@ public class SlothEntity extends HomunculusEntity {
 						continue;
 					}
 					float hardness = state.getDestroySpeed(level, p);
-					if (!griefing || hardness < 0 || hardness >= 50) {
+					// Le puits d'accès (échelle et pilier de briques) tient : on ne reste pas coincé en bas.
+					boolean shaft = state.is(Blocks.LADDER) || state.is(Blocks.STONE_BRICKS);
+					if (!griefing || shaft || hardness < 0 || hardness >= 50) {
 						stopped = true;
 						continue;
 					}

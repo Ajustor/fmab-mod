@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 640021977,
+    "separation": 14,
+    "spacing": 44,
+    "exclusion_zone": {
+      "other_set": "fmab:liore",
+      "chunk_count": 6
+    }
+  },
+  "structures": [
+    {
+      "structure": "fmab:ishval_ruins",
+      "weight": 1
+    }
+  ]
+}

@@ -3,11 +3,14 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.block.AlchemistTableBlock;
 import com.ajustor.fmab.block.AutomailBenchBlock;
+import com.ajustor.fmab.block.BloodCrestBlock;
+import com.ajustor.fmab.block.FatherSealBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -77,6 +80,64 @@ public final class FmabBlocks {
 					.mapColor(MapColor.CRIMSON_NYLIUM)
 					.strength(1.5f)
 					.sound(SoundType.AMETHYST));
+
+	/** Le sceau d'Ouroboros qui ferme le chemin de Père : indestructible, il s'ouvre ou résiste. */
+	public static final Block FATHER_SEAL = register("father_seal", FatherSealBlock::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.COLOR_RED)
+					.strength(-1.0f, 3600000.0f)
+					.noLootTable()
+					.lightLevel(state -> 4)
+					.sound(SoundType.DEEPSLATE_TILES));
+
+	/** Les tuyaux de la salle du trône de Père, qui courent sous tout le pays. */
+	public static final Block FATHER_PIPE = register("father_pipe", RotatedPillarBlock::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.METAL)
+					.strength(3.0f, 6.0f)
+					.requiresCorrectToolForDrops()
+					.sound(SoundType.COPPER));
+
+	/** Un point de sang du cercle national : indestructible, on le scelle par un contre-cercle. */
+	public static final Block BLOOD_CREST = register("blood_crest", BloodCrestBlock::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.COLOR_RED)
+					.strength(-1.0f, 3600000.0f)
+					.noLootTable()
+					.lightLevel(state -> state.getValue(BloodCrestBlock.SEALED) ? 0 : 6)
+					.sound(SoundType.DEEPSLATE_TILES));
+
+	/** Le minerai de pierre rouge, sous le temple de Liore : des éclats de Pierre impure. */
+	public static final Block RED_STONE_ORE = register("red_stone_ore", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.SAND)
+					.strength(3.0f, 3.0f)
+					.requiresCorrectToolForDrops()
+					.lightLevel(state -> 3)
+					.sound(SoundType.AMETHYST));
+
+	/** Les briques claires des villes d'Amestris, de Central à Dublith. */
+	public static final Block AMESTRIAN_BRICKS = register("amestrian_bricks", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.SAND)
+					.strength(2.0f, 6.0f)
+					.requiresCorrectToolForDrops()
+					.sound(SoundType.STONE));
+
+	/** Les briques rouges des pavillons de Xing. */
+	public static final Block XING_BRICKS = register("xing_bricks", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.COLOR_RED)
+					.strength(2.0f, 6.0f)
+					.requiresCorrectToolForDrops()
+					.sound(SoundType.MUD_BRICKS));
+
+	/** La neige tassée en blocs des remparts de Briggs. */
+	public static final Block BRIGGS_PACKED_SNOW = register("briggs_packed_snow", Block::new,
+			BlockBehaviour.Properties.of()
+					.mapColor(MapColor.SNOW)
+					.strength(0.8f)
+					.sound(SoundType.SNOW));
 
 	private FmabBlocks() {
 	}

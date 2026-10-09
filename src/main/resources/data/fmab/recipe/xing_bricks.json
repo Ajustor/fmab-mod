@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "MR",
+    "RM"
+  ],
+  "key": {
+    "M": "minecraft:mud_bricks",
+    "R": "minecraft:red_dye"
+  },
+  "result": {
+    "id": "fmab:xing_bricks",
+    "count": 4
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "clap": {
+    "sounds": [
+      "fmab:clap1",
+      "fmab:clap2",
+      "fmab:clap3"
+    ],
+    "subtitle": "subtitles.fmab.clap"
+  },
+  "transmute": {
+    "sounds": [
+      "fmab:transmute1",
+      "fmab:transmute2",
+      "fmab:transmute3"
+    ],
+    "subtitle": "subtitles.fmab.transmute"
+  },
+  "rebound": {
+    "sounds": [
+      "fmab:rebound1",
+      "fmab:rebound2"
+    ],
+    "subtitle": "subtitles.fmab.rebound"
+  },
+  "gate_open": {
+    "sounds": [
+      "fmab:gate_open"
+    ],
+    "subtitle": "subtitles.fmab.gate_open"
+  },
+  "gate_hands": {
+    "sounds": [
+      "fmab:gate_hands1",
+      "fmab:gate_hands2"
+    ],
+    "subtitle": "subtitles.fmab.gate_hands"
+  },
+  "gate_knowledge": {
+    "sounds": [
+      "fmab:gate_knowledge"
+    ],
+    "subtitle": "subtitles.fmab.gate_knowledge"
+  },
+  "pistol": {
+    "sounds": [
+      "fmab:pistol"
+    ],
+    "subtitle": "subtitles.fmab.pistol"
+  },
+  "rifle": {
+    "sounds": [
+      "fmab:rifle"
+    ],
+    "subtitle": "subtitles.fmab.rifle"
+  },
+  "throw": {
+    "sounds": [
+      "fmab:throw1",
+      "fmab:throw2"
+    ],
+    "subtitle": "subtitles.fmab.throw"
+  },
+  "seal_erase": {
+    "sounds": [
+      "fmab:seal_erase"
+    ],
+    "subtitle": "subtitles.fmab.seal_erase"
+  },
+  "armor_collapse": {
+    "sounds": [
+      "fmab:armor_collapse1",
+      "fmab:armor_collapse2",
+      "fmab:armor_collapse3"
+    ],
+    "subtitle": "subtitles.fmab.armor_collapse"
+  },
+  "father_sun": {
+    "sounds": [
+      "fmab:father_sun"
+    ],
+    "subtitle": "subtitles.fmab.father_sun"
+  },
+  "decompose": {
+    "sounds": [
+      "fmab:decompose1",
+      "fmab:decompose2",
+      "fmab:decompose3"
+    ],
+    "subtitle": "subtitles.fmab.decompose"
+  },
+  "mine_arm": {
+    "sounds": [
+      "fmab:mine_arm"
+    ],
+    "subtitle": "subtitles.fmab.mine_arm"
+  },
+  "alkahestry": {
+    "sounds": [
+      "fmab:alkahestry"
+    ],
+    "subtitle": "subtitles.fmab.alkahestry"
+  }
+}

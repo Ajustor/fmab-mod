@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/rank_gate",
+  "criteria": {
+    "automail": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "automail"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:iron_automail_arm"
+    },
+    "title": {
+      "translate": "advancements.fmab.automail.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.automail.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "automail"
+    ]
+  ]
+}

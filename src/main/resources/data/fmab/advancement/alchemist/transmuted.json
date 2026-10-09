@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/root",
+  "criteria": {
+    "transmuted": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "transmuted"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:chalk"
+    },
+    "title": {
+      "translate": "advancements.fmab.transmuted.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.transmuted.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "transmuted"
+    ]
+  ]
+}

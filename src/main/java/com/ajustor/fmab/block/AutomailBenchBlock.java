@@ -27,6 +27,15 @@ public class AutomailBenchBlock extends Block {
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
 		if (!(stack.getItem() instanceof AutomailItem)) {
+			ItemStack other = player.getItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND
+					: InteractionHand.MAIN_HAND);
+			if (other.getItem() instanceof AutomailItem) {
+				// L'autre main tient la pièce : on la pose.
+				if (player instanceof ServerPlayer server) {
+					Automails.fit(server, other);
+				}
+				return InteractionResult.SUCCESS;
+			}
 			if (player instanceof ServerPlayer server) {
 				server.sendOverlayMessage(Component.translatable("block.fmab.automail_bench.hint"));
 			}

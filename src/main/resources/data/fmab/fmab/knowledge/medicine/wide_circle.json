@@ -1,0 +1,13 @@
+{
+  "school": "medicine",
+  "mastery": 25,
+  "parent": "fmab:medicine/steady_hand",
+  "perks": [
+    {
+      "type": "range_bonus",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.medicine.wide_circle",
+  "description_key": "knowledge.fmab.medicine.wide_circle.desc"
+}

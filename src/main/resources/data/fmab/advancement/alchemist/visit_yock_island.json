@@ -1,0 +1,38 @@
+{
+  "parent": "fmab:alchemist/izumi_met",
+  "criteria": {
+    "visit_yock_island": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "minecraft:location": {
+                "structures": "fmab:yock_island"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:oak_sapling"
+    },
+    "frame": "task",
+    "title": {
+      "translate": "advancements.fmab.visit_yock_island.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.visit_yock_island.description"
+    }
+  },
+  "requirements": [
+    [
+      "visit_yock_island"
+    ]
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "school": "destruction",
+  "mastery": 35,
+  "parent": "fmab:destruction/steady_hand",
+  "perks": [
+    {
+      "type": "range_bonus",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.destruction.long_reach",
+  "description_key": "knowledge.fmab.destruction.long_reach.desc"
+}

@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 731004128,
+    "separation": 16,
+    "spacing": 48,
+    "exclusion_zone": {
+      "other_set": "fmab:dublith",
+      "chunk_count": 6
+    }
+  },
+  "structures": [
+    {
+      "structure": "fmab:marcoh_clinic",
+      "weight": 1
+    }
+  ]
+}

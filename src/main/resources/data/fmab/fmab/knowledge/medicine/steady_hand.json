@@ -1,0 +1,12 @@
+{
+  "school": "medicine",
+  "mastery": 10,
+  "perks": [
+    {
+      "type": "concentration_discount",
+      "value": 1
+    }
+  ],
+  "name_key": "knowledge.fmab.medicine.steady_hand",
+  "description_key": "knowledge.fmab.medicine.steady_hand.desc"
+}

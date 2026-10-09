@@ -1,11 +1,12 @@
-# Publie le site sur GitHub Pages à chaque push sur master : la page d'accueil (site/) à la racine,
-# l'éditeur de cercles (web/) sous /editor/. Les pages Releases et Changelog viendront avec le
-# workflow de release au tag.
+# Publie le site sur GitHub Pages à chaque push sur master et après chaque release : l'accueil, les
+# pages Releases, Changelog et Installation (générées par site/build.py, en français et en anglais)
+# et l'éditeur de cercles (web/) sous /editor/.
 name: pages
 on:
   push:
     branches: [master]
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -23,6 +24,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
+        with:
+          ref: master
       - name: setup node
         uses: actions/setup-node@v5
         with:
@@ -35,10 +38,13 @@ jobs:
           npm ci
           npm test
           npm run build
+      - name: releases
+        run: |
+          curl -sSf -H "Authorization: Bearer ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases?per_page=100" > releases.json
       - name: assemble site
         run: |
-          mkdir -p _site
-          cp -r site/. _site/
+          python3 site/build.py _site releases.json
           cp -r web/dist _site/editor
       - name: upload site
         uses: actions/upload-pages-artifact@v5

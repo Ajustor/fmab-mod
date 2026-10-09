@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "locked=false": {
+      "model": "fmab:block/blood_crest"
+    },
+    "locked=true": {
+      "model": "fmab:block/blood_crest_sealed"
+    }
+  }
+}

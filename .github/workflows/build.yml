@@ -1,7 +1,18 @@
-# Build et tests à chaque push et pull request : parseur de cercles, règles, clés fr_fr/en_us,
-# exemples du Traité. La release au tag viendra dans un workflow séparé.
+# Build du mod à chaque pull request et à chaque push sur master (ou à la demande) : compilation,
+# tests (parseur de cercles, règles, clés fr_fr/en_us, exemples du Traité), puis le jar du mod en
+# artefact téléchargeable, nommé d'après sa version et son commit. La release au tag est dans
+# release.yml.
 name: build
-on: [pull_request, push]
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Un nouveau push sur la même branche annule le build devenu inutile.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -22,11 +33,25 @@ jobs:
         run: chmod +x ./gradlew
       - name: build
         run: ./gradlew build
-      - name: capture build artifacts
+      - name: name the jar
+        id: jar
+        run: |
+          jar=$(ls build/libs/*.jar | grep -v -- '-sources\.jar$' | head -n 1)
+          name=$(basename "$jar" .jar)-${GITHUB_SHA::7}
+          echo "path=$jar" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Jar du mod"
+            echo
+            echo "\`$(basename "$jar")\` ($(du -h "$jar" | cut -f1)), commit \`${GITHUB_SHA::7}\` :"
+            echo "artefact **$name** ci-dessous, à poser dans \`mods/\` (Minecraft 26.2, Fabric API)."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: upload the mod jar
         uses: actions/upload-artifact@v7
         with:
-          name: Artifacts
-          path: build/libs/
+          name: ${{ steps.jar.outputs.name }}
+          path: ${{ steps.jar.outputs.path }}
+          if-no-files-found: error
 
   # L'éditeur web rejoue les mêmes cercles de test (testdata/circles) avec son portage TypeScript.
   editor:

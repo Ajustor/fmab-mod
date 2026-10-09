@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/seal_opened",
+  "criteria": {
+    "slain_father": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "slain_father"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:father_pipe"
+    },
+    "title": {
+      "translate": "advancements.fmab.slain_father.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.slain_father.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "slain_father"
+    ]
+  ]
+}

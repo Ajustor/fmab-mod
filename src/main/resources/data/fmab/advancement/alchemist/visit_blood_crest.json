@@ -1,0 +1,38 @@
+{
+  "parent": "fmab:alchemist/root",
+  "criteria": {
+    "visit_blood_crest": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "minecraft:location": {
+                "structures": "fmab:blood_crest"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:blood_crest"
+    },
+    "title": {
+      "translate": "advancements.fmab.visit_blood_crest.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.visit_blood_crest.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "visit_blood_crest"
+    ]
+  ]
+}

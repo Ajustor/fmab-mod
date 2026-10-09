@@ -1,0 +1,36 @@
+{
+  "parent": "fmab:alchemist/rank_alchemist",
+  "criteria": {
+    "slain_barry": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "minecraft:entity_type": "fmab:barry"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:iron_axe"
+    },
+    "title": {
+      "translate": "advancements.fmab.slain_barry.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.slain_barry.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "slain_barry"
+    ]
+  ]
+}

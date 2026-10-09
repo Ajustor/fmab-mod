@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "fmab:cartographer/map_fort_briggs",
+    "fmab:cartographer/map_xerxes_ruins"
+  ]
+}

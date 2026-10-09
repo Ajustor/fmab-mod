@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/rank_alchemist",
+  "criteria": {
+    "rank_gate": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "rank_gate"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:ender_eye"
+    },
+    "title": {
+      "translate": "advancements.fmab.rank_gate.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.rank_gate.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "rank_gate"
+    ]
+  ]
+}

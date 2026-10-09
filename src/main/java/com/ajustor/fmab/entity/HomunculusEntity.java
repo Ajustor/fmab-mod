@@ -1,8 +1,11 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.item.BriggsSabreItem;
+import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
@@ -20,6 +23,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Un homonculus : un être artificiel dont le cœur est une Pierre philosophale. Tant que la Pierre
@@ -44,7 +50,10 @@ public abstract class HomunculusEntity extends Monster {
 		setPersistenceRequired();
 	}
 
-	/** La barre de boss se montre-t-elle ? Un homonculus déguisé ne s'annonce pas. */
+	/**
+	 * La barre de boss peut-elle se montrer, une fois le combat engagé ({@link BossBars#engaged}) ?
+	 * Un homonculus déguisé ne s'annonce pas.
+	 */
 	protected boolean showBossBar() {
 		return true;
 	}
@@ -64,6 +73,10 @@ public abstract class HomunculusEntity extends Monster {
 			return false;
 		}
 		float dealt = damage * weakness(source);
+		ItemStack weapon = source.getWeaponItem();
+		if (weapon != null && weapon.getItem() instanceof BriggsSabreItem) {
+			dealt *= BriggsSabreItem.HOMUNCULUS_BONUS;
+		}
 		if (dealt >= getHealth() && souls > 0 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 			reconstitute(level);
 			return true;
@@ -79,11 +92,18 @@ public abstract class HomunculusEntity extends Monster {
 		setTarget(null);
 		getNavigation().stop();
 		level.playSound(null, blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.HOSTILE, 1, 0.6f);
-		Component name = getDisplayName();
-		for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(32))) {
-			p.sendSystemMessage(Component.translatable("homunculus.fmab.reconstitutes", name));
+		if (announcesReconstitution()) {
+			Component name = getDisplayName();
+			for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(32))) {
+				p.sendSystemMessage(Component.translatable("homunculus.fmab.reconstitutes", name));
+			}
 		}
 		onReconstitute(level);
+	}
+
+	/** Le message ordinaire de reconstitution ; Père annonce lui-même ses métamorphoses. */
+	protected boolean announcesReconstitution() {
+		return true;
 	}
 
 	/** Ce qui change quand l'homonculus se reconstitue (Envy change de forme, par exemple). */
@@ -121,8 +141,7 @@ public abstract class HomunculusEntity extends Monster {
 						getBbWidth() * 0.5, getBbHeight() * 0.5, getBbWidth() * 0.5, 0.05);
 			}
 		}
-		bossEvent.setProgress(getHealth() / getMaxHealth());
-		bossEvent.setVisible(showBossBar());
+		BossBars.update(bossEvent, this, showBossBar() && BossBars.engaged(this));
 	}
 
 	@Override
@@ -136,16 +155,24 @@ public abstract class HomunculusEntity extends Monster {
 		super.die(source);
 		if (level() instanceof ServerLevel level) {
 			Component name = getDisplayName();
-			for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(32))) {
+			String slain = BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath();
+			// Tous ceux qui étaient là l'ont vu tomber, et son tueur aussi, même de loin (un fusil, un arc) :
+			// le sceau de Père les reconnaîtra.
+			Set<ServerPlayer> witnesses = new HashSet<>(level.getEntitiesOfClass(ServerPlayer.class,
+					getBoundingBox().inflate(48)));
+			if (source.getEntity() instanceof ServerPlayer killer) {
+				witnesses.add(killer);
+			}
+			if (getLastHurtByPlayer() instanceof ServerPlayer last) {
+				witnesses.add(last);
+			}
+			for (ServerPlayer p : witnesses) {
 				p.sendSystemMessage(Component.translatable("homunculus.fmab.destroyed", name));
+				Set<String> seen = new HashSet<>(p.getAttachedOrCreate(FmabAttachments.SLAIN));
+				seen.add(slain);
+				p.setAttached(FmabAttachments.SLAIN, Set.copyOf(seen));
 			}
 		}
-	}
-
-	@Override
-	public void startSeenByPlayer(ServerPlayer player) {
-		super.startSeenByPlayer(player);
-		bossEvent.addPlayer(player);
 	}
 
 	@Override

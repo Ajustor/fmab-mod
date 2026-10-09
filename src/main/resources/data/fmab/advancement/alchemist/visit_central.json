@@ -1,0 +1,38 @@
+{
+  "parent": "fmab:alchemist/rank_alchemist",
+  "criteria": {
+    "visit_central": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "minecraft:location": {
+                "structures": "fmab:central"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:stone_bricks"
+    },
+    "title": {
+      "translate": "advancements.fmab.visit_central.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.visit_central.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "visit_central"
+    ]
+  ]
+}

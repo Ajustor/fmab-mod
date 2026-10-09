@@ -24,11 +24,11 @@ public class RushValleyStructure extends Structure {
 
 	private static final Spot[] LAYOUT = {
 			new Spot(-6, -6, "rush_valley_square", 13, 13, 0, Rotation.NONE),
-			new Spot(-6, -18, "rush_valley_shop", 11, 9, 2, Rotation.NONE),
+			new Spot(-6, -18, "rush_valley_shop", 11, 9, 2, Rotation.CLOCKWISE_180),
 			new Spot(10, -8, "rush_valley_workshop", 9, 7, 1, Rotation.COUNTERCLOCKWISE_90),
 			new Spot(-18, -6, "rush_valley_workshop", 9, 7, 2, Rotation.CLOCKWISE_90),
-			new Spot(-4, 10, "rush_valley_workshop", 9, 7, 1, Rotation.CLOCKWISE_180),
-			new Spot(10, 8, "rush_valley_workshop", 9, 7, 2, Rotation.CLOCKWISE_180),
+			new Spot(-4, 10, "rush_valley_workshop", 9, 7, 1, Rotation.NONE),
+			new Spot(10, 8, "rush_valley_workshop", 9, 7, 2, Rotation.NONE),
 	};
 
 	public RushValleyStructure(StructureSettings settings) {
@@ -37,6 +37,9 @@ public class RushValleyStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
+		if (Clearance.nearCentral(context)) {
+			return Optional.empty();
+		}
 		int cx = context.chunkPos().getMiddleBlockX();
 		int cz = context.chunkPos().getMiddleBlockZ();
 		int y = height(context, cx, cz);

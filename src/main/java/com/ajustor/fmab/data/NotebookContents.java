@@ -8,11 +8,12 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Pages du Carnet de cercles : les cercles enregistrés et celui qui est sélectionné (celui que la
- * craie trace au sol).
+ * Pages du Carnet de cercles d'un joueur : les cercles enregistrés et celui qui est sélectionné (celui
+ * que la craie trace au sol et que les mains jointes lancent).
  */
 public record NotebookContents(List<Page> pages, int selected) {
 	public static final int MAX_PAGES = 16;
@@ -63,5 +64,26 @@ public record NotebookContents(List<Page> pages, int selected) {
 
 	public NotebookContents select(int index) {
 		return new NotebookContents(pages, index);
+	}
+
+	/** Déplace la page {@code index} d'un cran ({@code delta} vaut −1 ou 1) ; elle devient la sélection. */
+	public NotebookContents moved(int index, int delta) {
+		int to = index + delta;
+		if (index < 0 || index >= pages.size() || to < 0 || to >= pages.size()) {
+			return this;
+		}
+		List<Page> out = new ArrayList<>(pages);
+		Collections.swap(out, index, to);
+		return new NotebookContents(out, to);
+	}
+
+	/** La première page qui porte exactement ce tracé, ou −1. */
+	public int indexOf(Drawing drawing) {
+		for (int i = 0; i < pages.size(); i++) {
+			if (pages.get(i).drawing().equals(drawing)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }

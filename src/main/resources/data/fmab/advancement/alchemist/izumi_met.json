@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_dublith",
+  "criteria": {
+    "izumi_met": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "izumi_met"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:iron_axe"
+    },
+    "title": {
+      "translate": "advancements.fmab.izumi_met.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.izumi_met.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "izumi_met"
+    ]
+  ]
+}

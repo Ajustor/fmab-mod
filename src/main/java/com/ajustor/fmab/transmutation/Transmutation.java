@@ -11,13 +11,18 @@ import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.TransmutationPose;
+import com.ajustor.fmab.homunculus.AntiAlchemy;
 import com.ajustor.fmab.homunculus.Belly;
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
 import com.ajustor.fmab.training.Trainings;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -61,6 +66,61 @@ public final class Transmutation {
 		DONE
 	}
 
+	/** Deux alchimistes qui posent les paumes sur le même cercle à moins de ce délai fusionnent. */
+	private static final int FUSION_WINDOW = 30;
+	private static final double FUSION_POWER = 1.75;
+	/** Le dernier à avoir touché chaque cercle inscrit, et quand. */
+	private record Touch(UUID player, long time) {
+	}
+
+	private static final Map<GlobalPos, Touch> TOUCHES = new HashMap<>();
+	/** Un cercle qui part tout seul (déclencheur) : l'auteur, loin de là, ne fait aucun geste. */
+	private static boolean remote;
+
+	/** Un autre alchimiste vient-il de poser ses paumes sur ce cercle (sans encore le noter) ? */
+	private static Optional<UUID> fusionPartner(ServerLevel level, BlockPos circle, ServerPlayer caster) {
+		long now = level.getGameTime();
+		TOUCHES.values().removeIf(t -> Math.abs(now - t.time()) > FUSION_WINDOW);
+		Touch before = TOUCHES.get(GlobalPos.of(level.dimension(), circle));
+		return before == null || before.player().equals(caster.getUUID()) ? Optional.empty()
+				: Optional.of(before.player());
+	}
+
+	/** Note ce contact pour le suivant. */
+	private static void touch(ServerLevel level, BlockPos circle, ServerPlayer caster) {
+		TOUCHES.put(GlobalPos.of(level.dimension(), circle.immutable()), new Touch(caster.getUUID(), level.getGameTime()));
+	}
+
+	/** Les énergies se mêlent : on l'annonce aux deux. */
+	private static void fuse(ServerLevel level, BlockPos circle, ServerPlayer caster, UUID partnerId) {
+		ServerPlayer partner = level.getServer().getPlayerList().getPlayer(partnerId);
+		Vec3 c = Vec3.atCenterOf(circle);
+		level.sendParticles(ParticleTypes.END_ROD, c.x, c.y + 0.3, c.z, 40, 1, 0.2, 1, 0.05);
+		caster.sendOverlayMessage(Component.translatable("transmutation.fmab.fused"));
+		if (partner != null) {
+			partner.sendOverlayMessage(Component.translatable("transmutation.fmab.fused"));
+			Milestones.reach(partner, "fused");
+		}
+		Milestones.reach(caster, "fused");
+	}
+
+	/** Un cercle armé qui part tout seul, au compte de son auteur, sans que celui-ci bouge. */
+	public static Result activateRemotely(ServerLevel level, BlockPos circle, BlockState state, Drawing drawing,
+			ServerPlayer author, CircleSize size) {
+		boolean before = remote;
+		remote = true;
+		try {
+			return activate(level, circle, state, drawing, author, size);
+		} finally {
+			remote = before;
+		}
+	}
+
+	public static void register() {
+		// Un nouveau monde (ou un serveur relancé) repart sans contacts en mémoire.
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> TOUCHES.clear());
+	}
+
 	/**
 	 * Un cercle inscrit sur une surface : en cas de rebond, c'est lui qui brûle. Sa taille règle la
 	 * puissance et le coût.
@@ -85,6 +145,10 @@ public final class Transmutation {
 	 */
 	public static Result activate(ServerLevel level, BlockPos circle, CircleFrame frame, Drawing drawing,
 			ServerPlayer caster, boolean inscribed, int maxStages, CircleSize size) {
+		// Père capte l'énergie tectonique : autour de lui, rien ne s'allume.
+		if (AntiAlchemy.blocks(level, circle, caster)) {
+			return Result.INERT;
+		}
 		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Knowledge knowledge = rules.knowledge(alchemist);
@@ -107,23 +171,34 @@ public final class Transmutation {
 		Optional<ItemStack> stone = PhilosopherStones.held(caster);
 		boolean living = LivingStone.souls(caster) > 0;
 		boolean amplified = stone.isPresent() || living;
-		int cost = amplified ? 0 : (int) Math.ceil(StateWatch.cost(analysis.concentration(), watch) * size.cost());
+		// Une pierre rouge impure amplifie, mais ne tient rien : le cercle rebondit comme sans elle.
+		boolean steady = living || stone.filter(PhilosopherStones::pure).isPresent();
+		// À deux sur le même cercle, les énergies se mêlent : plus fort, moitié moins cher.
+		Optional<UUID> partner = inscribed && !remote ? fusionPartner(level, circle, caster) : Optional.empty();
+		boolean fused = partner.isPresent();
+		double fusion = fused ? FUSION_POWER : 1;
+		int cost = amplified ? 0 : (int) Math.ceil(StateWatch.cost(analysis.concentration(), watch) * size.cost()
+				* (fused ? 0.5 : 1));
 		if (alchemist.concentration() < cost) {
 			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired",
 					cost, (int) alchemist.concentration()));
 			return Result.TIRED;
+		}
+		if (inscribed && !remote) {
+			touch(level, circle, caster);
+			partner.ifPresent(id -> fuse(level, circle, caster, id));
 		}
 		caster.setAttached(FmabAttachments.ALCHEMIST,
 				alchemist.withConcentration(alchemist.concentration() - cost));
 		// L'énergie est partie : quoi qu'il arrive, on s'est familiarisé avec les glyphes tracés.
 		practiceGlyphs(caster, rules, analysis);
 
-		if (analysis.outcome() == Analysis.Outcome.REBOUND && !(amplified && PhilosopherStones.steadies(analysis))) {
+		if (analysis.outcome() == Analysis.Outcome.REBOUND && !(steady && PhilosopherStones.steadies(analysis))) {
 			rebound(level, circle, frame, caster, analysis.reboundSeverity(), inscribed);
 			return Result.REBOUND;
 		}
 		// Un glyphe qu'on ne comprend pas peut tout faire basculer (sauf si la Pierre le tient).
-		if (!amplified && analysis.risk() > 0 && caster.getRandom().nextDouble() < analysis.risk()) {
+		if (!steady && analysis.risk() > 0 && caster.getRandom().nextDouble() < analysis.risk()) {
 			caster.sendSystemMessage(Component.translatable("transmutation.fmab.misunderstood"));
 			rebound(level, circle, frame, caster, analysis.risk(), inscribed);
 			return Result.REBOUND;
@@ -151,7 +226,7 @@ public final class Transmutation {
 			for (Analysis.StageEffect effect : effects) {
 				EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, flow, knowledge,
 						watch ? StateWatch.RANGE_BONUS : 0,
-						size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1), 0);
+						size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1) * fusion, 0);
 				Effects.Result result = Effects.get(effect.combination().effect())
 						.map(e -> e.apply(ctx))
 						.orElse(Effects.Result.NO_TARGET);
@@ -169,10 +244,13 @@ public final class Transmutation {
 		}
 		dropAll(level, circle, flow);
 		// Le geste : la paume plaquée sur le cercle (les mains jointes, l'appelant les remplace).
-		caster.swing(InteractionHand.MAIN_HAND, true);
-		TransmutationPose.strike(caster, TransmutationPose.Kind.PALM, 14);
+		if (!remote) {
+			caster.swing(InteractionHand.MAIN_HAND, true);
+			TransmutationPose.strike(caster, TransmutationPose.Kind.PALM, 14);
+		}
 		if (anything) {
-			if (inscribed) {
+			// Un cercle parti tout seul ne se tient pas : l'auteur n'a pas la main dessus.
+			if (inscribed && !remote) {
 				CHANNELS.put(caster.getUUID(), new Channel(circle, level.getGameTime(), 0));
 			}
 			TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 1);
@@ -227,6 +305,10 @@ public final class Transmutation {
 		if (channel == null || !channel.circle().equals(circle) || now - channel.last() > CHANNEL_GAP) {
 			CHANNELS.remove(caster.getUUID());
 			return false;
+		}
+		if (AntiAlchemy.blocks(level, circle, caster)) {
+			CHANNELS.remove(caster.getUUID());
+			return true;
 		}
 		if (channel.growth() >= MAX_GROWTH) {
 			return true;
@@ -294,6 +376,7 @@ public final class Transmutation {
 		} else {
 			level.playSound(null, circle, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1, 0.7f);
 		}
+		level.playSound(null, circle, FmabSounds.REBOUND, SoundSource.BLOCKS, 1, 1);
 	}
 
 	/**

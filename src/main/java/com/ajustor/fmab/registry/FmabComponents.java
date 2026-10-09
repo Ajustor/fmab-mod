@@ -3,7 +3,6 @@ package com.ajustor.fmab.registry;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.data.FmabCodecs;
-import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Tome;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -13,14 +12,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.item.ItemStack;
 
 public final class FmabComponents {
-	public static final DataComponentType<NotebookContents> NOTEBOOK = Registry.register(
-			BuiltInRegistries.DATA_COMPONENT_TYPE,
-			Fmab.id("notebook"),
-			DataComponentType.<NotebookContents>builder()
-					.persistent(NotebookContents.CODEC)
-					.networkSynchronized(NotebookContents.STREAM_CODEC)
-					.build());
-
 	/** Cercle brodé ou gravé sur un gant. */
 	public static final DataComponentType<Drawing> GLOVE_CIRCLE = Registry.register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
@@ -37,6 +28,33 @@ public final class FmabComponents {
 			DataComponentType.<Drawing>builder()
 					.persistent(FmabCodecs.DRAWING)
 					.networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(FmabCodecs.DRAWING))
+					.build());
+
+	/** Ce que dessinent les kunaï d'alkahestry : vrai pour un piège, faux pour un soin. */
+	public static final DataComponentType<Boolean> KUNAI_TRAP = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("kunai_trap"),
+			DataComponentType.<Boolean>builder()
+					.persistent(Codec.BOOL)
+					.networkSynchronized(ByteBufCodecs.BOOL)
+					.build());
+
+	/** Le tome que cachent des notes chiffrées de Marcoh. */
+	public static final DataComponentType<Integer> CIPHER = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("cipher"),
+			DataComponentType.<Integer>builder()
+					.persistent(Codec.INT)
+					.networkSynchronized(ByteBufCodecs.VAR_INT)
+					.build());
+
+	/** Le numéro d'un fragment de fresque de Xerxès. */
+	public static final DataComponentType<Integer> MURAL = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("mural"),
+			DataComponentType.<Integer>builder()
+					.persistent(Codec.INT)
+					.networkSynchronized(ByteBufCodecs.VAR_INT)
 					.build());
 
 	/** Heure de jeu (ticks) à laquelle une arme transmutée se défait. */

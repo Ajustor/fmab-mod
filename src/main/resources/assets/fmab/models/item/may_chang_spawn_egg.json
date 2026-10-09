@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "fmab:item/may_chang_spawn_egg"
+  }
+}

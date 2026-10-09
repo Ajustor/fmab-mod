@@ -23,7 +23,7 @@ public final class Concentration {
 			}
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-				if (data.concentration() >= AlchemistData.MAX_CONCENTRATION) {
+				if (data.concentration() >= data.maxConcentration()) {
 					continue;
 				}
 				boolean resting = player.isShiftKeyDown() && player.getDeltaMovement().horizontalDistanceSqr() < 1e-4;

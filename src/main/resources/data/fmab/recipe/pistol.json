@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "III",
+    " GW"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "G": "minecraft:gunpowder",
+    "W": "#minecraft:planks"
+  },
+  "result": {
+    "id": "fmab:pistol",
+    "count": 1
+  }
+}
