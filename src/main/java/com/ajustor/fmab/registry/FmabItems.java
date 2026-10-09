@@ -120,6 +120,13 @@ public final class FmabItems {
 	public static final Item GREED_SPAWN_EGG = register("greed_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.GREED));
 
+	public static final Item SLOTH_SPAWN_EGG = register("sloth_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.SLOTH));
+	public static final Item WRATH_SPAWN_EGG = register("wrath_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.WRATH));
+	public static final Item PRIDE_SPAWN_EGG = register("pride_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.PRIDE));
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -178,6 +185,9 @@ public final class FmabItems {
 					output.accept(GLUTTONY_SPAWN_EGG);
 					output.accept(ENVY_SPAWN_EGG);
 					output.accept(GREED_SPAWN_EGG);
+					output.accept(SLOTH_SPAWN_EGG);
+					output.accept(WRATH_SPAWN_EGG);
+					output.accept(PRIDE_SPAWN_EGG);
 				})
 				.build());
 	}
