@@ -19,6 +19,7 @@ import com.ajustor.fmab.entity.ImmortalSoldierEntity;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.KunaiEntity;
 import com.ajustor.fmab.entity.LustEntity;
+import com.ajustor.fmab.entity.MarcohEntity;
 import com.ajustor.fmab.entity.MayChangEntity;
 import com.ajustor.fmab.entity.OlivierEntity;
 import com.ajustor.fmab.entity.PrideEntity;
@@ -355,6 +356,16 @@ public final class FmabEntities {
 					.updateInterval(2)
 					.build(GATE_HAND_KEY));
 
+	private static final ResourceKey<EntityType<?>> MARCOH_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("marcoh"));
+
+	/** Le docteur Marcoh, dans son dispensaire de campagne. */
+	public static final EntityType<MarcohEntity> MARCOH = Registry.register(BuiltInRegistries.ENTITY_TYPE, MARCOH_KEY,
+			EntityType.Builder.<MarcohEntity>of(MarcohEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(MARCOH_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -384,6 +395,7 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(CORNELLO, CornelloEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(SCAR, ScarEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(HOHENHEIM, HohenheimEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(MARCOH, MarcohEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(BRIGGS_SOLDIER, AmestrianSoldierEntity.createAttributes());
 		// Les chimères rôdent la nuit, comme tout monstre ; on en croise un peu partout.
 		SpawnPlacements.register(CHIMERA_BEAST, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,

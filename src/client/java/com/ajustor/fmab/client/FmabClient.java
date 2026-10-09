@@ -16,6 +16,7 @@ import com.ajustor.fmab.client.render.ImmortalSoldierRenderer;
 import com.ajustor.fmab.client.render.IzumiRenderer;
 import com.ajustor.fmab.client.render.KunaiRenderer;
 import com.ajustor.fmab.client.render.LustRenderer;
+import com.ajustor.fmab.client.render.MarcohRenderer;
 import com.ajustor.fmab.client.render.MayChangRenderer;
 import com.ajustor.fmab.client.render.OlivierRenderer;
 import com.ajustor.fmab.client.render.PrideRenderer;
@@ -124,6 +125,7 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.CORNELLO, CornelloRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.SCAR, ScarRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.HOHENHEIM, HohenheimRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.MARCOH, MarcohRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.GATE_HAND, GateHandRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(CinematicPayload.TYPE, (payload, context) -> Cinematics.start(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> Cinematics.tick());

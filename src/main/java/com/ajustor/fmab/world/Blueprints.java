@@ -1,5 +1,6 @@
 package com.ajustor.fmab.world;
 
+import com.ajustor.fmab.item.CipheredNotesItem;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.item.XerxesMuralItem;
 import com.ajustor.fmab.registry.FmabBlocks;
@@ -86,6 +87,7 @@ public final class Blueprints {
 		out.put("dublith_square", Blueprints::dublithSquare);
 		out.put("dublith_house", (x, y, z, p) -> house(x, y, z, p, DUBLITH_PALETTES[p.variant(DUBLITH_PALETTES.length)]));
 		out.put("curtis_butcher", new CurtisButcher());
+		out.put("marcoh_clinic", new MarcohClinic());
 		out.put("ishval_ruins", new IshvalRuins());
 		out.put("xerxes_ruins", new XerxesRuins());
 		out.put("yock_island", new YockIsland());
@@ -659,6 +661,9 @@ public final class Blueprints {
 			}
 			if (p.noise(13, 0, 0, 5) == 0) {
 				out.add(Tomes.stack(Tomes.GOLD));
+			}
+			if (p.noise(14, 0, 0, 3) == 0) {
+				out.add(CipheredNotesItem.of(FmabItems.CIPHERED_NOTES, p.noise(15, 0, 0, 4)));
 			}
 			// Kimblee y a fait ses recherches avant sa prison.
 			if (p.noise(12, 0, 0, 4) == 0) {
@@ -1402,6 +1407,51 @@ public final class Blueprints {
 	}
 
 	/**
+	 * Le dispensaire de Marcoh : une maison de bois à l'écart, deux couchettes, un alambic, des
+	 * remèdes ; le docteur y soigne les gens du coin sous un faux nom.
+	 */
+	static final class MarcohClinic implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			BlockState shell = house(x, y, z, p, RURAL_PALETTES[0]);
+			int sx = p.sizeX(), sz = p.sizeZ();
+			boolean inside = x > 0 && x < sx - 1 && z > 0 && z < sz - 1;
+			if (!inside || y != 1) {
+				return shell;
+			}
+			// Deux couchettes contre le mur du fond, un alambic et un tonneau de remèdes.
+			if (z == sz - 2 && (x == 2 || x == 4)) {
+				return b(Blocks.WOOL.pick(DyeColor.WHITE));
+			}
+			if (z == sz - 2 && x == sx - 2) {
+				return b(Blocks.BREWING_STAND);
+			}
+			if (z == sz - 3 && x == sx - 2) {
+				return b(Blocks.BARREL);
+			}
+			return shell;
+		}
+
+		@Override
+		public List<Chest> chests(Plot p) {
+			return List.of(new Chest(new BlockPos(p.sizeX() - 2, 1, 2), MarcohClinic::remedies));
+		}
+
+		private static List<ItemStack> remedies(Plot p) {
+			List<ItemStack> out = new ArrayList<>();
+			out.add(new ItemStack(Items.GLISTERING_MELON_SLICE, 1 + p.noise(1, 0, 0, 3)));
+			out.add(new ItemStack(Items.GLASS_BOTTLE, 2 + p.noise(2, 0, 0, 4)));
+			out.add(new ItemStack(Items.PAPER, 2 + p.noise(3, 0, 0, 5)));
+			return out;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			return List.of(new Spawn(FmabEntities.MARCOH, new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2)));
+		}
+	}
+
+	/**
 	 * Liore, ville du désert : une place de grès, des maisons basses autour, et au nord le temple de
 	 * Leto, colonnes et dôme d'or, où le père Cornello fait ses « miracles ». Sous l'autel, la pierre
 	 * rouge ; sur le parvis, le point de sang de l'émeute.
@@ -1554,6 +1604,9 @@ public final class Blueprints {
 			out.add(new ItemStack(Items.BONE, 3 + p.noise(1, 0, 0, 5)));
 			out.add(new ItemStack(Items.CLAY_BALL, 2 + p.noise(2, 0, 0, 4)));
 			out.add(new ItemStack(Items.PAPER, 1 + p.noise(3, 0, 0, 3)));
+			if (p.noise(4, 0, 0, 2) == 0) {
+				out.add(CipheredNotesItem.of(FmabItems.CIPHERED_NOTES, p.noise(5, 0, 0, 4)));
+			}
 			return out;
 		}
 

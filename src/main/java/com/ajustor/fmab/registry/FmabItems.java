@@ -8,6 +8,7 @@ import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.item.AlchemicalInkItem;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.item.BriggsSabreItem;
+import com.ajustor.fmab.item.CipheredNotesItem;
 import com.ajustor.fmab.item.CrimsonSealsItem;
 import com.ajustor.fmab.item.FirearmItem;
 import com.ajustor.fmab.item.GloveItem;
@@ -216,6 +217,12 @@ public final class FmabItems {
 	public static final Item BRIGGS_PACKED_SNOW = register("briggs_packed_snow",
 			p -> new BlockItem(FmabBlocks.BRIGGS_PACKED_SNOW, p), new Item.Properties().useBlockDescriptionPrefix());
 
+	/** Les notes chiffrées de Marcoh : un livre de cuisine, en apparence. */
+	public static final Item CIPHERED_NOTES = register("ciphered_notes", CipheredNotesItem::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
+	public static final Item MARCOH_SPAWN_EGG = register("marcoh_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.MARCOH));
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -308,6 +315,8 @@ public final class FmabItems {
 					output.accept(CORNELLO_SPAWN_EGG);
 					output.accept(SCAR_SPAWN_EGG);
 					output.accept(HOHENHEIM_SPAWN_EGG);
+					output.accept(CIPHERED_NOTES);
+					output.accept(MARCOH_SPAWN_EGG);
 				})
 				.build());
 	}

@@ -48,6 +48,15 @@ public final class FmabComponents {
 					.networkSynchronized(ByteBufCodecs.BOOL)
 					.build());
 
+	/** Le tome que cachent des notes chiffrées de Marcoh. */
+	public static final DataComponentType<Integer> CIPHER = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("cipher"),
+			DataComponentType.<Integer>builder()
+					.persistent(Codec.INT)
+					.networkSynchronized(ByteBufCodecs.VAR_INT)
+					.build());
+
 	/** Le numéro d'un fragment de fresque de Xerxès. */
 	public static final DataComponentType<Integer> MURAL = Registry.register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,

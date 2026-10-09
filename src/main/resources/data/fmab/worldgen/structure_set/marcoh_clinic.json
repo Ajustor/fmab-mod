@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 731004128,
+    "separation": 16,
+    "spacing": 48
+  },
+  "structures": [
+    {
+      "structure": "fmab:marcoh_clinic",
+      "weight": 1
+    }
+  ]
+}
