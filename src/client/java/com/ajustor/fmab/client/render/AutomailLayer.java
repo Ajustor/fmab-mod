@@ -36,6 +36,11 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		}
 	}
 
+	/** La texture d'un modèle d'automail, au gabarit d'une peau de joueur (bras et jambes). */
+	public static Identifier texture(AutomailItem.Model kind) {
+		return Fmab.id("textures/entity/automail/" + kind.serializedName() + ".png");
+	}
+
 	@Override
 	public void submit(PoseStack poseStack, SubmitNodeCollector collector, int light, AvatarRenderState state, float yRot,
 			float xRot) {
@@ -58,7 +63,7 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		Model(ModelPart root, AutomailItem.Model kind) {
 			super(root);
 			this.kind = kind;
-			this.texture = Fmab.id("textures/entity/automail/" + kind.serializedName() + ".png");
+			this.texture = texture(kind);
 		}
 
 		@Override
