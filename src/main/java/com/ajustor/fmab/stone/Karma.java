@@ -1,6 +1,9 @@
 package com.ajustor.fmab.stone;
 
+import com.ajustor.fmab.entity.AmestrianSoldierEntity;
+import com.ajustor.fmab.entity.HauntedArmorEntity;
 import com.ajustor.fmab.entity.HomunculusEntity;
+import com.ajustor.fmab.entity.ImmortalSoldierEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -57,6 +60,11 @@ public final class Karma {
 			}
 			if (entity instanceof AbstractVillager) {
 				add(killer, -8);
+			} else if (entity instanceof AmestrianSoldierEntity) {
+				add(killer, -5);
+			} else if (entity instanceof HauntedArmorEntity || entity instanceof ImmortalSoldierEntity) {
+				// Libérer une âme captive.
+				add(killer, 2);
 			} else if (entity instanceof HomunculusEntity) {
 				add(killer, 10);
 			} else if (entity instanceof Monster && !entity.level().getEntitiesOfClass(Villager.class,

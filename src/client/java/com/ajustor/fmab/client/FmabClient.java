@@ -1,11 +1,15 @@
 package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.client.render.ChimeraBeastRenderer;
+import com.ajustor.fmab.client.render.ChimeraCrawlerRenderer;
 import com.ajustor.fmab.client.render.DrachmaSoldierRenderer;
 import com.ajustor.fmab.client.render.EnvyRenderer;
 import com.ajustor.fmab.client.render.FatherRenderer;
 import com.ajustor.fmab.client.render.GluttonyRenderer;
 import com.ajustor.fmab.client.render.GreedRenderer;
+import com.ajustor.fmab.client.render.HauntedArmorRenderer;
+import com.ajustor.fmab.client.render.ImmortalSoldierRenderer;
 import com.ajustor.fmab.client.render.IzumiRenderer;
 import com.ajustor.fmab.client.render.KunaiRenderer;
 import com.ajustor.fmab.client.render.LustRenderer;
@@ -13,6 +17,7 @@ import com.ajustor.fmab.client.render.MayChangRenderer;
 import com.ajustor.fmab.client.render.OlivierRenderer;
 import com.ajustor.fmab.client.render.PrideRenderer;
 import com.ajustor.fmab.client.render.SlothRenderer;
+import com.ajustor.fmab.client.render.SoldierRenderer;
 import com.ajustor.fmab.client.render.StateExaminerRenderer;
 import com.ajustor.fmab.client.render.StoneGolemRenderer;
 import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
@@ -99,6 +104,13 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.MAY_CHANG, MayChangRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.DRACHMA_SOLDIER, DrachmaSoldierRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.OLIVIER, OlivierRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.AMESTRIAN_SOLDIER, c -> new SoldierRenderer(c, "amestrian_soldier"));
+		EntityRendererRegistry.register(FmabEntities.BRIGGS_SOLDIER, c -> new SoldierRenderer(c, "briggs_soldier"));
+		EntityRendererRegistry.register(FmabEntities.IMMORTAL_SOLDIER, ImmortalSoldierRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.HAUNTED_ARMOR, c -> new HauntedArmorRenderer<>(c, "haunted_armor"));
+		EntityRendererRegistry.register(FmabEntities.BARRY, c -> new HauntedArmorRenderer<>(c, "barry"));
+		EntityRendererRegistry.register(FmabEntities.CHIMERA_BEAST, ChimeraBeastRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.CHIMERA_CRAWLER, ChimeraCrawlerRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(OpenTruthPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,

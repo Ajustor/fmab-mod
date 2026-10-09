@@ -1,11 +1,17 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.entity.AmestrianSoldierEntity;
+import com.ajustor.fmab.entity.BarryEntity;
+import com.ajustor.fmab.entity.ChimeraBeastEntity;
+import com.ajustor.fmab.entity.ChimeraCrawlerEntity;
 import com.ajustor.fmab.entity.DrachmaSoldierEntity;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.FatherEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
 import com.ajustor.fmab.entity.GreedEntity;
+import com.ajustor.fmab.entity.HauntedArmorEntity;
+import com.ajustor.fmab.entity.ImmortalSoldierEntity;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.KunaiEntity;
 import com.ajustor.fmab.entity.LustEntity;
@@ -18,11 +24,14 @@ import com.ajustor.fmab.entity.StoneGolemEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.entity.WrathEntity;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
@@ -201,6 +210,78 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(OLIVIER_KEY));
 
+	private static final ResourceKey<EntityType<?>> AMESTRIAN_SOLDIER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("amestrian_soldier"));
+
+	/** Un soldat d'Amestris, en uniforme bleu. */
+	public static final EntityType<AmestrianSoldierEntity> AMESTRIAN_SOLDIER = Registry.register(BuiltInRegistries.ENTITY_TYPE, AMESTRIAN_SOLDIER_KEY,
+			EntityType.Builder.<AmestrianSoldierEntity>of(AmestrianSoldierEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(AMESTRIAN_SOLDIER_KEY));
+
+	private static final ResourceKey<EntityType<?>> IMMORTAL_SOLDIER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("immortal_soldier"));
+
+	/** Un soldat immortel, sous Central et au Laboratoire 5. */
+	public static final EntityType<ImmortalSoldierEntity> IMMORTAL_SOLDIER = Registry.register(BuiltInRegistries.ENTITY_TYPE, IMMORTAL_SOLDIER_KEY,
+			EntityType.Builder.<ImmortalSoldierEntity>of(ImmortalSoldierEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(IMMORTAL_SOLDIER_KEY));
+
+	private static final ResourceKey<EntityType<?>> HAUNTED_ARMOR_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("haunted_armor"));
+
+	/** Une armure habitée, liée par un sceau de sang. */
+	public static final EntityType<HauntedArmorEntity> HAUNTED_ARMOR = Registry.register(BuiltInRegistries.ENTITY_TYPE, HAUNTED_ARMOR_KEY,
+			EntityType.Builder.<HauntedArmorEntity>of(HauntedArmorEntity::new, MobCategory.MONSTER)
+					.sized(0.7F, 2.0F)
+					.eyeHeight(1.8F)
+					.clientTrackingRange(10)
+					.build(HAUNTED_ARMOR_KEY));
+
+	private static final ResourceKey<EntityType<?>> BARRY_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("barry"));
+
+	/** Barry le Boucher, armure habitée au-dessus du Laboratoire 5. */
+	public static final EntityType<BarryEntity> BARRY = Registry.register(BuiltInRegistries.ENTITY_TYPE, BARRY_KEY,
+			EntityType.Builder.<BarryEntity>of(BarryEntity::new, MobCategory.MONSTER)
+					.sized(0.7F, 2.0F)
+					.eyeHeight(1.8F)
+					.clientTrackingRange(10)
+					.build(BARRY_KEY));
+
+	private static final ResourceKey<EntityType<?>> CHIMERA_BEAST_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("chimera_beast"));
+
+	/** Une chimère massive, lion, serpent et bouc. */
+	public static final EntityType<ChimeraBeastEntity> CHIMERA_BEAST = Registry.register(BuiltInRegistries.ENTITY_TYPE, CHIMERA_BEAST_KEY,
+			EntityType.Builder.<ChimeraBeastEntity>of(ChimeraBeastEntity::new, MobCategory.MONSTER)
+					.sized(1.4F, 1.4F)
+					.eyeHeight(1.2F)
+					.clientTrackingRange(10)
+					.build(CHIMERA_BEAST_KEY));
+
+	private static final ResourceKey<EntityType<?>> CHIMERA_CRAWLER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("chimera_crawler"));
+
+	/** Une chimère rampante, qui grimpe aux murs. */
+	public static final EntityType<ChimeraCrawlerEntity> CHIMERA_CRAWLER = Registry.register(BuiltInRegistries.ENTITY_TYPE, CHIMERA_CRAWLER_KEY,
+			EntityType.Builder.<ChimeraCrawlerEntity>of(ChimeraCrawlerEntity::new, MobCategory.MONSTER)
+					.sized(1.2F, 0.9F)
+					.eyeHeight(0.65F)
+					.clientTrackingRange(10)
+					.build(CHIMERA_CRAWLER_KEY));
+
+	private static final ResourceKey<EntityType<?>> BRIGGS_SOLDIER_KEY =
+			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("briggs_soldier"));
+
+	/** Un soldat de Briggs, en manteau d'hiver : la même classe que le soldat d'Amestris. */
+	public static final EntityType<AmestrianSoldierEntity> BRIGGS_SOLDIER = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+			BRIGGS_SOLDIER_KEY,
+			EntityType.Builder.<AmestrianSoldierEntity>of(AmestrianSoldierEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(BRIGGS_SOLDIER_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -221,6 +302,22 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(MAY_CHANG, MayChangEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(DRACHMA_SOLDIER, DrachmaSoldierEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(OLIVIER, OlivierEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(AMESTRIAN_SOLDIER, AmestrianSoldierEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(IMMORTAL_SOLDIER, ImmortalSoldierEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(HAUNTED_ARMOR, HauntedArmorEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(BARRY, BarryEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(CHIMERA_BEAST, ChimeraBeastEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(CHIMERA_CRAWLER, ChimeraCrawlerEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(BRIGGS_SOLDIER, AmestrianSoldierEntity.createAttributes());
+		// Les chimères rôdent la nuit, comme tout monstre ; on en croise un peu partout.
+		SpawnPlacements.register(CHIMERA_BEAST, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+				Monster::checkMonsterSpawnRules);
+		SpawnPlacements.register(CHIMERA_CRAWLER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+				Monster::checkMonsterSpawnRules);
+		SpawnPlacements.register(IMMORTAL_SOLDIER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+				Monster::checkMonsterSpawnRules);
+		BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OVERWORLD), MobCategory.MONSTER, CHIMERA_BEAST, 6, 1, 1);
+		BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OVERWORLD), MobCategory.MONSTER, CHIMERA_CRAWLER, 10, 1, 2);
 		// Les soldats de Drachma n'apparaissent que dans le noir, comme tout monstre.
 		SpawnPlacements.register(DRACHMA_SOLDIER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 				Monster::checkMonsterSpawnRules);

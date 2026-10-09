@@ -309,8 +309,13 @@ public final class Blueprints {
 
 		@Override
 		public List<Spawn> spawns(Plot p) {
-			// L'examinateur attend dans la cour, face au portail.
-			return List.of(new Spawn(FmabEntities.STATE_EXAMINER, new BlockPos(p.sizeX() / 2, 0, 9)));
+			// L'examinateur attend dans la cour, face au portail ; la garde se tient au portail et dans la cour.
+			int sx = p.sizeX(), sz = p.sizeZ();
+			return List.of(new Spawn(FmabEntities.STATE_EXAMINER, new BlockPos(sx / 2, 0, 9)),
+					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(sx / 2 - 2, 0, 2)),
+					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(sx / 2 + 2, 0, 2)),
+					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(8, 0, sz - 9)),
+					new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(sx - 9, 0, sz - 9)));
 		}
 	}
 
@@ -647,9 +652,19 @@ public final class Blueprints {
 
 		@Override
 		public List<Spawn> spawns(Plot p) {
+			int sx = p.sizeX(), sz = p.sizeZ();
 			return List.of(
-					new Spawn(FmabEntities.LUST, new BlockPos(p.sizeX() / 2 + 3, HALL_FLOOR + 1, 12)),
-					new Spawn(FmabEntities.GLUTTONY, new BlockPos(p.sizeX() / 2 - 4, HALL_FLOOR + 1, 10)));
+					// Barry le Boucher garde le poste en ruine, au-dessus du puits.
+					new Spawn(FmabEntities.BARRY, new BlockPos(10, 0, 6)),
+					new Spawn(FmabEntities.LUST, new BlockPos(sx / 2 + 3, HALL_FLOOR + 1, 12)),
+					new Spawn(FmabEntities.GLUTTONY, new BlockPos(sx / 2 - 4, HALL_FLOOR + 1, 10)),
+					new Spawn(FmabEntities.HAUNTED_ARMOR, new BlockPos(4, HALL_FLOOR + 1, 6)),
+					new Spawn(FmabEntities.HAUNTED_ARMOR, new BlockPos(sx - 5, HALL_FLOOR + 1, 6)),
+					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(sx / 2, HALL_FLOOR + 1, 4)),
+					// Dans les cellules, les essais ratés de l'armée.
+					new Spawn(FmabEntities.CHIMERA_CRAWLER, new BlockPos(2, HALL_FLOOR + 1, sz - 3)),
+					new Spawn(FmabEntities.CHIMERA_BEAST, new BlockPos(sx / 2 + 2, HALL_FLOOR + 1, sz - 3)),
+					new Spawn(FmabEntities.CHIMERA_CRAWLER, new BlockPos(sx - 3, HALL_FLOOR + 1, sz - 3)));
 		}
 	}
 
@@ -787,7 +802,11 @@ public final class Blueprints {
 
 		@Override
 		public List<Spawn> spawns(Plot p) {
-			return List.of(new Spawn(FmabEntities.SLOTH, new BlockPos(p.sizeX() / 2 + 30, FLOOR + 1, 3)));
+			int mid = p.sizeX() / 2;
+			return List.of(new Spawn(FmabEntities.SLOTH, new BlockPos(mid + 30, FLOOR + 1, 3)),
+					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(mid - 20, FLOOR + 1, 3)),
+					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(mid + 12, FLOOR + 1, 3)),
+					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(mid + 50, FLOOR + 1, 3)));
 		}
 	}
 
@@ -932,7 +951,11 @@ public final class Blueprints {
 
 		@Override
 		public List<Spawn> spawns(Plot p) {
-			return List.of(new Spawn(FmabEntities.FATHER, new BlockPos(DOOR_X, ROOM_FLOOR + 4, THRONE_Z - 1)));
+			return List.of(new Spawn(FmabEntities.FATHER, new BlockPos(DOOR_X, ROOM_FLOOR + 4, THRONE_Z - 1)),
+					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(6, ROOM_FLOOR + 1, 12)),
+					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(26, ROOM_FLOOR + 1, 12)),
+					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(6, ROOM_FLOOR + 1, 30)),
+					new Spawn(FmabEntities.IMMORTAL_SOLDIER, new BlockPos(26, ROOM_FLOOR + 1, 30)));
 		}
 	}
 
@@ -1232,7 +1255,11 @@ public final class Blueprints {
 
 		@Override
 		public List<Spawn> spawns(Plot p) {
-			return List.of(new Spawn(FmabEntities.OLIVIER, new BlockPos(MID, 1, WALL_Z1 + 6)));
+			return List.of(new Spawn(FmabEntities.OLIVIER, new BlockPos(MID, 1, WALL_Z1 + 6)),
+					new Spawn(FmabEntities.BRIGGS_SOLDIER, new BlockPos(8, 1, WALL_Z1 + 4)),
+					new Spawn(FmabEntities.BRIGGS_SOLDIER, new BlockPos(SIZE_X - 9, 1, WALL_Z1 + 4)),
+					new Spawn(FmabEntities.BRIGGS_SOLDIER, new BlockPos(MID, 7, WALL_Z1 + 5)),
+					new Spawn(FmabEntities.BRIGGS_SOLDIER, new BlockPos(MID - 6, 1, KEEP_Z1 + 3)));
 		}
 	}
 

@@ -152,6 +152,21 @@ public final class FmabItems {
 	public static final Item BLOOD_CREST = register("blood_crest",
 			p -> new BlockItem(FmabBlocks.BLOOD_CREST, p), new Item.Properties().useBlockDescriptionPrefix());
 
+	public static final Item AMESTRIAN_SOLDIER_SPAWN_EGG = register("amestrian_soldier_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.AMESTRIAN_SOLDIER));
+	public static final Item BRIGGS_SOLDIER_SPAWN_EGG = register("briggs_soldier_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.BRIGGS_SOLDIER));
+	public static final Item IMMORTAL_SOLDIER_SPAWN_EGG = register("immortal_soldier_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.IMMORTAL_SOLDIER));
+	public static final Item HAUNTED_ARMOR_SPAWN_EGG = register("haunted_armor_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.HAUNTED_ARMOR));
+	public static final Item BARRY_SPAWN_EGG = register("barry_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.BARRY));
+	public static final Item CHIMERA_BEAST_SPAWN_EGG = register("chimera_beast_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.CHIMERA_BEAST));
+	public static final Item CHIMERA_CRAWLER_SPAWN_EGG = register("chimera_crawler_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.CHIMERA_CRAWLER));
+
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
 
@@ -221,6 +236,13 @@ public final class FmabItems {
 					output.accept(OLIVIER_SPAWN_EGG);
 					output.accept(DRACHMA_SOLDIER_SPAWN_EGG);
 					output.accept(BLOOD_CREST);
+					output.accept(AMESTRIAN_SOLDIER_SPAWN_EGG);
+					output.accept(BRIGGS_SOLDIER_SPAWN_EGG);
+					output.accept(IMMORTAL_SOLDIER_SPAWN_EGG);
+					output.accept(HAUNTED_ARMOR_SPAWN_EGG);
+					output.accept(BARRY_SPAWN_EGG);
+					output.accept(CHIMERA_BEAST_SPAWN_EGG);
+					output.accept(CHIMERA_CRAWLER_SPAWN_EGG);
 				})
 				.build());
 	}

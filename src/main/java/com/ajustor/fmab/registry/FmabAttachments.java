@@ -106,6 +106,12 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("briggs_ally"));
 
+	/** Recherché par l'armée jusqu'à cette heure de jeu, pour avoir frappé un soldat. */
+	public static final AttachmentType<Long> WANTED = AttachmentRegistry.<Long>builder()
+			.persistent(Codec.LONG)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("wanted"));
+
 	/** Les homonculus qu'on a vus tomber : la clé du sceau de Père. Gardés à la mort. */
 	public static final AttachmentType<Set<String>> SLAIN = AttachmentRegistry.<Set<String>>builder()
 			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))

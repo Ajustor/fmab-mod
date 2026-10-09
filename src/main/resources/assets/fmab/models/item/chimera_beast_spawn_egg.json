@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "fmab:item/chimera_beast_spawn_egg"
+  }
+}
