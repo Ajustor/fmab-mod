@@ -128,6 +128,20 @@ joueur compose lui-même :
 - **Fort Briggs** dans les montagnes enneigées (`/locate structure fmab:fort_briggs`) : la générale
   **Olivier Armstrong** confie aux alliés de bon karma un **sabre de Briggs** (×1,5 contre les
   homonculus) ; les **soldats de Drachma** rôdent la nuit au pied du mur.
+- **Fil conducteur** : un arbre de progrès « Fullmetal Alchemist », des cartes de tous les lieux chez
+  les cartographes, et la quête des **points de sang** du cercle national (sept à sceller avant que
+  l'éclipse ne devienne le Jour promis).
+- **Lieux** : **Dublith** et la boucherie d'Izumi (elle donne la carte de l'île de Yock), **Liore** et
+  Cornello, les ruines d'**Ishval** (Scar) et de **Xerxès** (fresques, Hohenheim), l'**île de Yock**,
+  le dispensaire du docteur **Marcoh** (il déchiffre ses notes de recherche).
+- **Créatures** : Barry le Boucher, armures habitées, soldats immortels, chimères, soldats
+  d'Amestris et de Briggs.
+- **Styles de jeu** : bras de Scar, mines de Kimblee, pistolet et fusil, couteaux de Hughes, épée de
+  Xing ; le glyphe **Or** (interdit par la loi d'État) ; les écoles de la Destruction, de la
+  Médecine et de la Vie (chimères qui vous obéissent).
+- **Cercles** : déclencheurs (retardement, piège, redstone) et fusion à deux alchimistes.
+- **Finition** : cinématiques (la Porte, le Jour promis, la chute de Père), éclipse dans le ciel,
+  sons propres (CC0), silhouettes des boss, briques amestriennes et de Xing, neige de Briggs.
 
 Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/fmab/glyph`), combinaisons
 (`data/<ns>/fmab/combination`), valeurs d'échange (`data/<ns>/fmab/exchange`), éléments visés (tags
@@ -210,6 +224,12 @@ yields only to those who saw Sloth, Wrath and Pride fall; he fights in three for
 Amestrian alchemy around him. Xing's alkahestry (five kunai planted in a circle, taught by May
 Chang) still works there. Fort Briggs, Olivier Armstrong and her Briggs sabre hold the snowy north
 against Drachma's soldiers.
+An advancement tree, cartographer maps and the national circle's blood crests guide the way; Dublith
+(Izumi), Liore, the Ishval and Xerxes ruins, Yock Island and Marcoh's clinic fill the map; Barry,
+haunted armors, immortal soldiers and chimeras fill it with fights. New playstyles (Scar's arm,
+Kimblee's mines, firearms, throwing knives, the Xing sword), the forbidden Gold glyph, the schools of
+Destruction, Medicine and Life, circle triggers and two-alchemist fusion, cinematics, an eclipse in
+the sky and the mod's own sounds round it out.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 
