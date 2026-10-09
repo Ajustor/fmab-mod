@@ -3,7 +3,6 @@ package com.ajustor.fmab.client.render;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.FatherEntity;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
@@ -44,7 +43,7 @@ public class FatherRenderer extends HumanoidMobRenderer<FatherEntity, FatherRend
 	}
 
 	public FatherRenderer(EntityRendererProvider.Context context) {
-		super(context, new Model(context.bakeLayer(ModelLayers.PLAYER)), 0.5f);
+		super(context, new Model(BossModels.father()), 0.5f);
 	}
 
 	@Override
