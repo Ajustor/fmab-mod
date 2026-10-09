@@ -6,10 +6,13 @@ import com.ajustor.fmab.entity.GluttonyEntity;
 import com.ajustor.fmab.entity.GreedEntity;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.LustEntity;
+import com.ajustor.fmab.entity.PrideEntity;
+import com.ajustor.fmab.entity.SlothEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.StoneGolemEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
+import com.ajustor.fmab.entity.WrathEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -109,6 +112,36 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(GREED_KEY));
 
+	private static final ResourceKey<EntityType<?>> SLOTH_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("sloth"));
+
+	/** Sloth (Paresse), dans le grand tunnel sous Central ; sa taille vient de son échelle. */
+	public static final EntityType<SlothEntity> SLOTH = Registry.register(BuiltInRegistries.ENTITY_TYPE, SLOTH_KEY,
+			EntityType.Builder.<SlothEntity>of(SlothEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.8F)
+					.eyeHeight(1.62F)
+					.clientTrackingRange(10)
+					.build(SLOTH_KEY));
+
+	private static final ResourceKey<EntityType<?>> WRATH_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("wrath"));
+
+	/** Wrath (Colère), King Bradley, dans sa résidence de Central. */
+	public static final EntityType<WrathEntity> WRATH = Registry.register(BuiltInRegistries.ENTITY_TYPE, WRATH_KEY,
+			EntityType.Builder.<WrathEntity>of(WrathEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.9F)
+					.eyeHeight(1.7F)
+					.clientTrackingRange(10)
+					.build(WRATH_KEY));
+
+	private static final ResourceKey<EntityType<?>> PRIDE_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("pride"));
+
+	/** Pride (Orgueil), Selim Bradley : un enfant, à son échelle. */
+	public static final EntityType<PrideEntity> PRIDE = Registry.register(BuiltInRegistries.ENTITY_TYPE, PRIDE_KEY,
+			EntityType.Builder.<PrideEntity>of(PrideEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.8F)
+					.eyeHeight(1.62F)
+					.clientTrackingRange(10)
+					.build(PRIDE_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -122,5 +155,8 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(GLUTTONY, GluttonyEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(ENVY, EnvyEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(GREED, GreedEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(SLOTH, SlothEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(WRATH, WrathEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(PRIDE, PrideEntity.createAttributes());
 	}
 }

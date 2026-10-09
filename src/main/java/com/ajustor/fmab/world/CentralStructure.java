@@ -14,7 +14,8 @@ import java.util.Optional;
 /**
  * Central City : une grande ville circulaire et fortifiée, posée sur un plateau aplani. Muraille à
  * quatre portes, avenues en croix, boulevard circulaire, place et fontaine ; au nord de la place le
- * quartier général et son arène, à l'est la bibliothèque ; des maisons partout ailleurs.
+ * quartier général et son arène, à l'est la bibliothèque, à l'ouest la résidence Bradley ; des
+ * maisons partout ailleurs. Sous la ville, le tunnel de Sloth.
  */
 public class CentralStructure extends Structure {
 	public static final MapCodec<CentralStructure> CODEC = simpleCodec(CentralStructure::new);
@@ -68,6 +69,13 @@ public class CentralStructure extends Structure {
 		// La bibliothèque borde l'avenue est ; sa porte donne sur l'avenue, au nord.
 		builder.addPiece(new ProceduralPiece("central_library", new BlockPos(cx + 18, y, cz + 6), 21, 11, 15, 1,
 				Rotation.NONE, seed));
+		// La résidence Bradley borde l'avenue ouest ; sa porte donne sur l'avenue, au nord.
+		builder.addPiece(new ProceduralPiece("bradley_residence", new BlockPos(cx - 33, y, cz + 11), 15,
+				Blueprints.houseHeight(2, 11), 11, 1, Rotation.NONE, seed));
+		// Sous la ville, le tunnel de Sloth ; on y descend par un puits au milieu de l'avenue sud.
+		int depth = -Blueprints.SlothTunnel.FLOOR;
+		builder.addPiece(new ProceduralPiece("sloth_tunnel", new BlockPos(cx - R, y, cz + 30), size, depth + 1, 7, depth,
+				Rotation.NONE, seed));
 		for (int gx = -R + 6; gx < R - 6; gx += LOT) {
 			for (int gz = -R + 6; gz < R - 6; gz += LOT) {
 				if (!buildable(gx, gz)) {
@@ -98,7 +106,8 @@ public class CentralStructure extends Structure {
 		}
 		boolean headquarters = Math.abs(gx) <= 21 && gz >= -50 && gz <= -16;
 		boolean library = gx >= 12 && gx <= 44 && gz >= 0 && gz <= 26;
-		return !headquarters && !library;
+		boolean residence = gx >= -39 && gx <= -13 && gz >= 5 && gz <= 27;
+		return !headquarters && !library && !residence;
 	}
 
 	@Override

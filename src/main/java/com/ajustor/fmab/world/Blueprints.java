@@ -73,6 +73,8 @@ public final class Blueprints {
 		out.put("rush_valley_square", Blueprints::square);
 		out.put("laboratory_5", new Laboratory5());
 		out.put("devils_nest", new DevilsNest());
+		out.put("bradley_residence", new BradleyResidence());
+		out.put("sloth_tunnel", new SlothTunnel());
 		plans = out;
 		return plans;
 	}
@@ -695,6 +697,86 @@ public final class Blueprints {
 		@Override
 		public List<Spawn> spawns(Plot p) {
 			return List.of(new Spawn(FmabEntities.GREED, new BlockPos(p.sizeX() / 2, 1, p.sizeZ() - 4)));
+		}
+	}
+
+	/**
+	 * La résidence Bradley, à Central : une demeure de briques à deux étages, éclairée de lanternes
+	 * (une pénombre où les ombres de Pride se plaisent). Le Généralissime et son fils y vivent.
+	 */
+	static final class BradleyResidence implements Blueprint {
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			BlockState shell = house(x, y, z, p, CITY_PALETTES[0]);
+			int sx = p.sizeX(), sz = p.sizeZ();
+			boolean inside = x > 0 && x < sx - 1 && z > 0 && z < sz - 1;
+			if (inside && (y == 3 || y == 7) && x % 5 == 2 && z % 4 == 2) {
+				return b(Blocks.LANTERN).setValue(LanternBlock.HANGING, true);
+			}
+			if (inside && y == 1 && z == sz - 2 && x % 3 == 1) {
+				return b(Blocks.BOOKSHELF);
+			}
+			return shell;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			return List.of(
+					new Spawn(FmabEntities.WRATH, new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2)),
+					new Spawn(FmabEntities.PRIDE, new BlockPos(3, 1, p.sizeZ() - 3)));
+		}
+	}
+
+	/**
+	 * Le grand tunnel que Sloth creuse sous Central, pour le cercle de transmutation national : un
+	 * boyau de pierre de cinq sur cinq, à trente blocs sous la ville, d'un rempart à l'autre. Un puits
+	 * à échelle y descend depuis l'avenue sud.
+	 */
+	static final class SlothTunnel implements Blueprint {
+		static final int FLOOR = -28;
+		static final int CEILING = -22;
+		private static final int SHAFT_Z = 3;
+
+		@Override
+		public BlockState at(int x, int y, int z, Plot p) {
+			int sx = p.sizeX();
+			int shaftX = sx / 2;
+			if (y > CEILING) {
+				// Le puits, de l'avenue jusqu'au plafond du tunnel.
+				if (y >= 0 || Math.abs(x - shaftX) > 1 || Math.abs(z - SHAFT_Z) > 1) {
+					return null;
+				}
+				if (x == shaftX && z == SHAFT_Z) {
+					return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.NORTH);
+				}
+				return b(Blocks.STONE_BRICKS);
+			}
+			if (y < FLOOR || x < 10 || x > sx - 11) {
+				return null;
+			}
+			boolean end = x == 10 || x == sx - 11;
+			boolean shell = y == FLOOR || y == CEILING || z == 0 || z == p.sizeZ() - 1 || end;
+			if (x == shaftX && z == SHAFT_Z && y == CEILING) {
+				return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.NORTH);
+			}
+			if (x == shaftX && z == SHAFT_Z) {
+				return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.NORTH);
+			}
+			if (x == shaftX && z == SHAFT_Z + 1) {
+				return b(Blocks.STONE_BRICKS);
+			}
+			if (shell) {
+				return p.noise(x, y, z, 5) == 0 ? b(Blocks.COBBLED_DEEPSLATE) : b(Blocks.DEEPSLATE_BRICKS);
+			}
+			if (y == FLOOR + 1 && z == 1 && x % 12 == 0) {
+				return b(Blocks.SOUL_LANTERN);
+			}
+			return AIR;
+		}
+
+		@Override
+		public List<Spawn> spawns(Plot p) {
+			return List.of(new Spawn(FmabEntities.SLOTH, new BlockPos(p.sizeX() / 2 + 30, FLOOR + 1, 3)));
 		}
 	}
 

@@ -88,6 +88,18 @@ joueur compose lui-même :
 - **Envy** erre déguisé (un joueur, un habitant), se révèle, devient un monstre géant puis un lézard.
 - **Greed** et son Bouclier ultime tiennent le **Devil's Nest** ; un pacte (or, émeraudes, diamants,
   ou le battre) en fait un allié payé à la journée.
+- La **Pierre philosophale** (quatre noyaux autour de sang cristallisé, cent âmes) rend ce que la
+  Porte a pris, chaque partie coûtant des âmes selon sa gravité.
+
+**v0.6 (Derniers homonculus), en cours :**
+
+- **Sloth** creuse le grand tunnel sous Central : charges dévastatrices en ligne droite à travers la
+  roche, puis une pause épuisée où il encaisse davantage.
+- **Wrath** (King Bradley), dans la résidence Bradley à Central : une seule vie, mais son Œil
+  ultime esquive les flèches et une bonne part des coups de face ; on le touche dans le dos ou
+  pendant qu'il frappe.
+- **Pride** (Selim) : ses ombres tranchent, dévorent et parent les coups, mais ne vivent qu'avec de
+  la lumière ; dans le noir complet ou une lumière intense, il n'est qu'un enfant vulnérable.
 - **Transmutation sans cercle** pour les Initiés de la Porte : Maj+G joint les mains et lance le
   cercle sélectionné du carnet.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : établi d'automail, usure,
@@ -145,7 +157,12 @@ circle calls it into another armor (prepared seals let it call itself back); Gat
 **v0.5 (Homunculi), in progress:** homunculi reconstitute while their Philosopher's Stone holds
 souls; Lust and Gluttony (who swallows into his Belly) guard Laboratory 5; Envy roams in disguise,
 then turns into a giant monster and a lizard; Greed and his Ultimate Shield run the Devil's Nest and
-can be hired as an ally.
+can be hired as an ally; the Philosopher's Stone gives back what the Gate took, for souls.
+
+**v0.6 (Last homunculi), in progress:** Sloth charges through the rock of his tunnel under Central,
+then rests; Wrath (King Bradley) dodges with his Ultimate Eye unless struck from behind or while
+attacking; Pride's shadows only live with light, so total darkness or intense light leaves him a
+vulnerable child.
 
 Build with JDK 25+ (`./gradlew build`); runtime needs Fabric Loader ≥ 0.19.3 and Fabric API.
 

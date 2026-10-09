@@ -6,10 +6,13 @@ import com.ajustor.fmab.client.render.GluttonyRenderer;
 import com.ajustor.fmab.client.render.GreedRenderer;
 import com.ajustor.fmab.client.render.IzumiRenderer;
 import com.ajustor.fmab.client.render.LustRenderer;
+import com.ajustor.fmab.client.render.PrideRenderer;
+import com.ajustor.fmab.client.render.SlothRenderer;
 import com.ajustor.fmab.client.render.StateExaminerRenderer;
 import com.ajustor.fmab.client.render.StoneGolemRenderer;
 import com.ajustor.fmab.client.render.TruthRenderer;
 import com.ajustor.fmab.client.render.WinryRenderer;
+import com.ajustor.fmab.client.render.WrathRenderer;
 import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.screen.ExamScreen;
 import com.ajustor.fmab.client.screen.TattooScreen;
@@ -80,6 +83,9 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.GLUTTONY, GluttonyRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.ENVY, EnvyRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.GREED, GreedRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.SLOTH, SlothRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.WRATH, WrathRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.PRIDE, PrideRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new WinryScreen(payload.entityId())));
 		ClientPlayNetworking.registerGlobalReceiver(OpenTattooPayload.TYPE,
