@@ -959,5 +959,13 @@
   "item.fmab.human_transmutation_notes": "Notes on Human Transmutation",
   "item.fmab.human_transmutation_notes.tooltip": "Forbidden research. Reading it teaches the Human glyph and copies the circle into your notebook.",
   "item.fmab.human_transmutation_notes.copied": "The human transmutation circle is now in your notebook. Do not draw it.",
-  "gate.fmab.soul.notes_full": "Your notebook is full: make room, then copy your seal from the Treatise (chapter VIII)."
+  "gate.fmab.soul.notes_full": "Your notebook is full: make room, then copy your seal from the Treatise (chapter VIII).",
+
+  "entity.fmab.wheelchair": "Wheelchair",
+  "item.fmab.wheelchair": "Wheelchair",
+  "wheelchair.fmab.need_hands": "You need both arms to turn the wheels: have someone push you",
+  "wheelchair.fmab.need_hands_to_push": "You need both arms to push a wheelchair",
+  "wheelchair.fmab.hands_busy": "Your hands are on the wheels",
+  "wheelchair.fmab.hired": "The villager takes the handles for five minutes",
+  "wheelchair.fmab.let_go": "Nobody is pushing your wheelchair any more"
 }

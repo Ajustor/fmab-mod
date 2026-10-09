@@ -959,5 +959,13 @@
   "item.fmab.human_transmutation_notes": "Notes sur la transmutation humaine",
   "item.fmab.human_transmutation_notes.tooltip": "Recherches interdites. Les lire enseigne le glyphe Humain et recopie le cercle dans votre carnet.",
   "item.fmab.human_transmutation_notes.copied": "Le cercle de la transmutation humaine est maintenant dans votre carnet. Ne le tracez pas.",
-  "gate.fmab.soul.notes_full": "Votre carnet est plein : faites-y de la place, puis recopiez votre sceau depuis le Traité (chapitre VIII)."
+  "gate.fmab.soul.notes_full": "Votre carnet est plein : faites-y de la place, puis recopiez votre sceau depuis le Traité (chapitre VIII).",
+
+  "entity.fmab.wheelchair": "Fauteuil roulant",
+  "item.fmab.wheelchair": "Fauteuil roulant",
+  "wheelchair.fmab.need_hands": "Il faut vos deux bras pour faire tourner les roues : faites-vous pousser",
+  "wheelchair.fmab.need_hands_to_push": "Il faut vos deux bras pour pousser un fauteuil",
+  "wheelchair.fmab.hands_busy": "Vos mains sont sur les roues",
+  "wheelchair.fmab.hired": "Le villageois prend les poignées pour cinq minutes",
+  "wheelchair.fmab.let_go": "Plus personne ne pousse votre fauteuil"
 }

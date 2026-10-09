@@ -22,6 +22,7 @@
 		]
 	},
 	"mixins": [
+		"fmab.mixins.json",
 		{
 			"config": "fmab.client.mixins.json",
 			"environment": "client"

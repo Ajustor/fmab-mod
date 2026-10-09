@@ -7,6 +7,7 @@ import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Tolls;
+import com.ajustor.fmab.gate.Wheelchairs;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
@@ -44,6 +45,11 @@ public final class GloveCasting {
 	 * @param combine joindre les mains : les cercles des deux gants agissent l'un après l'autre
 	 */
 	public static void cast(ServerPlayer player, boolean combine) {
+		if (Wheelchairs.handsBusy(player)) {
+			// Les mains font tourner des roues, ou tiennent des poignées.
+			player.sendOverlayMessage(Component.translatable("wheelchair.fmab.hands_busy"));
+			return;
+		}
 		if (combine && player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.GATE)) {
 			clap(player);
 			return;

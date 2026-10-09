@@ -6,7 +6,8 @@
 	"environment": "client",
 	"entrypoints": {
 		"fabric-client-gametest": [
-			"com.ajustor.fmab.gametest.RenderShowcase"
+			"com.ajustor.fmab.gametest.RenderShowcase",
+			"com.ajustor.fmab.gametest.WheelchairScenes"
 		]
 	},
 	"depends": {

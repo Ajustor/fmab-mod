@@ -9,6 +9,7 @@ import com.ajustor.fmab.gate.GateOfTruth;
 import com.ajustor.fmab.gate.HumanTransmutation;
 import com.ajustor.fmab.gate.SoulBinding;
 import com.ajustor.fmab.gate.Tolls;
+import com.ajustor.fmab.gate.Wheelchairs;
 import com.ajustor.fmab.homunculus.Belly;
 import com.ajustor.fmab.homunculus.EnvySpawner;
 import com.ajustor.fmab.item.Tomes;
@@ -80,6 +81,7 @@ public class Fmab implements ModInitializer {
 		GateOfTruth.register();
 		Tolls.register();
 		Automails.register();
+		Wheelchairs.register();
 		SoulBinding.register();
 		Belly.register();
 		EnvySpawner.register();

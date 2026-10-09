@@ -2,6 +2,7 @@ package com.ajustor.fmab.client.mixin;
 
 import com.ajustor.fmab.client.render.BodyHolder;
 import com.ajustor.fmab.client.render.PoseHolder;
+import com.ajustor.fmab.client.render.WheelchairPose;
 import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.item.AutomailItem;
@@ -29,6 +30,8 @@ public abstract class AvatarRenderStateMixin implements PoseHolder, BodyHolder {
 	private Map<BodyPart, AutomailItem.Model> fmab$automails = Map.of();
 	@Unique
 	private Map<BodyPart, PartPose> fmab$skeleton = Map.of();
+	@Unique
+	private WheelchairPose fmab$wheelchair = WheelchairPose.NONE;
 
 	@Override
 	public TransmutationPose.Kind fmab$pose() {
@@ -70,5 +73,15 @@ public abstract class AvatarRenderStateMixin implements PoseHolder, BodyHolder {
 	@Override
 	public void fmab$setSkeleton(Map<BodyPart, PartPose> skeleton) {
 		fmab$skeleton = skeleton;
+	}
+
+	@Override
+	public WheelchairPose fmab$wheelchair() {
+		return fmab$wheelchair;
+	}
+
+	@Override
+	public void fmab$setWheelchair(WheelchairPose pose) {
+		fmab$wheelchair = pose;
 	}
 }

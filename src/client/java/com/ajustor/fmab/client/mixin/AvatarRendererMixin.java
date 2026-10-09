@@ -3,10 +3,13 @@ package com.ajustor.fmab.client.mixin;
 import com.ajustor.fmab.client.render.AutomailLayer;
 import com.ajustor.fmab.client.render.BodyHolder;
 import com.ajustor.fmab.client.render.PoseHolder;
+import com.ajustor.fmab.client.render.WheelchairPose;
 import com.ajustor.fmab.data.Automail;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.TransmutationPose;
+import com.ajustor.fmab.entity.WheelchairEntity;
 import com.ajustor.fmab.gate.BodyPart;
+import com.ajustor.fmab.gate.Wheelchairs;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -48,6 +51,19 @@ public abstract class AvatarRendererMixin {
 			holder.fmab$setPose(pose.kind(), pose.until() - now - partialTicks);
 		}
 		fmab$extractBody(entity, (BodyHolder) state);
+		((BodyHolder) state).fmab$setWheelchair(fmab$wheelchairPose(entity));
+	}
+
+	/** Assis dans un fauteuil qu'il fait avancer, ou debout derrière celui qu'il pousse. */
+	@Unique
+	private static WheelchairPose fmab$wheelchairPose(Avatar entity) {
+		if (entity.getVehicle() instanceof WheelchairEntity chair) {
+			return chair.propelling() ? WheelchairPose.ROLL : WheelchairPose.NONE;
+		}
+		if (entity instanceof Player player && Wheelchairs.pushing(player) != null) {
+			return WheelchairPose.PUSH;
+		}
+		return WheelchairPose.NONE;
 	}
 
 	@Unique

@@ -30,6 +30,7 @@ import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.StoneGolemEntity;
 import com.ajustor.fmab.entity.ThrowingKnifeEntity;
 import com.ajustor.fmab.entity.TruthEntity;
+import com.ajustor.fmab.entity.WheelchairEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.entity.WrathEntity;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -377,6 +378,19 @@ public final class FmabEntities {
 					.updateInterval(5)
 					.build(FATHER_SUN_KEY));
 
+	private static final ResourceKey<EntityType<?>> WHEELCHAIR_KEY =
+			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("wheelchair"));
+
+	/** Le fauteuil roulant : une monture, assise à mi-hauteur. */
+	public static final EntityType<WheelchairEntity> WHEELCHAIR = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+			WHEELCHAIR_KEY,
+			EntityType.Builder.<WheelchairEntity>of(WheelchairEntity::new, MobCategory.MISC)
+					.sized(0.8F, 0.9F)
+					.eyeHeight(0.6F)
+					.passengerAttachments(0.6F)
+					.clientTrackingRange(10)
+					.build(WHEELCHAIR_KEY));
+
 	private FmabEntities() {
 	}
 
@@ -408,6 +422,7 @@ public final class FmabEntities {
 		FabricDefaultAttributeRegistry.register(HOHENHEIM, HohenheimEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(MARCOH, MarcohEntity.createAttributes());
 		FabricDefaultAttributeRegistry.register(BRIGGS_SOLDIER, AmestrianSoldierEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(WHEELCHAIR, WheelchairEntity.createAttributes());
 		// Les chimères rôdent la nuit, comme tout monstre ; on en croise un peu partout.
 		SpawnPlacements.register(CHIMERA_BEAST, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 				Monster::checkMonsterSpawnRules);
