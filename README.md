@@ -79,7 +79,9 @@ d'État à Central, la Porte, les homonculus, puis Père.
 - **Autres arts et armes** : alkahestry de Xing (kunaï, May Chang), bras de Scar, mines de Kimblee,
   pistolet et fusil, couteaux, sabre de Briggs, épée de Xing.
 - **Villes habitées** : villageois (leur métier vient du poste de travail de leur maison), maisons
-  meublées, gardes aux portes de Central ; les cartographes vendent les cartes des lieux du mod.
+  meublées aux abords soignés (avant-toits, volets, jardinières, cheminées), arbres, marchés, pré à
+  moutons à Resembool, gardes aux portes de Central ; les cartographes vendent les cartes des lieux
+  du mod.
 - **Finition** : cinématiques (la Porte, le Jour promis, la chute de Père), éclipse dans le ciel,
   sons propres (CC0), modèles des boss, textes en français et en anglais.
 
@@ -221,8 +223,9 @@ Central, the Gate, the homunculi, then Father.
   a fight has begun.
 - **Other arts and weapons**: Xing alkahestry (kunai, May Chang), Scar's arm, Kimblee's mines,
   pistol and rifle, throwing knives, Briggs sabre, Xing sword.
-- **Lived-in towns**: villagers whose trade comes from their house's workstation, furnished houses,
-  guards at Central's gates; cartographers sell maps to the mod's places.
+- **Lived-in towns**: villagers whose trade comes from their house's workstation, furnished houses
+  with dressed surroundings (eaves, shutters, window boxes, chimneys), trees, markets, a sheep
+  pasture in Resembool, guards at Central's gates; cartographers sell maps to the mod's places.
 - **Polish**: cinematics (the Gate, the Promised Day, Father's fall), an eclipse in the sky, the mod's
   own sounds (CC0), boss models, texts in French and English.
 

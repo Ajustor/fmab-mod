@@ -96,6 +96,23 @@ public final class Blueprints {
 		out.put("ishval_ruins", new IshvalRuins());
 		out.put("xerxes_ruins", new XerxesRuins());
 		out.put("yock_island", new YockIsland());
+		// Les mêmes maisons, avec leurs abords (avant-toits, volets, jardinières, massifs) : les lieux
+		// les posent sur une parcelle plus large de deux blocs.
+		out.put("central_house_dressed", new Dressing(out.get("central_house"), Dressing.TOWN));
+		out.put("resembool_house_dressed", new Dressing(out.get("resembool_house"), Dressing.RURAL));
+		out.put("rockbell_house_dressed", new Dressing(out.get("rockbell_house"), Dressing.RURAL));
+		out.put("elric_house_dressed", new Dressing(out.get("elric_house"), Dressing.RURAL));
+		out.put("rush_valley_workshop_dressed", new Dressing(out.get("rush_valley_workshop"), Dressing.DESERT));
+		out.put("rush_valley_shop_dressed", new Dressing(out.get("rush_valley_shop"), Dressing.DESERT));
+		out.put("dublith_house_dressed", new Dressing(out.get("dublith_house"), Dressing.TOWN));
+		out.put("curtis_butcher_dressed", new Dressing(out.get("curtis_butcher"), Dressing.TOWN));
+		out.put("town_tree", Townscape.tree(Blocks.OAK_LOG, Blocks.OAK_LEAVES, Blocks.GRASS_BLOCK));
+		out.put("birch_tree", Townscape.tree(Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES, Blocks.GRASS_BLOCK));
+		out.put("acacia_tree", Townscape.tree(Blocks.ACACIA_LOG, Blocks.ACACIA_LEAVES, Blocks.COARSE_DIRT));
+		out.put("palm_tree", Townscape.palm(Blocks.SAND));
+		out.put("market_stall", Townscape.stall(Blocks.DARK_OAK_FENCE, Blocks.SPRUCE_SLAB));
+		out.put("desert_stall", Townscape.stall(Blocks.JUNGLE_FENCE, Blocks.SMOOTH_SANDSTONE_SLAB));
+		out.put("resembool_pasture", new Townscape.Pasture());
 		plans = out;
 		return plans;
 	}
@@ -411,6 +428,11 @@ public final class Blueprints {
 				return b(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.WEST);
 			}
 			return AIR;
+		}
+		// Une cheminée sur la pente arrière, dans deux maisons sur trois ; un feu couve tout en haut.
+		int ridge = h + (sz - 1) / 2;
+		if (x == 1 && z == sz - 2 && y > h && p.noise(3, 3, 3, 3) != 0) {
+			return y <= ridge ? b(Blocks.BRICKS) : y == ridge + 1 ? b(Blocks.CAMPFIRE) : null;
 		}
 		// Toit à deux pans : la pente monte de chaque côté vers le faîte, au milieu de z.
 		int d = y - h;
@@ -1708,13 +1730,55 @@ public final class Blueprints {
 					}
 					boolean door = z == h[1] && x == h[0] + 3 && y <= 2;
 					boolean window = y == 3 && (x == h[0] + 3 || z == h[1] + 3);
-					return door || window ? AIR : b(Blocks.SANDSTONE);
+					if (door || window) {
+						return AIR;
+					}
+					// Un bandeau de pierre taillée sous le toit, des coins plus clairs.
+					boolean corner = (x == h[0] || x == h[0] + 6) && (z == h[1] || z == h[1] + 6);
+					return y == 4 || corner ? b(Blocks.CUT_SANDSTONE) : b(Blocks.SANDSTONE);
 				}
+				// Un auvent de toile au-dessus de la porte, et des jarres de part et d'autre.
+				if (z == h[1] - 1 && x >= h[0] + 2 && x <= h[0] + 4) {
+					if (y == 3) {
+						return b(Blocks.WOOL.pick(p.noise(h[0], 1, h[1], 2) == 0 ? DyeColor.ORANGE : DyeColor.RED));
+					}
+					if (y == 1 && x != h[0] + 3) {
+						return p.noise(x, 1, z, 2) == 0 ? b(Blocks.DECORATED_POT) : b(Blocks.BARREL);
+					}
+				}
+			}
+			BlockState palm = palm(x, y, z, s, p);
+			if (palm != null) {
+				return palm;
 			}
 			if (y == 1 && x == c && z == c + 4) {
 				return b(FmabBlocks.BLOOD_CREST);
 			}
 			return y <= 8 ? AIR : null;
+		}
+
+		/** Des palmiers au bord de la place, entre le temple et les maisons du sud. */
+		private static BlockState palm(int x, int y, int z, int s, Plot p) {
+			int c = s / 2;
+			for (int[] at : new int[][]{{c - 5, c - 2}, {c + 5, c - 2}, {c - 5, c + 6}, {c + 5, c + 6}}) {
+				int dx = x - at[0], dz = z - at[1], top = 6 + p.noise(at[0], 0, at[1], 2);
+				if (Math.abs(dx) > 2 || Math.abs(dz) > 2) {
+					continue;
+				}
+				if (dx == 0 && dz == 0) {
+					return y <= top ? b(Blocks.STRIPPED_JUNGLE_LOG) : y == top + 1 ? palmLeaf() : null;
+				}
+				int reach = Math.max(Math.abs(dx), Math.abs(dz));
+				boolean cross = dx == 0 || dz == 0 || Math.abs(dx) == Math.abs(dz);
+				if (cross && (y == top + 1 && reach == 1 || y == top && reach == 2)) {
+					return palmLeaf();
+				}
+			}
+			return null;
+		}
+
+		private static BlockState palmLeaf() {
+			return b(Blocks.JUNGLE_LEAVES).setValue(LeavesBlock.PERSISTENT, true);
 		}
 
 		/** Le temple de Leto : 13 de large, 11 de profond, colonnes, autel, dôme d'or. */
