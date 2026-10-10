@@ -164,7 +164,7 @@ public abstract class AvatarRendererMixin {
 		ModelPart bone = arm == BodyPart.RIGHT_ARM ? skeleton.rightArm : skeleton.leftArm;
 		ModelPart blade = AutomailLayer.handBlade(arm);
 		blade.loadPose(bone.storePose());
-		collector.submitModelPart(blade, poseStack, RenderTypes.entityCutout(AutomailLayer.texture(model)), light,
+		collector.submitModelPart(blade, poseStack, RenderTypes.entityCutout(AutomailLayer.BLADE_TEXTURE), light,
 				OverlayTexture.NO_OVERLAY, null);
 	}
 

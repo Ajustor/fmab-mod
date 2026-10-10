@@ -4,10 +4,11 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.item.AutomailItem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
@@ -42,33 +43,48 @@ import java.util.Map;
  */
 public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 	private final Map<AutomailItem.Model, Model> models = new EnumMap<>(AutomailItem.Model.class);
+	private final Blades bladeModel;
 
 	public AutomailLayer(RenderLayerParent<AvatarRenderState, PlayerModel> parent, EntityRendererProvider.Context context) {
 		super(parent);
 		for (AutomailItem.Model kind : AutomailItem.Model.values()) {
-			models.put(kind, new Model(withBlades(), kind));
+			models.put(kind, new Model(context.bakeLayer(ModelLayers.PLAYER), kind));
 		}
+		bladeModel = new Blades(blades());
 	}
+
+	/** La texture de la lame transmutée : la même pour tous les automails, c'est de l'acier refait. */
+	public static final Identifier BLADE_TEXTURE = Fmab.id("textures/entity/automail/blade.png");
 
 	/**
-	 * La lame qu'un alchimiste transmute de son avant-bras, comme Ed : une arête d'acier le long du
-	 * dessus de l'avant-bras, qui dépasse le poing et s'effile. Texturée en (56, 16) dans la peau de
-	 * l'automail.
+	 * La lame qu'un alchimiste transmute de son avant-bras, comme Ed : un manchon renforcé sur
+	 * l'avant-bras, d'où sort une lame large qui dépasse le poing et s'effile en pointe, son dos épaissi
+	 * côté extérieur. Décrite pour le bras droit ; le gauche en est le miroir.
 	 */
-	private static void blade(PartDefinition arm, float x) {
-		arm.addOrReplaceChild(BLADE, CubeListBuilder.create().texOffs(56, 16)
-				.addBox(x, 4, 1.5f, 1, 12, 3)
-				.addBox(x, 16, 2, 1, 3, 2), PartPose.ZERO);
+	private static void blade(PartDefinition arm, boolean right) {
+		CubeListBuilder cubes = CubeListBuilder.create().mirror(!right);
+		box(cubes, right, 0, 0, -3.5f, 3.5f, -2.5f, 5, 5, 5);
+		box(cubes, right, 0, 10, -3, 8, 2, 4, 6, 1);
+		box(cubes, right, 10, 10, -3, 14, 2, 3, 3, 1);
+		box(cubes, right, 18, 10, -3, 17, 2, 2, 2, 1);
+		box(cubes, right, 24, 10, -3, 19, 2, 1, 2, 1);
+		box(cubes, right, 32, 0, -3.5f, 7.5f, 1.5f, 1, 12, 2);
+		arm.addOrReplaceChild("blade", cubes, PartPose.ZERO);
 	}
 
-	private static final String BLADE = "fmab_blade";
+	/** Une boîte du bras droit, ou son reflet sur le bras gauche (autour de l'axe de chaque bras). */
+	private static void box(CubeListBuilder cubes, boolean right, int u, int v, float x, float y, float z, int w, int h,
+			int d) {
+		cubes.texOffs(u, v).addBox(right ? x : -x - w, y, z, w, h, d);
+	}
 
-	/** Le squelette du joueur, une lame (cachée tant qu'on ne l'a pas transmutée) à chaque bras. */
-	private static ModelPart withBlades() {
-		MeshDefinition mesh = PlayerModel.createMesh(CubeDeformation.NONE, false);
-		blade(mesh.getRoot().getChild("right_arm"), -1.5f);
-		blade(mesh.getRoot().getChild("left_arm"), 0.5f);
-		return LayerDefinition.create(mesh, 64, 64).bakeRoot();
+	/** Les deux bras, sans volume propre, chacun avec sa lame : on n'en montre que les bras transmutés. */
+	private static ModelPart blades() {
+		MeshDefinition mesh = new MeshDefinition();
+		PartDefinition root = mesh.getRoot();
+		blade(root.addOrReplaceChild("right_arm", CubeListBuilder.create(), PartPose.offset(-5, 2, 0)), true);
+		blade(root.addOrReplaceChild("left_arm", CubeListBuilder.create(), PartPose.offset(5, 2, 0)), false);
+		return LayerDefinition.create(mesh, 64, 32).bakeRoot();
 	}
 
 	private static final Map<BodyPart, ModelPart> HAND_BLADES = new EnumMap<>(BodyPart.class);
@@ -78,12 +94,7 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 	 * pose du bras qu'on vient de dessiner.
 	 */
 	public static ModelPart handBlade(BodyPart arm) {
-		return HAND_BLADES.computeIfAbsent(arm, a -> {
-			MeshDefinition mesh = new MeshDefinition();
-			PartDefinition bone = mesh.getRoot().addOrReplaceChild("arm", CubeListBuilder.create(), PartPose.ZERO);
-			blade(bone, a == BodyPart.RIGHT_ARM ? -1.5f : 0.5f);
-			return LayerDefinition.create(mesh, 64, 64).bakeRoot().getChild("arm");
-		});
+		return HAND_BLADES.computeIfAbsent(arm, a -> blades().getChild(a == BodyPart.RIGHT_ARM ? "right_arm" : "left_arm"));
 	}
 
 	/** La texture d'un modèle d'automail, au gabarit d'une peau de joueur (bras et jambes). */
@@ -109,6 +120,10 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		for (AutomailItem.Model kind : EnumSet.copyOf(automails.values())) {
 			Model model = models.get(kind);
 			collector.order(1).submitModel(model, state, poseStack, RenderTypes.entityCutout(model.texture), light,
+					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor, null);
+		}
+		if (!holder.fmab$blades().isEmpty()) {
+			collector.order(1).submitModel(bladeModel, state, poseStack, RenderTypes.entityCutout(BLADE_TEXTURE), light,
 					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor, null);
 		}
 	}
@@ -139,8 +154,6 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 			body.visible = false;
 			rightArm.visible = automails.get(BodyPart.RIGHT_ARM) == kind;
 			leftArm.visible = automails.get(BodyPart.LEFT_ARM) == kind;
-			rightArm.getChild(BLADE).visible = holder.fmab$blades().contains(BodyPart.RIGHT_ARM);
-			leftArm.getChild(BLADE).visible = holder.fmab$blades().contains(BodyPart.LEFT_ARM);
 			rightLeg.visible = automails.get(BodyPart.RIGHT_LEG) == kind;
 			leftLeg.visible = automails.get(BodyPart.LEFT_LEG) == kind;
 		}
@@ -151,6 +164,27 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 			} else {
 				part.loadPose(pose);
 			}
+		}
+	}
+
+	/** Les lames des bras transmutés, qui prennent elles aussi la pose relevée sur le squelette. */
+	static class Blades extends EntityModel<AvatarRenderState> {
+		private final ModelPart right;
+		private final ModelPart left;
+
+		Blades(ModelPart root) {
+			super(root);
+			right = root.getChild("right_arm");
+			left = root.getChild("left_arm");
+		}
+
+		@Override
+		public void setupAnim(AvatarRenderState state) {
+			BodyHolder holder = (BodyHolder) state;
+			Model.load(right, holder.fmab$skeleton().get(BodyPart.RIGHT_ARM));
+			Model.load(left, holder.fmab$skeleton().get(BodyPart.LEFT_ARM));
+			right.visible = holder.fmab$blades().contains(BodyPart.RIGHT_ARM);
+			left.visible = holder.fmab$blades().contains(BodyPart.LEFT_ARM);
 		}
 	}
 }

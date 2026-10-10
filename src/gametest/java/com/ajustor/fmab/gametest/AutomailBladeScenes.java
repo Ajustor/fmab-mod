@@ -34,15 +34,18 @@ public class AutomailBladeScenes implements FabricClientGameTest {
 				server.getPlayerList().getPlayers().getFirst().getAttributeValue(Attributes.ATTACK_DAMAGE));
 	}
 
-	/** Tourne la tête de trois quarts (ou de profil), sans le corps. */
-	private static void turn(ClientGameTestContext context, float yaw) {
+	/**
+	 * La caméra de face suit le regard : on tourne la tête de {@code yaw} et le corps de {@code body}, et
+	 * la caméra voit le corps sous l'angle qui les sépare (de trois quarts, ou de profil).
+	 */
+	private static void turn(ClientGameTestContext context, float yaw, float body) {
 		context.runOnClient(mc -> {
 			mc.player.setYRot(yaw);
 			mc.player.yRotO = yaw;
 			mc.player.setYHeadRot(yaw);
 			mc.player.yHeadRotO = yaw;
-			mc.player.yBodyRot = 0;
-			mc.player.yBodyRotO = 0;
+			mc.player.yBodyRot = body;
+			mc.player.yBodyRotO = body;
 		});
 		context.waitTick();
 	}
@@ -87,15 +90,15 @@ public class AutomailBladeScenes implements FabricClientGameTest {
 						+ " (" + state + ")");
 			}
 			context.takeScreenshot("automail_blade_1_out_front");
-			turn(context, 60);
+			turn(context, 45, 0);
 			context.takeScreenshot("automail_blade_2_out_three_quarter");
-			turn(context, 90);
+			turn(context, 60, -30);
 			context.takeScreenshot("automail_blade_3_out_side");
 			// Le bras levé pour frapper.
 			context.runOnClient(mc -> mc.player.swing(net.minecraft.world.InteractionHand.MAIN_HAND));
 			context.waitTicks(2);
 			context.takeScreenshot("automail_blade_4_out_swing");
-			turn(context, 0);
+			turn(context, 0, 0);
 			// À la première personne, la main ne se dessine qu'avec l'interface.
 			context.runOnClient(mc -> {
 				mc.options.setCameraType(CameraType.FIRST_PERSON);
