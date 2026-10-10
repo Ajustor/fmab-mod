@@ -11,6 +11,7 @@ import com.ajustor.fmab.gate.Wheelchairs;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import net.minecraft.core.BlockPos;
@@ -73,15 +74,16 @@ public final class GloveCasting {
 
 	/**
 	 * Qui a vu la Porte joint les mains et transmute sans cercle : le cercle sélectionné dans le
-	 * carnet (ou sur la roue des cercles) agit sur la surface visée. Il faut deux mains, et qu'elles
-	 * soient libres.
+	 * carnet (ou sur la roue des cercles) agit sur la surface visée. Il faut deux mains, libres ou
+	 * tenant une Pierre philosophale.
 	 */
 	private static void clap(ServerPlayer player) {
 		if (Tolls.disabled(player, BodyPart.LEFT_ARM) || Tolls.disabled(player, BodyPart.RIGHT_ARM)) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.clap_needs_hands"));
 			return;
 		}
-		if (!player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty()) {
+		// Une Pierre philosophale se tient entre les paumes jointes ; rien d'autre.
+		if (!clapsWith(player.getMainHandItem()) || !clapsWith(player.getOffhandItem())) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.hand_not_free"));
 			return;
 		}
@@ -99,6 +101,10 @@ public final class GloveCasting {
 		Transmutation.activate(player.level(), hit.getBlockPos().relative(hit.getDirection()),
 				CircleFrame.forFace(hit.getDirection(), player.getDirection()), drawing, player, false, Integer.MAX_VALUE);
 		TransmutationPose.strike(player, TransmutationPose.Kind.CLAP, 14);
+	}
+
+	private static boolean clapsWith(ItemStack held) {
+		return held.isEmpty() || held.is(FmabItems.PHILOSOPHER_STONE) || held.is(FmabItems.RED_STONE_SHARD);
 	}
 
 	/** Une main porte-t-elle un cercle : celui de son gant, ou, paume nue, celui de son tatouage ? */

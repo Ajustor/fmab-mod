@@ -3,6 +3,7 @@ package com.ajustor.fmab.entity;
 import com.ajustor.fmab.FmabConfig;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.gate.BodyPart;
+import com.ajustor.fmab.gate.StoneBargain;
 import com.ajustor.fmab.network.OpenTruthPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -99,6 +100,10 @@ public class TruthEntity extends PathfinderMob {
 	protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 		if (player instanceof ServerPlayer server && owner().filter(server.getUUID()::equals).isPresent()) {
 			GateState gate = server.getAttachedOrCreate(FmabAttachments.GATE);
+			if (gate.visit().isPresent() && StoneBargain.offer(server)) {
+				// Pendant la visite, une Pierre en poche : la Vérité rouvre le marché.
+				return InteractionResult.SUCCESS;
+			}
 			if (gate.adrift()) {
 				// Être rappelée dans un sceau, ou repartir de zéro : l'âme choisit.
 				ServerPlayNetworking.send(server, new OpenTruthPayload(getId(), FmabConfig.get().restartWipesProgress()));

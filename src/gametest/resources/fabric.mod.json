@@ -8,7 +8,8 @@
 		"fabric-client-gametest": [
 			"com.ajustor.fmab.gametest.RenderShowcase",
 			"com.ajustor.fmab.gametest.WheelchairScenes",
-			"com.ajustor.fmab.gametest.RecompositionScenes"
+			"com.ajustor.fmab.gametest.RecompositionScenes",
+			"com.ajustor.fmab.gametest.StoneGateScenes"
 		]
 	},
 	"depends": {

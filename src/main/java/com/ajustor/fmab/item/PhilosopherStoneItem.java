@@ -73,7 +73,7 @@ public class PhilosopherStoneItem extends Item {
 	 * La Pierre paie ce que la Vérité exigerait. Une âme qui retrouve son corps quitte son armure,
 	 * qui reste debout, vide ; les automails des membres rendus retournent au sac.
 	 */
-	private static void restore(ServerPlayer player, GateState gate, Restoration.Plan plan) {
+	public static void restore(ServerPlayer player, GateState gate, Restoration.Plan plan) {
 		ServerLevel level = player.level();
 		if (plan.restored().contains(BodyPart.BODY) && gate.inArmor()) {
 			SoulBinding.leaveShell(player, false);

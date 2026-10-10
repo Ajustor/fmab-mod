@@ -33,6 +33,7 @@ import com.ajustor.fmab.client.render.TruthRenderer;
 import com.ajustor.fmab.client.render.WheelchairRenderer;
 import com.ajustor.fmab.client.render.WinryRenderer;
 import com.ajustor.fmab.client.render.WrathRenderer;
+import com.ajustor.fmab.client.screen.BargainScreen;
 import com.ajustor.fmab.client.screen.BodyScreen;
 import com.ajustor.fmab.client.screen.CircleWheelScreen;
 import com.ajustor.fmab.client.screen.DesignScreen;
@@ -43,6 +44,7 @@ import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TattooScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
+import com.ajustor.fmab.client.screen.StoneChoiceScreen;
 import com.ajustor.fmab.client.screen.TruthScreen;
 import com.ajustor.fmab.client.screen.WinryScreen;
 import com.ajustor.fmab.data.AlchemistData;
@@ -52,11 +54,13 @@ import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.network.CastGlovesPayload;
 import com.ajustor.fmab.network.CinematicPayload;
+import com.ajustor.fmab.network.BargainPayload;
 import com.ajustor.fmab.network.OpenDesignsPayload;
 import com.ajustor.fmab.network.OpenExamPayload;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.network.OpenTruthPayload;
+import com.ajustor.fmab.network.StoneChoicePayload;
 import com.ajustor.fmab.network.OpenWinryPayload;
 import com.ajustor.fmab.network.RequestDesignsPayload;
 import com.ajustor.fmab.network.SelectCirclePayload;
@@ -185,6 +189,19 @@ public class FmabClient implements ClientModInitializer {
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> Cinematics.stop());
 		ClientPlayNetworking.registerGlobalReceiver(OpenTruthPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
+		ClientPlayNetworking.registerGlobalReceiver(StoneChoicePayload.TYPE,
+				(payload, context) -> context.client().gui.setScreen(new StoneChoiceScreen(payload)));
+		ClientPlayNetworking.registerGlobalReceiver(BargainPayload.TYPE, (payload, context) -> {
+			if (context.client().gui.screen() instanceof BargainScreen open) {
+				if (payload.souls() < 0) {
+					open.closeSilently();
+				} else {
+					open.update(payload);
+				}
+			} else if (payload.souls() >= 0) {
+				context.client().gui.setScreen(new BargainScreen(payload));
+			}
+		});
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new WinryScreen(payload.entityId())));
 		ClientPlayNetworking.registerGlobalReceiver(OpenDesignsPayload.TYPE,

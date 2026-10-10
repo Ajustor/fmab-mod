@@ -9,6 +9,8 @@ import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
+import com.ajustor.fmab.gate.StoneBargain;
+import com.ajustor.fmab.gate.StoneChoice;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyMenu;
 import com.ajustor.fmab.gate.BodyPart;
@@ -42,6 +44,10 @@ public final class FmabNetwork {
 		PayloadTypeRegistry.serverboundPlay().register(WinryActionPayload.TYPE, WinryActionPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(TruthChoicePayload.TYPE, TruthChoicePayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenTruthPayload.TYPE, OpenTruthPayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(StoneChoicePayload.TYPE, StoneChoicePayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(StoneChosenPayload.TYPE, StoneChosenPayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(BargainPayload.TYPE, BargainPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(BargainAnswerPayload.TYPE, BargainAnswerPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(CinematicPayload.TYPE, CinematicPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenWinryPayload.TYPE, OpenWinryPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenIzumiPayload.TYPE, OpenIzumiPayload.CODEC);
@@ -70,6 +76,10 @@ public final class FmabNetwork {
 				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
 		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,
 				(payload, context) -> removeGlove(context.player(), payload.left()));
+		ServerPlayNetworking.registerGlobalReceiver(StoneChosenPayload.TYPE,
+				(payload, context) -> StoneChoice.answer(context.player(), payload.choice()));
+		ServerPlayNetworking.registerGlobalReceiver(BargainAnswerPayload.TYPE,
+				(payload, context) -> StoneBargain.answer(context.player(), payload.part()));
 		ServerPlayNetworking.registerGlobalReceiver(TruthChoicePayload.TYPE,
 				(payload, context) -> truth(context.player(), payload));
 		ServerPlayNetworking.registerGlobalReceiver(WinryActionPayload.TYPE,
