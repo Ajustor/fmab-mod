@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Les personnages du mod, en rang, pour juger leurs silhouettes : chacun de trois quarts et presque
- * de profil (à hauteur de buste), de près, puis toute la troupe. Lancer avec {@code ./gradlew runClientGameTest -PfmabGametest=figures}.
+ * Les personnages du mod, en rang, pour juger leurs silhouettes : chacun de trois quarts, presque de
+ * profil (à hauteur de buste) et de dos, de près, puis toute la troupe. Lancer avec {@code ./gradlew runClientGameTest -PfmabGametest=figures}.
  */
 public class FigureScenes implements FabricClientGameTest {
 	private static final List<String> FIGURES = List.of("lust", "izumi", "winry", "olivier", "may_chang", "hohenheim",
@@ -58,6 +58,9 @@ public class FigureScenes implements FabricClientGameTest {
 				look(sp, x - 2.4, Y + 1.35, -0.9, x, Y + 1.1, 0.5);
 				context.waitTicks(8);
 				context.takeScreenshot("figure_%02d_%s_1_side".formatted(i, FIGURES.get(i)));
+				look(sp, x + 1.6, Y + 1.9, 2.8, x, Y + 1.05, 0.5);
+				context.waitTicks(8);
+				context.takeScreenshot("figure_%02d_%s_2_back".formatted(i, FIGURES.get(i)));
 			}
 			double mid = (FIGURES.size() - 1) * STEP / 2.0 + 0.5;
 			look(sp, mid, Y + 6, -26, mid, Y + 1, 0.5);
