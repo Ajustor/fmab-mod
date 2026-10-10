@@ -11,8 +11,9 @@ import net.minecraft.client.model.player.PlayerModel;
 
 /**
  * Des silhouettes pour les personnages au squelette de joueur (avec sa surcouche) : une poitrine,
- * une queue de cheval, des chignons, une visière. Ces volumes se texturent dans les coins que la
- * peau de joueur laisse libres : (24, 0) sur 16x8, et (56, 16) sur 8x32.
+ * une queue de cheval, des chignons, une visière, un col de fourrure... Les petits volumes se
+ * texturent dans les coins que la peau de joueur laisse libres, (24, 0) sur 16x8 et (56, 16) sur
+ * 8x32 ; les plus grands demandent une peau élargie à 128x64, dont la moitié droite leur revient.
  */
 public final class FigureModels {
 	private FigureModels() {
@@ -24,6 +25,11 @@ public final class FigureModels {
 
 	private static ModelPart bake(MeshDefinition mesh) {
 		return LayerDefinition.create(mesh, 64, 64).bakeRoot();
+	}
+
+	/** Pour une peau élargie à 128x64 : la disposition du joueur à gauche, les volumes à droite. */
+	private static ModelPart bakeWide(MeshDefinition mesh) {
+		return LayerDefinition.create(mesh, 128, 64).bakeRoot();
 	}
 
 	/**
@@ -38,6 +44,71 @@ public final class FigureModels {
 		body.addOrReplaceChild("bust", CubeListBuilder.create().texOffs(u, v)
 						.addBox(-width / 2f, 0, -(depth - embed), width, 3, depth),
 				PartPose.offsetAndRotation(0, y, -2, tilt, 0, 0));
+	}
+
+	/** Olivier : la poitrine, et sa longue chevelure blonde qui tombe dans le dos. */
+	public static ModelPart olivier() {
+		MeshDefinition mesh = mesh(true);
+		PartDefinition body = mesh.getRoot().getChild("body");
+		bust(body, 24, 0, 6, 2, 2.5f, -0.15f);
+		body.addOrReplaceChild("hair", CubeListBuilder.create().texOffs(64, 0).addBox(-4, -1, 2.3f, 8, 11, 1),
+				PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
+	/** Scar : un torse de lutteur, les pectoraux saillants sous le maillot. */
+	public static ModelPart scar() {
+		MeshDefinition mesh = mesh(false);
+		mesh.getRoot().getChild("body").addOrReplaceChild("chest",
+				CubeListBuilder.create().texOffs(64, 0).addBox(-4, 1, -3, 8, 3, 1), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
+	/** Cornello : le soleil de Léto en médaillon sur la poitrine, la robe de prêtre qui s'évase. */
+	public static ModelPart cornello() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition body = mesh.getRoot().getChild("body");
+		body.addOrReplaceChild("medallion",
+				CubeListBuilder.create().texOffs(64, 0).addBox(-2, 1.5f, -3, 4, 4, 1), PartPose.ZERO);
+		body.addOrReplaceChild("robe",
+				CubeListBuilder.create().texOffs(64, 8).addBox(-5, 10, -3, 10, 6, 6), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
+	/** Marcoh : la sacoche de médecin qu'il porte en bandoulière, sur la hanche, dans le dos. */
+	public static ModelPart marcoh() {
+		MeshDefinition mesh = mesh(false);
+		mesh.getRoot().getChild("body").addOrReplaceChild("satchel",
+				CubeListBuilder.create().texOffs(64, 0).addBox(-4.5f, 7.5f, 2, 4, 3, 2), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
+	/** Un soldat de Briggs : le col de fourrure de la parka, les lunettes de neige, le sac au dos. */
+	public static ModelPart briggs() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition root = mesh.getRoot();
+		root.getChild("body").addOrReplaceChild("collar",
+				CubeListBuilder.create().texOffs(64, 0).addBox(-5, -1, -3, 10, 2, 6), PartPose.ZERO);
+		root.getChild("body").addOrReplaceChild("pack",
+				CubeListBuilder.create().texOffs(64, 12).addBox(-3, 1.5f, 2, 6, 7, 3), PartPose.ZERO);
+		root.getChild("head").addOrReplaceChild("goggles",
+				CubeListBuilder.create().texOffs(64, 8).addBox(-3.5f, -6.8f, -5.3f, 7, 2, 1), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
+	/** Un soldat de Drachma : la chapka bouffante et ses rabats, les pans de la capote. */
+	public static ModelPart drachma() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition root = mesh.getRoot();
+		PartDefinition head = root.getChild("head");
+		head.addOrReplaceChild("chapka",
+				CubeListBuilder.create().texOffs(64, 0).addBox(-5, -10, -5, 10, 2, 10), PartPose.ZERO);
+		head.addOrReplaceChild("flaps", CubeListBuilder.create().texOffs(64, 12)
+				.addBox(-5.5f, -5, -2.5f, 1, 5, 5)
+				.addBox(4.5f, -5, -2.5f, 1, 5, 5, true), PartPose.ZERO);
+		root.getChild("body").addOrReplaceChild("skirt",
+				CubeListBuilder.create().texOffs(64, 24).addBox(-4.5f, 10, -2.5f, 9, 5, 5), PartPose.ZERO);
+		return bakeWide(mesh);
 	}
 
 	/** Une femme : la poitrine, sous la surcouche de la veste. */

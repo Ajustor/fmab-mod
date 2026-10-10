@@ -13,7 +13,7 @@ public class OlivierRenderer extends HumanoidMobRenderer<OlivierEntity, Humanoid
 	private static final Identifier TEXTURE = Fmab.id("textures/entity/olivier.png");
 
 	public OlivierRenderer(EntityRendererProvider.Context context) {
-		super(context, new HumanoidModel<>(FigureModels.woman(true)), 0.5f);
+		super(context, new HumanoidModel<>(FigureModels.olivier()), 0.5f);
 	}
 
 	@Override
