@@ -281,7 +281,7 @@ def wheelchair(s):
 # --- automails ------------------------------------------------------------------------------------
 LIMBS = {"rarm": (40, 16, 4, 12, 4), "larm": (32, 48, 4, 12, 4), "rleg": (0, 16, 4, 12, 4), "lleg": (16, 48, 4, 12, 4),
          "rsleeve": (40, 32, 4, 12, 4), "lsleeve": (48, 48, 4, 12, 4), "rpants": (0, 32, 4, 12, 4),
-         "lpants": (0, 48, 4, 12, 4), "blade": (56, 16, 1, 12, 3)}
+         "lpants": (0, 48, 4, 12, 4)}
 
 
 def automail(s, metal, joint, accent, bolts, heavy=False):
@@ -310,15 +310,6 @@ def automail(s, metal, joint, accent, bolts, heavy=False):
     for leg in ("rleg", "lleg"):
         s.band(leg, 10, 2, shade(metal, 0.8), "metal")
         s.material(leg, "bottom", joint, "metal")
-    # La lame qu'on transmute de l'avant-bras : de l'acier poli, le fil clair sur le dessus, la base
-    # sombre où elle sort du bras.
-    s.fill("blade", "#c8ced6", "metal")
-    s.material("blade", "back", "#eef2f6", "metal")
-    s.material("blade", "front", shade(metal, 0.7), "metal")
-    for f in ("right", "left"):
-        s.material("blade", f, "#b4bac4", "metal")
-        s.seam("blade", f, 2, 0, 12, "#eef2f6")
-        s.rect("blade", f, 0, 0, 3, 1, joint)
     # La surcouche : une plaque d'avant-bras ou de tibia, aux couleurs du fabricant.
     for over, rows in (("rsleeve", (7, 10)), ("lsleeve", (7, 10)), ("rpants", (7, 10)), ("lpants", (7, 10))):
         y0, y1 = rows
@@ -348,6 +339,46 @@ def automail_briggs(s):
 def automail_rush_valley(s):
     """L'automail de Rush Valley : acier poli, liserés de laiton, la fierté des artisans."""
     automail(s, "#c8ccd2", "#34302a", "#c8a24a", "#e8d080")
+
+
+# --- la lame transmutée d'un bras d'automail -------------------------------------------------------
+@creature("automail/blade", (64, 32), {
+    "cuff": (0, 0, 5, 5, 5), "blade1": (0, 10, 4, 6, 1), "blade2": (10, 10, 3, 3, 1), "blade3": (18, 10, 2, 2, 1),
+    "tip": (24, 10, 1, 2, 1), "spine": (32, 0, 1, 12, 2)})
+def automail_blade(s):
+    """La lame qu'on transmute de l'avant-bras, comme Ed : le manchon riveté d'où elle sort, l'acier
+    poli qui s'éclaircit du dos vers le fil, une gorge le long de la lame, le fil presque blanc."""
+    steel, dark, edge = "#b8c0cc", "#6a7480", "#f6f9fc"
+    # Le manchon : de l'acier brut, une bande sombre à chaque bout, des rivets, un trait de cercle.
+    s.fill("cuff", "#a9afb6", "metal")
+    s.band("cuff", 0, 1, "#5a5e66", "metal")
+    s.band("cuff", 4, 1, "#5a5e66", "metal")
+    for f in SIDES:
+        s.px("cuff", f, 1, 2, "#e1e5ea")
+        s.px("cuff", f, 3, 2, "#e1e5ea")
+    s.material("cuff", "bottom", "#3a3e44", "metal")
+    # La lame : chaque face plate passe du dos (sombre) au fil (clair).
+    for part in ("blade1", "blade2", "blade3", "tip"):
+        s.fill(part, steel, "metal")
+        for f in ("front", "back"):
+            w, h = s.size(part, f)
+            for x in range(w):
+                t = x / max(1, w - 1) if f == "front" else 1 - x / max(1, w - 1)
+                for y in range(h):
+                    s.px(part, f, x, y, mix(dark, edge, 0.25 + 0.7 * t))
+            # Le fil : la colonne la plus éloignée du dos, presque blanche.
+            s.rect(part, f, w - 1 if f == "front" else 0, 0, 1, h, edge)
+        # La tranche du fil, côté intérieur, et celle du dos.
+        s.material(part, "left", edge, "metal")
+        s.material(part, "right", dark, "metal")
+    # La gorge, au milieu de la lame large.
+    for f in ("front", "back"):
+        s.seam("blade1", f, 1 if f == "front" else 2, 0, 6, None, k=0.78)
+    s.px("tip", "front", 0, 1, "#ffffff")
+    # Le dos épaissi : un acier plus sombre, une ligne claire sur l'arête.
+    s.fill("spine", "#5e6670", "metal")
+    s.seam("spine", "front", 0, 0, 12, "#9aa4b0")
+    s.material("spine", "bottom", "#3a3e44", "metal")
 
 
 def build(names=None):
