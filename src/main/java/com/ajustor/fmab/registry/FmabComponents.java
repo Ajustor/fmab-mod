@@ -39,6 +39,15 @@ public final class FmabComponents {
 					.networkSynchronized(ByteBufCodecs.BOOL)
 					.build());
 
+	/** Un bras d'automail transmuté en lame, comme celui d'Ed : la lame sort de l'avant-bras. */
+	public static final DataComponentType<Boolean> AUTOMAIL_BLADE = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("automail_blade"),
+			DataComponentType.<Boolean>builder()
+					.persistent(Codec.BOOL)
+					.networkSynchronized(ByteBufCodecs.BOOL)
+					.build());
+
 	/** Le tome que cachent des notes chiffrées de Marcoh. */
 	public static final DataComponentType<Integer> CIPHER = Registry.register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,

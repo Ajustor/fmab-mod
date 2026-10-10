@@ -281,7 +281,7 @@ def wheelchair(s):
 # --- automails ------------------------------------------------------------------------------------
 LIMBS = {"rarm": (40, 16, 4, 12, 4), "larm": (32, 48, 4, 12, 4), "rleg": (0, 16, 4, 12, 4), "lleg": (16, 48, 4, 12, 4),
          "rsleeve": (40, 32, 4, 12, 4), "lsleeve": (48, 48, 4, 12, 4), "rpants": (0, 32, 4, 12, 4),
-         "lpants": (0, 48, 4, 12, 4)}
+         "lpants": (0, 48, 4, 12, 4), "blade": (56, 16, 1, 12, 3)}
 
 
 def automail(s, metal, joint, accent, bolts, heavy=False):
@@ -310,6 +310,15 @@ def automail(s, metal, joint, accent, bolts, heavy=False):
     for leg in ("rleg", "lleg"):
         s.band(leg, 10, 2, shade(metal, 0.8), "metal")
         s.material(leg, "bottom", joint, "metal")
+    # La lame qu'on transmute de l'avant-bras : de l'acier poli, le fil clair sur le dessus, la base
+    # sombre où elle sort du bras.
+    s.fill("blade", "#c8ced6", "metal")
+    s.material("blade", "back", "#eef2f6", "metal")
+    s.material("blade", "front", shade(metal, 0.7), "metal")
+    for f in ("right", "left"):
+        s.material("blade", f, "#b4bac4", "metal")
+        s.seam("blade", f, 2, 0, 12, "#eef2f6")
+        s.rect("blade", f, 0, 0, 3, 1, joint)
     # La surcouche : une plaque d'avant-bras ou de tibia, aux couleurs du fabricant.
     for over, rows in (("rsleeve", (7, 10)), ("lsleeve", (7, 10)), ("rpants", (7, 10)), ("lpants", (7, 10))):
         y0, y1 = rows

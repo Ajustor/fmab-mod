@@ -5,9 +5,13 @@ import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.item.AutomailItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -25,6 +29,7 @@ import java.util.Map;
 /**
  * Les automails sur le corps du joueur : à la place du membre perdu, le bras ou la jambe de métal.
  * Les bras sont toujours larges, même sur une peau fine : une prothèse ne se taille pas sur la peau.
+ * Un bras transmuté porte sa lame.
  *
  * <p><strong>Un squelette recopié, pas une animation rejouée.</strong> L'automail ne calcule pas sa
  * pose : il reprend os par os celle du vrai modèle du joueur, tel que tout l'a posé (marche, gestes de
@@ -41,8 +46,44 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 	public AutomailLayer(RenderLayerParent<AvatarRenderState, PlayerModel> parent, EntityRendererProvider.Context context) {
 		super(parent);
 		for (AutomailItem.Model kind : AutomailItem.Model.values()) {
-			models.put(kind, new Model(context.bakeLayer(ModelLayers.PLAYER), kind));
+			models.put(kind, new Model(withBlades(), kind));
 		}
+	}
+
+	/**
+	 * La lame qu'un alchimiste transmute de son avant-bras, comme Ed : une arête d'acier le long du
+	 * dessus de l'avant-bras, qui dépasse le poing et s'effile. Texturée en (56, 16) dans la peau de
+	 * l'automail.
+	 */
+	private static void blade(PartDefinition arm, float x) {
+		arm.addOrReplaceChild(BLADE, CubeListBuilder.create().texOffs(56, 16)
+				.addBox(x, 4, 1.5f, 1, 12, 3)
+				.addBox(x, 16, 2, 1, 3, 2), PartPose.ZERO);
+	}
+
+	private static final String BLADE = "fmab_blade";
+
+	/** Le squelette du joueur, une lame (cachée tant qu'on ne l'a pas transmutée) à chaque bras. */
+	private static ModelPart withBlades() {
+		MeshDefinition mesh = PlayerModel.createMesh(CubeDeformation.NONE, false);
+		blade(mesh.getRoot().getChild("right_arm"), -1.5f);
+		blade(mesh.getRoot().getChild("left_arm"), 0.5f);
+		return LayerDefinition.create(mesh, 64, 64).bakeRoot();
+	}
+
+	private static final Map<BodyPart, ModelPart> HAND_BLADES = new EnumMap<>(BodyPart.class);
+
+	/**
+	 * Pour la première personne : un os de bras sans volume, qui ne porte que la lame. On lui donne la
+	 * pose du bras qu'on vient de dessiner.
+	 */
+	public static ModelPart handBlade(BodyPart arm) {
+		return HAND_BLADES.computeIfAbsent(arm, a -> {
+			MeshDefinition mesh = new MeshDefinition();
+			PartDefinition bone = mesh.getRoot().addOrReplaceChild("arm", CubeListBuilder.create(), PartPose.ZERO);
+			blade(bone, a == BodyPart.RIGHT_ARM ? -1.5f : 0.5f);
+			return LayerDefinition.create(mesh, 64, 64).bakeRoot().getChild("arm");
+		});
 	}
 
 	/** La texture d'un modèle d'automail, au gabarit d'une peau de joueur (bras et jambes). */
@@ -98,6 +139,8 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 			body.visible = false;
 			rightArm.visible = automails.get(BodyPart.RIGHT_ARM) == kind;
 			leftArm.visible = automails.get(BodyPart.LEFT_ARM) == kind;
+			rightArm.getChild(BLADE).visible = holder.fmab$blades().contains(BodyPart.RIGHT_ARM);
+			leftArm.getChild(BLADE).visible = holder.fmab$blades().contains(BodyPart.LEFT_ARM);
 			rightLeg.visible = automails.get(BodyPart.RIGHT_LEG) == kind;
 			leftLeg.visible = automails.get(BodyPart.LEFT_LEG) == kind;
 		}
