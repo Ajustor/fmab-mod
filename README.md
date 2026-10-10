@@ -27,6 +27,7 @@ Toutes réglables dans Options → Commandes → Touches, catégorie « Alchimie
 | R (maintenue) | Roue des cercles : pointer un cercle et relâcher ; 1 à 9 pour choisir sans viser ; un clic gauche joint aussitôt les mains (Initiés de la Porte) |
 | G / Maj+G | Lancer le cercle des gants / joindre les mains (les deux gants, ou sans cercle pour un Initié) |
 | H | Écran des gants |
+| J | Page de conception : l'objet auquel penser en recomposant |
 | — | Cercle suivant / précédent (sans touche par défaut) |
 
 Dans l'inventaire de survie, l'onglet **Corps** montre les membres, les automails et les gants.
@@ -44,16 +45,22 @@ d'État à Central, la Porte, les homonculus, puis Père.
 - **Cercles composés par le joueur** : grille de 32 cases, outils ligne, cercle, polygone, arc, point
   et tampon (glyphes compris), symétrie, pages nommées et rangées, import/export par code. Le carnet
   lit le cercle en direct : glyphes, effet, complexité, stabilité, coût, verdict.
-- **15 glyphes et 19 combinaisons** : Terre, Eau, Fer, Cuivre, Feu, Air, Or, Humain ; Fixer,
-  Projeter, Réparer, Décomposer, Recomposer ; Direction, Intensité. Étages reliés en série, en
-  parallèle ou en condition, satellites, fusion de deux éléments, polygones superposés.
+- **31 glyphes et 54 combinaisons** : les éléments Terre, Eau, Feu, Air, Or, Humain et seize
+  matières (Fer, Cuivre, Bois, Fibre, Carbone, Cristal, Soufre, Mercure, Chaux, Plante, Chair, Argent,
+  Étain, Plomb, Zinc, Nickel, Aluminium, Nethérite) ; Fixer, Projeter, Réparer, Décomposer,
+  Recomposer ; Direction, Intensité. Étages reliés en série, en parallèle ou en condition, satellites,
+  fusion de deux éléments, polygones superposés.
+- **Fabriquer des objets** : décomposer un objet pour le comprendre, puis le recomposer d'après modèle
+  ou d'après la page de conception (J), contre sa matière exacte. Toute matière se transmute, y compris
+  celles des autres mods (tags communs, alliages).
 - **Échange équivalent** : la matière vient du monde ou des objets posés sur le cercle ; jamais de
   changement de famille, jamais plus de masse produite que donnée.
 - **Supports** : sol, murs et plafonds ; craie, peinture, gravure au burin ; cercles de 1 à 7 blocs ;
   déclencheurs (retardement, piège, redstone) ; fusion à deux alchimistes. Accroupi, main vide, un
   clic droit sur un cercle inconnu le recopie dans le carnet.
 - **Rangs et savoir** : Apprenti, Alchimiste (par la pratique), Alchimiste d'État (examen contre un
-  golem), Initié de la Porte. La concentration grandit avec le rang. Maîtrise par école (Terre, Métal,
+  golem), Initié de la Porte. La concentration grandit avec le rang ; un cercle au-delà du rang
+  marche, mais perd de sa stabilité. Maîtrise par école (Terre, Métal,
   Eau, Feu, Explosion, Destruction, Médecine, Vie) ; un glyphe non compris marche avec un risque de
   rebond, et s'apprend par l'usage ou par les tomes.
 - **Cercles portés** : gants brodés ou gravés (dont les gants à silex de Mustang et les gantelets),
@@ -173,6 +180,7 @@ All rebindable under Options → Controls → Key Binds, "Alchemy" category.
 | R (hold) | Circle wheel: point at a circle and release; 1 to 9 to pick without aiming; a left click joins the hands at once (Gate initiates) |
 | G / Shift+G | Cast the gloves' circle / join hands (both gloves, or no circle for an initiate) |
 | H | Gloves screen |
+| J | Design page: the object to think of while recomposing |
 | — | Next / previous circle (unbound by default) |
 
 In the survival inventory, the **Body** tab shows limbs, automail and gloves.
@@ -190,15 +198,21 @@ Central, the Gate, the homunculi, then Father.
 - **Player-designed circles**: a 32-cell grid with line, circle, polygon, arc, dot and stamp tools,
   symmetry, named and ordered pages, import/export codes, and live analysis (glyphs, effect,
   complexity, stability, cost, verdict).
-- **15 glyphs and 19 combinations**, multi-stage circles linked in series, parallel or condition,
-  satellites, two-element fusion, layered polygons.
+- **31 glyphs and 54 combinations**: the elements Earth, Water, Fire, Air, Gold, Human and sixteen
+  kinds of matter (Iron, Copper, Wood, Fiber, Carbon, Crystal, Sulfur, Mercury, Lime, Plant, Flesh,
+  Silver, Tin, Lead, Zinc, Nickel, Aluminium, Netherite); multi-stage circles linked in series,
+  parallel or condition, satellites, two-element fusion, layered polygons.
+- **Making objects**: break an object down to understand it, then recompose it from a model or from
+  the design page (J), for its exact matter. Every material can be transmuted, other mods' included
+  (common tags, alloys).
 - **Equivalent exchange**: matter comes from the world or from items laid on the circle; never a
   change of family, never more mass out than in.
 - **Media**: floors, walls and ceilings; chalk, paint, chisel engraving; 1 to 7-block circles;
   triggers (delay, trap, redstone); two-alchemist fusion. Crouching empty-handed, right-click an
   unknown circle to copy it into the notebook.
 - **Ranks and knowledge**: Apprentice, Alchemist (through practice), State Alchemist (exam against a
-  golem), Gate initiate; concentration grows with rank; mastery per school (Earth, Metal, Water, Fire, Explosion, Destruction,
+  golem), Gate initiate; concentration grows with rank; a circle beyond your rank works but loses
+  stability; mastery per school (Earth, Metal, Water, Fire, Explosion, Destruction,
   Medicine, Life); unknown glyphs work with
   a rebound risk and are learned through use or tomes.
 - **Worn circles**: embroidered or engraved gloves (including Mustang's spark gloves and
