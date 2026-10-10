@@ -1,5 +1,7 @@
 package com.ajustor.fmab.gate;
 
+import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.network.StoneChoicePayload;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -32,10 +34,11 @@ public final class StoneChoice {
 	/** Il faut rester près de son cercle pour choisir. */
 	private static final double REACH = 8;
 
-	private record Pending(ResourceKey<Level> dimension, BlockPos circle, long since) {
+	/** @param inscribed le cercle est tracé (et non lancé mains jointes) : il doit être encore là */
+	private record Pending(ResourceKey<Level> dimension, BlockPos circle, long since, boolean inscribed) {
 	}
 
-	private static final Map<UUID, Pending> PENDING = new HashMap<>();
+	private static final Map<UUID, Pending> PENDING = Transient.perPlayer(new HashMap<>());
 
 	private StoneChoice() {
 	}
@@ -43,7 +46,8 @@ public final class StoneChoice {
 	/** Le cercle s'est éveillé : l'alchimiste a une minute pour choisir. */
 	static void ask(ServerPlayer caster, BlockPos circle) {
 		ServerLevel level = caster.level();
-		PENDING.put(caster.getUUID(), new Pending(level.dimension(), circle.immutable(), level.getGameTime()));
+		PENDING.put(caster.getUUID(), new Pending(level.dimension(), circle.immutable(), level.getGameTime(),
+				level.getBlockEntity(circle) instanceof TransmutationCircleBlockEntity));
 		int souls = PhilosopherStones.held(caster).map(PhilosopherStoneItem::souls).orElse(0);
 		ServerPlayNetworking.send(caster, new StoneChoicePayload(souls));
 	}
@@ -52,7 +56,8 @@ public final class StoneChoice {
 	public static void answer(ServerPlayer player, String choice) {
 		Pending pending = PENDING.remove(player.getUUID());
 		ServerLevel level = player.level();
-		if (pending == null || level.dimension() != pending.dimension()
+		if (pending == null || !player.isAlive() || level.dimension() != pending.dimension()
+				|| pending.inscribed() && !(level.getBlockEntity(pending.circle()) instanceof TransmutationCircleBlockEntity)
 				|| level.getGameTime() - pending.since() > PATIENCE
 				|| player.position().distanceTo(Vec3.atCenterOf(pending.circle())) > REACH
 				|| player.getAttachedOrCreate(FmabAttachments.GATE).visit().isPresent()) {

@@ -5,12 +5,12 @@ import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Tattoos;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
@@ -55,7 +55,7 @@ public final class Passives {
 	private static final int CACHE_SIZE = 256;
 
 	/** Passifs actifs par joueur, recalculés toutes les deux secondes. */
-	private static final Map<UUID, Map<String, Integer>> ACTIVE = new HashMap<>();
+	private static final Map<UUID, Map<String, Integer>> ACTIVE = Transient.perPlayer(new HashMap<>());
 	/** Analyses des cercles portés : on ne relit pas un tracé inchangé toutes les deux secondes. */
 	private static final Map<CacheKey, Analysis> CACHE = new LinkedHashMap<>(64, 0.75f, true) {
 		@Override
@@ -64,7 +64,15 @@ public final class Passives {
 		}
 	};
 
+	/** Les règles pour lesquelles {@link #CACHE} vaut : un autre monde, d'autres data packs, on oublie tout. */
+	private static AlchemyRules cachedFor;
+
+	/** La concentration n'entre pas dans la clé : elle bouge chaque seconde, l'analyse non. */
 	private record CacheKey(Drawing drawing, AlchemistData alchemist) {
+	}
+
+	static {
+		Transient.perServer(CACHE.keySet());
 	}
 
 	private Passives() {
@@ -79,7 +87,6 @@ public final class Passives {
 				apply(player, count(player));
 			}
 		});
-		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> ACTIVE.remove(handler.getPlayer().getUUID()));
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damage, blocked) -> {
 			if (entity instanceof ServerPlayer player && source.getEntity() instanceof LivingEntity attacker
 					&& attacker != player) {
@@ -93,7 +100,7 @@ public final class Passives {
 	}
 
 	/** Les cercles que porte le joueur, et combien de fois chaque passif y figure. */
-	public static Map<String, Integer> count(ServerPlayer player) {
+	private static Map<String, Integer> count(ServerPlayer player) {
 		List<Drawing> worn = new ArrayList<>();
 		for (EquipmentSlot slot : WORN) {
 			Drawing d = player.getItemBySlot(slot).get(FmabComponents.EMBROIDERY);
@@ -111,8 +118,12 @@ public final class Passives {
 		if (worn.isEmpty()) {
 			return out;
 		}
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).withConcentration(0);
 		AlchemyRules rules = AlchemyRules.of(player.level().registryAccess());
+		if (rules != cachedFor) {
+			CACHE.clear();
+			cachedFor = rules;
+		}
 		for (Drawing d : worn) {
 			Analysis a = CACHE.computeIfAbsent(new CacheKey(d, me), k -> rules.analyze(k.drawing(), k.alchemist()));
 			if (a.outcome() != Analysis.Outcome.WORKS) {

@@ -6,6 +6,7 @@ import com.ajustor.fmab.alchemy.exchange.ExchangeValue;
 import com.ajustor.fmab.data.AlloyGroup;
 import com.ajustor.fmab.registry.FmabRegistries;
 import com.ajustor.fmab.registry.FmabTags;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -76,6 +77,27 @@ public final class ItemCompositions {
 	private ItemCompositions() {
 	}
 
+	/**
+	 * Le calcul parcourt tous les objets et toutes les recettes : on le fait au démarrage et après un
+	 * /reload, plutôt qu'à la première transmutation d'un joueur.
+	 */
+	public static void register() {
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> all(server.overworld()));
+		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> {
+			if (success) {
+				all(server.overworld());
+			}
+		});
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> forget());
+	}
+
+	private static synchronized void forget() {
+		cachedFor = null;
+		cache = Map.of();
+		base = Map.of();
+		units = Map.of();
+	}
+
 	/** La composition d'un objet, s'il en a une. */
 	public static Optional<Composition> of(ServerLevel level, Item item) {
 		return Optional.ofNullable(all(level).get(item));
@@ -88,7 +110,7 @@ public final class ItemCompositions {
 	}
 
 	/** L'élément d'une matière de base, s'il en a un. */
-	public static Optional<String> elementOf(ItemStack stack) {
+	private static Optional<String> elementOf(ItemStack stack) {
 		return ELEMENTS.stream().filter(e -> stack.is(FmabTags.elementItems(e))).findFirst();
 	}
 

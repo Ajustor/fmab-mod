@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.registry.FmabSounds;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
@@ -42,7 +43,9 @@ public final class TransmutationLightning {
 		}
 	}
 
-	private static final List<Discharge> ACTIVE = new ArrayList<>();
+	private static final List<Discharge> ACTIVE = Transient.perServer(new ArrayList<>());
+	/** Au-delà, les décharges les plus anciennes cèdent la place : le ciel n'a pas besoin de plus. */
+	private static final int MAX_ACTIVE = 64;
 
 	private TransmutationLightning() {
 	}
@@ -51,6 +54,11 @@ public final class TransmutationLightning {
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			for (Iterator<Discharge> it = ACTIVE.iterator(); it.hasNext(); ) {
 				Discharge d = it.next();
+				if (d.level.getServer() != server) {
+					// Un monde fermé (solo) : ses décharges ne le suivent pas dans le suivant.
+					it.remove();
+					continue;
+				}
 				for (int i = 0; i < d.boltsPerTick; i++) {
 					bolt(d.level, d.center, d.radius, d.level.getRandom());
 				}
@@ -70,6 +78,9 @@ public final class TransmutationLightning {
 	public static void discharge(ServerLevel level, BlockPos circle, double radius, double intensity) {
 		Vec3 center = Vec3.atBottomCenterOf(circle).add(0, 0.1, 0);
 		int bolts = Math.max(1, (int) Math.round((2 + radius) * intensity));
+		if (ACTIVE.size() >= MAX_ACTIVE) {
+			ACTIVE.removeFirst();
+		}
 		ACTIVE.add(new Discharge(level, center, radius, bolts, Math.max(3, (int) (DURATION * intensity))));
 		level.playSound(null, circle, FmabSounds.TRANSMUTE, SoundSource.PLAYERS, (float) (0.6 * intensity),
 				0.9f + level.getRandom().nextFloat() * 0.2f);

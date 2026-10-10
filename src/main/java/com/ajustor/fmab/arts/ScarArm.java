@@ -2,6 +2,7 @@ package com.ajustor.fmab.arts;
 
 import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.transmutation.AlchemyRules;
@@ -39,7 +40,7 @@ public final class ScarArm {
 	private static final float ENTITY_COST = 2;
 	private static final float ENTITY_DAMAGE = 7;
 	private static final int COOLDOWN = 8;
-	private static final Map<UUID, Long> LAST = new HashMap<>();
+	private static final Map<UUID, Long> LAST = Transient.perPlayer(new HashMap<>());
 
 	private ScarArm() {
 	}
