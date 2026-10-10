@@ -5,6 +5,7 @@ import com.ajustor.fmab.item.TransmutedWeaponItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabTags;
+import net.minecraft.network.chat.Component;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -93,6 +94,12 @@ public final class Effects {
 	private static final float BLAST_POWER = 2;
 	/** Une lance de pierre demande deux blocs. */
 	private static final int LANCE_BLOCKS = 2;
+	/**
+	 * La lame-bras et la lance de pierre sont des savoirs : sans eux, Fer ou Terre + Recomposer ne
+	 * fait que copier un modèle.
+	 */
+	private static final String ARM_BLADE_KNOWLEDGE = "fmab:metal/arm_blade";
+	private static final String STONE_LANCE_KNOWLEDGE = "fmab:earth/stone_lance";
 	/** Un charbon cuit huit objets, comme au fourneau. */
 	private static final int ITEMS_PER_FUEL = 8;
 
@@ -112,6 +119,8 @@ public final class Effects {
 		register("fmab:ice_spike", Effects::iceSpike);
 		register("fmab:ice_wall", Effects::iceWall);
 		register("fmab:detonate", Effects::detonate);
+		register("fmab:recompose", Recomposition::recompose);
+		register("fmab:dismantle", Recomposition::dismantleEffect);
 		for (String grows : new String[]{"fmab:wall", "fmab:spike", "fmab:ice_spike", "fmab:ice_wall"}) {
 			CHANNELS.put(grows, Channel.GROW);
 		}
@@ -247,6 +256,8 @@ public final class Effects {
 	 */
 	private static Result decompose(EffectContext ctx) {
 		ServerLevel level = ctx.level();
+		// Les objets de pierre posés sur le cercle se défont aussi : on en comprend la structure.
+		int dismantled = Recomposition.dismantle(ctx);
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
 		BlockPos support = ctx.support();
 		BlockPos center = ctx.origin().below();
@@ -264,7 +275,7 @@ public final class Effects {
 				broken++;
 			}
 		}
-		return broken > 0 ? Result.DONE : Result.NO_TARGET;
+		return broken + dismantled > 0 ? Result.DONE : Result.NO_TARGET;
 	}
 
 	/** Fer + Réparer : les objets en fer posés sur le cercle sont réparés avec du fer. */
@@ -420,6 +431,14 @@ public final class Effects {
 	 * défait au bout d'une minute et rend ces deux blocs.
 	 */
 	private static Result stoneLance(EffectContext ctx) {
+		Optional<Result> copied = Recomposition.copy(ctx);
+		if (copied.isPresent()) {
+			return copied.get();
+		}
+		if (!ctx.knowledge().has(STONE_LANCE_KNOWLEDGE)) {
+			ctx.caster().sendSystemMessage(Component.translatable("transmutation.fmab.copy.no_model"));
+			return Result.NO_TARGET;
+		}
 		ServerLevel level = ctx.level();
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
 		List<BlockState> taken = new ArrayList<>();
@@ -458,6 +477,15 @@ public final class Effects {
 
 	/** Fer + Recomposer : une lame-bras, d'un lingot de fer, qu'elle rend en se défaisant. */
 	private static Result armBlade(EffectContext ctx) {
+		// Un modèle posé sur le cercle : on le copie au lieu de forger la lame.
+		Optional<Result> copied = Recomposition.copy(ctx);
+		if (copied.isPresent()) {
+			return copied.get();
+		}
+		if (!ctx.knowledge().has(ARM_BLADE_KNOWLEDGE)) {
+			ctx.caster().sendSystemMessage(Component.translatable("transmutation.fmab.copy.no_model"));
+			return Result.NO_TARGET;
+		}
 		MaterialPool pool = MaterialPool.collect(ctx, "iron", Family.METAL);
 		if (!pool.consume(INGOT_MASS)) {
 			return Result.NO_MATERIAL;

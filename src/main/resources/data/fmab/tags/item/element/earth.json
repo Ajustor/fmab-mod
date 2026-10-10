@@ -1,0 +1,11 @@
+{
+  "values": [
+    "#minecraft:dirt",
+    "#minecraft:sand",
+    "#minecraft:stone_crafting_materials",
+    "minecraft:stone",
+    "minecraft:gravel",
+    "minecraft:clay_ball",
+    "minecraft:flint"
+  ]
+}

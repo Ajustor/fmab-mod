@@ -7,7 +7,8 @@
 	"entrypoints": {
 		"fabric-client-gametest": [
 			"com.ajustor.fmab.gametest.RenderShowcase",
-			"com.ajustor.fmab.gametest.WheelchairScenes"
+			"com.ajustor.fmab.gametest.WheelchairScenes",
+			"com.ajustor.fmab.gametest.RecompositionScenes"
 		]
 	},
 	"depends": {

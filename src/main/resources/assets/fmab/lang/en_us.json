@@ -967,5 +967,23 @@
   "wheelchair.fmab.need_hands_to_push": "You need both arms to push a wheelchair",
   "wheelchair.fmab.hands_busy": "Your hands are on the wheels",
   "wheelchair.fmab.hired": "The villager takes the handles for five minutes",
-  "wheelchair.fmab.let_go": "Nobody is pushing your wheelchair any more"
+  "wheelchair.fmab.let_go": "Nobody is pushing your wheelchair any more",
+
+  "transmutation.fmab.understood": "You understand how %s is made: you can now recompose it from a model",
+  "transmutation.fmab.copy.no_model": "Nothing to recompose: lay the object to copy on the circle",
+  "transmutation.fmab.copy.not_understood": "You do not understand how %s is made: break one down on a circle first",
+  "transmutation.fmab.copy.wrong_element": "%s is mostly made of %s: this circle does not aim at it",
+  "transmutation.fmab.copy.gold": "%s holds gold: the State forbids making gold",
+  "transmutation.fmab.copy.missing": "Not enough matter to recompose %s: %s",
+  "transmutation.fmab.copy.amount": "%s %s/%s",
+  "material.fmab.iron": "iron",
+  "material.fmab.copper": "copper",
+  "material.fmab.gold": "gold",
+  "material.fmab.earth": "earth",
+  "material.fmab.water": "ice",
+  "material.fmab.wood": "wood",
+  "item.fmab.understood": "Structure understood",
+  "effect.fmab.recompose": "Recomposition from a model",
+  "effect.fmab.dismantle": "Breaking down objects",
+  "treatise.fmab.ch2.objects": "Making an object follows the same steps.\n\n1. Understand: lay the object on a circle of its main element (Iron for an iron pickaxe, Earth for a stone one) with Decompose. It breaks down into its matter, and you learn how it is made.\n\n2. Then lay one as a model on a Recompose circle of the same element, with the matter it holds (three ingots and some wood for an iron pickaxe), on the circle or on you.\n\n3. The copy comes out new, without enchantments. The exchange is equivalent: nothing more, nothing less. Gold, however, is never made."
 }

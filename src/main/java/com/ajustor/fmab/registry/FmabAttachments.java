@@ -166,6 +166,18 @@ public final class FmabAttachments {
 	private FmabAttachments() {
 	}
 
+	/**
+	 * Les objets dont l'alchimiste a compris la structure en les décomposant sur un cercle : lui seul
+	 * peut les recomposer d'après modèle. Gardés à la mort, visibles de lui seul.
+	 */
+	public static final AttachmentType<Set<String>> UNDERSTOOD = AttachmentRegistry.<Set<String>>builder()
+			.persistent(Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf))
+			.initializer(Set::of)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).map(Set::copyOf, List::copyOf),
+					AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("understood"));
+
 	public static void register() {
 	}
 }

@@ -82,6 +82,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -182,6 +183,12 @@ public class FmabClient implements ClientModInitializer {
 		ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> {
 			if (stack.has(FmabComponents.EMBROIDERY)) {
 				lines.add(Component.translatable("item.fmab.embroidered").withStyle(ChatFormatting.DARK_AQUA));
+			}
+			// Décomposé une fois sur un cercle : l'alchimiste sait le recomposer d'après modèle.
+			var player = Minecraft.getInstance().player;
+			if (player != null && player.getAttachedOrCreate(FmabAttachments.UNDERSTOOD)
+					.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString())) {
+				lines.add(Component.translatable("item.fmab.understood").withStyle(ChatFormatting.DARK_AQUA));
 			}
 		});
 		ClientPlayNetworking.registerGlobalReceiver(OpenExamPayload.TYPE,

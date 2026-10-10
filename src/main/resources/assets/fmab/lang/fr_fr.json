@@ -967,5 +967,23 @@
   "wheelchair.fmab.need_hands_to_push": "Il faut vos deux bras pour pousser un fauteuil",
   "wheelchair.fmab.hands_busy": "Vos mains sont sur les roues",
   "wheelchair.fmab.hired": "Le villageois prend les poignées pour cinq minutes",
-  "wheelchair.fmab.let_go": "Plus personne ne pousse votre fauteuil"
+  "wheelchair.fmab.let_go": "Plus personne ne pousse votre fauteuil",
+
+  "transmutation.fmab.understood": "Vous comprenez comment %s est fait : vous pouvez le recomposer d'après modèle",
+  "transmutation.fmab.copy.no_model": "Rien à recomposer : posez sur le cercle l'objet à copier",
+  "transmutation.fmab.copy.not_understood": "Vous ne comprenez pas comment %s est fait : décomposez-en un sur un cercle d'abord",
+  "transmutation.fmab.copy.wrong_element": "%s est surtout fait de %s : ce cercle ne le vise pas",
+  "transmutation.fmab.copy.gold": "%s contient de l'or : l'État interdit d'en fabriquer",
+  "transmutation.fmab.copy.missing": "Pas assez de matière pour recomposer %s : %s",
+  "transmutation.fmab.copy.amount": "%s %s/%s",
+  "material.fmab.iron": "fer",
+  "material.fmab.copper": "cuivre",
+  "material.fmab.gold": "or",
+  "material.fmab.earth": "terre",
+  "material.fmab.water": "glace",
+  "material.fmab.wood": "bois",
+  "item.fmab.understood": "Structure comprise",
+  "effect.fmab.recompose": "Recomposition d'après modèle",
+  "effect.fmab.dismantle": "Décomposition d'objets",
+  "treatise.fmab.ch2.objects": "Fabriquer un objet suit les mêmes étapes.\n\n1. Comprendre : posez l'objet sur un cercle de son élément principal (Fer pour une pioche de fer, Terre pour une pioche de pierre) avec Décomposer. Il se défait en sa matière, et vous en retenez la structure.\n\n2. Posez ensuite un exemplaire en modèle sur un cercle Recomposer du même élément, avec la matière qu'il contient (trois lingots et du bois pour une pioche de fer), sur le cercle ou sur vous.\n\n3. La copie sort, neuve, sans enchantement. L'échange est équivalent : rien de plus, rien de moins. L'or, lui, ne se fabrique pas."
 }
