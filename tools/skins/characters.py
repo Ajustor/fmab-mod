@@ -1222,6 +1222,40 @@ def father_divine(s):
     father_mane(s, "#e9d48a", "#e0c87a")
 
 
+# --- l'armure d'âme, portée -------------------------------------------------------------------------
+@skin("equipment/humanoid/soul", size=(64, 32), volume=False)
+def soul_armor(s):
+    """Le plastron d'âme porté, à la manière de l'armure d'Alphonse : acier bleuté, épaulières rondes
+    rivetées, la plaque du torse à arête, des lames sur le ventre, des gantelets plus sombres."""
+    steel, dark, light_ = "#9aa6b6", "#5e6a7a", "#d8e0ea"
+    for part in ("body", "rarm"):
+        s.fill(part, steel, "metal")
+    # Le col : un anneau sombre. L'arête du torse, claire, et les deux pans qui s'en écartent.
+    s.band("body", 0, 1, dark, "metal")
+    s.seam("body", "front", 4, 1, 6, light_)
+    s.seam("body", "front", 3, 1, 6, None, k=1.12)
+    s.seam("body", "front", 5, 1, 6, None, k=0.82)
+    # Les lames du ventre, superposées.
+    for y in (7, 9):
+        s.band("body", y, 1, dark, "metal")
+        s.band_tint("body", y + 1, 1, 1.12)
+    s.band("body", 11, 1, shade(dark, 0.85), "metal")
+    for x, y in ((1, 2), (6, 2), (1, 5), (6, 5)):
+        s.px("body", "front", x, y, "#eef2f6")
+    for x, y in ((1, 2), (6, 2), (3, 6), (4, 6)):
+        s.px("body", "back", x, y, "#eef2f6")
+    # L'épaulière ronde : le haut du bras plus clair, bordé, un rivet ; puis le brassard et le gantelet.
+    s.material("rarm", "top", light_, "metal")
+    for f in SIDES:
+        s.material("rarm", f, shade(steel, 1.1), "metal", h=4)
+    s.band("rarm", 4, 1, dark, "metal")
+    s.px("rarm", "front", 1, 1, "#eef2f6")
+    s.px("rarm", "right", 2, 1, "#eef2f6")
+    s.band("rarm", 8, 1, dark, "metal")
+    for f in SIDES:
+        s.material("rarm", f, shade(steel, 0.82), "metal", y=9, h=3)
+
+
 def build(names=None):
     os.makedirs(OUT, exist_ok=True)
     for name in names or SKINS:
@@ -1232,7 +1266,9 @@ def build(names=None):
         fn(s)
         if volume:
             s.volume()
-        s.save(os.path.join(OUT, name + ".png"))
+        path = os.path.join(OUT, name + ".png")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        s.save(path)
         print("peau", name)
 
 

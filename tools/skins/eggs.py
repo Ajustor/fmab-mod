@@ -400,6 +400,25 @@ def _(e):
 EGG_NAMES = {"father": "father_spawn_egg"}
 
 
+@egg("stone_golem")
+def _(e):
+    """Le golem de pierre : des blocs appareillés, deux yeux de lumière, le cercle gravé sur le torse."""
+    stone, glow = "#8a8780", "#7fd8ff"
+    e.paint(1, 15, stone)
+    for y in (4, 8, 12):
+        e.row(y, 0, 15, shade(stone, 0.72))
+    for x, y in ((6, 2), (10, 3), (4, 6), (9, 6), (7, 10), (11, 10), (5, 14), (9, 14)):
+        e.px(x, y, shade(stone, 0.78))
+    e.row(5, 3, 12, shade(stone, 0.6))
+    for x in (5, 10):
+        e.px(x, 6, glow)
+        e.px(x + 1, 6, glow)
+        e.px(x, 7, shade(glow, 0.55))
+    for x, y in ((7, 10), (8, 10), (6, 11), (9, 11), (6, 12), (9, 12), (7, 13), (8, 13)):
+        e.px(x, y, glow)
+    e.px(7, 11, "#ffffff")
+
+
 def build(names=None):
     for name in names or EGGS:
         e = Egg(name)
