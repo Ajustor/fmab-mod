@@ -30,6 +30,7 @@ import com.ajustor.fmab.client.render.StoneGolemRenderer;
 import com.ajustor.fmab.client.render.ThrowingKnifeRenderer;
 import com.ajustor.fmab.client.render.TransmutationCircleRenderer;
 import com.ajustor.fmab.client.render.TruthRenderer;
+import com.ajustor.fmab.client.render.WheelchairRenderer;
 import com.ajustor.fmab.client.render.WinryRenderer;
 import com.ajustor.fmab.client.render.WrathRenderer;
 import com.ajustor.fmab.client.screen.BodyScreen;
@@ -134,6 +135,7 @@ public class FmabClient implements ClientModInitializer {
 		EntityRendererRegistry.register(FmabEntities.STONE_GOLEM, StoneGolemRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.TRUTH, TruthRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.WINRY, WinryRenderer::new);
+		EntityRendererRegistry.register(FmabEntities.WHEELCHAIR, WheelchairRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.LUST, LustRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.GLUTTONY, GluttonyRenderer::new);
 		EntityRendererRegistry.register(FmabEntities.ENVY, EnvyRenderer::new);

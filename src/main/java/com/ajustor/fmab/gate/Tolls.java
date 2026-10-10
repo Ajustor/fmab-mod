@@ -49,6 +49,7 @@ public final class Tolls {
 	private static final Identifier RIGHT_LEG_SPEED = Fmab.id("toll_right_leg_speed");
 	private static final Identifier LEFT_LEG_JUMP = Fmab.id("toll_left_leg_jump");
 	private static final Identifier RIGHT_LEG_JUMP = Fmab.id("toll_right_leg_jump");
+	private static final Identifier NO_LEGS_JUMP = Fmab.id("toll_no_legs_jump");
 	private static final Identifier ORGANS_HEALTH = Fmab.id("toll_organs_health");
 	private static final Identifier SOUL_NO_LEGGINGS = Fmab.id("soul_no_leggings");
 	private static final Identifier SOUL_NO_BOOTS = Fmab.id("soul_no_boots");
@@ -206,6 +207,8 @@ public final class Tolls {
 		modifier(player, Attributes.MOVEMENT_SPEED, RIGHT_LEG_SPEED, right ? LEG_SPEED : 0);
 		modifier(player, Attributes.JUMP_STRENGTH, LEFT_LEG_JUMP, left ? LEG_JUMP : 0);
 		modifier(player, Attributes.JUMP_STRENGTH, RIGHT_LEG_JUMP, right ? LEG_JUMP : 0);
+		// Sans aucune jambe, on ne saute plus du tout : on rampe, ou l'on roule.
+		modifier(player, Attributes.JUMP_STRENGTH, NO_LEGS_JUMP, left && right ? -1 : 0);
 		if ((left || right) && player.isSprinting()) {
 			player.setSprinting(false);
 		}

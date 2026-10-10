@@ -22,6 +22,7 @@ import com.ajustor.fmab.item.ThrowingKnifeItem;
 import com.ajustor.fmab.item.TomeItem;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
+import com.ajustor.fmab.item.WheelchairItem;
 import com.ajustor.fmab.item.XerxesMuralItem;
 import com.ajustor.fmab.item.XingSwordItem;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
@@ -104,6 +105,8 @@ public final class FmabItems {
 			AutomailItem.Model.RUSH_VALLEY, false, 260);
 	public static final Item BRIGGS_AUTOMAIL_ARM = automail("briggs_automail_arm", AutomailItem.Model.BRIGGS, true, 600);
 	public static final Item BRIGGS_AUTOMAIL_LEG = automail("briggs_automail_leg", AutomailItem.Model.BRIGGS, false, 600);
+	/** Le fauteuil roulant, plié : la monture de qui n'a plus de jambes, ou de qui veut. */
+	public static final Item WHEELCHAIR = register("wheelchair", WheelchairItem::new, new Item.Properties().stacksTo(1));
 
 	public static final Item WINRY_SPAWN_EGG = register("winry_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.WINRY));
@@ -272,6 +275,7 @@ public final class FmabItems {
 					output.accept(RUSH_VALLEY_AUTOMAIL_LEG);
 					output.accept(BRIGGS_AUTOMAIL_ARM);
 					output.accept(BRIGGS_AUTOMAIL_LEG);
+					output.accept(WHEELCHAIR);
 					output.accept(WINRY_SPAWN_EGG);
 					output.accept(TRUTH_SPAWN_EGG);
 					output.accept(PHILOSOPHER_STONE_CORE);

@@ -65,6 +65,10 @@ d'État à Central, la Porte, les homonculus, puis Père.
   transmutation humaine**.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : à l'établi ou dans l'onglet Corps,
   usure, réparation et retrait chez **Winry**.
+- **Fauteuil roulant** (craft, ou chez un forgeron d'outils) : sans jambes, on rampe, ou l'on s'y assied.
+  Il ne saute pas et ne franchit qu'une demi-hauteur (dalles, escaliers : il faut des rampes) ; il faut
+  deux bras pour faire tourner ses roues, qui prennent alors les mains. Un autre joueur peut le pousser
+  (clic droit dessus, accroupi pour lâcher), ou un villageois contre une émeraude.
 - **Pierre philosophale** : elle rend ce que la Porte a pris, amplifie les transmutations, se fabrique
   par sacrifice. **Karma**, **éclipse** tous les huit jours, **Pierre vivante**.
 - **Homonculus** qui se reconstituent tant que leur Pierre a des âmes : Lust, Gluttony (et son Ventre),
@@ -204,6 +208,10 @@ Central, the Gate, the homunculi, then Father.
   treatise: work it out yourself, or find very rare **Notes on Human Transmutation**.
 - **Automail** (iron, Rush Valley, Briggs) on lost limbs: fitted at the bench or in the Body tab,
   wears out, repaired and removed by **Winry**.
+- **Wheelchair** (crafted, or bought from a toolsmith): without legs you crawl, or sit in one. It
+  cannot jump and only climbs half a block (slabs, stairs: you need ramps); turning its wheels takes
+  both arms, and keeps your hands busy. Another player can push it (right-click it, sneak to let go),
+  or a villager for an emerald.
 - **Philosopher's Stone**: restores what the Gate took, amplifies transmutations, made by sacrifice.
   **Karma**, an **eclipse** every eighth day, the **Living Stone**.
 - **Homunculi** that reconstitute while their Stone holds souls: Lust, Gluttony (and his Belly),

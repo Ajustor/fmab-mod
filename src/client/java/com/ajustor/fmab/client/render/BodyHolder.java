@@ -27,4 +27,9 @@ public interface BodyHolder {
 	Map<BodyPart, PartPose> fmab$skeleton();
 
 	void fmab$setSkeleton(Map<BodyPart, PartPose> skeleton);
+
+	/** Ce que font ses bras autour d'un fauteuil roulant. */
+	WheelchairPose fmab$wheelchair();
+
+	void fmab$setWheelchair(WheelchairPose pose);
 }

@@ -26,6 +26,7 @@ public abstract class PlayerModelMixin extends HumanoidModel<AvatarRenderState> 
 	@Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"))
 	private void fmab$pose(AvatarRenderState state, CallbackInfo ci) {
 		TransmutationGestures.apply(this, state);
+		((BodyHolder) state).fmab$wheelchair().apply(this, state.ageInTicks);
 		for (BodyPart part : ((BodyHolder) state).fmab$lostLimbs()) {
 			switch (part) {
 				case RIGHT_ARM -> rightArm.visible = false;

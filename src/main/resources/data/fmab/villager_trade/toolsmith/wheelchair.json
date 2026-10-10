@@ -1,0 +1,12 @@
+{
+  "gives": {
+    "id": "fmab:wheelchair"
+  },
+  "max_uses": 3.0,
+  "reputation_discount": 0.2,
+  "wants": {
+    "count": 8.0,
+    "id": "minecraft:emerald"
+  },
+  "xp": 10.0
+}

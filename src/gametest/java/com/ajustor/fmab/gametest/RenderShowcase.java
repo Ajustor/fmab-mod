@@ -40,8 +40,20 @@ public class RenderShowcase implements FabricClientGameTest {
 			"chimera_beast", "chimera_crawler", "cornello", "scar", "hohenheim", "marcoh", "gate_hand", "kunai",
 			"throwing_knife");
 
+	/**
+	 * Ce test tourne-t-il ? {@code -Dfmab.gametest=wheelchair,showcase} en restreint la liste ; sans
+	 * cette propriété, tous tournent.
+	 */
+	static boolean selected(String name) {
+		String only = System.getProperty("fmab.gametest");
+		return only == null || only.isBlank() || java.util.Arrays.asList(only.split(",")).contains(name);
+	}
+
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		if (!selected("showcase")) {
+			return;
+		}
 		try (TestSingleplayerContext sp = context.worldBuilder()
 				.adjustSettings(c -> c.setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE)).create()) {
 			sp.getServer().runCommand("time set 6000");
@@ -57,7 +69,7 @@ public class RenderShowcase implements FabricClientGameTest {
 		}
 	}
 
-	private static void hideGui(net.minecraft.client.Minecraft mc, boolean hidden) {
+	static void hideGui(net.minecraft.client.Minecraft mc, boolean hidden) {
 		if (mc.gui.hud.isHidden() != hidden) {
 			mc.gui.hud.toggle();
 		}
