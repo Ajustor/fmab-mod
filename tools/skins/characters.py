@@ -854,7 +854,8 @@ def truth(s):
 
 
 # --- les homoncules (squelette BossModels) --------------------------------------------------------
-@skin("lust", slim=True, parts={"hair_back": (0, 32, 9, 14, 2), "bust": (24, 32, 7, 3, 3), "hips": (24, 38, 9, 3, 5)})
+@skin("lust", slim=True, parts={"hair_back": (0, 32, 9, 14, 2), "bust": (24, 32, 7, 3, 3), "hips": (24, 38, 9, 3, 5),
+                                       "lance": (52, 38, 1, 4, 1)})
 def lust(s):
     """Lust : la longue chevelure noire, les yeux violets, la robe noire, l'ouroboros sur la poitrine."""
     tone, hair = "#f2ddd0", "#17141c"
@@ -874,6 +875,10 @@ def lust(s):
     ouroboros(s, "body", "front", 3, 0)
     s.px("body", "front", 2, 0, shade(tone, 0.9))
     bust(s, BLACK_CLOTH, skin=tone, neckline=1, shadow=7)
+    # Les ongles qui deviennent lames : un noir laqué, reflet violet.
+    s.rect("lance", "front", 0, 0, 1, 4, "#1a0a1e")
+    s.fill("lance", "#1a0a1e", "metal")
+    s.px("lance", "front", 0, 0, "#6a3a7a")
     # Les hanches dans la robe, et la fente de la jupe sur la cuisse gauche.
     s.fill("hips", BLACK_CLOTH, "cloth")
     s.tint("hips", "top", 0, 0, 9, 5, 1.1)

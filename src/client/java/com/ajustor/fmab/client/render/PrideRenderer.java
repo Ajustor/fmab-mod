@@ -6,7 +6,6 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.Identifier;
 
 /**
@@ -16,7 +15,7 @@ import net.minecraft.resources.Identifier;
 public class PrideRenderer extends HumanoidMobRenderer<PrideEntity, PrideRenderer.State, PrideRenderer.Model> {
 	private static final Identifier TEXTURE = Fmab.id("textures/entity/pride.png");
 
-	public static class State extends HumanoidRenderState {
+	public static class State extends FigureRenderer.State {
 		boolean revealed;
 	}
 
@@ -35,6 +34,7 @@ public class PrideRenderer extends HumanoidMobRenderer<PrideEntity, PrideRendere
 		@Override
 		public void setupAnim(State state) {
 			super.setupAnim(state);
+			Temper.PRIDE.apply(this, state, state.aggressive);
 			shadows.visible = state.revealed;
 			mask.visible = state.revealed;
 			head.xScale = head.yScale = head.zScale = CHILD_HEAD;
@@ -55,6 +55,7 @@ public class PrideRenderer extends HumanoidMobRenderer<PrideEntity, PrideRendere
 	@Override
 	public void extractRenderState(PrideEntity entity, State state, float partialTicks) {
 		super.extractRenderState(entity, state, partialTicks);
+		state.aggressive = entity.isAggressive();
 		state.revealed = entity.revealed();
 	}
 
