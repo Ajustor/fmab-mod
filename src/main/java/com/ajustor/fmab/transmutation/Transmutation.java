@@ -158,7 +158,7 @@ public final class Transmutation {
 			CircleIssue first = analysis.issues().isEmpty() ? null : analysis.issues().getFirst();
 			caster.sendOverlayMessage(first == null
 					? Component.translatable("transmutation.fmab.inert")
-					: Component.translatable(first.kind().translationKey()));
+					: IssueText.of(first));
 			level.playSound(null, circle, SoundEvents.SAND_STEP, SoundSource.BLOCKS, 0.6f, 0.8f);
 			return Result.INERT;
 		}

@@ -28,6 +28,9 @@
     },
     {
      "text": "treatise.fmab.ch2.objects"
+    },
+    {
+     "text": "treatise.fmab.ch2.tomes"
     }
    ]
   },
@@ -1460,6 +1463,178 @@
      ]
     },
     {
+     "text": "treatise.fmab.ch5.detonation",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        16.0
+       ],
+       "radius": 14.0
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16.0,
+         2.0
+        ],
+        [
+         28.0,
+         23.0
+        ],
+        [
+         4.0,
+         23.0
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16.0,
+         30.0
+        ],
+        [
+         4.0,
+         9.0
+        ],
+        [
+         28.0,
+         9.0
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         30.0,
+         16.0
+        ],
+        [
+         23.0,
+         28.0
+        ],
+        [
+         9.0,
+         28.0
+        ],
+        [
+         2.0,
+         16.0
+        ],
+        [
+         9.0,
+         4.0
+        ],
+        [
+         23.0,
+         4.0
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         10.0,
+         13.5
+        ],
+        [
+         14.0,
+         13.5
+        ],
+        [
+         12.0,
+         10.0
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         18.5,
+         12.0
+        ],
+        [
+         21.5,
+         12.0
+        ],
+        [
+         20.0,
+         9.5
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        20.0,
+        13.5
+       ],
+       "radius": 1.0
+      },
+      {
+       "type": "line",
+       "from": [
+        14.5,
+        20.0
+       ],
+       "to": [
+        17.5,
+        20.0
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        18.5
+       ],
+       "to": [
+        16.0,
+        21.5
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        18.0,
+        20.0
+       ],
+       "radius": 0.5
+      },
+      {
+       "type": "circle",
+       "center": [
+        14.0,
+        20.0
+       ],
+       "radius": 0.5
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        22.0
+       ],
+       "radius": 0.5
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        18.0
+       ],
+       "radius": 0.5
+      }
+     ]
+    },
+    {
      "text": "treatise.fmab.ch5.stone_lance",
      "example": [
       {
@@ -1676,6 +1851,9 @@
        ]
       }
      ]
+    },
+    {
+     "text": "treatise.fmab.ch5.more"
     }
    ]
   },
