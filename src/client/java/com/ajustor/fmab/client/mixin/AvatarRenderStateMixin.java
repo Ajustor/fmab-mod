@@ -29,6 +29,8 @@ public abstract class AvatarRenderStateMixin implements PoseHolder, BodyHolder {
 	@Unique
 	private Map<BodyPart, AutomailItem.Model> fmab$automails = Map.of();
 	@Unique
+	private Set<BodyPart> fmab$blades = Set.of();
+	@Unique
 	private Map<BodyPart, PartPose> fmab$skeleton = Map.of();
 	@Unique
 	private WheelchairPose fmab$wheelchair = WheelchairPose.NONE;
@@ -63,6 +65,16 @@ public abstract class AvatarRenderStateMixin implements PoseHolder, BodyHolder {
 	public void fmab$setBody(Set<BodyPart> lostLimbs, Map<BodyPart, AutomailItem.Model> automails) {
 		fmab$lostLimbs = lostLimbs;
 		fmab$automails = automails;
+	}
+
+	@Override
+	public Set<BodyPart> fmab$blades() {
+		return fmab$blades;
+	}
+
+	@Override
+	public void fmab$setBlades(Set<BodyPart> blades) {
+		fmab$blades = blades;
 	}
 
 	@Override

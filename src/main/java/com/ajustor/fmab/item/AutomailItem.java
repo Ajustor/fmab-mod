@@ -58,6 +58,9 @@ public class AutomailItem extends Item {
 		tooltip.accept(Component.translatable("item.fmab.automail.model." + model.serializedName())
 				.withStyle(ChatFormatting.GRAY));
 		tooltip.accept(Component.translatable("item.fmab.automail.fit").withStyle(ChatFormatting.DARK_GRAY));
+		if (Automails.bladed(stack)) {
+			tooltip.accept(Component.translatable("item.fmab.automail.bladed").withStyle(ChatFormatting.AQUA));
+		}
 		if (Automails.broken(stack)) {
 			tooltip.accept(Component.translatable("item.fmab.automail.broken").withStyle(ChatFormatting.RED));
 		}

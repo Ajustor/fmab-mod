@@ -311,7 +311,7 @@
   "knowledge.fmab.metal.docile_iron": "Docile iron",
   "knowledge.fmab.metal.docile_iron.desc": "Each Metal effect costs 1 less concentration.",
   "knowledge.fmab.metal.arm_blade": "Arm blade",
-  "knowledge.fmab.metal.arm_blade.desc": "Iron and Recompose forge an arm blade from an ingot, sharper than a sword. It turns back into an ingot after a minute.",
+  "knowledge.fmab.metal.arm_blade.desc": "Iron and Recompose forge an arm blade from an ingot, sharper than a sword. It turns back into an ingot after a minute. With an automail arm, the arm itself is transmuted: a blade springs from the forearm, no ingot needed; the same transmutation draws it back in.",
   "knowledge.fmab.metal.long_reach": "Metal's reach",
   "knowledge.fmab.metal.long_reach.desc": "Metal effects reach one block further.",
 
@@ -400,7 +400,7 @@
   "treatise.fmab.ch5.burning_blade": "Burning blade (Alchemist): Iron and Project in a hexagon, and a Fire satellite on a corner.\n\nThe forged blade sets alight whatever it strikes.",
   "treatise.fmab.ch5.amplified_combustion": "Amplified combustion (Alchemist): Fire, Air and Project in a hexagram layered with a hexagon.\n\nThe hexagram fuses both elements; the hexagon adds its six sides to bear the load. Burns two pieces of fuel.",
   "treatise.fmab.ch5.stone_lance": "Stone lance (Alchemist, \"Stone lance\" node): Earth and Recompose in a square.\n\nTwo blocks of earth or stone under the circle become a lance, which comes straight to your hand.",
-  "treatise.fmab.ch5.arm_blade": "Arm blade (Alchemist, \"Arm blade\" node): Iron and Recompose in a square.\n\nAn iron ingot becomes a blade sharper than a sword; you get it back when the blade comes undone.",
+  "treatise.fmab.ch5.arm_blade": "Arm blade (Alchemist, \"Arm blade\" node): Iron and Recompose in a square.\n\nAn iron ingot becomes a blade sharper than a sword; you get it back when the blade comes undone. With an automail arm, the arm itself is transmuted: a blade springs from the forearm, no ingot needed; the same transmutation draws it back in.",
 
   "treatise.fmab.ch6.title": "VI. Mistakes and rebounds",
   "treatise.fmab.ch6.p1": "A circle that does not react: no ring, no action or no element. Nothing is spent.\n\nA circle beyond your rank reacts, but it wavers: every limit it exceeds takes away some stability, and it rebounds all the harder. A Philosopher's Stone holds it.\n\nA glyph you do not understand lets the circle react, but each one adds a quarter chance of rebound. The notebook shows its verdict before you pick up the chalk.",
@@ -566,6 +566,9 @@
   "automail.fmab.fitted": "The nerves connect in a flash of pain: the automail replaces %s.",
   "automail.fmab.repair_cost": "This repair takes %s iron ingots.",
   "automail.fmab.broke": "The automail replacing %s stopped working: have Winry repair it.",
+  "automail.fmab.blade_out": "A blade springs from your automail forearm.",
+  "automail.fmab.blade_in": "The blade withdraws: your arm takes back its shape.",
+  "item.fmab.automail.bladed": "Transmuted blade on the forearm",
 
   "entity.fmab.lust": "Lust",
   "entity.fmab.gluttony": "Gluttony",

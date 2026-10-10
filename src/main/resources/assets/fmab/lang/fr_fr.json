@@ -311,7 +311,7 @@
   "knowledge.fmab.metal.docile_iron": "Fer docile",
   "knowledge.fmab.metal.docile_iron.desc": "Chaque effet du Métal coûte 1 de concentration en moins.",
   "knowledge.fmab.metal.arm_blade": "Lame-bras",
-  "knowledge.fmab.metal.arm_blade.desc": "Fer et Recomposer forgent d'un lingot une lame-bras, plus tranchante qu'une épée. Elle redevient lingot au bout d'une minute.",
+  "knowledge.fmab.metal.arm_blade.desc": "Fer et Recomposer forgent d'un lingot une lame-bras, plus tranchante qu'une épée. Elle redevient lingot au bout d'une minute. Avec un bras d'automail, c'est le bras lui-même qui se transmute : une lame sort de l'avant-bras, sans lingot ; la même transmutation la fait rentrer.",
   "knowledge.fmab.metal.long_reach": "Allonge du Métal",
   "knowledge.fmab.metal.long_reach.desc": "Les effets du Métal portent un bloc plus loin.",
 
@@ -400,7 +400,7 @@
   "treatise.fmab.ch5.burning_blade": "Lame ardente (Alchimiste) : Fer et Projeter dans un hexagone, et un satellite de Feu sur un sommet.\n\nLa lame forgée enflamme ce qu'elle frappe.",
   "treatise.fmab.ch5.amplified_combustion": "Combustion amplifiée (Alchimiste) : Feu, Air et Projeter dans un hexagramme doublé d'un hexagone.\n\nL'hexagramme fusionne les deux éléments ; l'hexagone ajoute ses six côtés pour tenir la charge. Brûle deux combustibles.",
   "treatise.fmab.ch5.stone_lance": "Lance de pierre (Alchimiste, nœud « Lance de pierre ») : Terre et Recomposer dans un carré.\n\nDeux blocs de terre ou de pierre sous le cercle deviennent une lance, qui vous revient en main.",
-  "treatise.fmab.ch5.arm_blade": "Lame-bras (Alchimiste, nœud « Lame-bras ») : Fer et Recomposer dans un carré.\n\nUn lingot de fer devient une lame plus tranchante qu'une épée ; il vous est rendu quand elle se défait.",
+  "treatise.fmab.ch5.arm_blade": "Lame-bras (Alchimiste, nœud « Lame-bras ») : Fer et Recomposer dans un carré.\n\nUn lingot de fer devient une lame plus tranchante qu'une épée ; il vous est rendu quand elle se défait. Avec un bras d'automail, c'est le bras lui-même qui se transmute : une lame sort de l'avant-bras, sans lingot ; la même transmutation la fait rentrer.",
 
   "treatise.fmab.ch6.title": "VI. Erreurs et rebonds",
   "treatise.fmab.ch6.p1": "Un cercle qui ne réagit pas : pas d'anneau, pas d'action ou pas d'élément. Rien n'est consommé.\n\nUn cercle au-delà de votre rang réagit, mais il vacille : chaque limite dépassée lui retire de la stabilité, et il rebondit d'autant plus fort. Une Pierre philosophale le tient.\n\nUn glyphe que vous ne comprenez pas laisse le cercle réagir, mais chacun ajoute un quart de risque de rebond. Le carnet affiche son verdict avant que vous ne preniez la craie.",
@@ -566,6 +566,9 @@
   "automail.fmab.fitted": "Les nerfs se branchent dans un éclair de douleur : l'automail remplace %s.",
   "automail.fmab.repair_cost": "Il faut %s lingots de fer pour cette réparation.",
   "automail.fmab.broke": "L'automail qui remplaçait %s ne répond plus : faites-le réparer chez Winry.",
+  "automail.fmab.blade_out": "Une lame jaillit de votre avant-bras d'automail.",
+  "automail.fmab.blade_in": "La lame rentre : votre bras reprend sa forme.",
+  "item.fmab.automail.bladed": "Lame transmutée sur l'avant-bras",
 
   "entity.fmab.lust": "Lust",
   "entity.fmab.gluttony": "Gluttony",
