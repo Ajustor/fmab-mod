@@ -56,11 +56,14 @@ public final class FigureModels {
 		return bakeWide(mesh);
 	}
 
-	/** Scar : un torse de lutteur, les pectoraux saillants sous le maillot. */
+	/** Scar : une carrure de lutteur, les épaules larges et les deltoïdes saillants. */
 	public static ModelPart scar() {
 		MeshDefinition mesh = mesh(false);
-		mesh.getRoot().getChild("body").addOrReplaceChild("chest",
-				CubeListBuilder.create().texOffs(64, 0).addBox(-4, 1, -3, 8, 3, 1), PartPose.ZERO);
+		PartDefinition root = mesh.getRoot();
+		root.getChild("right_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 0).addBox(-3.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
+		root.getChild("left_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 8).addBox(-1.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
 		return bakeWide(mesh);
 	}
 

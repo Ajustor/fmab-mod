@@ -514,7 +514,7 @@ def marcoh(s):
         s.px("body", "back", 7 - i, min(11, i + 1), strap)
 
 
-@skin("scar", size=WIDE, parts={"chest": (64, 0, 8, 3, 1)})
+@skin("scar", size=WIDE, parts={"rshoulder": (64, 0, 5, 3, 5), "lshoulder": (64, 8, 5, 3, 5)})
 def scar(s):
     """Scar : la peau mate d'Ishval, la cicatrice en X, les yeux rouges, le bras tatoué."""
     tone = ISHVAL
@@ -556,15 +556,18 @@ def scar(s):
     s.material("larm", "bottom", tone, "skin")
     pants(s, "#2e2f36")
     boots(s, color="#3b2a20", rows=3)
-    # Les pectoraux sous le maillot noir, entre les pans de la veste.
-    s.fill("chest", BLACK_CLOTH, "cloth")
-    for f in ("front", "top", "bottom"):
-        s.material("chest", f, jacket, "cloth", x=0, w=2)
-        s.material("chest", f, jacket, "cloth", x=6, w=2)
-    s.fill("chest", jacket, "cloth", faces=("right", "left"))
-    s.seam("chest", "front", 4, 0, 3, None, k=0.6)
-    s.tint("chest", "front", 2, 0, 4, 1, 1.25)
-    s.tint("body", "front", 2, 4, 4, 1, 0.75)
+    # Les épaules de lutteur : le deltoïde nu et tatoué à droite, sous la veste à gauche.
+    s.fill("rshoulder", tone, "skin")
+    for f in SIDES:
+        w, _ = s.size("rshoulder", f)
+        for x in range(0, w, 3):
+            s.px("rshoulder", f, x, 2, ink)
+    s.material("rshoulder", "top", shade(jacket, 0.9), "cloth")
+    s.fill("lshoulder", jacket, "cloth")
+    s.material("lshoulder", "top", shade(jacket, 1.08), "cloth")
+    # Un torse plat et sec : l'ombre sous les pectoraux, la ligne du sternum.
+    s.tint("body", "front", 2, 3, 4, 1, 0.7)
+    s.seam("body", "front", 4, 0, 3, None, k=0.75)
 
 
 @skin("cornello", size=WIDE, parts={"medallion": (64, 0, 4, 4, 1), "robe": (64, 8, 10, 6, 6)})
@@ -1138,8 +1141,8 @@ def pride(s):
         s.band(leg, 6, 4, "#f2f0ea")
         s.band(leg, 10, 2, "#2a1c16", "leather")
         s.material(leg, "bottom", "#140e0c", "leather")
-    # Les ombres : trois lames noires (2x14, 2x16, 2x13), parsemées d'yeux et de dents.
-    for u, w, h in ((0, 2, 14), (6, 2, 16), (12, 2, 13)):
+    # Les ombres : cinq lames noires, parsemées d'yeux et de dents.
+    for u, w, h in ((0, 2, 14), (6, 2, 16), (12, 2, 13), (18, 2, 15), (24, 2, 12)):
         s.parts["shadow%d" % u] = (u, 32, w, h, 1)
         s.fill("shadow%d" % u, "#0a080c", "flat")
         for y in range(1, h, 4):
@@ -1148,6 +1151,17 @@ def pride(s):
             s.px("shadow%d" % u, "back", 1, y + 2, "#c0101e")
         s.px("shadow%d" % u, "front", 0, h - 2, "#e8e0d8")
         s.px("shadow%d" % u, "front", 1, h - 3, "#e8e0d8")
+    # Le masque d'ombre qui lui mange le visage une fois révélé : des yeux ronds, un sourire de crocs.
+    s.parts["mask"] = (32, 32, 8, 8, 0)
+    s.rect("mask", "front", 0, 0, 8, 8, "#060408")
+    for x0 in (1, 5):
+        s.rect("mask", "front", x0, 2, 2, 2, "#f4ece4")
+        s.px("mask", "front", x0 + (1 if x0 == 1 else 0), 3, "#d0101e")
+    s.rect("mask", "front", 1, 5, 6, 2, "#2a0408")
+    for x in range(1, 7):
+        s.px("mask", "front", x, 5 if x % 2 else 6, "#f0e8dc")
+    s.px("mask", "front", 0, 4, "#2a0408")
+    s.px("mask", "front", 7, 4, "#2a0408")
 
 
 def father_mane(s, hair, beard):
