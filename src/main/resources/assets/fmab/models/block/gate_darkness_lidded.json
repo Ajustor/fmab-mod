@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "fmab:block/gate_darkness_lidded"
+  }
+}

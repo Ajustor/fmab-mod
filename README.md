@@ -60,7 +60,7 @@ d'État à Central, la Porte, les homonculus, puis Père.
   vêtements brodés, tatouages par rituel, aux passifs permanents.
 - **La Porte** : la transmutation humaine échoue toujours et happe l'alchimiste dans l'Espace blanc,
   où la Vérité prend son péage (un bras, une jambe, les organes, la vue... ou le corps entier : l'âme
-  vit alors dans une armure scellée de son sang). En échange, l'Initié transmute sans cercle. Le cercle
+  vit alors dans une armure scellée de son sang). En échange, l'Initié comprend tous les glyphes et transmute sans cercle. Le cercle
   n'est dans aucun traité : on le recompose soi-même, ou on trouve de très rares **Notes sur la
   transmutation humaine**.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : à l'établi ou dans l'onglet Corps,

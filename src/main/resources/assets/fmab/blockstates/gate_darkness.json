@@ -1,7 +1,11 @@
 {
   "variants": {
-    "": {
-      "model": "fmab:block/gate_darkness"
-    }
+    "": [
+      { "model": "fmab:block/gate_darkness", "weight": 6 },
+      { "model": "fmab:block/gate_darkness", "y": 180, "weight": 3 },
+      { "model": "fmab:block/gate_darkness_eye", "weight": 2 },
+      { "model": "fmab:block/gate_darkness_lidded", "weight": 2 },
+      { "model": "fmab:block/gate_darkness_eyes", "weight": 2 }
+    ]
   }
 }

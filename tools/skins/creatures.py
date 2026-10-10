@@ -214,22 +214,26 @@ def envy_lizard(s):
 
 
 # --- la Porte -------------------------------------------------------------------------------------
-@creature("gate_hand", (64, 64), {"arm": (0, 0, 3, 3, 16), "hand": (0, 20, 5, 2, 4), "finger": (20, 20, 1, 1, 5)})
+@creature("gate_hand", (64, 64), {"arm": (0, 0, 3, 3, 16), "palm": (0, 20, 4, 2, 3), "finger": (20, 20, 1, 1, 3),
+                                  "fingertip": (30, 20, 1, 1, 2), "thumb": (20, 26, 1, 1, 2),
+                                  "thumbtip": (30, 26, 1, 1, 2)})
 def gate_hand(s):
-    """Les bras noirs de la Porte : une encre épaisse, des reflets violacés, des doigts effilés."""
-    ink = "#0d0b12"
+    """Les bras noirs de la Porte : une encre épaisse et humide, des reflets violacés qui courent le
+    long du bras, des doigts qui s'effilent en fumée."""
+    ink, sheen, vein = "#0b0910", "#18122a", "#060509"
     for part in s.parts:
         s.fill(part, ink, "stone")
-    # Un lustre humide qui court le long du bras.
-    for f in ("top", "right", "left"):
+    # Le bras : des reflets en longues traînées sur le dessus et les côtés, des veines plus sombres.
+    for f in ("top", "right", "left", "front", "back", "bottom"):
         w, h = s.size("arm", f)
-        for i in range(max(w, h)):
-            s.px("arm", f, (i * 3) % w if w < h else i % w, i % h if w < h else (i * 3) % h, "#2a1d3a")
-    for f in FACES:
-        w, h = s.size("finger", f)
-        s.tint("finger", f, 0, 0, w, h, 1.0)
-    # Les bouts des doigts se dissolvent en fumée : un peu plus clairs.
-    s.px("finger", "front", 0, 0, "#3a2c4e")
+        for i in range(0, max(w, h), 3):
+            x, y = (i % w, (i * 5) % h) if h > w else ((i * 5) % w, i % h)
+            s.px("arm", f, x, y, sheen if f == "top" or i % 2 else vein)
+    # La paume et les doigts : un lustre sur le dessus, les bouts qui se dissolvent.
+    s.material("palm", "top", shade(sheen, 0.8), "stone")
+    for part in ("fingertip", "thumbtip"):
+        s.material(part, "front", "#3a2c4e", "stone")
+        s.material(part, "top", shade(sheen, 0.9), "stone")
 
 
 # --- le fauteuil roulant --------------------------------------------------------------------------

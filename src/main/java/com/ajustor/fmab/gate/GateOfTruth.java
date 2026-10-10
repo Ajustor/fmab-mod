@@ -1,6 +1,7 @@
 package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
@@ -12,6 +13,7 @@ import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.LivingStone;
+import com.ajustor.fmab.transmutation.AlchemyRules;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -68,8 +70,13 @@ public final class GateOfTruth {
 	private static final int GREETING = 40;
 	private static final int PRESENTATION = 110;
 	private static final int OPENING = 190;
+	/** Les deux battants s'écartent depuis le centre, une paire de colonnes tous les {@link #DOOR_PERIOD} ticks. */
+	private static final int DOOR_PERIOD = 4;
+	private static final int DOOR_STEPS = GATE_HALF_WIDTH - 1;
 	private static final int KNOWLEDGE = 250;
 	private static final int TOLL = 330;
+	/** Le péage pris, la Vérité vue : les bras le lâchent et la Porte se referme, des bords vers le centre. */
+	private static final int CLOSING = TOLL + 10;
 	/** Le péage payé, la Vérité propose de racheter ce qu'elle a pris contre les âmes d'une Pierre. */
 	private static final int BARGAIN = 350;
 	private static final int RETURN = 400;
@@ -179,6 +186,24 @@ public final class GateOfTruth {
 			case TOLL -> gate = toll(space, player, gate, visit);
 			default -> {
 			}
+		}
+		if (t > OPENING && t <= OPENING + DOOR_PERIOD * (DOOR_STEPS - 1) && (t - OPENING) % DOOR_PERIOD == 0) {
+			int step = (t - OPENING) / DOOR_PERIOD;
+			openDoors(space, player, step);
+			if (step == DOOR_STEPS - 1) {
+				releaseArms(space, player, t);
+			}
+		}
+		if (t == CLOSING) {
+			// Les bras l'ont traîné jusqu'au seuil : ils le rejettent devant la Porte avant qu'elle se
+			// referme, pour qu'il ne reste pas pris dans la pierre.
+			Vec3 back = at(player, ARRIVAL);
+			player.teleportTo(back.x, back.y, back.z);
+			player.setDeltaMovement(Vec3.ZERO);
+			player.hurtMarked = true;
+		}
+		if (t >= CLOSING && t < CLOSING + DOOR_PERIOD * DOOR_STEPS && (t - CLOSING) % DOOR_PERIOD == 0) {
+			closeDoors(space, player, (t - CLOSING) / DOOR_PERIOD);
 		}
 		if (t > OPENING && t < TOLL && t % 4 == 0) {
 			blackArms(space, player);
@@ -295,13 +320,18 @@ public final class GateOfTruth {
 		}
 	}
 
-	/** La Porte fermée : un mur de pierre sculptée, et les ténèbres derrière. */
+	/**
+	 * La Porte fermée : un mur de pierre sculptée, et rien derrière. Les ténèbres n'apparaissent que
+	 * dans l'embrasure, le temps qu'elle est ouverte (voir {@link #openDoors}).
+	 */
 	private static void build(ServerLevel space, ServerPlayer player) {
 		BlockPos o = origin(player);
+		BlockState air = Blocks.AIR.defaultBlockState();
 		for (int x = -GATE_HALF_WIDTH; x < GATE_HALF_WIDTH; x++) {
 			for (int y = 1; y <= GATE_HEIGHT; y++) {
 				space.setBlockAndUpdate(o.offset(x, y, GATE_Z), FmabBlocks.GATE_STONE.defaultBlockState());
-				space.setBlockAndUpdate(o.offset(x, y, GATE_Z - 1), FmabBlocks.GATE_DARKNESS.defaultBlockState());
+				// Les Portes d'avant gardaient un mur de ténèbres dans le dos : on l'efface.
+				space.setBlockAndUpdate(o.offset(x, y, GATE_Z - 1), air);
 			}
 		}
 	}
@@ -310,32 +340,85 @@ public final class GateOfTruth {
 		build(space, player);
 	}
 
+	/** La Porte s'ébranle : le grondement, puis les battants qui s'écartent (voir {@link #openDoors}). */
 	private static void open(ServerLevel space, ServerPlayer player) {
 		BlockPos o = origin(player);
-		BlockState air = Blocks.AIR.defaultBlockState();
-		for (int x = -GATE_HALF_WIDTH + 1; x < GATE_HALF_WIDTH - 1; x++) {
-			for (int y = 1; y < GATE_HEIGHT; y++) {
-				space.setBlockAndUpdate(o.offset(x, y, GATE_Z), air);
-			}
-		}
 		space.playSound(null, o.offset(0, 4, GATE_Z), FmabSounds.GATE_OPEN, SoundSource.PLAYERS, 3, 1);
 		say(player, "truth.fmab.opening");
-		// Les bras noirs sortent des ténèbres derrière la Porte et viennent le chercher.
-		for (int i = 0; i < 8; i++) {
-			double x = o.getX() + 0.5 + (space.getRandom().nextDouble() - 0.5) * 2 * (GATE_HALF_WIDTH - 1.5);
-			// À hauteur d'homme : ils le tirent vers la Porte, pas vers le ciel.
-			double y = o.getY() + 1.2 + space.getRandom().nextDouble() * 2.5;
-			GateHandEntity.reach(space, new Vec3(x, y, o.getZ() + GATE_Z - 0.5), player, TOLL - OPENING + 20, 0.035);
+		openDoors(space, player, 0);
+	}
+
+	/**
+	 * Les battants s'écartent d'une paire de colonnes, du centre vers les bords ; l'encre des ténèbres
+	 * s'échappe par la fente.
+	 */
+	private static void openDoors(ServerLevel space, ServerPlayer player, int step) {
+		BlockPos o = origin(player);
+		BlockState air = Blocks.AIR.defaultBlockState();
+		for (int x : new int[]{-1 - step, step}) {
+			for (int y = 1; y < GATE_HEIGHT; y++) {
+				space.setBlockAndUpdate(o.offset(x, y, GATE_Z - 1), FmabBlocks.GATE_DARKNESS.defaultBlockState());
+				space.setBlockAndUpdate(o.offset(x, y, GATE_Z), air);
+			}
+			space.sendParticles(ParticleTypes.SQUID_INK, o.getX() + x + 0.5, o.getY() + GATE_HEIGHT / 2.0,
+					o.getZ() + GATE_Z + 0.6, 6, 0.2, GATE_HEIGHT / 3.0, 0.1, 0.01);
+			space.sendParticles(ParticleTypes.LARGE_SMOKE, o.getX() + x + 0.5, o.getY() + GATE_HEIGHT / 2.0,
+					o.getZ() + GATE_Z + 0.6, 20, 0.2, GATE_HEIGHT / 3.0, 0.1, 0.01);
+		}
+		space.playSound(null, o.offset(0, 4, GATE_Z), SoundEvents.DEEPSLATE_BREAK, SoundSource.PLAYERS, 2,
+				0.4f + step * 0.08f);
+	}
+
+	/** Les battants se rejoignent, des bords vers le centre ; les ténèbres disparaissent derrière eux. */
+	private static void closeDoors(ServerLevel space, ServerPlayer player, int step) {
+		BlockPos o = origin(player);
+		BlockState air = Blocks.AIR.defaultBlockState();
+		for (int x : new int[]{-DOOR_STEPS + step, DOOR_STEPS - 1 - step}) {
+			for (int y = 1; y < GATE_HEIGHT; y++) {
+				space.setBlockAndUpdate(o.offset(x, y, GATE_Z), FmabBlocks.GATE_STONE.defaultBlockState());
+				space.setBlockAndUpdate(o.offset(x, y, GATE_Z - 1), air);
+			}
+		}
+		space.playSound(null, o.offset(0, 4, GATE_Z), SoundEvents.DEEPSLATE_BREAK, SoundSource.PLAYERS, 2,
+				0.6f - step * 0.08f);
+		if (step == DOOR_STEPS - 1) {
+			space.playSound(null, o.offset(0, 4, GATE_Z), SoundEvents.IRON_DOOR_CLOSE, SoundSource.PLAYERS, 3, 0.4f);
 		}
 	}
 
-	/** Le savoir déferle : des images, trop, trop vite. */
+	/** La Porte grande ouverte : les bras noirs sortent des ténèbres et viennent le chercher. */
+	private static void releaseArms(ServerLevel space, ServerPlayer player, int t) {
+		BlockPos o = origin(player);
+		for (int i = 0; i < 10; i++) {
+			// Répartis sur toute la largeur, d'un bord à l'autre, à des hauteurs variées.
+			double x = o.getX() + 0.5 + ((i + space.getRandom().nextDouble()) / 10 - 0.5) * 2 * (GATE_HALF_WIDTH - 1.5);
+			double y = o.getY() + 1.2 + space.getRandom().nextDouble() * 4;
+			// Ils le tiennent jusqu'au péage, et rentrent quand la Porte se referme.
+			GateHandEntity.reach(space, new Vec3(x, y, o.getZ() + GATE_Z - 0.5), player, CLOSING - t, 0.035);
+		}
+		space.playSound(null, player.blockPosition(), FmabSounds.GATE_HANDS, SoundSource.PLAYERS, 1.5f, 0.8f);
+	}
+
+	/**
+	 * Le savoir déferle : des images, trop, trop vite. Ce qu'il y a derrière la Porte, c'est le savoir
+	 * alchimique tout entier : l'alchimiste en revient en comprenant tous les glyphes.
+	 */
 	private static void knowledge(ServerLevel space, ServerPlayer player) {
 		player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 160, 0, false, false));
 		space.playSound(null, player.blockPosition(), FmabSounds.GATE_KNOWLEDGE, SoundSource.PLAYERS, 2, 1);
 		say(player, "truth.fmab.knowledge");
 		// Derrière la Porte : l'œil, le torrent des symboles, puis le blanc.
 		CinematicPayload.play(player, CinematicPayload.GATE_KNOWLEDGE, TOLL - KNOWLEDGE);
+		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		int before = me.known().size();
+		for (Glyph glyph : AlchemyRules.of(space.registryAccess()).glyphs()) {
+			me = me.learn(glyph.id());
+		}
+		if (me.known().size() > before) {
+			player.setAttached(FmabAttachments.ALCHEMIST, me);
+			player.sendSystemMessage(Component.translatable("gate.fmab.knowledge_learned", me.known().size() - before)
+					.withStyle(s -> s.withColor(0xE0D8B0)));
+		}
 	}
 
 	/**
@@ -356,7 +439,7 @@ public final class GateOfTruth {
 	/** Les bras noirs sortent de la Porte et tirent l'alchimiste vers elle. */
 	private static void blackArms(ServerLevel space, ServerPlayer player) {
 		BlockPos o = origin(player);
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 3; i++) {
 			double x = o.getX() + 0.5 + (space.getRandom().nextDouble() - 0.5) * 2 * (GATE_HALF_WIDTH - 1);
 			double y = 1 + space.getRandom().nextDouble() * (GATE_HEIGHT - 2);
 			double z = o.getZ() + GATE_Z + 0.5;

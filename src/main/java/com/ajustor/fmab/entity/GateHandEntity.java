@@ -1,6 +1,7 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.registry.FmabEntities;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -11,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -23,6 +25,8 @@ public class GateHandEntity extends Entity {
 			SynchedEntityData.defineId(GateHandEntity.class, EntityDataSerializers.INT);
 	/** Le temps qu'il met à atteindre sa proie, en ticks. */
 	public static final int REACH = 18;
+	/** L'encre qui s'échappe du bras : une poussière noire, à peine violacée. */
+	private static final DustParticleOptions INK = new DustParticleOptions(0x120C1C, 1.1f);
 
 	private int lifetime = 60;
 	private double pull = 0.08;
@@ -58,15 +62,61 @@ public class GateHandEntity extends Entity {
 		return id < 0 ? null : level().getEntity(id);
 	}
 
-	/** Où en est le bras, de 0 (il sort) à 1 (il tient sa proie). */
+	/** Où en est le bras, de 0 (il sort) à 1 (il tient sa proie) : vite au départ, il ralentit en arrivant. */
 	public float reach(float partialTicks) {
-		return Math.min(1, (tickCount + partialTicks) / REACH);
+		float t = Math.min(1, (tickCount + partialTicks) / REACH);
+		return 1 - (1 - t) * (1 - t);
+	}
+
+	/** Longueur d'un bras sans proie, en blocs : il se dresse vers le ciel. */
+	public static final float RISE = 4;
+
+	/** Vers où le bras s'étire, depuis sa base : la poitrine de sa proie, ou le ciel. */
+	public Vec3 toward(float partialTicks) {
+		Entity target = target();
+		return target == null ? new Vec3(0, RISE, 0)
+				: target.getPosition(partialTicks).add(0, target.getBbHeight() * 0.6, 0).subtract(getPosition(partialTicks));
+	}
+
+	/**
+	 * Un point du bras, par rapport à sa base. Le bras n'est pas raide : il ondule comme une encre
+	 * vivante, mais reste ancré à ses deux bouts (l'ondulation s'annule à la base et à la main).
+	 *
+	 * @param toward vers où il s'étire, depuis sa base
+	 * @param reach  où il en est, de 0 à 1
+	 * @param s      position le long du bras, de 0 (la base) à 1 (la main)
+	 * @param age    temps, en ticks
+	 * @param seed   pour que deux bras n'ondulent pas d'un même mouvement
+	 */
+	public static Vec3 point(Vec3 toward, float reach, float s, float age, int seed) {
+		double length = toward.length();
+		if (length < 1.0e-4) {
+			return Vec3.ZERO;
+		}
+		Vec3 dir = toward.scale(1 / length);
+		// Deux directions perpendiculaires au bras, pour onduler dans l'espace et pas dans un plan.
+		Vec3 side = dir.cross(Math.abs(dir.y) > 0.95 ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0)).normalize();
+		Vec3 up = side.cross(dir);
+		// Il ondule fort en cherchant sa proie, moins une fois qu'il la tient.
+		double amplitude = Math.min(0.75, length * 0.1) * (reach >= 1 ? 0.45 : 1);
+		double envelope = Mth.sin((float) Math.PI * s) * amplitude;
+		double phase = seed * 1.37;
+		double a = Mth.sin(age * 0.23f + s * 6.5f + (float) phase);
+		double b = 0.6 * Mth.cos(age * 0.17f + s * 4.1f + (float) phase * 1.7f);
+		return toward.scale(s * reach).add(side.scale(a * envelope)).add(up.scale(b * envelope));
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
 		if (level().isClientSide()) {
+			// Une encre qui fume : des volutes noires s'échappent le long du bras.
+			if (random.nextInt(4) == 0) {
+				float s = random.nextFloat();
+				Vec3 at = position().add(point(toward(1), reach(1), s, tickCount, getId()));
+				level().addParticle(INK,
+						at.x, at.y, at.z, (random.nextDouble() - 0.5) * 0.02, 0.01, (random.nextDouble() - 0.5) * 0.02);
+			}
 			return;
 		}
 		if (tickCount > lifetime) {

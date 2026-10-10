@@ -271,10 +271,55 @@ def chalk():
     return light(img)
 
 
+# --- les ténèbres derrière la Porte -----------------------------------------------------------------
+BLOCKS = {}
+
+
+EYES = {
+    "big": ["...sss....",
+            ".sWGRRWWs.",
+            "sWWRPPRWWs",
+            ".sWWRRWWs.",
+            "...sss...."],
+    "lidded": ["sLLLLLLLs",
+               "sWWRPPRWs",
+               ".ssWWWss."],
+    "small": [".sWWs.",
+              "sWRPWs",
+              ".sWWs."],
+}
+EYE_COLORS = dict(s="#6a665e", W="#dcd8cc", R="#6a0f18", P="#050407", G="#ffffff", L="#2a2630")
+
+
+def darkness(eyes):
+    """Un bloc de ténèbres : un noir à peine grenu, et des yeux qui s'ouvrent dedans."""
+    import random
+    rng = random.Random(str(eyes))
+    img = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            img.putpixel((x, y), shade("#0a080e", rng.uniform(0.85, 1.15)))
+    for kind, x0, y0 in eyes:
+        for dy, row in enumerate(EYES[kind]):
+            for dx, ch in enumerate(row):
+                if ch != ".":
+                    img.putpixel((x0 + dx, y0 + dy), rgb(EYE_COLORS[ch]))
+    return img
+
+
+BLOCKS["gate_darkness"] = lambda: darkness([])
+BLOCKS["gate_darkness_eye"] = lambda: darkness([("big", 4, 5)])
+BLOCKS["gate_darkness_lidded"] = lambda: darkness([("lidded", 2, 10)])
+BLOCKS["gate_darkness_eyes"] = lambda: darkness([("small", 1, 2), ("small", 9, 10)])
+
+
 def build(names=None):
-    for name in names or ITEMS:
-        ITEMS[name]().save(os.path.join(OUT, name + ".png"))
-        print("objet", name)
+    for name in names or list(ITEMS) + list(BLOCKS):
+        if name in BLOCKS:
+            BLOCKS[name]().save(os.path.join(OUT, "..", "block", name + ".png"))
+        else:
+            ITEMS[name]().save(os.path.join(OUT, name + ".png"))
+        print("texture", name)
 
 
 if __name__ == "__main__":
