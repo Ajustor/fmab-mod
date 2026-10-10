@@ -199,17 +199,48 @@ def pants(s, color, mat="cloth"):
         s.material(leg, "top", shade(color, 0.8), mat)
 
 
+# Les volumes que FigureModels ajoute au squelette de joueur, dans les coins libres de la peau.
+BUST = {"bust": (24, 0, 6, 3, 2)}
+VISOR = {"visor": (24, 0, 6, 1, 2)}
+
+
+def bust(s, cloth, mat="cloth", skin=None, neckline=0, shadow=6):
+    """La poitrine (le volume « bust ») : l'étoffe qui la couvre, le décolleté en haut, le sillon au
+    milieu, un reflet dessus et l'ombre qu'elle porte dessous."""
+    s.fill("bust", cloth, mat)
+    w, h = s.size("bust", "front")
+    if skin:
+        s.material("bust", "top", skin, "skin")
+        if neckline:
+            s.material("bust", "front", skin, "skin", h=neckline)
+    s.seam("bust", "front", w // 2, 0, neckline + 1 if skin else 2, None, k=0.72)
+    s.tint("bust", "front", 0, h - 1, w, 1, 0.85)
+    s.tint("bust", "top", 0, 0, w, 1, 1.08)
+    s.fill("bust", shade(cloth, 0.62), mat, faces=("bottom",))
+    for f in ("right", "left"):
+        s.tint("bust", f, 0, 0, 2, h, 0.9)
+    # L'ombre qu'elle porte sur le buste, juste dessous.
+    s.tint("body", "front", 1, shadow, 6, 1, 0.72)
+
+
+def visor(s, color="#0d0d10"):
+    """La visière de la casquette : du cuir verni, un reflet sur le bord."""
+    s.fill("visor", color, "leather")
+    s.tint("visor", "top", 0, 0, 6, 1, 1.6)
+
+
 # --- l'armée ------------------------------------------------------------------------------------
-@skin("amestrian_soldier")
+@skin("amestrian_soldier", parts=VISOR)
 def amestrian_soldier(s):
     skin_face(s, FAIR, mouth="#a0645a")
     short_hair(s, "#3b2a1e", fringe=1, back=5)
     eyes(s, "#3c4a5e", brow="#2a1d14")
     amestris_uniform(s)
     army_cap(s)
+    visor(s)
 
 
-@skin("state_examiner")
+@skin("state_examiner", parts=VISOR)
 def state_examiner(s):
     """L'examinateur d'État : un officier grisonnant, moustache, gants blancs, galons dorés."""
     skin_face(s, FAIR, mouth=None)
@@ -221,6 +252,7 @@ def state_examiner(s):
     s.tint("head", "front", 2, 7, 4, 1, 0.9)
     amestris_uniform(s, officer=True, gloves="#f2f0ea")
     army_cap(s, badge="#e8c650")
+    visor(s)
     # Un dossier sous le bras : non, des galons sur les manches.
     for arm in ("rarm", "larm"):
         s.band(arm, 7, 1, GOLD, "metal")
@@ -363,7 +395,7 @@ def immortal_soldier(s):
 
 
 # --- alliés et habitants --------------------------------------------------------------------------
-@skin("hohenheim")
+@skin("hohenheim", parts={"ponytail": (56, 16, 2, 7, 2)})
 def hohenheim(s):
     """Van Hohenheim : cheveux blonds noués, barbe, lunettes rondes, long manteau brun."""
     blond, coat = "#e1c26a", "#7a5a3a"
@@ -391,6 +423,8 @@ def hohenheim(s):
     hair_volume(s, blond, sides=3, back=6)
     s.rect("hat", "back", 3, 5, 2, 3, shade(blond, 0.9))
     long_hair_back(s, blond, rows=5, width=2)
+    s.fill("ponytail", blond, "hair")
+    s.band("ponytail", 0, 1, "#4a3f30", "leather")
     # Le long manteau brun, ouvert sur une chemise claire et un gilet.
     for part in ("body", "rarm", "larm"):
         s.fill(part, coat, "cloth")
@@ -524,7 +558,7 @@ def cornello(s):
                lambda i, j: trim if j < 10 else None)
 
 
-@skin("izumi", slim=True)
+@skin("izumi", slim=True, parts=BUST)
 def izumi(s):
     """Izumi Curtis : les dreadlocks noires, la chemise blanche, le pantalon sombre, les sandales."""
     tone = "#e4bc98"
@@ -545,6 +579,7 @@ def izumi(s):
     for part in ("body", "rarm", "larm"):
         s.fill(part, "#f0ece2", "cloth")
     s.rect("body", "front", 3, 0, 2, 2, tone)
+    bust(s, "#f0ece2")
     s.seam("body", "front", 4, 2, 8, None, k=0.88)
     s.band("body", 8, 1, "#3b3330", "leather")
     for arm in ("rarm", "larm"):
@@ -559,7 +594,7 @@ def izumi(s):
         s.band(leg, 10, 1, tone, "skin")
 
 
-@skin("may_chang", slim=True)
+@skin("may_chang", slim=True, parts={"buns": (24, 0, 3, 3, 3), "braids": (56, 16, 1, 7, 1)})
 def may_chang(s):
     """May Chang : la petite princesse de Xing, nattes et chignons noirs, tunique rose à revers blancs."""
     tone = "#f0d0b4"
@@ -574,6 +609,10 @@ def may_chang(s):
         s.material("hat", f, shade(hair, 1.2), "hair", x=x, w=3, h=3)
         s.px("hat", f, x + 1, 1, "#e85a80")
     long_hair_back(s, hair, rows=8, width=2)
+    s.fill("buns", shade(hair, 1.15), "hair")
+    s.px("buns", "front", 1, 1, "#e85a80")
+    s.fill("braids", hair, "hair")
+    s.band("braids", 5, 1, "#e85a80")
     tunic, trim = "#d9608c", "#f4ecef"
     for part in ("body", "rarm", "larm"):
         s.fill(part, tunic, "cloth")
@@ -594,7 +633,7 @@ def may_chang(s):
     boots(s, color="#1e1a22", rows=3)
 
 
-@skin("olivier", slim=True)
+@skin("olivier", slim=True, parts=BUST)
 def olivier(s):
     """Olivier Mira Armstrong : la longue chevelure blonde qui cache un œil, l'uniforme de général."""
     tone, blond = "#f0d4b8", "#ecd27a"
@@ -610,13 +649,15 @@ def olivier(s):
     for f in ("right", "left"):
         s.material("jacket", f, blond, "hair", h=3)
     amestris_uniform(s, officer=True, gloves="#20202a", tone=tone)
+    bust(s, AMESTRIS_BLUE)
+    s.px("bust", "front", 2, 1, GOLD)
     # Le long manteau d'officier de Briggs.
     s.band("body", 11, 1, AMESTRIS_BLUE)
     coat_tails(s, shade(AMESTRIS_BLUE, 0.85), rows=7)
     boots(s, color="#16161b", rows=6)
 
 
-@skin("winry", slim=True)
+@skin("winry", slim=True, parts={**BUST, "ponytail": (56, 16, 2, 8, 2)})
 def winry(s):
     """Winry Rockbell : queue de cheval blonde, débardeur noir, combinaison bleue nouée à la taille."""
     tone, blond = "#f2d6ba", "#efd27e"
@@ -629,6 +670,8 @@ def winry(s):
     s.band("hat", 1, 1, "#e8e8f0")
     s.material("hat", "top", "#e8e8f0", "cloth")
     long_hair_back(s, blond, rows=7, width=2)
+    s.fill("ponytail", blond, "hair")
+    s.band("ponytail", 0, 1, "#e8e8f0")
     s.px("head", "left", 3, 5, "#c0c0c8")
     s.px("head", "left", 4, 5, "#c0c0c8")
     # Le débardeur noir, les épaules nues, la combinaison nouée par les manches.
@@ -638,6 +681,7 @@ def winry(s):
     s.material("body", "back", tone, "skin", h=2)
     s.material("body", "right", tone, "skin", h=2)
     s.material("body", "left", tone, "skin", h=2)
+    bust(s, BLACK_CLOTH, skin=tone)
     s.band("body", 8, 4, overall)
     s.band("body", 8, 1, shade(overall, 0.75))
     s.rect("body", "front", 2, 8, 4, 1, shade(overall, 0.6))
@@ -742,7 +786,7 @@ def truth(s):
 
 
 # --- les homoncules (squelette BossModels) --------------------------------------------------------
-@skin("lust", slim=True, parts={"hair_back": (0, 32, 9, 14, 2)})
+@skin("lust", slim=True, parts={"hair_back": (0, 32, 9, 14, 2), "bust": (24, 32, 7, 3, 3), "hips": (24, 38, 9, 3, 5)})
 def lust(s):
     """Lust : la longue chevelure noire, les yeux violets, la robe noire, l'ouroboros sur la poitrine."""
     tone, hair = "#f2ddd0", "#17141c"
@@ -761,6 +805,16 @@ def lust(s):
     s.rect("body", "front", 3, 3, 2, 1, tone)
     ouroboros(s, "body", "front", 3, 0)
     s.px("body", "front", 2, 0, shade(tone, 0.9))
+    bust(s, BLACK_CLOTH, skin=tone, neckline=1, shadow=7)
+    # Les hanches dans la robe, et la fente de la jupe sur la cuisse gauche.
+    s.fill("hips", BLACK_CLOTH, "cloth")
+    s.tint("hips", "top", 0, 0, 9, 5, 1.1)
+    s.tint("hips", "front", 0, 2, 9, 1, 0.82)
+    s.px("hips", "front", 6, 1, tone)
+    s.px("hips", "front", 6, 2, tone)
+    # La taille fine : la robe s'ombre sur les flancs, sous la poitrine.
+    s.tint("body", "front", 0, 6, 1, 4, 0.7)
+    s.tint("body", "front", 7, 6, 1, 4, 0.7)
     for arm in ("rarm", "larm"):
         s.fill(arm, tone, "skin")
         s.band(arm, 3, 9, BLACK_CLOTH)

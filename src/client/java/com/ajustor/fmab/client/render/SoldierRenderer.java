@@ -15,7 +15,8 @@ public class SoldierRenderer extends HumanoidMobRenderer<AmestrianSoldierEntity,
 	private final Identifier texture;
 
 	public SoldierRenderer(EntityRendererProvider.Context context, String skin) {
-		super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), 0.5f);
+		super(context, new HumanoidModel<>(skin.equals("amestrian_soldier") ? FigureModels.soldier()
+				: context.bakeLayer(ModelLayers.PLAYER)), 0.5f);
 		this.texture = Fmab.id("textures/entity/" + skin + ".png");
 	}
 

@@ -63,11 +63,19 @@ public final class BossModels {
 		return bake(mesh);
 	}
 
-	/** Lust : une longue chevelure noire qui tombe jusqu'aux reins. */
+	/**
+	 * Lust : une longue chevelure noire qui tombe jusqu'aux reins, et une silhouette de femme fatale :
+	 * la poitrine haute et marquée sous le décolleté de sa robe, la taille fine, les hanches rondes.
+	 */
 	public static ModelPart lust() {
 		MeshDefinition mesh = slimBase();
 		mesh.getRoot().getChild("head").addOrReplaceChild("hair",
 				CubeListBuilder.create().texOffs(0, 32).addBox(-4.5f, -8.3f, 2.4f, 9, 14, 2), PartPose.ZERO);
+		PartDefinition body = mesh.getRoot().getChild("body");
+		FigureModels.bust(body, 24, 32, 7, 3, 3, -0.35f);
+		// Les hanches, plus larges que la taille : la robe s'évase en haut des cuisses.
+		body.addOrReplaceChild("hips",
+				CubeListBuilder.create().texOffs(24, 38).addBox(-4.5f, 9.5f, -2.5f, 9, 3, 5), PartPose.ZERO);
 		return bake(mesh);
 	}
 
