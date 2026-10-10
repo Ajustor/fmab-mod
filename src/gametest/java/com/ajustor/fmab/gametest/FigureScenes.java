@@ -16,7 +16,9 @@ import java.util.Locale;
 public class FigureScenes implements FabricClientGameTest {
 	private static final List<String> FIGURES = List.of("lust", "izumi", "winry", "olivier", "may_chang", "hohenheim",
 			"amestrian_soldier", "briggs_soldier", "drachma_soldier", "state_examiner", "scar", "marcoh", "cornello",
-			"envy", "greed", "wrath", "gluttony", "sloth");
+			"envy", "greed", "wrath", "gluttony", "sloth", "pride", "pride_revealed");
+	/** Les personnages sous une seconde forme : on les frappe une fois pour qu'ils se révèlent. */
+	private static final String REVEALED = "_revealed";
 	private static final int Y = -60;
 	private static final int STEP = 4;
 
@@ -43,10 +45,17 @@ public class FigureScenes implements FabricClientGameTest {
 				mc.options.setCameraType(CameraType.FIRST_PERSON);
 			});
 			for (int i = 0; i < FIGURES.size(); i++) {
+				String name = FIGURES.get(i);
+				boolean revealed = name.endsWith(REVEALED);
+				String id = revealed ? name.substring(0, name.length() - REVEALED.length()) : name;
 				// Face au nord, vers la caméra qui les regarde depuis le nord.
 				sp.getServer().runCommand(String.format(Locale.ROOT,
-						"summon fmab:%s %d.5 %d 0.5 {NoAI:1b,NoGravity:1b,Silent:1b,Invulnerable:1b,Rotation:[180f,0f]}",
-						FIGURES.get(i), i * STEP, Y));
+						"summon fmab:%s %d.5 %d 0.5 {NoAI:1b,NoGravity:1b,Silent:1b,Invulnerable:%db,Rotation:[180f,0f]}",
+						id, i * STEP, Y, revealed ? 0 : 1));
+				if (revealed) {
+					sp.getServer().runCommand(String.format(Locale.ROOT,
+							"damage @e[type=fmab:%s,x=%d.5,y=%d,z=0.5,distance=..1,limit=1] 1", id, i * STEP, Y));
+				}
 			}
 			sp.getConnection().waitForClientboundPackets();
 			context.waitTicks(40);
