@@ -188,6 +188,14 @@ public final class FmabAttachments {
 			.syncWith(ByteBufCodecs.STRING_UTF8, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("design"));
 
+	/**
+	 * Quand l'âme s'est mise à errer devant sa Porte (heure du monde) : la file des âmes errantes,
+	 * qui survit au redémarrage du serveur.
+	 */
+	public static final AttachmentType<Long> ADRIFT_SINCE = AttachmentRegistry.<Long>builder()
+			.persistent(Codec.LONG)
+			.buildAndRegister(Fmab.id("adrift_since"));
+
 	public static void register() {
 	}
 }

@@ -56,6 +56,11 @@ public final class PhilosopherStones {
 		return Optional.empty();
 	}
 
+	/** Une Pierre en main, ou une Pierre vivante : la transmutation est amplifiée et ne coûte rien. */
+	public static boolean amplifies(ServerPlayer player) {
+		return held(player).isPresent() || LivingStone.souls(player) > 0;
+	}
+
 	/** Une vraie Pierre, et non un éclat de pierre rouge impure. */
 	public static boolean pure(ItemStack stone) {
 		return stone.is(FmabItems.PHILOSOPHER_STONE);

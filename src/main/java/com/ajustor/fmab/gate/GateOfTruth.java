@@ -100,6 +100,10 @@ public final class GateOfTruth {
 				if (t >= KNOWLEDGE && t < TOLL) {
 					CinematicPayload.play(player, CinematicPayload.GATE_KNOWLEDGE, TOLL - t);
 				}
+				if (t >= BARGAIN) {
+					// Parti en plein marché : la Vérité le lui propose de nouveau.
+					StoneBargain.offer(player);
+				}
 			}
 		});
 		// Mort pendant qu'on l'aspirait : revenu à la vie, il est de nouveau happé.

@@ -1,6 +1,7 @@
 package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.network.BargainPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -28,7 +29,8 @@ public final class StoneBargain {
 	/** La Vérité ne marchande pas plus de deux minutes. */
 	private static final int PATIENCE = 20 * 60 * 2;
 
-	private static final Map<UUID, Long> BARGAINING = new HashMap<>();
+	/** Qui se déconnecte en plein marché le quitte : à son retour, la visite reprend sans lui. */
+	private static final Map<UUID, Long> BARGAINING = Transient.perPlayer(new HashMap<>());
 
 	private StoneBargain() {
 	}

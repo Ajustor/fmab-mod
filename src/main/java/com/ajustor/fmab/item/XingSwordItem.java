@@ -1,5 +1,6 @@
 package com.ajustor.fmab.item;
 
+import com.ajustor.fmab.data.Transient;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -34,7 +35,9 @@ public class XingSwordItem extends Item {
 	private record Combo(long last, int count) {
 	}
 
-	private static final Map<UUID, Combo> COMBOS = new HashMap<>();
+	/** Par attaquant, joueur ou monstre : les combos éteints s'effacent quand la table grossit. */
+	private static final Map<UUID, Combo> COMBOS = Transient.perServerMap(new HashMap<>());
+	private static final int PRUNE_ABOVE = 256;
 
 	public XingSwordItem(Properties properties) {
 		super(properties);
@@ -49,6 +52,9 @@ public class XingSwordItem extends Item {
 		long now = level.getGameTime();
 		Combo combo = COMBOS.get(attacker.getUUID());
 		int count = combo != null && now - combo.last() <= CHAIN ? Math.min(MAX_COMBO, combo.count() + 1) : 0;
+		if (COMBOS.size() > PRUNE_ABOVE) {
+			COMBOS.values().removeIf(c -> now - c.last() > CHAIN);
+		}
 		COMBOS.put(attacker.getUUID(), new Combo(now, count));
 		if (count > 0 && target.isAlive()) {
 			target.invulnerableTime = 0;

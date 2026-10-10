@@ -5,17 +5,18 @@ import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Notebooks;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.entity.IzumiEntity;
 import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
-import com.ajustor.fmab.gate.StoneBargain;
-import com.ajustor.fmab.gate.StoneChoice;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyMenu;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Rebirth;
 import com.ajustor.fmab.gate.SoulBinding;
+import com.ajustor.fmab.gate.StoneBargain;
+import com.ajustor.fmab.gate.StoneChoice;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.state.StateExam;
 import com.ajustor.fmab.tattoo.TattooRitual;
@@ -30,7 +31,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public final class FmabNetwork {
+	private static final int DESIGNS_COOLDOWN = 20;
+	private static final Map<UUID, Long> LAST_DESIGNS = Transient.perPlayer(new HashMap<>());
+
 	private FmabNetwork() {
 	}
 
@@ -63,7 +71,7 @@ public final class FmabNetwork {
 		PayloadTypeRegistry.clientboundPlay().registerLarge(OpenDesignsPayload.TYPE, OpenDesignsPayload.CODEC, 1 << 20);
 
 		ServerPlayNetworking.registerGlobalReceiver(RequestDesignsPayload.TYPE,
-				(payload, context) -> ServerPlayNetworking.send(context.player(), Recomposition.designs(context.player())));
+				(payload, context) -> designs(context.player()));
 		ServerPlayNetworking.registerGlobalReceiver(ChooseDesignPayload.TYPE,
 				(payload, context) -> Recomposition.choose(context.player(), payload.item()));
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
@@ -191,6 +199,17 @@ public final class FmabNetwork {
 			case ALREADY_THERE -> "notebook.fmab.already";
 			case FULL -> "notebook.fmab.full";
 		}));
+	}
+
+	/** La page de conception coûte un parcours de tout ce qu'on a compris : une par seconde suffit. */
+	private static void designs(ServerPlayer player) {
+		long now = player.level().getGameTime();
+		Long last = LAST_DESIGNS.get(player.getUUID());
+		if (last != null && now >= last && now - last < DESIGNS_COOLDOWN) {
+			return;
+		}
+		LAST_DESIGNS.put(player.getUUID(), now);
+		ServerPlayNetworking.send(player, Recomposition.designs(player));
 	}
 
 	/** La roue des cercles : une page devient la sélection, et l'Initié peut joindre aussitôt les mains. */

@@ -3,7 +3,6 @@ package com.ajustor.fmab.transmutation;
 import com.ajustor.fmab.alchemy.exchange.Composition;
 import com.ajustor.fmab.network.OpenDesignsPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
-import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
@@ -197,7 +196,7 @@ public final class Recomposition {
 
 	/** On porte ou l'on est une Pierre philosophale : la matière se crée de toutes pièces. */
 	private static boolean fromNothing(ServerPlayer caster) {
-		return PhilosopherStones.held(caster).isPresent() || LivingStone.souls(caster) > 0;
+		return PhilosopherStones.amplifies(caster);
 	}
 
 	/**

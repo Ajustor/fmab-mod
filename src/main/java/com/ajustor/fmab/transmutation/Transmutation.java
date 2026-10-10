@@ -10,6 +10,7 @@ import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.homunculus.AntiAlchemy;
 import com.ajustor.fmab.homunculus.Belly;
@@ -285,7 +286,7 @@ public final class Transmutation {
 	private record Channel(BlockPos circle, long last, int growth) {
 	}
 
-	private static final Map<UUID, Channel> CHANNELS = new HashMap<>();
+	private static final Map<UUID, Channel> CHANNELS = Transient.perPlayer(new HashMap<>());
 	/** Le jeu répète le geste toutes les quatre ticks tant qu'on maintient le clic. */
 	private static final int CHANNEL_GAP = 8;
 	/** Au-delà, l'ouvrage ne grandit plus. */
@@ -316,7 +317,7 @@ public final class Transmutation {
 		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Analysis analysis = rules.analyze(drawing, alchemist);
-		boolean amplified = PhilosopherStones.held(caster).isPresent() || LivingStone.souls(caster) > 0;
+		boolean amplified = PhilosopherStones.amplifies(caster);
 		if (!amplified) {
 			if (alchemist.concentration() < 1) {
 				caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", 1, 0));

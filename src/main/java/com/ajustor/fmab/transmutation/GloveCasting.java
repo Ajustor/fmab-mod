@@ -4,6 +4,7 @@ import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.Notebooks;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Tolls;
@@ -29,6 +30,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * Lancer le cercle d'un gant : sur la surface visée, à portée de main (ou à distance pour les gants
  * à silex), comme si on l'y avait tracé. Il faut avoir la main libre.
@@ -38,6 +43,12 @@ public final class GloveCasting {
 	private static final int REBOUND_WEAR = 8;
 	/** Délai entre deux frappes de gantelet, en ticks. */
 	private static final int STRIKE_COOLDOWN = 20;
+	/**
+	 * Délai entre deux lancers de gants ou deux claquements de mains, en ticks : le serveur ne croit
+	 * pas un client qui en enverrait vingt par seconde.
+	 */
+	private static final int CAST_COOLDOWN = 10;
+	private static final Map<UUID, Long> LAST_CAST = Transient.perPlayer(new HashMap<>());
 
 	private GloveCasting() {
 	}
@@ -46,6 +57,15 @@ public final class GloveCasting {
 	 * @param combine joindre les mains : les cercles des deux gants agissent l'un après l'autre
 	 */
 	public static void cast(ServerPlayer player, boolean combine) {
+		if (!player.isAlive() || player.isSpectator()) {
+			return;
+		}
+		long now = player.level().getGameTime();
+		Long last = LAST_CAST.get(player.getUUID());
+		if (last != null && now >= last && now - last < CAST_COOLDOWN) {
+			return;
+		}
+		LAST_CAST.put(player.getUUID(), now);
 		if (Wheelchairs.handsBusy(player)) {
 			// Les mains font tourner des roues, ou tiennent des poignées.
 			player.sendOverlayMessage(Component.translatable("wheelchair.fmab.hands_busy"));

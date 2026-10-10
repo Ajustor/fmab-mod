@@ -3,6 +3,7 @@ package com.ajustor.fmab.transmutation;
 import com.ajustor.fmab.alchemy.exchange.ExchangeValue;
 import com.ajustor.fmab.alchemy.exchange.Family;
 import com.ajustor.fmab.data.ExchangeGroup;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.registry.FmabRegistries;
 import com.ajustor.fmab.registry.FmabTags;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -13,11 +14,14 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -120,8 +124,26 @@ public final class MaterialPool {
 		return remaining <= 0;
 	}
 
+	/** Les valeurs déjà lues, valables tant que les data packs (et leurs tags) ne changent pas. */
+	private static final Map<Item, Optional<ExchangeValue>> VALUES = new HashMap<>();
+	private static @Nullable RecipeManager valuesFor;
+
+	static {
+		Transient.perServer(VALUES.keySet());
+	}
+
 	/** Valeur d'échange d'un objet : son identifiant d'abord, puis ses tags. */
 	public static Optional<ExchangeValue> valueOf(ServerLevel level, ItemStack stack) {
+		// Un /reload recrée le gestionnaire de recettes : c'est le signe que les tags ont pu changer.
+		RecipeManager recipes = level.getServer().getRecipeManager();
+		if (recipes != valuesFor) {
+			VALUES.clear();
+			valuesFor = recipes;
+		}
+		return VALUES.computeIfAbsent(stack.getItem(), item -> lookup(level, stack));
+	}
+
+	private static Optional<ExchangeValue> lookup(ServerLevel level, ItemStack stack) {
 		Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
 		for (ExchangeGroup group : level.registryAccess().lookupOrThrow(FmabRegistries.EXCHANGE)) {
 			Integer direct = group.values().get(id.toString());

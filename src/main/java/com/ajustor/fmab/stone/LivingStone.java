@@ -2,6 +2,7 @@ package com.ajustor.fmab.stone;
 
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.HomunculusEntity;
@@ -61,7 +62,7 @@ public final class LivingStone {
 	private record Grip(UUID target, long last, int streak) {
 	}
 
-	private static final Map<UUID, Grip> GRIPS = new HashMap<>();
+	private static final Map<UUID, Grip> GRIPS = Transient.perPlayer(new HashMap<>());
 	/** Une mort coûte cher ; une grande transmutation (deux étages ou plus), une âme. */
 	private static final int DEATH = 20;
 	private static final DustParticleOptions RED = new DustParticleOptions(0xD01020, 1.2f);

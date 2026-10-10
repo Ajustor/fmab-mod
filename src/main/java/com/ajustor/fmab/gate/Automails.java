@@ -3,6 +3,7 @@ package com.ajustor.fmab.gate;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.Automail;
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.data.Transient;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -47,8 +48,8 @@ public final class Automails {
 	/** Le prix de la réparation : un lingot de fer par quart de l'usure. */
 	public static final int REPAIR_STEPS = 4;
 
-	private static final Map<UUID, Vec3> LAST_POSITIONS = new HashMap<>();
-	private static final Map<UUID, Double> WALKED = new HashMap<>();
+	private static final Map<UUID, Vec3> LAST_POSITIONS = Transient.perPlayer(new HashMap<>());
+	private static final Map<UUID, Double> WALKED = Transient.perPlayer(new HashMap<>());
 
 	private Automails() {
 	}
