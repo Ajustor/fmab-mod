@@ -271,6 +271,91 @@ def chalk():
     return light(img)
 
 
+# --- objets du quotidien de l'alchimiste -------------------------------------------------------------
+@item("leather_gloves")
+def leather_gloves():
+    """Un gant de cuir fauve : doigts séparés, une couture sur le dos, un poignet plus sombre à boucle."""
+    return light(sprite([
+        "................",
+        "......L.L.L.....",
+        "......M.M.M.L...",
+        "......MDMDMDM...",
+        "......MDMDMDM...",
+        "......MDMDMDM...",
+        "......MMMMMMM...",
+        "...LL.MMMMMMM...",
+        "...MMMMSMMMMD...",
+        "....MMMMSMMMD...",
+        ".....MMMMSMMD...",
+        "......MMMMMMD...",
+        "......MMMMMMD...",
+        ".....CCCCCCCC...",
+        ".....CKCCCCCC...",
+        ".....CCCCCCCC...",
+    ], dict(L="#c48a52", M="#a06a3a", D="#6e4524", S="#d8b080", C="#5a361c", K="#d9b440")))
+
+
+@item("red_stone_shard")
+def red_stone_shard():
+    """Un éclat de pierre rouge : un cristal à facettes, translucide sur l'arête, presque noir au cœur."""
+    img = sprite([
+        "................",
+        "..........H.....",
+        ".........HLR....",
+        "........HLLRD...",
+        ".......HLLRRD...",
+        "......HLLRRRD...",
+        ".....HLLRRRDD...",
+        ".....LLRRRRD....",
+        "....HLRRRRDD....",
+        "....LLRRRDD.....",
+        "....LRRRDD......",
+        "...HLRRDD.......",
+        "...LRRDD........",
+        "...RRDD.........",
+        "...DD...........",
+        "................",
+    ], dict(H="#ffc8d0", L="#e8506a", R="#b0162e", D="#5a0814"))
+    out = light(img)
+    for x, y in ((12, 3), (6, 11)):
+        out.putpixel((x, y), rgb("#fff4f6"))
+    return out
+
+
+@item("state_watch")
+def state_watch():
+    """La montre d'Alchimiste d'État : boîtier d'argent fermé, l'emblème d'Amestris gravé sur le
+    couvercle, la bélière et un bout de chaîne."""
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    cx, cy, r = 7.5, 9.5, 6.0
+    for y in range(16):
+        for x in range(16):
+            d = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
+            if d > r + 0.4:
+                continue
+            if d > r - 0.6:
+                img.putpixel((x, y), rgb("#4a4f58"))
+                continue
+            # L'argent poli : clair en haut à gauche, sombre en bas à droite, un liseré près du bord.
+            t = ((x - cx) + (y - cy)) / (2 * r)
+            base = mix(rgb("#f2f4f7"), rgb("#7c838d"), min(1.0, max(0.0, t + 0.5)))
+            if r - 1.8 < d <= r - 0.6:
+                base = shade(base, 0.86)
+            img.putpixel((x, y), base)
+    # L'emblème : un hexagramme stylisé, gravé.
+    for dx, dy in ((0, -2), (-2, -1), (-1, -1), (0, -1), (1, -1), (2, -1), (-1, 0), (1, 0),
+                   (-2, 1), (-1, 1), (0, 1), (1, 1), (2, 1), (0, 2)):
+        img.putpixel((int(cx + 0.5) + dx, int(cy) + dy), rgb("#5a616b"))
+    # La bélière (le petit pas de vis) et son anneau.
+    for x, y, c in ((7, 3, "#9aa1aa"), (8, 3, "#c9ced6"), (7, 2, "#c9ced6"), (8, 2, "#8a9099"),
+                    (6, 1, "#4a4f58"), (7, 0, "#c9ced6"), (8, 0, "#c9ced6"), (9, 1, "#4a4f58")):
+        img.putpixel((x, y), rgb(c))
+    # La chaîne, qui part vers la droite et retombe.
+    for k, (x, y) in enumerate(((10, 1), (11, 1), (12, 2), (13, 3), (13, 4), (14, 5), (14, 6))):
+        img.putpixel((x, y), rgb("#d8dde2" if k % 2 == 0 else "#7c838d"))
+    return img
+
+
 # --- les ténèbres derrière la Porte -----------------------------------------------------------------
 BLOCKS = {}
 
