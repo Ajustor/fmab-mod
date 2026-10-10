@@ -41,6 +41,14 @@ public final class MaterialPool {
 	 *               transmuté (il compte alors pour sa valeur d'échange, ou 1)
 	 */
 	public static MaterialPool collect(EffectContext ctx, String element, Family family) {
+		return collect(ctx, element, family, true);
+	}
+
+	/**
+	 * Comme {@link #collect(EffectContext, String, Family)}, en laissant de côté l'inventaire si
+	 * {@code fromInventory} est faux : seulement ce qui vient de l'étage précédent ou du cercle.
+	 */
+	public static MaterialPool collect(EffectContext ctx, String element, Family family, boolean fromInventory) {
 		ServerLevel level = ctx.level();
 		TagKey<Item> tag = FmabTags.elementItems(element);
 		List<Source> sources = new ArrayList<>();
@@ -50,8 +58,10 @@ public final class MaterialPool {
 		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, ctx.onCircle())) {
 			add(level, entity.getItem(), tag, family, sources);
 		}
-		for (ItemStack stack : ctx.caster().getInventory()) {
-			add(level, stack, tag, family, sources);
+		if (fromInventory) {
+			for (ItemStack stack : ctx.caster().getInventory()) {
+				add(level, stack, tag, family, sources);
+			}
 		}
 		sources.sort(Comparator.comparingInt(Source::unitMass));
 		return new MaterialPool(sources);

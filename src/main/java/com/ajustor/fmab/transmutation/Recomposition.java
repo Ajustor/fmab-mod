@@ -1,11 +1,16 @@
 package com.ajustor.fmab.transmutation;
 
 import com.ajustor.fmab.alchemy.exchange.Composition;
+import com.ajustor.fmab.network.OpenDesignsPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.stone.LivingStone;
+import com.ajustor.fmab.stone.PhilosopherStones;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -13,6 +18,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -20,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Fabriquer un objet par l'alchimie, en trois temps comme toute transmutation.
@@ -30,7 +37,8 @@ import java.util.Set;
  *   <li><b>Décomposer</b> la matière : celle qu'on pose sur le cercle ou qu'on porte, de chaque
  *   élément dont l'objet est fait, à hauteur de sa masse.</li>
  *   <li><b>Recomposer</b> : posé sur le cercle, un exemplaire de l'objet sert de modèle, et le cercle
- *   (son élément principal + Recomposer) en fait une copie, neuve et sans enchantement.</li>
+ *   (son élément principal + Recomposer) en fait une copie, neuve et sans enchantement. Sans
+ *   modèle, le cercle crée l'objet auquel l'alchimiste pense, choisi sur sa page de conception.</li>
  * </ol>
  *
  * <p>L'échange est équivalent, à la masse près : une pioche de fer coûte trois lingots et deux
@@ -95,9 +103,9 @@ public final class Recomposition {
 				.contains(BuiltInRegistries.ITEM.getKey(item).toString());
 	}
 
-	// --- Recomposer d'après modèle -----------------------------------------------------------------
+	// --- Recomposer d'après modèle, ou d'après conception ----------------------------------------
 
-	/** Élément + Recomposer, sans autre usage : il faut un modèle sur le cercle. */
+	/** Élément + Recomposer, sans autre usage : il faut un modèle sur le cercle, ou une conception. */
 	public static Effects.Result recompose(EffectContext ctx) {
 		return copy(ctx).orElseGet(() -> {
 			ctx.caster().sendSystemMessage(Component.translatable("transmutation.fmab.copy.no_model"));
@@ -106,33 +114,47 @@ public final class Recomposition {
 	}
 
 	/**
-	 * Copie l'objet posé en modèle sur le cercle, s'il y en a un.
+	 * Crée l'objet posé en modèle sur le cercle, ou, à défaut, celui auquel l'alchimiste pense (sa
+	 * conception). La matière qu'il contient est consommée, élément par élément ; ce qu'on pose en
+	 * plus de l'élément principal sur le cercle (la moitié de sa masse au plus) rend l'objet plus
+	 * solide. Avec une Pierre philosophale en main ou dans le corps, plus besoin de matière : l'objet
+	 * est créé de toutes pièces.
 	 *
-	 * @return vide s'il n'y a pas de modèle : l'étage fait alors ce qu'il fait d'ordinaire
+	 * @return vide s'il n'y a ni modèle ni conception : l'étage fait alors ce qu'il fait d'ordinaire
 	 */
 	public static Optional<Effects.Result> copy(EffectContext ctx) {
 		ServerLevel level = ctx.level();
-		Optional<ItemEntity> found = model(ctx);
+		ServerPlayer caster = ctx.caster();
+		Optional<Item> target = model(ctx).map(e -> e.getItem().getItem()).or(() -> design(caster));
+		if (target.isEmpty()) {
+			return Optional.empty();
+		}
+		Item item = target.get();
+		ItemStack shown = new ItemStack(item);
+		Optional<Composition> found = composition(level, item);
 		if (found.isEmpty()) {
 			return Optional.empty();
 		}
-		ItemStack model = found.get().getItem();
-		Composition composition = composition(level, model.getItem()).orElseThrow();
-		ServerPlayer caster = ctx.caster();
+		Composition composition = found.get();
 		if (composition.masses().containsKey("gold")) {
-			caster.sendSystemMessage(Component.translatable("transmutation.fmab.copy.gold", model.getHoverName()));
+			caster.sendSystemMessage(Component.translatable("transmutation.fmab.copy.gold", shown.getHoverName()));
 			return Optional.of(Effects.Result.NO_TARGET);
 		}
-		if (!understands(caster, model.getItem())) {
+		if (!understands(caster, item)) {
 			caster.sendSystemMessage(Component.translatable("transmutation.fmab.copy.not_understood",
-					model.getHoverName()));
+					shown.getHoverName()));
 			return Optional.of(Effects.Result.NO_TARGET);
 		}
 		String principal = composition.principal();
 		if (!ctx.stage().combination().elements().contains(principal)) {
 			caster.sendSystemMessage(Component.translatable("transmutation.fmab.copy.wrong_element",
-					model.getHoverName(), element(principal)));
+					shown.getHoverName(), element(principal)));
 			return Optional.of(Effects.Result.NO_TARGET);
+		}
+		if (fromNothing(caster)) {
+			// La Pierre ignore l'échange équivalent : rien n'est pris, l'objet sort tel quel.
+			Effects.drop(ctx, shown);
+			return Optional.of(Effects.Result.DONE);
 		}
 		Map<String, Integer> cost = composition.cost();
 		Map<String, MaterialPool> pools = new LinkedHashMap<>();
@@ -152,12 +174,76 @@ public final class Recomposition {
 		}
 		if (!enough) {
 			caster.sendSystemMessage(Component.translatable("transmutation.fmab.copy.missing",
-					model.getHoverName(), missing));
+					shown.getHoverName(), missing));
 			return Optional.of(Effects.Result.NO_MATERIAL);
 		}
 		cost.forEach((element, mass) -> pools.get(element).consume(mass));
-		Effects.drop(ctx, new ItemStack(model.getItem()));
+		ItemStack made = shown.copy();
+		reinforce(ctx, made, principal, cost.get(principal));
+		Effects.drop(ctx, made);
 		return Optional.of(Effects.Result.DONE);
+	}
+
+	/** On porte ou l'on est une Pierre philosophale : la matière se crée de toutes pièces. */
+	private static boolean fromNothing(ServerPlayer caster) {
+		return PhilosopherStones.held(caster).isPresent() || LivingStone.souls(caster) > 0;
+	}
+
+	/**
+	 * La matière de l'élément principal posée sur le cercle en plus du prix entre dans l'objet : sa
+	 * durabilité grandit d'autant, jusqu'à moitié en plus.
+	 */
+	private static void reinforce(EffectContext ctx, ItemStack made, String principal, int paid) {
+		if (!made.isDamageableItem() || paid <= 0) {
+			return;
+		}
+		MaterialPool extra = MaterialPool.collect(ctx, principal, null, false);
+		int added = Math.min(extra.available(), paid / 2);
+		if (added <= 0 || !extra.consume(added)) {
+			return;
+		}
+		int max = made.getMaxDamage();
+		made.set(DataComponents.MAX_DAMAGE, max + (int) Math.round(max * (double) added / paid));
+	}
+
+	/** L'objet auquel l'alchimiste pense, s'il en a choisi un. */
+	private static Optional<Item> design(ServerPlayer caster) {
+		String id = caster.getAttached(FmabAttachments.DESIGN);
+		if (id == null || id.isEmpty()) {
+			return Optional.empty();
+		}
+		return BuiltInRegistries.ITEM.getOptional(Identifier.parse(id));
+	}
+
+	// --- La page de conception --------------------------------------------------------------------
+
+	/** Ce que l'alchimiste sait recomposer, avec le prix de chaque objet, pour sa page de conception. */
+	public static OpenDesignsPayload designs(ServerPlayer player) {
+		ServerLevel level = player.level();
+		List<OpenDesignsPayload.Entry> entries = new ArrayList<>();
+		for (String id : new TreeSet<>(player.getAttachedOrCreate(FmabAttachments.UNDERSTOOD))) {
+			BuiltInRegistries.ITEM.getOptional(Identifier.parse(id))
+					.flatMap(item -> composition(level, item))
+					.ifPresent(c -> entries.add(new OpenDesignsPayload.Entry(id, c.cost())));
+		}
+		String current = player.getAttached(FmabAttachments.DESIGN);
+		return new OpenDesignsPayload(entries, current == null ? "" : current);
+	}
+
+	/** L'alchimiste pense désormais à cet objet (ou à rien, si l'identifiant est vide). */
+	public static void choose(ServerPlayer player, String id) {
+		if (id.isEmpty()) {
+			player.removeAttached(FmabAttachments.DESIGN);
+			player.sendOverlayMessage(Component.translatable("transmutation.fmab.design.cleared"));
+			return;
+		}
+		Optional<Item> item = BuiltInRegistries.ITEM.getOptional(Identifier.tryParse(id));
+		if (item.isEmpty() || !understands(player, item.get()) || composition(player.level(), item.get()).isEmpty()) {
+			return;
+		}
+		player.setAttached(FmabAttachments.DESIGN, id);
+		player.sendOverlayMessage(Component.translatable("transmutation.fmab.design.chosen",
+				new ItemStack(item.get()).getHoverName()));
 	}
 
 	/** Le modèle : l'objet composé posé sur le cercle, le plus près du centre. */

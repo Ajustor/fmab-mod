@@ -12,6 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -46,6 +48,15 @@ final class AlchemyHud {
 				THUMB, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE);
 		String name = mc.font.plainSubstrByWidth(Notebooks.pageName(page).getString(), NAME_WIDTH);
 		graphics.text(mc.font, name, MARGIN + THUMB + 6, MARGIN + (THUMB - 8) / 2, INK, true);
+		// L'objet auquel l'alchimiste pense : ce qu'un cercle Recomposer créera sans modèle.
+		String design = player.getAttached(FmabAttachments.DESIGN);
+		if (design != null && !design.isEmpty()) {
+			BuiltInRegistries.ITEM.getOptional(Identifier.tryParse(design)).ifPresent(item -> {
+				int y = MARGIN + THUMB + 4;
+				graphics.fill(MARGIN - 2, y - 2, MARGIN + 18, y + 18, BACKDROP);
+				graphics.item(new ItemStack(item), MARGIN + 1, y + 1);
+			});
+		}
 	}
 
 	/** Le cercle sélectionné sert-il en ce moment ? */

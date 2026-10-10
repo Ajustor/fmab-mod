@@ -35,6 +35,7 @@ import com.ajustor.fmab.client.render.WinryRenderer;
 import com.ajustor.fmab.client.render.WrathRenderer;
 import com.ajustor.fmab.client.screen.BodyScreen;
 import com.ajustor.fmab.client.screen.CircleWheelScreen;
+import com.ajustor.fmab.client.screen.DesignScreen;
 import com.ajustor.fmab.client.screen.ExamScreen;
 import com.ajustor.fmab.client.screen.GlovesScreen;
 import com.ajustor.fmab.client.screen.InventoryTabs;
@@ -51,11 +52,13 @@ import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.network.CastGlovesPayload;
 import com.ajustor.fmab.network.CinematicPayload;
+import com.ajustor.fmab.network.OpenDesignsPayload;
 import com.ajustor.fmab.network.OpenExamPayload;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.network.OpenTruthPayload;
 import com.ajustor.fmab.network.OpenWinryPayload;
+import com.ajustor.fmab.network.RequestDesignsPayload;
 import com.ajustor.fmab.network.SelectCirclePayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
@@ -103,6 +106,9 @@ public class FmabClient implements ClientModInitializer {
 				new KeyMapping("key.fmab.gloves", GLFW.GLFW_KEY_H, category));
 		KeyMapping notebook = KeyMappingHelper.registerKeyMapping(
 				new KeyMapping("key.fmab.notebook", GLFW.GLFW_KEY_N, category));
+		// La page de conception : l'objet auquel on pense en recomposant.
+		KeyMapping design = KeyMappingHelper.registerKeyMapping(
+				new KeyMapping("key.fmab.design", GLFW.GLFW_KEY_J, category));
 		KeyMapping wheel = KeyMappingHelper.registerKeyMapping(
 				new KeyMapping("key.fmab.circle_wheel", GLFW.GLFW_KEY_R, category));
 		// Passer d'un cercle à l'autre sans ouvrir la roue : sans touche par défaut.
@@ -120,6 +126,9 @@ public class FmabClient implements ClientModInitializer {
 			}
 			while (notebook.consumeClick()) {
 				mc.gui.setScreen(new NotebookScreen());
+			}
+			while (design.consumeClick()) {
+				ClientPlayNetworking.send(RequestDesignsPayload.INSTANCE);
 			}
 			while (wheel.consumeClick()) {
 				CircleWheelScreen.open(wheel);
@@ -178,6 +187,8 @@ public class FmabClient implements ClientModInitializer {
 				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new WinryScreen(payload.entityId())));
+		ClientPlayNetworking.registerGlobalReceiver(OpenDesignsPayload.TYPE,
+				(payload, context) -> context.client().gui.setScreen(new DesignScreen(payload)));
 		ClientPlayNetworking.registerGlobalReceiver(OpenTattooPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TattooScreen(payload)));
 		ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> {

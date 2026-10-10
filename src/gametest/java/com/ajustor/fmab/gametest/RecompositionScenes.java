@@ -11,6 +11,12 @@ import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
+import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.client.screen.DesignScreen;
+import com.ajustor.fmab.network.ChooseDesignPayload;
+import com.ajustor.fmab.network.RequestDesignsPayload;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.world.InteractionHand;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Transmutation;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -111,6 +117,46 @@ public class RecompositionScenes implements FabricClientGameTest {
 			cast(context, sp, "fmab:terre", "fmab:recomposer");
 			check(count(context, sp, Items.STONE_PICKAXE) == 2, "et la recompose d'après modèle");
 			context.takeScreenshot("recomposition_05_stone_pickaxe");
+			clear(context, sp);
+
+			// 6. La page de conception : on pense à la pioche de fer.
+			context.runOnClient(mc -> ClientPlayNetworking.send(RequestDesignsPayload.INSTANCE));
+			context.waitForScreen(DesignScreen.class);
+			context.takeScreenshot("recomposition_06_design_page");
+			context.runOnClient(mc -> ClientPlayNetworking.send(new ChooseDesignPayload("minecraft:iron_pickaxe")));
+			sp.getConnection().waitForServerboundPackets();
+			context.waitTicks(2);
+			context.runOnClient(mc -> ClientPlayNetworking.send(RequestDesignsPayload.INSTANCE));
+			context.waitTicks(5);
+			context.takeScreenshot("recomposition_07_design_chosen");
+			context.setScreen(() -> null);
+			check(server(context, sp, (level, p) -> "minecraft:iron_pickaxe".equals(p.getAttached(FmabAttachments.DESIGN))),
+					"la conception devrait être la pioche de fer");
+
+			// 7. Sans modèle : le cercle crée l'objet auquel on pense ; un lingot de plus le rend plus solide.
+			drop(context, sp, new ItemStack(Items.IRON_INGOT, 4));
+			drop(context, sp, new ItemStack(Items.OAK_PLANKS, 1));
+			server(context, sp, (level, p) -> {
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FmabItems.CHALK));
+				return null;
+			});
+			cast(context, sp, "fmab:fer", "fmab:recomposer");
+			check(count(context, sp, Items.IRON_PICKAXE) == 1, "la pioche pensée devrait être créée");
+			check(count(context, sp, Items.IRON_INGOT) == 0, "le lingot en plus devrait entrer dans la pioche");
+			int max = server(context, sp, (level, p) -> level.getEntitiesOfClass(ItemEntity.class, around(),
+					e -> e.getItem().is(Items.IRON_PICKAXE)).getFirst().getItem().getMaxDamage());
+			check(max == 250 + 83, "un tiers de fer en plus, un tiers de durabilité en plus : " + max);
+			context.takeScreenshot("recomposition_08_created_from_design_sturdier");
+			clear(context, sp);
+
+			// 8. Avec une Pierre philosophale en main : créée de toutes pièces, sans matière.
+			server(context, sp, (level, p) -> {
+				p.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(FmabItems.PHILOSOPHER_STONE));
+				return null;
+			});
+			cast(context, sp, "fmab:fer", "fmab:recomposer");
+			check(count(context, sp, Items.IRON_PICKAXE) == 1, "la Pierre crée la pioche sans matière");
+			context.takeScreenshot("recomposition_09_from_nothing_with_the_stone");
 		}
 	}
 

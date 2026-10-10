@@ -178,6 +178,16 @@ public final class FmabAttachments {
 					AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(Fmab.id("understood"));
 
+	/**
+	 * L'objet auquel l'alchimiste pense en recomposant, choisi sur sa page de conception : sans
+	 * modèle posé sur le cercle, c'est lui qu'un cercle Recomposer crée. Gardé à la mort.
+	 */
+	public static final AttachmentType<String> DESIGN = AttachmentRegistry.<String>builder()
+			.persistent(Codec.STRING)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.STRING_UTF8, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("design"));
+
 	public static void register() {
 	}
 }

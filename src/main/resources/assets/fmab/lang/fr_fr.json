@@ -985,5 +985,16 @@
   "item.fmab.understood": "Structure comprise",
   "effect.fmab.recompose": "Recomposition d'après modèle",
   "effect.fmab.dismantle": "Décomposition d'objets",
-  "treatise.fmab.ch2.objects": "Fabriquer un objet suit les mêmes étapes.\n\n1. Comprendre : posez l'objet sur un cercle de son élément principal (Fer pour une pioche de fer, Terre pour une pioche de pierre) avec Décomposer. Il se défait en sa matière, et vous en retenez la structure.\n\n2. Posez ensuite un exemplaire en modèle sur un cercle Recomposer du même élément, avec la matière qu'il contient (trois lingots et du bois pour une pioche de fer), sur le cercle ou sur vous.\n\n3. La copie sort, neuve, sans enchantement. L'échange est équivalent : rien de plus, rien de moins. L'or, lui, ne se fabrique pas."
+  "treatise.fmab.ch2.objects": "Fabriquer un objet suit les mêmes étapes.\n\n1. Comprendre : posez l'objet sur un cercle de son élément principal (Fer pour une pioche de fer, Terre pour une pioche de pierre) avec Décomposer. Il se défait en sa matière, et vous en retenez la structure.\n\n2. Pensez ensuite à l'objet (page de conception, touche J), ou posez-en un exemplaire en modèle, sur un cercle Recomposer du même élément, avec la matière qu'il contient, sur le cercle ou sur vous.\n\n3. L'objet sort, neuf. L'échange est équivalent ; un surplus de l'élément principal posé sur le cercle le rend plus solide. Avec une Pierre philosophale, nul besoin de matière. L'or, lui, ne se fabrique pas.",
+  "key.fmab.design": "Conception (objet à recomposer)",
+  "design.fmab.title": "Conception",
+  "design.fmab.intro": "Pensez à l'objet à créer : sans modèle sur le cercle, un cercle Recomposer fabrique celui-ci.",
+  "design.fmab.search": "Chercher…",
+  "design.fmab.forget": "Ne penser à rien",
+  "design.fmab.empty": "Vous ne comprenez encore aucun objet : décomposez-en un sur un cercle (son élément + Décomposer).",
+  "design.fmab.current": "Vous pensez à :",
+  "design.fmab.nothing": "rien",
+  "design.fmab.cost_line": "%s : %s",
+  "transmutation.fmab.design.chosen": "Vous pensez à %s",
+  "transmutation.fmab.design.cleared": "Vous ne pensez à rien de particulier"
 }
