@@ -12,7 +12,8 @@
 			"com.ajustor.fmab.gametest.StoneGateScenes",
 			"com.ajustor.fmab.gametest.GateScenes",
 			"com.ajustor.fmab.gametest.BlockScenes",
-			"com.ajustor.fmab.gametest.TownScenes"
+			"com.ajustor.fmab.gametest.TownScenes",
+			"com.ajustor.fmab.gametest.FigureScenes"
 		]
 	},
 	"depends": {
