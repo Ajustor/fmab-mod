@@ -996,5 +996,13 @@
   "design.fmab.nothing": "nothing",
   "design.fmab.cost_line": "%s: %s",
   "transmutation.fmab.design.chosen": "You think of %s",
-  "transmutation.fmab.design.cleared": "You think of nothing in particular"
+  "transmutation.fmab.design.cleared": "You think of nothing in particular",
+  "glyph.fmab.bois": "Wood",
+  "glyph.fmab.bois.desc": "A trunk rising from its roots, with two branches: targets wood, logs and planks. Chests, boats, tools' handles…",
+  "glyph.fmab.fibre": "Fiber",
+  "glyph.fmab.fibre.desc": "Two woven threads around a needle: targets wool, string and leather. Beds, bows, banners…",
+  "tome.fmab.wood_and_fiber": "On Wood and Fiber",
+  "material.fmab.fiber": "fiber",
+  "tag.item.fmab.element.wood": "Wood (Wood element)",
+  "tag.item.fmab.element.fiber": "Fibers (Fiber element)"
 }

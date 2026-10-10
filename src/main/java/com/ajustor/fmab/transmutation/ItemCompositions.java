@@ -35,7 +35,7 @@ import java.util.Optional;
  */
 public final class ItemCompositions {
 	/** Les éléments, dans l'ordre où l'on range une matière qui en porterait plusieurs. */
-	public static final List<String> ELEMENTS = List.of("iron", "copper", "gold", "earth", "water", "wood");
+	public static final List<String> ELEMENTS = List.of("iron", "copper", "gold", "earth", "water", "wood", "fiber");
 	/** Profondeur des recettes : un objet fait d'objets faits d'objets… */
 	private static final int PASSES = 12;
 	/**
@@ -48,7 +48,8 @@ public final class ItemCompositions {
 			"gold", List.of("minecraft:gold_block", "minecraft:gold_ingot", "minecraft:gold_nugget"),
 			"earth", List.of("minecraft:cobblestone"),
 			"water", List.of("minecraft:packed_ice", "minecraft:ice"),
-			"wood", List.of("minecraft:oak_log", "minecraft:oak_planks"));
+			"wood", List.of("minecraft:oak_log", "minecraft:oak_planks"),
+			"fiber", List.of("minecraft:white_wool", "minecraft:string"));
 
 	private static @Nullable RecipeManager cachedFor;
 	private static Map<Item, Composition> cache = Map.of();

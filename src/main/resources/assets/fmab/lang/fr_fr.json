@@ -996,5 +996,13 @@
   "design.fmab.nothing": "rien",
   "design.fmab.cost_line": "%s : %s",
   "transmutation.fmab.design.chosen": "Vous pensez à %s",
-  "transmutation.fmab.design.cleared": "Vous ne pensez à rien de particulier"
+  "transmutation.fmab.design.cleared": "Vous ne pensez à rien de particulier",
+  "glyph.fmab.bois": "Bois",
+  "glyph.fmab.bois.desc": "Un tronc sur ses racines, deux branches : vise le bois, bûches et planches. Coffres, bateaux, manches d'outils…",
+  "glyph.fmab.fibre": "Fibre",
+  "glyph.fmab.fibre.desc": "Deux fils tissés autour d'une aiguille : vise la laine, la ficelle et le cuir. Lits, arcs, bannières…",
+  "tome.fmab.wood_and_fiber": "Du bois et de la fibre",
+  "material.fmab.fiber": "fibre",
+  "tag.item.fmab.element.wood": "Bois (élément Bois)",
+  "tag.item.fmab.element.fiber": "Fibres (élément Fibre)"
 }

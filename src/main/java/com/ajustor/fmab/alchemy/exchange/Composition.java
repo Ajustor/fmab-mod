@@ -11,7 +11,7 @@ import java.util.TreeMap;
 
 /**
  * Ce dont un objet est fait, élément par élément : une pioche de fer, c'est 27 de fer et 2 de bois.
- * Les éléments sont ceux des glyphes (terre, fer, cuivre, or, eau…) et du bois, qui n'en a pas.
+ * Les éléments sont ceux des glyphes (terre, fer, cuivre, or, eau, bois, fibres…).
  *
  * <p>Les objets de base (lingots, pierre, planches…) tiennent leur masse des tables d'échange ; les
  * autres la tirent de leurs recettes : la somme de leurs ingrédients, divisée par ce que la recette

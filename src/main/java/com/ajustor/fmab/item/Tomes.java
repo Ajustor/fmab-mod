@@ -19,6 +19,8 @@ public final class Tomes {
 	/** La pierre et le métal : décomposer, réparer, le fer et le cuivre. */
 	public static final Tome STONE_AND_METAL = tome("stone_and_metal", "fmab:fer", "fmab:cuivre", "fmab:decomposer",
 			"fmab:reparer");
+	/** Le bois et la fibre : de quoi recomposer coffres, bateaux, lits, arcs… */
+	public static final Tome WOOD_AND_FIBER = tome("wood_and_fiber", "fmab:bois", "fmab:fibre");
 	/** Les formes : recomposer la matière, orienter et intensifier un cercle. */
 	public static final Tome FORMS = tome("forms", "fmab:recomposer", "fmab:direction", "fmab:intensite");
 	/** Notes sur la combustion : le feu et l'air, l'alchimie de Mustang. */
@@ -31,7 +33,7 @@ public final class Tomes {
 	 */
 	public static final Tome GOLD = tome("gold", "fmab:or");
 
-	public static final List<Tome> ALL = List.of(RUDIMENTS, STONE_AND_METAL, FORMS, FLAME, HOHENHEIM, GOLD);
+	public static final List<Tome> ALL = List.of(RUDIMENTS, STONE_AND_METAL, WOOD_AND_FIBER, FORMS, FLAME, HOHENHEIM, GOLD);
 
 	private Tomes() {
 	}

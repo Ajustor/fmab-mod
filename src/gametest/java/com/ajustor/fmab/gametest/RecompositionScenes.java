@@ -157,6 +157,36 @@ public class RecompositionScenes implements FabricClientGameTest {
 			cast(context, sp, "fmab:fer", "fmab:recomposer");
 			check(count(context, sp, Items.IRON_PICKAXE) == 1, "la Pierre crée la pioche sans matière");
 			context.takeScreenshot("recomposition_09_from_nothing_with_the_stone");
+			clear(context, sp);
+			server(context, sp, (level, p) -> {
+				p.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+				p.removeAttached(FmabAttachments.DESIGN);
+				return null;
+			});
+
+			// 9. Bois : un coffre (huit planches) se défait en deux bûches et se recompose.
+			drop(context, sp, new ItemStack(Items.CHEST));
+			cast(context, sp, "fmab:bois", "fmab:decomposer");
+			check(count(context, sp, Items.CHEST) == 0 && count(context, sp, Items.OAK_LOG) == 2,
+					"le coffre devrait rendre deux bûches : " + count(context, sp, Items.OAK_LOG));
+			drop(context, sp, new ItemStack(Items.CHEST));
+			cast(context, sp, "fmab:bois", "fmab:recomposer");
+			check(count(context, sp, Items.CHEST) == 2 && count(context, sp, Items.OAK_LOG) == 0,
+					"le bois devrait recomposer le coffre");
+			context.takeScreenshot("recomposition_10_wood_chest");
+			clear(context, sp);
+
+			// 10. Fibre : un lit est surtout de laine ; le bois de son cadre vient avec.
+			drop(context, sp, new ItemStack(Items.BED.white()));
+			cast(context, sp, "fmab:bois", "fmab:decomposer");
+			check(count(context, sp, Items.BED.white()) == 1, "le bois ne vise pas un lit, surtout fait de laine");
+			cast(context, sp, "fmab:fibre", "fmab:decomposer");
+			check(count(context, sp, Items.BED.white()) == 0 && count(context, sp, Items.WOOL.white()) == 3
+					&& count(context, sp, Items.OAK_PLANKS) == 3, "le lit devrait rendre trois laines et trois planches");
+			drop(context, sp, new ItemStack(Items.BED.white()));
+			cast(context, sp, "fmab:fibre", "fmab:recomposer");
+			check(count(context, sp, Items.BED.white()) == 2, "la fibre devrait recomposer le lit");
+			context.takeScreenshot("recomposition_11_fiber_bed");
 		}
 	}
 
