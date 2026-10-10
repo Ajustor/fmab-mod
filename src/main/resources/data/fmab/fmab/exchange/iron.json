@@ -1,0 +1,16 @@
+{
+  "family": "metal",
+  "values": {
+    "minecraft:iron_ore": 9,
+    "minecraft:deepslate_iron_ore": 9,
+    "#c:nuggets/iron": 1,
+    "#c:ingots/iron": 9,
+    "#c:raw_materials/iron": 9,
+    "#c:plates/iron": 9,
+    "#c:dusts/iron": 9,
+    "#c:gears/iron": 36,
+    "#c:ores/iron": 9,
+    "#c:storage_blocks/iron": 81,
+    "#c:storage_blocks/raw_iron": 81
+  }
+}

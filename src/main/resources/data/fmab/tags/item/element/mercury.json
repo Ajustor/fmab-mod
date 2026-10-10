@@ -1,0 +1,21 @@
+{
+  "values": [
+    "minecraft:redstone",
+    "minecraft:redstone_block",
+    "minecraft:redstone_ore",
+    "minecraft:deepslate_redstone_ore",
+    "minecraft:cinnabar",
+    {
+      "id": "#c:dusts/redstone",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/redstone",
+      "required": false
+    },
+    {
+      "id": "#c:ores/redstone",
+      "required": false
+    }
+  ]
+}

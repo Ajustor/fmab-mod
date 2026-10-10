@@ -1,0 +1,16 @@
+{
+  "family": "mineral",
+  "values": {
+    "minecraft:gunpowder": 1,
+    "minecraft:glowstone_dust": 1,
+    "minecraft:glowstone": 4,
+    "minecraft:sulfur": 4,
+    "minecraft:potent_sulfur": 8,
+    "minecraft:sulfur_spike": 2,
+    "#c:dusts/glowstone": 1,
+    "#c:dusts/sulfur": 1,
+    "#c:gems/sulfur": 1,
+    "#c:dusts/saltpeter": 1,
+    "#c:gems/saltpeter": 1
+  }
+}

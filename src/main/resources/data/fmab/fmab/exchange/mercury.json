@@ -1,0 +1,13 @@
+{
+  "family": "mineral",
+  "values": {
+    "minecraft:redstone": 1,
+    "minecraft:redstone_block": 9,
+    "minecraft:redstone_ore": 4,
+    "minecraft:deepslate_redstone_ore": 4,
+    "minecraft:cinnabar": 4,
+    "#c:dusts/redstone": 1,
+    "#c:storage_blocks/redstone": 9,
+    "#c:ores/redstone": 4
+  }
+}

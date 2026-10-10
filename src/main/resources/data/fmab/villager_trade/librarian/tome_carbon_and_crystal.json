@@ -1,0 +1,24 @@
+{
+  "additional_wants": {
+    "id": "minecraft:book"
+  },
+  "gives": {
+    "id": "fmab:alchemy_tome",
+    "components": {
+      "fmab:tome": {
+        "title": "tome.fmab.carbon_and_crystal",
+        "glyphs": [
+          "fmab:carbone",
+          "fmab:cristal"
+        ]
+      }
+    }
+  },
+  "max_uses": 4.0,
+  "reputation_discount": 0.2,
+  "wants": {
+    "count": 16.0,
+    "id": "minecraft:emerald"
+  },
+  "xp": 10.0
+}

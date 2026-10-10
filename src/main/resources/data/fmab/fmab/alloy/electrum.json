@@ -1,0 +1,14 @@
+{
+  "parts": {
+    "gold": 1,
+    "silver": 1
+  },
+  "values": {
+    "#c:nuggets/electrum": 1,
+    "#c:ingots/electrum": 9,
+    "#c:plates/electrum": 9,
+    "#c:dusts/electrum": 9,
+    "#c:gears/electrum": 36,
+    "#c:storage_blocks/electrum": 81
+  }
+}

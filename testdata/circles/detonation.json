@@ -1,5 +1,5 @@
 {
-  "description": "Feu + Air + Décomposer : détonation",
+  "description": "Feu + Soufre + Décomposer : détonation",
   "rank": "alchemist",
   "primitives": [
     {
@@ -94,29 +94,26 @@
       "type": "polygon",
       "points": [
         [
-          18.0,
-          13.5
+          18.5,
+          12.0
         ],
         [
-          22.0,
-          13.5
+          21.5,
+          12.0
         ],
         [
           20.0,
-          10.0
+          9.5
         ]
       ]
     },
     {
-      "type": "line",
-      "from": [
-        18.5,
-        11.5
+      "type": "circle",
+      "center": [
+        20.0,
+        13.5
       ],
-      "to": [
-        21.5,
-        11.5
-      ]
+      "radius": 1.0
     },
     {
       "type": "line",
@@ -175,9 +172,9 @@
   ],
   "expected": {
     "outcome": "works",
-    "complexity": 8,
-    "concentration": 14,
-    "stability": 1.5,
+    "complexity": 7,
+    "concentration": 12,
+    "stability": 1.714,
     "required_rank": "alchemist",
     "rebound": 0.0,
     "stages": [
@@ -190,7 +187,7 @@
         "link": "none",
         "glyphs": [
           "fmab:feu",
-          "fmab:air",
+          "fmab:soufre",
           "fmab:decomposer"
         ],
         "satellites": 0

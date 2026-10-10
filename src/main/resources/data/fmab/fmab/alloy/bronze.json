@@ -1,0 +1,14 @@
+{
+  "parts": {
+    "copper": 3,
+    "tin": 1
+  },
+  "values": {
+    "#c:nuggets/bronze": 1,
+    "#c:ingots/bronze": 9,
+    "#c:plates/bronze": 9,
+    "#c:dusts/bronze": 9,
+    "#c:gears/bronze": 36,
+    "#c:storage_blocks/bronze": 81
+  }
+}

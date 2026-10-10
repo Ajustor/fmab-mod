@@ -1,0 +1,40 @@
+{
+  "values": [
+    {
+      "id": "#c:nuggets/silver",
+      "required": false
+    },
+    {
+      "id": "#c:ingots/silver",
+      "required": false
+    },
+    {
+      "id": "#c:raw_materials/silver",
+      "required": false
+    },
+    {
+      "id": "#c:plates/silver",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/silver",
+      "required": false
+    },
+    {
+      "id": "#c:gears/silver",
+      "required": false
+    },
+    {
+      "id": "#c:ores/silver",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/silver",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/raw_silver",
+      "required": false
+    }
+  ]
+}

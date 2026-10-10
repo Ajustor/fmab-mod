@@ -78,6 +78,8 @@ export interface Combination {
   readonly range: number;
   readonly school: string;
   readonly requires?: string;
+  /** Éléments que des satellites doivent infuser dans l'étage, sinon le cercle rebondit. */
+  readonly formula: ReadonlySet<string>;
 }
 
 const SCHOOLS: Record<string, string> = {
@@ -100,6 +102,7 @@ export function parseCombination(id: string, json: Record<string, unknown>): Com
     range: json.range === undefined ? 1 : Number(json.range),
     school: json.school ? String(json.school) : (SCHOOLS[first] ?? "earth"),
     requires: json.requires ? String(json.requires) : undefined,
+    formula: new Set(((json.formula as string[] | undefined) ?? []).map(String)),
   };
 }
 

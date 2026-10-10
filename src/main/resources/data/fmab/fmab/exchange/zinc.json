@@ -1,0 +1,14 @@
+{
+  "family": "metal",
+  "values": {
+    "#c:nuggets/zinc": 1,
+    "#c:ingots/zinc": 9,
+    "#c:raw_materials/zinc": 9,
+    "#c:plates/zinc": 9,
+    "#c:dusts/zinc": 9,
+    "#c:gears/zinc": 36,
+    "#c:ores/zinc": 9,
+    "#c:storage_blocks/zinc": 81,
+    "#c:storage_blocks/raw_zinc": 81
+  }
+}

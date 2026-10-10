@@ -1,0 +1,15 @@
+{
+  "family": "crystal",
+  "values": {
+    "minecraft:diamond": 64,
+    "minecraft:diamond_block": 576,
+    "minecraft:diamond_ore": 64,
+    "minecraft:deepslate_diamond_ore": 64,
+    "minecraft:coal_ore": 1,
+    "minecraft:deepslate_coal_ore": 1,
+    "#c:gems/diamond": 64,
+    "#c:storage_blocks/diamond": 576,
+    "#c:ores/diamond": 64,
+    "#c:ores/coal": 1
+  }
+}

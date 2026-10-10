@@ -1,0 +1,14 @@
+{
+  "family": "metal",
+  "values": {
+    "#c:nuggets/lead": 1,
+    "#c:ingots/lead": 9,
+    "#c:raw_materials/lead": 9,
+    "#c:plates/lead": 9,
+    "#c:dusts/lead": 9,
+    "#c:gears/lead": 36,
+    "#c:ores/lead": 9,
+    "#c:storage_blocks/lead": 81,
+    "#c:storage_blocks/raw_lead": 81
+  }
+}

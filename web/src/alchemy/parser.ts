@@ -37,7 +37,8 @@ export type IssueKind =
   | "conflicting_links"
   | "fusion_needs_hexagram"
   | "satellite_incomplete"
-  | "knowledge_missing";
+  | "knowledge_missing"
+  | "incomplete_formula";
 
 export interface CircleIssue {
   readonly kind: IssueKind;

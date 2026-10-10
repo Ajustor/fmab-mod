@@ -3,6 +3,45 @@
     "minecraft:copper_nugget",
     "minecraft:copper_ingot",
     "minecraft:copper_block",
-    "minecraft:raw_copper"
+    "minecraft:raw_copper",
+    "minecraft:raw_copper_block",
+    "minecraft:copper_ore",
+    "minecraft:deepslate_copper_ore",
+    {
+      "id": "#c:nuggets/copper",
+      "required": false
+    },
+    {
+      "id": "#c:ingots/copper",
+      "required": false
+    },
+    {
+      "id": "#c:raw_materials/copper",
+      "required": false
+    },
+    {
+      "id": "#c:plates/copper",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/copper",
+      "required": false
+    },
+    {
+      "id": "#c:gears/copper",
+      "required": false
+    },
+    {
+      "id": "#c:ores/copper",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/copper",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/raw_copper",
+      "required": false
+    }
   ]
 }

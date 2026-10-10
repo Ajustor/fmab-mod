@@ -2,6 +2,47 @@
   "values": [
     "minecraft:gold_nugget",
     "minecraft:gold_ingot",
-    "minecraft:gold_block"
+    "minecraft:gold_block",
+    "minecraft:raw_gold",
+    "minecraft:raw_gold_block",
+    "minecraft:gold_ore",
+    "minecraft:deepslate_gold_ore",
+    "minecraft:nether_gold_ore",
+    {
+      "id": "#c:nuggets/gold",
+      "required": false
+    },
+    {
+      "id": "#c:ingots/gold",
+      "required": false
+    },
+    {
+      "id": "#c:raw_materials/gold",
+      "required": false
+    },
+    {
+      "id": "#c:plates/gold",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/gold",
+      "required": false
+    },
+    {
+      "id": "#c:gears/gold",
+      "required": false
+    },
+    {
+      "id": "#c:ores/gold",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/gold",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/raw_gold",
+      "required": false
+    }
   ]
 }

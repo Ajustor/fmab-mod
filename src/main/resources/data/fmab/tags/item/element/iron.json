@@ -4,6 +4,44 @@
     "minecraft:iron_ingot",
     "minecraft:iron_block",
     "minecraft:raw_iron",
-    "minecraft:raw_iron_block"
+    "minecraft:raw_iron_block",
+    "minecraft:iron_ore",
+    "minecraft:deepslate_iron_ore",
+    {
+      "id": "#c:nuggets/iron",
+      "required": false
+    },
+    {
+      "id": "#c:ingots/iron",
+      "required": false
+    },
+    {
+      "id": "#c:raw_materials/iron",
+      "required": false
+    },
+    {
+      "id": "#c:plates/iron",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/iron",
+      "required": false
+    },
+    {
+      "id": "#c:gears/iron",
+      "required": false
+    },
+    {
+      "id": "#c:ores/iron",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/iron",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/raw_iron",
+      "required": false
+    }
   ]
 }

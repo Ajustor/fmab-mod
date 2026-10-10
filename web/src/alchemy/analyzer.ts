@@ -66,6 +66,7 @@ const MISCOMPOSED: ReadonlySet<IssueKind> = new Set<IssueKind>([
   "conflicting_links",
   "fusion_needs_hexagram",
   "satellite_incomplete",
+  "incomplete_formula",
 ]);
 
 function rankFor(value: number, limit: (r: RankInfo) => number): number {
@@ -193,7 +194,14 @@ export class CircleAnalyzer {
       }
     }
 
-    const main = this.combination(inLayer(stage.glyphs, "element"), inLayer(stage.glyphs, "action"), stage.hexagram, issues);
+    let main = this.combination(inLayer(stage.glyphs, "element"), inLayer(stage.glyphs, "action"), stage.hexagram, issues);
+    if (main) {
+      const missing = [...main.formula].filter((e) => !infusions.has(e)).sort();
+      if (missing.length > 0) {
+        issues.push(issue("incomplete_formula", null, missing.join("+")));
+        main = undefined;
+      }
+    }
     if (main) {
       out.push({
         stage: stage.index,

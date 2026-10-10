@@ -17,6 +17,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -73,6 +74,11 @@ public final class Recomposition {
 			if (composition.isEmpty() || !aimed.contains(composition.get().principal())) {
 				continue;
 			}
+			if (ItemCompositions.isUnit(level, stack.getItem())) {
+				// Un lingot défait redonnerait un lingot : on en comprend la matière, sans la toucher.
+				understand(ctx.caster(), stack);
+				continue;
+			}
 			Map<String, Integer> yield = new LinkedHashMap<>();
 			composition.get().masses().forEach((element, mass) ->
 					yield.put(element, (int) Math.floor(mass * stack.getCount() + 1e-9)));
@@ -125,7 +131,12 @@ public final class Recomposition {
 	public static Optional<Effects.Result> copy(EffectContext ctx) {
 		ServerLevel level = ctx.level();
 		ServerPlayer caster = ctx.caster();
-		Optional<Item> target = model(ctx).map(e -> e.getItem().getItem()).or(() -> design(caster));
+		// Un objet fabriqué posé sur le cercle passe avant la conception ; la conception passe avant
+		// la matière posée, qui sert d'ordinaire à payer.
+		Optional<ItemEntity> crafted = model(ctx, false);
+		Optional<Item> designed = crafted.isPresent() ? Optional.empty() : design(caster);
+		Optional<ItemEntity> model = crafted.isPresent() || designed.isPresent() ? crafted : model(ctx, true);
+		Optional<Item> target = model.map(e -> e.getItem().getItem()).or(() -> designed);
 		if (target.isEmpty()) {
 			return Optional.empty();
 		}
@@ -161,7 +172,7 @@ public final class Recomposition {
 		MutableComponent missing = Component.empty();
 		boolean enough = true;
 		for (var entry : cost.entrySet()) {
-			MaterialPool pool = MaterialPool.collect(ctx, entry.getKey(), null);
+			MaterialPool pool = MaterialPool.collect(ctx, entry.getKey(), null, true, model.orElse(null));
 			pools.put(entry.getKey(), pool);
 			if (pool.available() < entry.getValue()) {
 				enough = false;
@@ -179,7 +190,7 @@ public final class Recomposition {
 		}
 		cost.forEach((element, mass) -> pools.get(element).consume(mass));
 		ItemStack made = shown.copy();
-		reinforce(ctx, made, principal, cost.get(principal));
+		reinforce(ctx, made, principal, cost.get(principal), model.orElse(null));
 		Effects.drop(ctx, made);
 		return Optional.of(Effects.Result.DONE);
 	}
@@ -193,11 +204,12 @@ public final class Recomposition {
 	 * La matière de l'élément principal posée sur le cercle en plus du prix entre dans l'objet : sa
 	 * durabilité grandit d'autant, jusqu'à moitié en plus.
 	 */
-	private static void reinforce(EffectContext ctx, ItemStack made, String principal, int paid) {
+	private static void reinforce(EffectContext ctx, ItemStack made, String principal, int paid,
+			@Nullable ItemEntity model) {
 		if (!made.isDamageableItem() || paid <= 0) {
 			return;
 		}
-		MaterialPool extra = MaterialPool.collect(ctx, principal, null, false);
+		MaterialPool extra = MaterialPool.collect(ctx, principal, null, false, model);
 		int added = Math.min(extra.available(), paid / 2);
 		if (added <= 0 || !extra.consume(added)) {
 			return;
@@ -246,22 +258,33 @@ public final class Recomposition {
 				new ItemStack(item.get()).getHoverName()));
 	}
 
-	/** Le modèle : l'objet composé posé sur le cercle, le plus près du centre. */
-	private static Optional<ItemEntity> model(EffectContext ctx) {
+	/**
+	 * Le modèle : l'objet posé sur le cercle, le plus près du centre. Sans {@code matter}, seulement
+	 * un objet fabriqué ; avec, une matière de l'élément visé, la plus lourde (entre un diamant et du
+	 * charbon, le modèle est le diamant, le charbon le paie).
+	 */
+	private static Optional<ItemEntity> model(EffectContext ctx, boolean matter) {
 		ServerLevel level = ctx.level();
 		Vec3 center = Vec3.atCenterOf(ctx.circle());
-		List<ItemEntity> candidates = level.getEntitiesOfClass(ItemEntity.class, ctx.onCircle(),
-				e -> composition(level, e.getItem().getItem()).isPresent());
-		return candidates.stream().min(Comparator.comparingDouble(e -> e.distanceToSqr(center)));
+		Set<String> aimed = ctx.stage().combination().elements();
+		List<ItemEntity> candidates = level.getEntitiesOfClass(ItemEntity.class, ctx.onCircle(), e -> {
+			Item item = e.getItem().getItem();
+			Optional<Composition> c = composition(level, item);
+			return c.isPresent() && ItemCompositions.isBase(level, item) == matter
+					&& (!matter || aimed.contains(c.get().principal()));
+		});
+		Comparator<ItemEntity> nearest = Comparator.comparingDouble(e -> e.distanceToSqr(center));
+		Comparator<ItemEntity> heaviest = Comparator.comparingDouble(
+				e -> -composition(level, e.getItem().getItem()).map(Composition::total).orElse(0.0));
+		return candidates.stream().min(matter ? heaviest.thenComparing(nearest) : nearest);
 	}
 
 	/**
-	 * La composition d'un objet qu'on peut défaire ou recomposer : ni matière de base, ni objet du
-	 * mod.
+	 * La composition d'un objet qu'on peut défaire ou recomposer : tout ce qui a une matière, sauf
+	 * les objets du mod. Une matière de base se recompose aussi (un diamant à partir de charbon).
 	 */
 	static Optional<Composition> composition(ServerLevel level, Item item) {
-		if (ItemCompositions.isBase(level, item)
-				|| BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("fmab")) {
+		if (BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("fmab")) {
 			return Optional.empty();
 		}
 		return ItemCompositions.of(level, item);

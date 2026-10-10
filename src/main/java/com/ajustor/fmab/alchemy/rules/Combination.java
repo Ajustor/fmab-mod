@@ -17,14 +17,23 @@ import java.util.Set;
  * @param school   école dont la maîtrise progresse, et dont les bonus s'appliquent
  * @param requires nœud de savoir sans lequel la combinaison est inconnue
  * @param passive  effet permanent du cercle quand il est porté (vêtement brodé, tatouage)
+ * @param formula  éléments que des satellites doivent infuser dans l'étage : la formule complète
+ *                 de ce qu'on veut créer (la transmutation humaine écrit tout ce dont un corps est
+ *                 fait). Il en manque un, et le cercle rebondit.
  */
 public record Combination(String id, Set<String> elements, String action, String effect, double range, String school,
-		Optional<String> requires, Optional<String> passive) {
+		Optional<String> requires, Optional<String> passive, Set<String> formula) {
 	public Combination {
 		elements = Set.copyOf(elements);
+		formula = Set.copyOf(formula);
+	}
+
+	public Combination(String id, Set<String> elements, String action, String effect, double range, String school,
+			Optional<String> requires, Optional<String> passive) {
+		this(id, elements, action, effect, range, school, requires, passive, Set.of());
 	}
 
 	public Combination withId(String newId) {
-		return new Combination(newId, elements, action, effect, range, school, requires, passive);
+		return new Combination(newId, elements, action, effect, range, school, requires, passive, formula);
 	}
 }

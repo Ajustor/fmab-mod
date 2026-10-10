@@ -1,5 +1,7 @@
 {
   "values": [
-    "fmab:librarian/tome_forms"
+    "fmab:librarian/tome_forms",
+    "fmab:librarian/tome_carbon_and_crystal",
+    "fmab:librarian/tome_sulfur_and_lime"
   ]
 }

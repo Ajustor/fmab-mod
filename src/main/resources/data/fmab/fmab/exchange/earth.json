@@ -1,0 +1,26 @@
+{
+  "family": "mineral",
+  "values": {
+    "minecraft:netherrack": 1,
+    "minecraft:end_stone": 1,
+    "minecraft:obsidian": 8,
+    "minecraft:crying_obsidian": 8,
+    "minecraft:basalt": 1,
+    "minecraft:blackstone": 1,
+    "minecraft:soul_sand": 1,
+    "minecraft:soul_soil": 1,
+    "minecraft:tuff": 1,
+    "minecraft:mud": 1,
+    "minecraft:dripstone_block": 1,
+    "minecraft:pointed_dripstone": 1,
+    "minecraft:clay": 4,
+    "minecraft:magma_block": 1,
+    "minecraft:deepslate": 1,
+    "minecraft:dirt": 1,
+    "#c:stones": 1,
+    "#c:cobblestones": 1,
+    "#c:sands": 1,
+    "#c:gravels": 1,
+    "#c:obsidians": 8
+  }
+}

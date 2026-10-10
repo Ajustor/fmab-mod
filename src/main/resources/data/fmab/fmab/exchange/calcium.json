@@ -1,0 +1,15 @@
+{
+  "family": "mineral",
+  "values": {
+    "minecraft:bone_meal": 1,
+    "minecraft:bone": 3,
+    "minecraft:bone_block": 9,
+    "minecraft:calcite": 4,
+    "minecraft:nautilus_shell": 8,
+    "minecraft:shulker_shell": 16,
+    "minecraft:turtle_scute": 4,
+    "minecraft:armadillo_scute": 4,
+    "#c:bones": 3,
+    "#c:dusts/salt": 1
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "fmab:plomb",
+  "layer": "element",
+  "element": "lead",
+  "primitives": [
+    { "type": "line", "from": [-0.3, -0.95], "to": [-0.3, 0.3] },
+    { "type": "line", "from": [-0.75, -0.55], "to": [0.15, -0.55] },
+    { "type": "polyline", "points": [[-0.3, 0.05], [0.3, -0.2], [0.65, 0.25], [0.3, 0.95]] }
+  ],
+  "complexity": 3,
+  "concentration": 4,
+  "rank": "alchemist",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.plomb",
+  "description_key": "glyph.fmab.plomb.desc",
+  "since": "1.1"
+}

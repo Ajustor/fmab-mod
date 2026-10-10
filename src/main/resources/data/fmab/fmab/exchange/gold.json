@@ -1,0 +1,19 @@
+{
+  "family": "metal",
+  "values": {
+    "minecraft:raw_gold": 9,
+    "minecraft:raw_gold_block": 81,
+    "minecraft:gold_ore": 9,
+    "minecraft:deepslate_gold_ore": 9,
+    "minecraft:nether_gold_ore": 3,
+    "#c:nuggets/gold": 1,
+    "#c:ingots/gold": 9,
+    "#c:raw_materials/gold": 9,
+    "#c:plates/gold": 9,
+    "#c:dusts/gold": 9,
+    "#c:gears/gold": 36,
+    "#c:ores/gold": 9,
+    "#c:storage_blocks/gold": 81,
+    "#c:storage_blocks/raw_gold": 81
+  }
+}

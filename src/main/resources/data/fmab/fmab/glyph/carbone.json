@@ -1,0 +1,20 @@
+{
+  "id": "fmab:carbone",
+  "layer": "element",
+  "element": "carbon",
+  "primitives": [
+    { "type": "polygon", "points": [[0, -0.95], [0.55, 0], [0, 0.95], [-0.55, 0]] },
+    { "type": "line", "from": [-0.95, 0], "to": [0.95, 0] }
+  ],
+  "complexity": 2,
+  "concentration": 3,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.carbone",
+  "description_key": "glyph.fmab.carbone.desc",
+  "since": "1.1"
+}

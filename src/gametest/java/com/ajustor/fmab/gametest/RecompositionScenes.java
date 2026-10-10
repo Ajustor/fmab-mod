@@ -1,5 +1,6 @@
 package com.ajustor.fmab.gametest;
 
+import com.ajustor.fmab.alchemy.ForbiddenCircles;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.SimpleCircles;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
@@ -187,6 +188,66 @@ public class RecompositionScenes implements FabricClientGameTest {
 			cast(context, sp, "fmab:fibre", "fmab:recomposer");
 			check(count(context, sp, Items.BED.white()) == 2, "la fibre devrait recomposer le lit");
 			context.takeScreenshot("recomposition_11_fiber_bed");
+			clear(context, sp);
+
+			// 11. Carbone : le diamant se comprend sans se défaire, puis se recompose avec du charbon.
+			drop(context, sp, new ItemStack(Items.DIAMOND));
+			cast(context, sp, "fmab:carbone", "fmab:decomposer");
+			check(count(context, sp, Items.DIAMOND) == 1, "le diamant reste un diamant");
+			check(server(context, sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.UNDERSTOOD)
+					.contains("minecraft:diamond")), "l'alchimiste devrait avoir compris le diamant");
+			drop(context, sp, new ItemStack(Items.COAL, 64));
+			cast(context, sp, "fmab:carbone", "fmab:recomposer");
+			check(count(context, sp, Items.DIAMOND) == 2 && count(context, sp, Items.COAL) == 0,
+					"64 charbons devraient faire un diamant : " + count(context, sp, Items.DIAMOND) + " diamants, "
+							+ count(context, sp, Items.COAL) + " charbons");
+			context.takeScreenshot("recomposition_12_carbon_diamond");
+			clear(context, sp);
+
+			// 12. Le fer brut est du fer sous une autre forme : le cercle de Fer en fait des lingots.
+			drop(context, sp, new ItemStack(Items.RAW_IRON, 3));
+			cast(context, sp, "fmab:fer", "fmab:decomposer");
+			check(count(context, sp, Items.RAW_IRON) == 0 && count(context, sp, Items.IRON_INGOT) == 3,
+					"trois fers bruts devraient rendre trois lingots");
+			context.takeScreenshot("recomposition_13_raw_iron_refined");
+			clear(context, sp);
+
+			// 13. Une pioche en diamant : surtout du carbone, et le bois de son manche.
+			drop(context, sp, new ItemStack(Items.DIAMOND_PICKAXE));
+			cast(context, sp, "fmab:carbone", "fmab:decomposer");
+			check(count(context, sp, Items.DIAMOND) == 3 && count(context, sp, Items.OAK_PLANKS) == 1,
+					"la pioche en diamant devrait rendre trois diamants et une planche");
+			context.takeScreenshot("recomposition_14_diamond_pickaxe");
+			clear(context, sp);
+
+			// 14. Cristal, Plante, Chair : l'améthyste, le pain, le gâteau…
+			drop(context, sp, new ItemStack(Items.SPYGLASS));
+			cast(context, sp, "fmab:cuivre", "fmab:decomposer");
+			check(count(context, sp, Items.SPYGLASS) == 0, "la longue-vue est surtout de cuivre");
+			clear(context, sp);
+			drop(context, sp, new ItemStack(Items.BREAD));
+			cast(context, sp, "fmab:plante", "fmab:decomposer");
+			check(count(context, sp, Items.BREAD) == 0 && count(context, sp, Items.WHEAT) == 3,
+					"le pain devrait rendre trois blés");
+			context.takeScreenshot("recomposition_15_plant_bread");
+			clear(context, sp);
+
+			// 15. Le nouveau cercle de transmutation humaine, vu d'en haut (tracé, pas activé).
+			server(context, sp, (level, p) -> {
+				BlockState state = ((TransmutationCircleBlock) FmabBlocks.TRANSMUTATION_CIRCLE)
+						.stateFor(Direction.UP, Direction.SOUTH, CircleMedium.CHALK);
+				level.setBlockAndUpdate(CIRCLE, state);
+				if (level.getBlockEntity(CIRCLE) instanceof TransmutationCircleBlockEntity be) {
+					be.setSize(CircleSize.LARGE);
+					be.setDrawing(ForbiddenCircles.HUMAN_TRANSMUTATION);
+				}
+				return null;
+			});
+			sp.getServer().runCommand("gamemode spectator @p");
+			sp.getServer().runCommand("tp @p 0.5 -57.2 2.5 0 90");
+			context.runOnClient(mc -> RenderShowcase.hideGui(mc, true));
+			context.waitTicks(60);
+			context.takeScreenshot("recomposition_16_human_transmutation_circle");
 		}
 	}
 

@@ -1,0 +1,21 @@
+{
+  "id": "fmab:chaux",
+  "layer": "element",
+  "element": "calcium",
+  "primitives": [
+    { "type": "line", "from": [-0.4, 0], "to": [0.4, 0] },
+    { "type": "circle", "center": [-0.75, 0], "radius": 0.35 },
+    { "type": "circle", "center": [0.75, 0], "radius": 0.35 }
+  ],
+  "complexity": 2,
+  "concentration": 3,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.chaux",
+  "description_key": "glyph.fmab.chaux.desc",
+  "since": "1.1"
+}

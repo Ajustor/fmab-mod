@@ -1,0 +1,20 @@
+{
+  "id": "fmab:netherite",
+  "layer": "element",
+  "element": "netherite",
+  "primitives": [
+    { "type": "circle", "center": [0, 0], "radius": 0.9 },
+    { "type": "polygon", "points": [[-0.65, -0.35], [0.65, -0.35], [0, 0.7]] }
+  ],
+  "complexity": 4,
+  "concentration": 6,
+  "rank": "alchemist",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.netherite",
+  "description_key": "glyph.fmab.netherite.desc",
+  "since": "1.1"
+}

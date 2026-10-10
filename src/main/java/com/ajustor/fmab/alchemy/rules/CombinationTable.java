@@ -43,6 +43,12 @@ public final class CombinationTable {
 			for (JsonElement e : json.getAsJsonArray("elements")) {
 				elements.add(e.getAsString());
 			}
+			Set<String> formula = new HashSet<>();
+			if (json.has("formula")) {
+				for (JsonElement e : json.getAsJsonArray("formula")) {
+					formula.add(e.getAsString());
+				}
+			}
 			return new Combination(
 					id,
 					elements,
@@ -52,7 +58,8 @@ public final class CombinationTable {
 					json.has("school") ? json.get("school").getAsString() : SCHOOLS.getOrDefault(
 							elements.stream().sorted().findFirst().orElse(""), "earth"),
 					json.has("requires") ? Optional.of(json.get("requires").getAsString()) : Optional.empty(),
-					json.has("passive") ? Optional.of(json.get("passive").getAsString()) : Optional.empty());
+					json.has("passive") ? Optional.of(json.get("passive").getAsString()) : Optional.empty(),
+					formula);
 		} catch (RuntimeException e) {
 			throw new IllegalArgumentException("Combinaison " + id + " invalide : " + e.getMessage(), e);
 		}
@@ -69,6 +76,11 @@ public final class CombinationTable {
 		o.addProperty("school", c.school());
 		c.requires().ifPresent(r -> o.addProperty("requires", r));
 		c.passive().ifPresent(p -> o.addProperty("passive", p));
+		if (!c.formula().isEmpty()) {
+			JsonArray formula = new JsonArray();
+			c.formula().stream().sorted().forEach(formula::add);
+			o.add("formula", formula);
+		}
 		return o;
 	}
 }

@@ -1,1 +1,1 @@
-{ "elements": ["air", "fire"], "action": "decompose", "effect": "fmab:detonate", "range": 4, "school": "explosion" }
+{ "elements": ["fire", "sulfur"], "action": "decompose", "effect": "fmab:detonate", "range": 4, "school": "explosion" }

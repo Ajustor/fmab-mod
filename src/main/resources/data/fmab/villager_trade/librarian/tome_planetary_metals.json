@@ -1,0 +1,26 @@
+{
+  "additional_wants": {
+    "id": "minecraft:book"
+  },
+  "gives": {
+    "id": "fmab:alchemy_tome",
+    "components": {
+      "fmab:tome": {
+        "title": "tome.fmab.planetary_metals",
+        "glyphs": [
+          "fmab:argent",
+          "fmab:etain",
+          "fmab:plomb",
+          "fmab:mercure"
+        ]
+      }
+    }
+  },
+  "max_uses": 4.0,
+  "reputation_discount": 0.2,
+  "wants": {
+    "count": 20.0,
+    "id": "minecraft:emerald"
+  },
+  "xp": 10.0
+}
