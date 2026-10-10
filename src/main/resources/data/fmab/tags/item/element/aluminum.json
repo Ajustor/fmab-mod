@@ -1,0 +1,76 @@
+{
+  "values": [
+    {
+      "id": "#c:nuggets/aluminum",
+      "required": false
+    },
+    {
+      "id": "#c:ingots/aluminum",
+      "required": false
+    },
+    {
+      "id": "#c:raw_materials/aluminum",
+      "required": false
+    },
+    {
+      "id": "#c:plates/aluminum",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/aluminum",
+      "required": false
+    },
+    {
+      "id": "#c:gears/aluminum",
+      "required": false
+    },
+    {
+      "id": "#c:ores/aluminum",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/aluminum",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/raw_aluminum",
+      "required": false
+    },
+    {
+      "id": "#c:nuggets/aluminium",
+      "required": false
+    },
+    {
+      "id": "#c:ingots/aluminium",
+      "required": false
+    },
+    {
+      "id": "#c:raw_materials/aluminium",
+      "required": false
+    },
+    {
+      "id": "#c:plates/aluminium",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/aluminium",
+      "required": false
+    },
+    {
+      "id": "#c:gears/aluminium",
+      "required": false
+    },
+    {
+      "id": "#c:ores/aluminium",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/aluminium",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/raw_aluminium",
+      "required": false
+    }
+  ]
+}

@@ -175,8 +175,10 @@ class CircleFixturesTest {
 		s.put("fusion_layered", new Scenario("alchemist", "Hexagramme et hexagone", fusion));
 		List<Primitive> blast = new ArrayList<>(fusion.subList(0, fusion.size()));
 		blast.removeAll(TestGlyphs.drawn("projeter", new Vec2(16, 20), 2.5, 0));
+		blast.removeAll(TestGlyphs.drawn("air", new Vec2(20, 12), 2.5, 0));
+		blast.addAll(TestGlyphs.drawn("soufre", new Vec2(20, 12), 2.5, 0));
 		blast.addAll(TestGlyphs.drawn("decomposer", new Vec2(16, 20), 2.5, 0));
-		s.put("detonation", new Scenario("alchemist", "Feu + Air + Décomposer : détonation", blast));
+		s.put("detonation", new Scenario("alchemist", "Feu + Soufre + Décomposer : détonation", blast));
 		List<Primitive> noFusion = new ArrayList<>(fusion.subList(0, 1));
 		noFusion.add(polygon(14, 4, -90));
 		noFusion.addAll(fusion.subList(4, fusion.size()));

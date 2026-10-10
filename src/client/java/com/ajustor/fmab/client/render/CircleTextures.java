@@ -17,7 +17,7 @@ import java.util.Map;
  * Les plus anciennes sont libérées au-delà de {@link #MAX_TEXTURES}.
  */
 public final class CircleTextures {
-	public static final int SIZE = 128;
+	public static final int SIZE = 256;
 	private static final int MAX_TEXTURES = 64;
 	private static final Map<Key, Identifier> TEXTURES = new LinkedHashMap<>(16, 0.75f, true);
 	private static int counter;
@@ -37,7 +37,7 @@ public final class CircleTextures {
 		if (id != null) {
 			return id;
 		}
-		boolean[] mask = Raster.rasterize(drawing, SIZE, 2.2);
+		boolean[] mask = Raster.rasterize(drawing, SIZE, 4.4);
 		NativeImage image = new NativeImage(SIZE, SIZE, true);
 		for (int y = 0; y < SIZE; y++) {
 			for (int x = 0; x < SIZE; x++) {

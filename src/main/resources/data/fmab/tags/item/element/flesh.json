@@ -1,0 +1,26 @@
+{
+  "values": [
+    "#minecraft:meat",
+    "#minecraft:fishes",
+    "#minecraft:eggs",
+    {
+      "id": "#c:foods/raw_meat",
+      "required": false
+    },
+    {
+      "id": "#c:foods/raw_fish",
+      "required": false
+    },
+    "minecraft:rotten_flesh",
+    "minecraft:spider_eye",
+    "minecraft:slime_ball",
+    "minecraft:ender_pearl",
+    "minecraft:ink_sac",
+    "minecraft:glow_ink_sac",
+    "minecraft:phantom_membrane",
+    "minecraft:rabbit_foot",
+    "minecraft:honey_bottle",
+    "minecraft:fermented_spider_eye",
+    "minecraft:magma_cream"
+  ]
+}

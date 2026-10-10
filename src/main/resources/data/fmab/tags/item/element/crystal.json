@@ -1,0 +1,88 @@
+{
+  "values": [
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_block",
+    "minecraft:quartz",
+    "minecraft:nether_quartz_ore",
+    "minecraft:emerald",
+    "minecraft:emerald_block",
+    "minecraft:emerald_ore",
+    "minecraft:deepslate_emerald_ore",
+    "minecraft:lapis_lazuli",
+    "minecraft:lapis_block",
+    "minecraft:lapis_ore",
+    "minecraft:deepslate_lapis_ore",
+    "minecraft:prismarine_shard",
+    "minecraft:prismarine_crystals",
+    "minecraft:echo_shard",
+    "minecraft:ghast_tear",
+    {
+      "id": "#c:gems/amethyst",
+      "required": false
+    },
+    {
+      "id": "#c:gems/quartz",
+      "required": false
+    },
+    {
+      "id": "#c:gems/emerald",
+      "required": false
+    },
+    {
+      "id": "#c:gems/lapis",
+      "required": false
+    },
+    {
+      "id": "#c:gems/prismarine",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/emerald",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/lapis",
+      "required": false
+    },
+    {
+      "id": "#c:ores/emerald",
+      "required": false
+    },
+    {
+      "id": "#c:ores/lapis",
+      "required": false
+    },
+    {
+      "id": "#c:ores/quartz",
+      "required": false
+    },
+    {
+      "id": "#c:gems/ruby",
+      "required": false
+    },
+    {
+      "id": "#c:gems/sapphire",
+      "required": false
+    },
+    {
+      "id": "#c:gems/peridot",
+      "required": false
+    },
+    {
+      "id": "#c:gems/certus_quartz",
+      "required": false
+    },
+    {
+      "id": "#c:gems/fluix",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/certus_quartz",
+      "required": false
+    },
+    {
+      "id": "#c:silicon",
+      "required": false
+    }
+  ]
+}

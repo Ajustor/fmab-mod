@@ -1,0 +1,21 @@
+{
+  "id": "fmab:bois",
+  "layer": "element",
+  "element": "wood",
+  "primitives": [
+    { "type": "line", "from": [0.0, 0.9], "to": [0.0, -0.1] },
+    { "type": "polyline", "points": [[-0.6, -0.8], [0.0, -0.1], [0.6, -0.8]] },
+    { "type": "line", "from": [-0.45, 0.9], "to": [0.45, 0.9] }
+  ],
+  "complexity": 2,
+  "concentration": 3,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.bois",
+  "description_key": "glyph.fmab.bois.desc",
+  "since": "1.1"
+}

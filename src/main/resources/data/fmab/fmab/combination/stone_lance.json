@@ -1,1 +1,1 @@
-{ "elements": ["earth"], "action": "recompose", "effect": "fmab:stone_lance", "range": 1, "requires": "fmab:earth/stone_lance" }
+{ "elements": ["earth"], "action": "recompose", "effect": "fmab:stone_lance", "range": 1 }

@@ -19,6 +19,20 @@ public final class Tomes {
 	/** La pierre et le métal : décomposer, réparer, le fer et le cuivre. */
 	public static final Tome STONE_AND_METAL = tome("stone_and_metal", "fmab:fer", "fmab:cuivre", "fmab:decomposer",
 			"fmab:reparer");
+	/** Le bois et la fibre : de quoi recomposer coffres, bateaux, lits, arcs… */
+	public static final Tome WOOD_AND_FIBER = tome("wood_and_fiber", "fmab:bois", "fmab:fibre");
+	/** La matière vivante : les plantes et la chair. */
+	public static final Tome LIVING_MATTER = tome("living_matter", "fmab:plante", "fmab:chair");
+	/** Le carbone (du charbon au diamant) et les cristaux. */
+	public static final Tome CARBON_AND_CRYSTAL = tome("carbon_and_crystal", "fmab:carbone", "fmab:cristal");
+	/** Le soufre et la chaux. */
+	public static final Tome SULFUR_AND_LIME = tome("sulfur_and_lime", "fmab:soufre", "fmab:chaux");
+	/** Les métaux des planètes : l'argent de la Lune, l'étain de Jupiter, le plomb de Saturne, le mercure. */
+	public static final Tome PLANETARY_METALS = tome("planetary_metals", "fmab:argent", "fmab:etain", "fmab:plomb",
+			"fmab:mercure");
+	/** Les métaux qu'on tire de plus loin : zinc, nickel, aluminium et nethérite. */
+	public static final Tome DEEP_METALS = tome("deep_metals", "fmab:zinc", "fmab:nickel", "fmab:aluminium",
+			"fmab:netherite");
 	/** Les formes : recomposer la matière, orienter et intensifier un cercle. */
 	public static final Tome FORMS = tome("forms", "fmab:recomposer", "fmab:direction", "fmab:intensite");
 	/** Notes sur la combustion : le feu et l'air, l'alchimie de Mustang. */
@@ -31,7 +45,8 @@ public final class Tomes {
 	 */
 	public static final Tome GOLD = tome("gold", "fmab:or");
 
-	public static final List<Tome> ALL = List.of(RUDIMENTS, STONE_AND_METAL, FORMS, FLAME, HOHENHEIM, GOLD);
+	public static final List<Tome> ALL = List.of(RUDIMENTS, STONE_AND_METAL, WOOD_AND_FIBER, LIVING_MATTER,
+			CARBON_AND_CRYSTAL, SULFUR_AND_LIME, PLANETARY_METALS, DEEP_METALS, FORMS, FLAME, HOHENHEIM, GOLD);
 
 	private Tomes() {
 	}

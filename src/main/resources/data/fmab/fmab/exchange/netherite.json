@@ -1,0 +1,12 @@
+{
+  "family": "metal",
+  "values": {
+    "minecraft:netherite_scrap": 9,
+    "minecraft:ancient_debris": 9,
+    "minecraft:netherite_ingot": 72,
+    "minecraft:netherite_block": 648,
+    "#c:ingots/netherite": 72,
+    "#c:storage_blocks/netherite": 648,
+    "#c:nuggets/netherite": 8
+  }
+}

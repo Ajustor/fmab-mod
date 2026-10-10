@@ -1,0 +1,47 @@
+{
+  "values": [
+    "#minecraft:dirt",
+    "#minecraft:sand",
+    "#minecraft:stone_crafting_materials",
+    "minecraft:stone",
+    "minecraft:gravel",
+    "minecraft:clay_ball",
+    "minecraft:flint",
+    "minecraft:netherrack",
+    "minecraft:end_stone",
+    "minecraft:obsidian",
+    "minecraft:crying_obsidian",
+    "minecraft:basalt",
+    "minecraft:blackstone",
+    "minecraft:soul_sand",
+    "minecraft:soul_soil",
+    "minecraft:tuff",
+    "minecraft:mud",
+    "minecraft:dripstone_block",
+    "minecraft:pointed_dripstone",
+    "minecraft:clay",
+    "minecraft:magma_block",
+    "minecraft:deepslate",
+    "minecraft:dirt",
+    {
+      "id": "#c:stones",
+      "required": false
+    },
+    {
+      "id": "#c:cobblestones",
+      "required": false
+    },
+    {
+      "id": "#c:sands",
+      "required": false
+    },
+    {
+      "id": "#c:gravels",
+      "required": false
+    },
+    {
+      "id": "#c:obsidians",
+      "required": false
+    }
+  ]
+}

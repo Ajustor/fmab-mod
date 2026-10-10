@@ -21,6 +21,7 @@ import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.transmutation.GloveCasting;
+import com.ajustor.fmab.transmutation.Recomposition;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
@@ -51,7 +52,14 @@ public final class FmabNetwork {
 		PayloadTypeRegistry.serverboundPlay().register(SelectCirclePayload.TYPE, SelectCirclePayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(OpenBodyPayload.TYPE, OpenBodyPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenTattooPayload.TYPE, OpenTattooPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(RequestDesignsPayload.TYPE, RequestDesignsPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(ChooseDesignPayload.TYPE, ChooseDesignPayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().registerLarge(OpenDesignsPayload.TYPE, OpenDesignsPayload.CODEC, 1 << 20);
 
+		ServerPlayNetworking.registerGlobalReceiver(RequestDesignsPayload.TYPE,
+				(payload, context) -> ServerPlayNetworking.send(context.player(), Recomposition.designs(context.player())));
+		ServerPlayNetworking.registerGlobalReceiver(ChooseDesignPayload.TYPE,
+				(payload, context) -> Recomposition.choose(context.player(), payload.item()));
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
 				(payload, context) -> Notebooks.set(context.player(), payload.contents()));
 		ServerPlayNetworking.registerGlobalReceiver(SelectCirclePayload.TYPE,

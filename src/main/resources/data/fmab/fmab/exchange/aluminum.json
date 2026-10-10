@@ -1,0 +1,23 @@
+{
+  "family": "metal",
+  "values": {
+    "#c:nuggets/aluminum": 1,
+    "#c:ingots/aluminum": 9,
+    "#c:raw_materials/aluminum": 9,
+    "#c:plates/aluminum": 9,
+    "#c:dusts/aluminum": 9,
+    "#c:gears/aluminum": 36,
+    "#c:ores/aluminum": 9,
+    "#c:storage_blocks/aluminum": 81,
+    "#c:storage_blocks/raw_aluminum": 81,
+    "#c:nuggets/aluminium": 1,
+    "#c:ingots/aluminium": 9,
+    "#c:raw_materials/aluminium": 9,
+    "#c:plates/aluminium": 9,
+    "#c:dusts/aluminium": 9,
+    "#c:gears/aluminium": 36,
+    "#c:ores/aluminium": 9,
+    "#c:storage_blocks/aluminium": 81,
+    "#c:storage_blocks/raw_aluminium": 81
+  }
+}

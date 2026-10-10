@@ -1,5 +1,7 @@
 {
   "values": [
-    "fmab:librarian/tome_flame"
+    "fmab:librarian/tome_flame",
+    "fmab:librarian/tome_planetary_metals",
+    "fmab:librarian/tome_deep_metals"
   ]
 }

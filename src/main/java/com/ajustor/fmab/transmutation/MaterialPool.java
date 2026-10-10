@@ -13,6 +13,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,17 +42,36 @@ public final class MaterialPool {
 	 *               transmuté (il compte alors pour sa valeur d'échange, ou 1)
 	 */
 	public static MaterialPool collect(EffectContext ctx, String element, Family family) {
+		return collect(ctx, element, family, true);
+	}
+
+	/**
+	 * Comme {@link #collect(EffectContext, String, Family)}, en laissant de côté l'inventaire si
+	 * {@code fromInventory} est faux : seulement ce qui vient de l'étage précédent ou du cercle.
+	 */
+	public static MaterialPool collect(EffectContext ctx, String element, Family family, boolean fromInventory) {
+		return collect(ctx, element, family, fromInventory, null);
+	}
+
+	/**
+	 * Comme {@link #collect(EffectContext, String, Family, boolean)}, sans compter {@code kept} : le
+	 * modèle d'une copie, qui peut être lui-même de la matière (un diamant copié avec du charbon).
+	 */
+	public static MaterialPool collect(EffectContext ctx, String element, Family family, boolean fromInventory,
+			@Nullable ItemEntity kept) {
 		ServerLevel level = ctx.level();
 		TagKey<Item> tag = FmabTags.elementItems(element);
 		List<Source> sources = new ArrayList<>();
 		for (ItemStack stack : ctx.flow()) {
 			add(level, stack, tag, family, sources);
 		}
-		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, ctx.onCircle())) {
+		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, ctx.onCircle(), e -> e != kept)) {
 			add(level, entity.getItem(), tag, family, sources);
 		}
-		for (ItemStack stack : ctx.caster().getInventory()) {
-			add(level, stack, tag, family, sources);
+		if (fromInventory) {
+			for (ItemStack stack : ctx.caster().getInventory()) {
+				add(level, stack, tag, family, sources);
+			}
 		}
 		sources.sort(Comparator.comparingInt(Source::unitMass));
 		return new MaterialPool(sources);

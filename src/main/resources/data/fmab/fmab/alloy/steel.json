@@ -1,0 +1,14 @@
+{
+  "parts": {
+    "iron": 8,
+    "carbon": 1
+  },
+  "values": {
+    "#c:nuggets/steel": 1,
+    "#c:ingots/steel": 9,
+    "#c:plates/steel": 9,
+    "#c:dusts/steel": 9,
+    "#c:gears/steel": 36,
+    "#c:storage_blocks/steel": 81
+  }
+}

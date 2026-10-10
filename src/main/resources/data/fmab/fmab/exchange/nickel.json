@@ -1,0 +1,14 @@
+{
+  "family": "metal",
+  "values": {
+    "#c:nuggets/nickel": 1,
+    "#c:ingots/nickel": 9,
+    "#c:raw_materials/nickel": 9,
+    "#c:plates/nickel": 9,
+    "#c:dusts/nickel": 9,
+    "#c:gears/nickel": 36,
+    "#c:ores/nickel": 9,
+    "#c:storage_blocks/nickel": 81,
+    "#c:storage_blocks/raw_nickel": 81
+  }
+}

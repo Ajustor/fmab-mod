@@ -31,7 +31,8 @@ class SimpleCirclesTest {
 	List<DynamicTest> everySingleElementCombinationHasAWorkingSimpleCircle() {
 		List<DynamicTest> tests = new ArrayList<>();
 		for (Combination c : TestGlyphs.combinations().all()) {
-			if (c.elements().size() != 1) {
+			// Une combinaison à formule demande ses satellites : un cercle simple ne lui suffit pas.
+			if (c.elements().size() != 1 || !c.formula().isEmpty()) {
 				continue;
 			}
 			Glyph element = find(GlyphLayer.ELEMENT, c.elements().iterator().next()).orElseThrow();

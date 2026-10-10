@@ -37,6 +37,8 @@ import java.util.function.UnaryOperator;
  *   <li>Deux éléments dans un étage ne fusionnent que dans un hexagramme.</li>
  *   <li>Un satellite qui ne porte que des éléments infuse l'effet de son étage ; un satellite
  *   complet (élément et action) lance son propre effet depuis son sommet.</li>
+ *   <li>Une combinaison à formule (la transmutation humaine) exige que ses satellites infusent
+ *   chacun des éléments de la formule.</li>
  * </ul>
  */
 public final class CircleAnalyzer {
@@ -59,7 +61,7 @@ public final class CircleAnalyzer {
 	public static final double MAX_UNLEARNED_RISK = 0.75;
 	/** Problèmes qui font rebondir le cercle, avec la gravité d'une combinaison inconnue. */
 	private static final Set<Kind> MISCOMPOSED = EnumSet.of(Kind.UNKNOWN_COMBINATION, Kind.CONFLICTING_LINKS,
-			Kind.FUSION_NEEDS_HEXAGRAM, Kind.SATELLITE_INCOMPLETE);
+			Kind.FUSION_NEEDS_HEXAGRAM, Kind.SATELLITE_INCOMPLETE, Kind.INCOMPLETE_FORMULA);
 
 	private final CombinationTable combinations;
 	private final Optional<Glyph> intensityGlyph;
@@ -196,6 +198,7 @@ public final class CircleAnalyzer {
 		}
 
 		combination(stage.layer(GlyphLayer.ELEMENT), stage.layer(GlyphLayer.ACTION), stage.hexagram(), issues, knowledge)
+				.filter(c -> formulaComplete(c, infusions, issues))
 				.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), -1, c, range(c, stage.intensity(), knowledge),
 						stage.intensity(), Vec2.ZERO, direction, infusions, stage.link())));
 
@@ -250,6 +253,16 @@ public final class CircleAnalyzer {
 			return Optional.empty();
 		}
 		return combination;
+	}
+
+	/** Les satellites infusent-ils tout ce que la formule demande ? Sinon, le cercle rebondit. */
+	private static boolean formulaComplete(Combination c, Set<String> infusions, List<CircleIssue> issues) {
+		List<String> missing = c.formula().stream().filter(e -> !infusions.contains(e)).sorted().toList();
+		if (missing.isEmpty()) {
+			return true;
+		}
+		issues.add(new CircleIssue(Kind.INCOMPLETE_FORMULA, null, String.join("+", missing)));
+		return false;
 	}
 
 	private static double range(Combination c, int intensity, Knowledge knowledge) {

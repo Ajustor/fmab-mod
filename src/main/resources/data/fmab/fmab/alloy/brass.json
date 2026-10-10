@@ -1,0 +1,14 @@
+{
+  "parts": {
+    "copper": 1,
+    "zinc": 1
+  },
+  "values": {
+    "#c:nuggets/brass": 1,
+    "#c:ingots/brass": 9,
+    "#c:plates/brass": 9,
+    "#c:dusts/brass": 9,
+    "#c:gears/brass": 36,
+    "#c:storage_blocks/brass": 81
+  }
+}

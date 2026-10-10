@@ -1,0 +1,21 @@
+{
+  "id": "fmab:cristal",
+  "layer": "element",
+  "element": "crystal",
+  "primitives": [
+    { "type": "polygon", "points": [[0, -0.95], [0.5, -0.45], [0.5, 0.45], [0, 0.95], [-0.5, 0.45], [-0.5, -0.45]] },
+    { "type": "line", "from": [-0.5, -0.45], "to": [0.5, -0.45] },
+    { "type": "line", "from": [-0.5, 0.45], "to": [0.5, 0.45] }
+  ],
+  "complexity": 2,
+  "concentration": 3,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.cristal",
+  "description_key": "glyph.fmab.cristal.desc",
+  "since": "1.1"
+}

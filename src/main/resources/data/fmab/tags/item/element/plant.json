@@ -1,0 +1,88 @@
+{
+  "values": [
+    "#minecraft:leaves",
+    "#minecraft:saplings",
+    "#minecraft:flowers",
+    "#minecraft:small_flowers",
+    "#minecraft:villager_plantable_seeds",
+    {
+      "id": "#c:seeds",
+      "required": false
+    },
+    {
+      "id": "#c:crops",
+      "required": false
+    },
+    {
+      "id": "#c:mushrooms",
+      "required": false
+    },
+    {
+      "id": "#c:flowers",
+      "required": false
+    },
+    {
+      "id": "#c:foods/fruit",
+      "required": false
+    },
+    {
+      "id": "#c:foods/vegetable",
+      "required": false
+    },
+    "minecraft:wheat",
+    "minecraft:sugar_cane",
+    "minecraft:kelp",
+    "minecraft:dried_kelp",
+    "minecraft:bamboo",
+    "minecraft:cactus",
+    "minecraft:vine",
+    "minecraft:carrot",
+    "minecraft:potato",
+    "minecraft:beetroot",
+    "minecraft:apple",
+    "minecraft:cocoa_beans",
+    "minecraft:sweet_berries",
+    "minecraft:glow_berries",
+    "minecraft:melon_slice",
+    "minecraft:pumpkin",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "minecraft:nether_wart",
+    "minecraft:chorus_fruit",
+    "minecraft:moss_block",
+    "minecraft:lily_pad",
+    "minecraft:sea_pickle",
+    "minecraft:seagrass",
+    "minecraft:short_grass",
+    "minecraft:fern",
+    "minecraft:tall_grass",
+    "minecraft:large_fern",
+    "minecraft:crimson_fungus",
+    "minecraft:warped_fungus",
+    "minecraft:crimson_roots",
+    "minecraft:warped_roots",
+    "minecraft:weeping_vines",
+    "minecraft:twisting_vines",
+    "minecraft:hanging_roots",
+    "minecraft:glow_lichen",
+    "minecraft:big_dripleaf",
+    "minecraft:small_dripleaf",
+    "minecraft:spore_blossom",
+    "minecraft:torchflower_seeds",
+    "minecraft:pitcher_pod",
+    "minecraft:sugar",
+    "minecraft:honeycomb",
+    "minecraft:resin_clump",
+    "minecraft:wheat_seeds",
+    "minecraft:beetroot_seeds",
+    "minecraft:melon_seeds",
+    "minecraft:pumpkin_seeds",
+    "minecraft:dead_bush",
+    "minecraft:cactus_flower",
+    "minecraft:leaf_litter",
+    "minecraft:bush",
+    "minecraft:firefly_bush",
+    "minecraft:short_dry_grass",
+    "minecraft:tall_dry_grass"
+  ]
+}

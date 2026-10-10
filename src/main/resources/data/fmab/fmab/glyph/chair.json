@@ -1,0 +1,19 @@
+{
+  "id": "fmab:chair",
+  "layer": "element",
+  "element": "flesh",
+  "primitives": [
+    { "type": "polygon", "points": [[0, 0.85], [-0.8, 0.0], [-0.75, -0.55], [-0.4, -0.8], [0, -0.45], [0.4, -0.8], [0.75, -0.55], [0.8, 0.0]] }
+  ],
+  "complexity": 2,
+  "concentration": 3,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.chair",
+  "description_key": "glyph.fmab.chair.desc",
+  "since": "1.1"
+}

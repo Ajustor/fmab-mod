@@ -1,0 +1,14 @@
+{
+  "parts": {
+    "copper": 1,
+    "nickel": 1
+  },
+  "values": {
+    "#c:nuggets/constantan": 1,
+    "#c:ingots/constantan": 9,
+    "#c:plates/constantan": 9,
+    "#c:dusts/constantan": 9,
+    "#c:gears/constantan": 36,
+    "#c:storage_blocks/constantan": 81
+  }
+}

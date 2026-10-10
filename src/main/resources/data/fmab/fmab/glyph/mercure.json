@@ -1,0 +1,22 @@
+{
+  "id": "fmab:mercure",
+  "layer": "element",
+  "element": "mercury",
+  "primitives": [
+    { "type": "polyline", "points": [[0.45, -0.8], [0.32, -0.48], [0.0, -0.35], [-0.32, -0.48], [-0.45, -0.8]] },
+    { "type": "circle", "center": [0, -0.05], "radius": 0.35 },
+    { "type": "line", "from": [0, 0.3], "to": [0, 0.95] },
+    { "type": "line", "from": [-0.35, 0.65], "to": [0.35, 0.65] }
+  ],
+  "complexity": 3,
+  "concentration": 4,
+  "rank": "alchemist",
+  "tolerance": {
+    "rotation_deg": 15,
+    "position": 0.1,
+    "scale": [0.7, 1.4]
+  },
+  "name_key": "glyph.fmab.mercure",
+  "description_key": "glyph.fmab.mercure.desc",
+  "since": "1.1"
+}

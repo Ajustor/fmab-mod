@@ -1,0 +1,32 @@
+{
+  "values": [
+    "minecraft:gunpowder",
+    "minecraft:glowstone_dust",
+    "minecraft:glowstone",
+    "minecraft:sulfur",
+    "minecraft:potent_sulfur",
+    "minecraft:sulfur_spike",
+    {
+      "id": "#c:dusts/glowstone",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/sulfur",
+      "required": false
+    },
+    {
+      "id": "#c:gems/sulfur",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/saltpeter",
+      "required": false
+    },
+    {
+      "id": "#c:gems/saltpeter",
+      "required": false
+    },
+    "minecraft:blaze_powder",
+    "minecraft:blaze_rod"
+  ]
+}

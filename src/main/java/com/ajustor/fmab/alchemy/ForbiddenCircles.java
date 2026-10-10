@@ -17,20 +17,46 @@ public final class ForbiddenCircles {
 	public static final String HUMAN_TRANSMUTATION_EFFECT = "fmab:human_transmutation";
 
 	/**
-	 * La transmutation humaine des frères Elric : un carré et un triangle superposés dans l'anneau,
-	 * Humain en haut, Recomposer en bas.
+	 * La transmutation humaine : la formule complète d'un corps. Au centre d'un hexagramme inscrit
+	 * dans un dodécagone, Humain et Recomposer ; sur les six pointes, des satellites infusent ce dont
+	 * un corps est fait (eau, carbone, chaux, soufre, fer et cristal pour le silicium). Il en manque
+	 * un, et le cercle rebondit. Un double anneau l'entoure. Il faut le rang d'alchimiste d'État pour
+	 * tenir six satellites.
 	 */
 	public static final Drawing HUMAN_TRANSMUTATION = parse("""
-			[{"type": "circle", "center": [16, 16], "radius": 14},
-			 {"type": "polygon", "points": [[16, 2], [30, 16], [16, 30], [2, 16]]},
-			 {"type": "polygon", "points": [[16, 30], [4, 9], [28, 9]]},
-			 {"type": "circle", "center": [16.0, 13.0], "radius": 1.0},
-			 {"type": "line", "from": [16.0, 14.0], "to": [16.0, 15.5]},
-			 {"type": "line", "from": [14.0, 14.5], "to": [18.0, 14.5]},
-			 {"type": "polyline", "points": [[14.5, 17.0], [16.0, 15.5], [17.5, 17.0]]},
-			 {"type": "polygon", "points": [[14.5, 21.5], [18.0, 21.5], [18.0, 25.0], [14.5, 25.0]]},
-			 {"type": "line", "from": [14.5, 21.5], "to": [18.0, 25.0]},
-			 {"type": "line", "from": [18.0, 21.5], "to": [14.5, 25.0]}]
+			[{"type": "circle", "center": [16, 16], "radius": 15},
+			 {"type": "circle", "center": [16, 16], "radius": 14.3},
+			 {"type": "circle", "center": [16, 16], "radius": 10},
+			 {"type": "polygon", "points": [[16.0, 6.0], [24.66, 21.0], [7.34, 21.0]]},
+			 {"type": "polygon", "points": [[16.0, 26.0], [7.34, 11.0], [24.66, 11.0]]},
+			 {"type": "polygon", "points": [[16.0, 6.0], [21.0, 7.34], [24.66, 11.0], [26.0, 16.0], [24.66, 21.0], [21.0, 24.66], [16.0, 26.0], [11.0, 24.66], [7.34, 21.0], [6.0, 16.0], [7.34, 11.0], [11.0, 7.34]]},
+			 {"type": "circle", "center": [16.0, 6.0], "radius": 3.5},
+			 {"type": "polygon", "points": [[14.24, 4.68], [17.76, 4.68], [16.0, 7.76]]},
+			 {"type": "circle", "center": [24.66, 11.0], "radius": 3.5},
+			 {"type": "polygon", "points": [[24.66, 8.91], [25.87, 11.0], [24.66, 13.09], [23.45, 11.0]]},
+			 {"type": "line", "from": [22.57, 11.0], "to": [26.75, 11.0]},
+			 {"type": "circle", "center": [24.66, 21.0], "radius": 3.5},
+			 {"type": "circle", "center": [24.22, 21.44], "radius": 1.1},
+			 {"type": "line", "from": [25.0, 20.66], "to": [26.31, 19.35]},
+			 {"type": "polyline", "points": [[25.43, 19.35], [26.31, 19.35], [26.31, 20.23]]},
+			 {"type": "circle", "center": [16.0, 26.0], "radius": 3.5},
+			 {"type": "line", "from": [15.12, 26.0], "to": [16.88, 26.0]},
+			 {"type": "circle", "center": [14.35, 26.0], "radius": 0.77},
+			 {"type": "circle", "center": [17.65, 26.0], "radius": 0.77},
+			 {"type": "circle", "center": [7.34, 21.0], "radius": 3.5},
+			 {"type": "polygon", "points": [[6.02, 21.11], [8.66, 21.11], [7.34, 18.91]]},
+			 {"type": "circle", "center": [7.34, 22.1], "radius": 0.88},
+			 {"type": "circle", "center": [7.34, 11.0], "radius": 3.5},
+			 {"type": "polygon", "points": [[7.34, 8.91], [8.44, 10.01], [8.44, 11.99], [7.34, 13.09], [6.24, 11.99], [6.24, 10.01]]},
+			 {"type": "line", "from": [6.24, 10.01], "to": [8.44, 10.01]},
+			 {"type": "line", "from": [6.24, 11.99], "to": [8.44, 11.99]},
+			 {"type": "circle", "center": [16.0, 11.96], "radius": 0.57},
+			 {"type": "line", "from": [16.0, 12.52], "to": [16.0, 13.57]},
+			 {"type": "line", "from": [14.86, 12.9], "to": [17.14, 12.9]},
+			 {"type": "polyline", "points": [[15.05, 14.71], [16.0, 13.57], [16.95, 14.71]]},
+			 {"type": "polygon", "points": [[14.88, 18.18], [17.12, 18.18], [17.12, 20.42], [14.88, 20.42]]},
+			 {"type": "line", "from": [14.88, 18.18], "to": [17.12, 20.42]},
+			 {"type": "line", "from": [17.12, 18.18], "to": [14.88, 20.42]}]
 			""");
 
 	private ForbiddenCircles() {

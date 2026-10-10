@@ -1,0 +1,40 @@
+{
+  "values": [
+    {
+      "id": "#c:nuggets/tin",
+      "required": false
+    },
+    {
+      "id": "#c:ingots/tin",
+      "required": false
+    },
+    {
+      "id": "#c:raw_materials/tin",
+      "required": false
+    },
+    {
+      "id": "#c:plates/tin",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/tin",
+      "required": false
+    },
+    {
+      "id": "#c:gears/tin",
+      "required": false
+    },
+    {
+      "id": "#c:ores/tin",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/tin",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/raw_tin",
+      "required": false
+    }
+  ]
+}

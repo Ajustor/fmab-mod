@@ -5,6 +5,13 @@
     "minecraft:charcoal": 1,
     "minecraft:coal_block": 9,
     "minecraft:blaze_powder": 1,
-    "minecraft:blaze_rod": 2
+    "minecraft:blaze_rod": 2,
+    "#minecraft:planks": 2,
+    "#minecraft:logs": 8,
+    "minecraft:string": 1,
+    "#minecraft:wool": 4,
+    "minecraft:leather": 4,
+    "minecraft:feather": 1,
+    "minecraft:rabbit_hide": 1
   }
 }

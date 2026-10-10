@@ -61,17 +61,15 @@ class KnowledgeTest {
 	}
 
 	@Test
-	void aStoneLanceNeedsItsNode() {
+	void recomposingEarthNeedsNoNodeOnlyTheLanceDoes() {
+		// Terre + Recomposer copie un modèle posé sur le cercle, sans savoir particulier : le cercle
+		// tient. C'est la lance, sans modèle, qui demande son nœud (vérifié par l'effet).
 		Drawing lance = square("terre", "recomposer");
 		Analysis without = analyzer.analyze(parser.parse(lance), Rank.ALCHEMIST, null,
 				new Knowledge(nodes, Map.of(), Set.of()));
-		assertEquals(Analysis.Outcome.INERT, without.outcome());
-		assertTrue(without.issues().stream().anyMatch(i -> i.kind() == CircleIssue.Kind.KNOWLEDGE_MISSING));
-
-		Analysis with = analyzer.analyze(parser.parse(lance), Rank.ALCHEMIST, null,
-				new Knowledge(nodes, Map.of("earth", 45), Set.of()));
-		assertEquals(Analysis.Outcome.WORKS, with.outcome(), () -> with.issues().toString());
-		assertEquals("fmab:stone_lance", with.effects().getFirst().combination().effect());
+		assertEquals(Analysis.Outcome.WORKS, without.outcome(), () -> without.issues().toString());
+		assertTrue(without.issues().stream().noneMatch(i -> i.kind() == CircleIssue.Kind.KNOWLEDGE_MISSING));
+		assertEquals("fmab:stone_lance", without.effects().getFirst().combination().effect());
 	}
 
 	@Test

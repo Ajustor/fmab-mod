@@ -1,0 +1,17 @@
+{
+  "family": "metal",
+  "values": {
+    "minecraft:raw_copper_block": 81,
+    "minecraft:copper_ore": 9,
+    "minecraft:deepslate_copper_ore": 9,
+    "#c:nuggets/copper": 1,
+    "#c:ingots/copper": 9,
+    "#c:raw_materials/copper": 9,
+    "#c:plates/copper": 9,
+    "#c:dusts/copper": 9,
+    "#c:gears/copper": 36,
+    "#c:ores/copper": 9,
+    "#c:storage_blocks/copper": 81,
+    "#c:storage_blocks/raw_copper": 81
+  }
+}

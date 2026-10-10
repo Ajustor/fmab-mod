@@ -1,0 +1,14 @@
+{
+  "family": "metal",
+  "values": {
+    "#c:nuggets/silver": 1,
+    "#c:ingots/silver": 9,
+    "#c:raw_materials/silver": 9,
+    "#c:plates/silver": 9,
+    "#c:dusts/silver": 9,
+    "#c:gears/silver": 36,
+    "#c:ores/silver": 9,
+    "#c:storage_blocks/silver": 81,
+    "#c:storage_blocks/raw_silver": 81
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "values": [
+    "minecraft:bone_meal",
+    "minecraft:bone",
+    "minecraft:bone_block",
+    "minecraft:calcite",
+    "minecraft:nautilus_shell",
+    "minecraft:shulker_shell",
+    "minecraft:turtle_scute",
+    "minecraft:armadillo_scute",
+    {
+      "id": "#c:bones",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/salt",
+      "required": false
+    }
+  ]
+}

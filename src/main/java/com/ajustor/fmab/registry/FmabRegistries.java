@@ -4,6 +4,7 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.alchemy.rules.Combination;
+import com.ajustor.fmab.data.AlloyGroup;
 import com.ajustor.fmab.data.ExchangeGroup;
 import com.ajustor.fmab.data.FmabCodecs;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
@@ -26,6 +27,8 @@ public final class FmabRegistries {
 			ResourceKey.createRegistryKey(Fmab.id("knowledge"));
 	/** {@code data/<ns>/fmab/exchange/<nom>.json} */
 	public static final ResourceKey<Registry<ExchangeGroup>> EXCHANGE = ResourceKey.createRegistryKey(Fmab.id("exchange"));
+	/** {@code data/<ns>/fmab/alloy/<nom>.json} : les métaux faits de plusieurs éléments. */
+	public static final ResourceKey<Registry<AlloyGroup>> ALLOY = ResourceKey.createRegistryKey(Fmab.id("alloy"));
 
 	private FmabRegistries() {
 	}
@@ -35,5 +38,6 @@ public final class FmabRegistries {
 		DynamicRegistries.registerSynced(COMBINATION, FmabCodecs.COMBINATION);
 		DynamicRegistries.registerSynced(KNOWLEDGE, FmabCodecs.KNOWLEDGE_NODE);
 		DynamicRegistries.register(EXCHANGE, ExchangeGroup.CODEC);
+		DynamicRegistries.register(ALLOY, AlloyGroup.CODEC);
 	}
 }

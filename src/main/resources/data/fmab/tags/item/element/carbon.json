@@ -1,0 +1,29 @@
+{
+  "values": [
+    "minecraft:diamond",
+    "minecraft:diamond_block",
+    "minecraft:diamond_ore",
+    "minecraft:deepslate_diamond_ore",
+    "minecraft:coal_ore",
+    "minecraft:deepslate_coal_ore",
+    {
+      "id": "#c:gems/diamond",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/diamond",
+      "required": false
+    },
+    {
+      "id": "#c:ores/diamond",
+      "required": false
+    },
+    {
+      "id": "#c:ores/coal",
+      "required": false
+    },
+    "minecraft:coal",
+    "minecraft:charcoal",
+    "minecraft:coal_block"
+  ]
+}

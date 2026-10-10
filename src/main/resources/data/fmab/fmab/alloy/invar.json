@@ -1,0 +1,14 @@
+{
+  "parts": {
+    "iron": 2,
+    "nickel": 1
+  },
+  "values": {
+    "#c:nuggets/invar": 1,
+    "#c:ingots/invar": 9,
+    "#c:plates/invar": 9,
+    "#c:dusts/invar": 9,
+    "#c:gears/invar": 36,
+    "#c:storage_blocks/invar": 81
+  }
+}

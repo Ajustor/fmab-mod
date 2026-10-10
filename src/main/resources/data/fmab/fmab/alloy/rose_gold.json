@@ -1,0 +1,14 @@
+{
+  "parts": {
+    "copper": 1,
+    "gold": 1
+  },
+  "values": {
+    "#c:nuggets/rose_gold": 1,
+    "#c:ingots/rose_gold": 9,
+    "#c:plates/rose_gold": 9,
+    "#c:dusts/rose_gold": 9,
+    "#c:gears/rose_gold": 36,
+    "#c:storage_blocks/rose_gold": 81
+  }
+}

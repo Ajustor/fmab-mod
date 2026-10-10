@@ -42,7 +42,9 @@ public record CircleIssue(Kind kind, Vec2 where, String detail) {
 		/** Un satellite qui n'est ni une infusion (éléments seuls) ni un cercle complet. */
 		SATELLITE_INCOMPLETE,
 		/** Une combinaison qui demande un nœud de savoir pas encore acquis. */
-		KNOWLEDGE_MISSING;
+		KNOWLEDGE_MISSING,
+		/** Des satellites n'infusent pas tous les éléments que la formule demande : rebond. */
+		INCOMPLETE_FORMULA;
 
 		public String translationKey() {
 			return "circle.fmab.issue." + name().toLowerCase(Locale.ROOT);

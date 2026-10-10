@@ -1,0 +1,40 @@
+{
+  "values": [
+    {
+      "id": "#c:nuggets/nickel",
+      "required": false
+    },
+    {
+      "id": "#c:ingots/nickel",
+      "required": false
+    },
+    {
+      "id": "#c:raw_materials/nickel",
+      "required": false
+    },
+    {
+      "id": "#c:plates/nickel",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/nickel",
+      "required": false
+    },
+    {
+      "id": "#c:gears/nickel",
+      "required": false
+    },
+    {
+      "id": "#c:ores/nickel",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/nickel",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/raw_nickel",
+      "required": false
+    }
+  ]
+}
