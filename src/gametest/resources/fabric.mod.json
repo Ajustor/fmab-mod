@@ -13,7 +13,8 @@
 			"com.ajustor.fmab.gametest.GateScenes",
 			"com.ajustor.fmab.gametest.BlockScenes",
 			"com.ajustor.fmab.gametest.TownScenes",
-			"com.ajustor.fmab.gametest.FigureScenes"
+			"com.ajustor.fmab.gametest.FigureScenes",
+			"com.ajustor.fmab.gametest.ItemScenes"
 		]
 	},
 	"depends": {
