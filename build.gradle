@@ -117,4 +117,7 @@ loom.runs.matching { it.name == 'clientGameTest' }.configureEach {
 	if (project.hasProperty('fmabGametest')) {
 		vmArg "-Dfmab.gametest=${project.property('fmabGametest')}"
 	}
+	if (project.hasProperty('fmabTowns')) {
+		vmArg "-Dfmab.towns=${project.property('fmabTowns')}"
+	}
 }
