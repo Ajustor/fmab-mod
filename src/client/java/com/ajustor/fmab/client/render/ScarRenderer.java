@@ -3,7 +3,6 @@ package com.ajustor.fmab.client.render;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.ScarEntity;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
@@ -14,7 +13,7 @@ public class ScarRenderer extends HumanoidMobRenderer<ScarEntity, HumanoidRender
 	private static final Identifier TEXTURE = Fmab.id("textures/entity/scar.png");
 
 	public ScarRenderer(EntityRendererProvider.Context context) {
-		super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), 0.5f);
+		super(context, new HumanoidModel<>(FigureModels.scar()), 0.5f);
 	}
 
 	@Override

@@ -202,6 +202,8 @@ def pants(s, color, mat="cloth"):
 # Les volumes que FigureModels ajoute au squelette de joueur, dans les coins libres de la peau.
 BUST = {"bust": (24, 0, 6, 3, 2)}
 VISOR = {"visor": (24, 0, 6, 1, 2)}
+# Les peaux élargies à 128x64 : la moitié droite reçoit les grands volumes.
+WIDE = (128, 64)
 
 
 def bust(s, cloth, mat="cloth", skin=None, neckline=0, shadow=6):
@@ -258,7 +260,8 @@ def state_examiner(s):
         s.band(arm, 7, 1, GOLD, "metal")
 
 
-@skin("briggs_soldier")
+@skin("briggs_soldier", size=WIDE, parts={"collar": (64, 0, 10, 2, 6), "goggles": (64, 8, 7, 2, 1),
+                                          "pack": (64, 12, 6, 7, 3)})
 def briggs_soldier(s):
     """Briggs : la parka d'hiver grise, la capuche bordée de fourrure, les lunettes de neige."""
     coat, coat_dark, fur = "#c9d0d6", "#9aa3ab", "#eee9df"
@@ -313,9 +316,23 @@ def briggs_soldier(s):
         for f in SIDES:
             w, _ = s.size(leg, f)
             s.material(leg, f, fur, "fur", y=7, h=1)
+    # Le col de fourrure, les lunettes de neige relevées sur la capuche, le sac et ses bretelles.
+    s.fill("collar", fur, "fur")
+    s.material("collar", "top", shade(fur, 1.05), "fur")
+    s.fill("goggles", "#2a2a30", "leather")
+    for x in (1, 4):
+        s.rect("goggles", "front", x, 0, 2, 2, "#5d7d93")
+        s.px("goggles", "front", x, 0, "#a9c6d8")
+    s.fill("pack", "#6b6a52", "cloth")
+    s.material("pack", "back", "#5c5b45", "cloth", y=0, h=3)
+    s.tint("pack", "back", 0, 3, 6, 1, 0.75)
+    s.rect("pack", "back", 2, 4, 2, 1, "#a7a7ad")
+    for x in (1, 6):
+        s.seam("body", "front", x, 0, 7, "#3f3730")
 
 
-@skin("drachma_soldier")
+@skin("drachma_soldier", size=WIDE, parts={"chapka": (64, 0, 10, 2, 10), "flaps": (64, 12, 1, 5, 5),
+                                           "skirt": (64, 24, 9, 5, 5)})
 def drachma_soldier(s):
     """Drachma : la capote brun-vert, la chapka de fourrure frappée d'une étoile rouge."""
     coat, fur = "#545239", "#5b4331"
@@ -350,6 +367,15 @@ def drachma_soldier(s):
     coat_tails(s, coat, rows=5)
     pants(s, "#4a4835")
     boots(s, rows=5)
+    # La chapka bouffante, son étoile rouge, ses rabats ; les pans de la capote.
+    s.fill("chapka", fur, "fur")
+    s.material("chapka", "top", shade(fur, 1.1), "fur")
+    s.rect("chapka", "front", 4, 0, 2, 2, "#c8202c")
+    s.px("chapka", "front", 4, 0, "#e8484e")
+    s.fill("flaps", fur, "fur")
+    s.fill("skirt", coat, "cloth")
+    s.seam("skirt", "front", 4, 0, 5, None, k=0.75)
+    s.band("skirt", 4, 1, shade(coat, 0.7))
 
 
 @skin("immortal_soldier")
@@ -446,7 +472,7 @@ def hohenheim(s):
     boots(s, color="#4a3426", rows=3)
 
 
-@skin("marcoh")
+@skin("marcoh", size=WIDE, parts={"satchel": (64, 0, 4, 3, 2)})
 def marcoh(s):
     """Le docteur Marcoh : crâne dégarni, tempes grises, la brûlure sur le visage, chemise et gilet."""
     grey = "#8f8a80"
@@ -477,9 +503,18 @@ def marcoh(s):
     hands(s, "#e2bd99", rows=3)
     pants(s, "#8a7a62")
     boots(s, color="#3e2c20", rows=2)
+    # La sacoche de médecin et sa bandoulière, en travers du buste.
+    leather = "#5a3a24"
+    s.fill("satchel", leather, "leather")
+    s.material("satchel", "back", shade(leather, 0.8), "leather", h=1)
+    s.px("satchel", "back", 1, 1, "#c2a46a")
+    strap = "#2a1a10"
+    for i in range(8):
+        s.px("body", "front", i, min(11, i + 1), strap)
+        s.px("body", "back", 7 - i, min(11, i + 1), strap)
 
 
-@skin("scar")
+@skin("scar", size=WIDE, parts={"chest": (64, 0, 8, 3, 1)})
 def scar(s):
     """Scar : la peau mate d'Ishval, la cicatrice en X, les yeux rouges, le bras tatoué."""
     tone = ISHVAL
@@ -521,9 +556,18 @@ def scar(s):
     s.material("larm", "bottom", tone, "skin")
     pants(s, "#2e2f36")
     boots(s, color="#3b2a20", rows=3)
+    # Les pectoraux sous le maillot noir, entre les pans de la veste.
+    s.fill("chest", BLACK_CLOTH, "cloth")
+    for f in ("front", "top", "bottom"):
+        s.material("chest", f, jacket, "cloth", x=0, w=2)
+        s.material("chest", f, jacket, "cloth", x=6, w=2)
+    s.fill("chest", jacket, "cloth", faces=("right", "left"))
+    s.seam("chest", "front", 4, 0, 3, None, k=0.6)
+    s.tint("chest", "front", 2, 0, 4, 1, 1.25)
+    s.tint("body", "front", 2, 4, 4, 1, 0.75)
 
 
-@skin("cornello")
+@skin("cornello", size=WIDE, parts={"medallion": (64, 0, 4, 4, 1), "robe": (64, 8, 10, 6, 6)})
 def cornello(s):
     """Le père Cornello, prophète de Léto : crâne rasé, robe crème, soleil d'or, bague rouge."""
     robe, trim = "#ddd1aa", "#b88a2c"
@@ -556,6 +600,18 @@ def cornello(s):
     for leg in ("rpants", "lpants"):
         s.rect(leg, "front", 3 if leg == "rpants" else 0, 0, 1, 10,
                lambda i, j: trim if j < 10 else None)
+    # Le soleil de Léto en médaillon : un disque d'or rayonnant, le cœur clair.
+    s.fill("medallion", GOLD, "metal")
+    for f in ("front", "back"):
+        for x, y in ((0, 0), (3, 0), (0, 3), (3, 3)):
+            s.px("medallion", f, x, y, None)
+    s.rect("medallion", "front", 1, 1, 2, 2, "#f0d870")
+    s.px("medallion", "front", 1, 1, "#fff4b0")
+    # La robe qui s'évase sous la ceinture, galonnée devant et à l'ourlet.
+    s.fill("robe", robe, "cloth")
+    s.material("robe", "front", trim, "metal", x=4, w=2)
+    s.band("robe", 5, 1, trim, "metal")
+    s.material("robe", "top", shade(robe, 0.9), "cloth")
 
 
 @skin("izumi", slim=True, parts=BUST)
@@ -633,7 +689,7 @@ def may_chang(s):
     boots(s, color="#1e1a22", rows=3)
 
 
-@skin("olivier", slim=True, parts=BUST)
+@skin("olivier", slim=True, size=WIDE, parts={**BUST, "hair": (64, 0, 8, 11, 1)})
 def olivier(s):
     """Olivier Mira Armstrong : la longue chevelure blonde qui cache un œil, l'uniforme de général."""
     tone, blond = "#f0d4b8", "#ecd27a"
@@ -651,6 +707,15 @@ def olivier(s):
     amestris_uniform(s, officer=True, gloves="#20202a", tone=tone)
     bust(s, AMESTRIS_BLUE)
     s.px("bust", "front", 2, 1, GOLD)
+    # La chevelure qui tombe jusqu'aux reins, en mèches, les pointes irrégulières.
+    s.fill("hair", blond, "hair")
+    s.material("hair", "back", shade(blond, 1.08), "hair")
+    for x in range(8):
+        if x % 3 == 1:
+            s.px("hair", "back", x, 10, None)
+            s.px("hair", "front", x, 10, None)
+        if x % 2 == 0:
+            s.seam("hair", "back", x, 2, 6, None, k=0.88)
     # Le long manteau d'officier de Briggs.
     s.band("body", 11, 1, AMESTRIS_BLUE)
     coat_tails(s, shade(AMESTRIS_BLUE, 0.85), rows=7)
