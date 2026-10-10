@@ -112,11 +112,18 @@ class CircleTest {
 	}
 
 	@Test
-	void anApprenticeCannotHoldAHexagon() {
-		Analysis a = analyze(circle(6, glyph("terre", TOP), glyph("fixer", BOTTOM)));
-		assertEquals(Outcome.INERT, a.outcome());
-		assertTrue(kinds(a).contains(Kind.RANK_TOO_LOW));
-		assertEquals(Rank.ALCHEMIST, a.requiredRank());
+	void anApprenticesHexagonHoldsLessThanTheirSquare() {
+		// Le rang ne bloque pas : l'hexagone dépasse les quatre côtés d'un Apprenti, il vacille.
+		Analysis hexagon = analyze(circle(6, glyph("terre", TOP), glyph("fixer", BOTTOM)));
+		Analysis square = analyze(circle(4, glyph("terre", TOP), glyph("fixer", BOTTOM)));
+		assertTrue(kinds(hexagon).contains(Kind.RANK_TOO_LOW));
+		assertEquals(Rank.ALCHEMIST, hexagon.requiredRank());
+		assertTrue(hexagon.effects().size() == 1, () -> hexagon.issues().toString());
+		assertTrue(hexagon.stability() < square.stability(),
+				() -> "hexagone " + hexagon.stability() + ", carré " + square.stability());
+		Analysis alchemist = analyzer.analyze(parser.parse(circle(6, glyph("terre", TOP), glyph("fixer", BOTTOM))),
+				Rank.ALCHEMIST, null);
+		assertTrue(hexagon.stability() < alchemist.stability());
 	}
 
 	@Test

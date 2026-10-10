@@ -20,8 +20,8 @@ public final class ForbiddenCircles {
 	 * La transmutation humaine : la formule complète d'un corps. Au centre d'un hexagramme inscrit
 	 * dans un dodécagone, Humain et Recomposer ; sur les six pointes, des satellites infusent ce dont
 	 * un corps est fait (eau, carbone, chaux, soufre, fer et cristal pour le silicium). Il en manque
-	 * un, et le cercle rebondit. Un double anneau l'entoure. Il faut le rang d'alchimiste d'État pour
-	 * tenir six satellites.
+	 * un, et le cercle rebondit. Un double anneau l'entoure. Six satellites, c'est la mesure d'un
+	 * Alchimiste d'État : en dessous, le cercle vacille.
 	 */
 	public static final Drawing HUMAN_TRANSMUTATION = parse("""
 			[{"type": "circle", "center": [16, 16], "radius": 15},

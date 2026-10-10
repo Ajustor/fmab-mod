@@ -74,10 +74,13 @@ class MultiStageTest {
 	}
 
 	@Test
-	void anApprenticeCannotHoldTwoStages() {
+	void twoStagesWaverInAnApprenticesHands() {
 		Analysis a = analyzer.analyze(parser.parse(twoStages(seriesLink())), Rank.APPRENTICE, null);
-		assertEquals(Outcome.INERT, a.outcome());
+		Analysis alchemist = analyzer.analyze(parser.parse(twoStages(seriesLink())), Rank.ALCHEMIST, null);
+		assertEquals(Outcome.REBOUND, a.outcome(), () -> a.issues().toString());
 		assertTrue(kinds(a).contains(Kind.RANK_TOO_LOW));
+		assertTrue(kinds(a).contains(Kind.UNSTABLE));
+		assertTrue(a.stability() < alchemist.stability());
 	}
 
 	@Test
@@ -149,7 +152,7 @@ class MultiStageTest {
 	}
 
 	@Test
-	void anApprenticeDrawsASinglePolygonPerRing() {
+	void twoPolygonsInOneRingWaverForAnApprentice() {
 		List<Primitive> all = new ArrayList<>();
 		all.add(new Primitive.Circle(Drawing.CENTER_POINT, 14));
 		all.add(polygon(14, 3, -90));
@@ -157,8 +160,10 @@ class MultiStageTest {
 		all.addAll(TestGlyphs.drawn("fer", new Vec2(16, 11), 3, 0));
 		all.addAll(TestGlyphs.drawn("projeter", new Vec2(16, 20), 3, 0));
 		Analysis a = analyzer.analyze(parser.parse(new Drawing(all)), Rank.APPRENTICE, null);
+		Analysis alchemist = analyzer.analyze(parser.parse(new Drawing(all)), Rank.ALCHEMIST, null);
 		assertEquals(Rank.ALCHEMIST, a.requiredRank());
-		assertEquals(Outcome.INERT, a.outcome());
+		assertTrue(kinds(a).contains(Kind.RANK_TOO_LOW));
+		assertTrue(a.stability() < alchemist.stability());
 	}
 
 	private Analysis analyze(Drawing d) {

@@ -29,7 +29,7 @@ public final class PhilosopherStones {
 	public static final double AMPLIFICATION = 1.5;
 	/** Les problèmes que la Pierre efface : elle tient le cercle et comprend pour vous. */
 	private static final Set<CircleIssue.Kind> STEADIED = EnumSet.of(CircleIssue.Kind.UNSTABLE,
-			CircleIssue.Kind.GLYPH_NOT_LEARNED);
+			CircleIssue.Kind.GLYPH_NOT_LEARNED, CircleIssue.Kind.RANK_TOO_LOW);
 	/** Distance à laquelle les monstres sentent une Pierre. */
 	private static final double LURE = 24;
 
