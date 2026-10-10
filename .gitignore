@@ -50,3 +50,7 @@ logs/
 # python
 
 __pycache__/
+
+# captures en jeu (tests de rendu)
+
+captures/
