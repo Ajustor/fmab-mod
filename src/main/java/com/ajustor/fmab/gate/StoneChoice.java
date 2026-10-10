@@ -15,15 +15,18 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Une transmutation humaine, Pierre philosophale en main : le cercle attend que l'alchimiste
- * choisisse. Ouvrir sa Porte, ou donner une âme de la Pierre à l'être qui naît du cercle.
+ * choisisse. Ouvrir sa Porte, ou donner une âme de la Pierre à l'être qui naît du cercle, sous la
+ * forme qu'il choisit ({@link BeingKind}).
  */
 public final class StoneChoice {
 	public static final String GATE = "gate";
-	public static final String BEING = "being";
+	/** Suivi de l'identifiant de la forme choisie : {@code being:dog}. */
+	public static final String BEING = "being:";
 	/** Le cercle n'attend pas plus d'une minute. */
 	private static final int PATIENCE = 20 * 60;
 	/** Il faut rester près de son cercle pour choisir. */
@@ -53,15 +56,21 @@ public final class StoneChoice {
 				|| level.getGameTime() - pending.since() > PATIENCE
 				|| player.position().distanceTo(Vec3.atCenterOf(pending.circle())) > REACH
 				|| player.getAttachedOrCreate(FmabAttachments.GATE).visit().isPresent()) {
-			if (GATE.equals(choice) || BEING.equals(choice)) {
+			if (GATE.equals(choice) || choice.startsWith(BEING)) {
 				player.sendOverlayMessage(Component.translatable("gate.fmab.choice.too_late"));
 			}
 			return;
 		}
-		switch (choice) {
-			case GATE -> HumanTransmutation.openGate(player, level, pending.circle());
-			case BEING -> HumanTransmutation.createBeing(player, level, pending.circle());
-			default -> player.sendOverlayMessage(Component.translatable("gate.fmab.choice.declined"));
+		if (GATE.equals(choice)) {
+			HumanTransmutation.openGate(player, level, pending.circle());
+			return;
+		}
+		Optional<BeingKind> kind = choice.startsWith(BEING)
+				? BeingKind.byId(choice.substring(BEING.length())) : Optional.empty();
+		if (kind.isPresent()) {
+			HumanTransmutation.createBeing(player, level, pending.circle(), kind.get());
+		} else {
+			player.sendOverlayMessage(Component.translatable("gate.fmab.choice.declined"));
 		}
 	}
 }

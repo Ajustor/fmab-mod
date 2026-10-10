@@ -33,7 +33,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -44,7 +44,7 @@ import java.util.Map;
 
 /**
  * La transmutation humaine, Pierre philosophale en main : l'alchimiste choisit. D'abord créer un
- * être (une âme de la Pierre, et le corps vit), puis ouvrir la Porte et racheter à la Vérité ce
+ * être (un chien : une âme de la Pierre, et le corps vit), puis ouvrir la Porte et racheter à la Vérité ce
  * qu'elle a pris. Chaque étape est vérifiée et capturée.
  */
 public class StoneGateScenes implements FabricClientGameTest {
@@ -85,14 +85,18 @@ public class StoneGateScenes implements FabricClientGameTest {
 			context.waitForScreen(StoneChoiceScreen.class);
 			context.takeScreenshot("stonegate_00_choice");
 
-			// 2. Créer un être : une âme de la Pierre, et le corps vit.
+			// 2. Créer un être, sous la forme d'un chien : une âme de la Pierre, et le corps vit.
+			context.runOnClient(mc -> ((StoneChoiceScreen) mc.gui.screen()).chooseForm());
+			context.waitTicks(2);
+			context.takeScreenshot("stonegate_00b_choose_form");
 			int before = souls(context, sp);
-			context.runOnClient(mc -> ClientPlayNetworking.send(new StoneChosenPayload("being")));
+			context.runOnClient(mc -> ClientPlayNetworking.send(new StoneChosenPayload("being:dog")));
 			context.setScreen(() -> null);
 			sp.getConnection().waitForServerboundPackets();
 			context.waitTicks(20);
-			check(server(context, sp, (level, p) -> level.getEntitiesOfClass(Villager.class, around(),
-					v -> v.hasCustomName()).size()) == 1, "un être devrait être né du cercle");
+			check(server(context, sp, (level, p) -> level.getEntitiesOfClass(Wolf.class, around(),
+					w -> w.hasCustomName() && w.isOwnedBy(p)).size()) == 1,
+					"un chien devrait être né du cercle, attaché à l'alchimiste");
 			check(souls(context, sp) == before - 1, "la Pierre devrait avoir donné une âme");
 			check(server(context, sp, (level, p) -> level.getEntitiesOfClass(ItemEntity.class, around()).stream()
 					.noneMatch(e -> e.getItem().is(Items.COAL))), "les ingrédients devraient être consommés");
@@ -100,7 +104,7 @@ public class StoneGateScenes implements FabricClientGameTest {
 					"la Porte ne devrait pas s'ouvrir");
 			context.takeScreenshot("stonegate_01_being_created");
 			server(context, sp, (level, p) -> {
-				level.getEntitiesOfClass(Villager.class, around()).forEach(v -> v.discard());
+				level.getEntitiesOfClass(Wolf.class, around()).forEach(w -> w.discard());
 				return null;
 			});
 

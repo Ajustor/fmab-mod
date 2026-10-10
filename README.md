@@ -69,8 +69,9 @@ d'État à Central, la Porte, les homonculus, puis Père.
   Il ne saute pas et ne franchit qu'une demi-hauteur (dalles, escaliers : il faut des rampes) ; il faut
   deux bras pour faire tourner ses roues, qui prennent alors les mains. Un autre joueur peut le pousser
   (clic droit dessus, accroupi pour lâcher), ou un villageois contre une émeraude.
-- **Pierre philosophale** : elle rend ce que la Porte a pris, amplifie les transmutations, se fabrique
-  par sacrifice. **Karma**, **éclipse** tous les huit jours, **Pierre vivante**.
+- **Pierre philosophale** : devant la Porte, elle rachète à la Vérité ce qu'elle a pris ; elle anime
+  l'être d'une transmutation humaine, amplifie les transmutations, se fabrique par sacrifice.
+  **Karma**, **éclipse** tous les huit jours, **Pierre vivante**.
 - **Homonculus** qui se reconstituent tant que leur Pierre a des âmes : Lust, Gluttony (et son Ventre),
   Envy le déguisé, Greed (allié possible), Sloth, Wrath, Pride ; enfin **Père** et sa zone
   anti-alchimie, au bout de la quête des sept **points de sang**. Barres de boss une fois le combat

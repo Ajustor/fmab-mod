@@ -23,10 +23,12 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.zombie.Husk;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
-import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -139,9 +141,10 @@ public final class HumanTransmutation {
 
 	/**
 	 * Avec la Pierre, l'être qui naît du cercle reçoit une âme : un corps complet d'ingrédients et une
-	 * âme de la Pierre, et il vit. La Porte ne s'ouvre pas ; mais cette âme était celle de quelqu'un.
+	 * âme de la Pierre, et il vit, sous la forme que l'alchimiste a choisie. Une bête s'attache à
+	 * lui. La Porte ne s'ouvre pas ; mais cette âme était celle de quelqu'un.
 	 */
-	static void createBeing(ServerPlayer caster, ServerLevel level, BlockPos circle) {
+	static void createBeing(ServerPlayer caster, ServerLevel level, BlockPos circle, BeingKind kind) {
 		AABB area = new AABB(circle).inflate(REACH, 1, REACH);
 		List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, area, ItemEntity::isAlive);
 		if (sets(items) == 0) {
@@ -153,7 +156,7 @@ public final class HumanTransmutation {
 			caster.sendSystemMessage(Component.translatable("gate.fmab.being.no_stone"));
 			return;
 		}
-		Villager being = EntityTypes.VILLAGER.create(level, EntitySpawnReason.MOB_SUMMONED);
+		Mob being = kind.type().create(level, EntitySpawnReason.MOB_SUMMONED);
 		if (being == null) {
 			return;
 		}
@@ -163,6 +166,11 @@ public final class HumanTransmutation {
 		being.setPos(Vec3.atBottomCenterOf(circle));
 		being.setCustomName(Component.translatable("entity.fmab.transmuted_being"));
 		being.setPersistenceRequired();
+		if (being instanceof TamableAnimal pet) {
+			pet.tame(caster);
+		} else if (being instanceof AbstractHorse horse) {
+			horse.tameWithName(caster);
+		}
 		level.addFreshEntity(being);
 		level.sendParticles(STONE_RED, circle.getX() + 0.5, circle.getY() + 0.5, circle.getZ() + 0.5,
 				150, 1.2, 0.8, 1.2, 0);
