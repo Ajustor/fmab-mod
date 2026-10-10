@@ -29,8 +29,9 @@ import java.util.function.Consumer;
 /**
  * La Pierre philosophale : des âmes humaines condensées en une pierre rouge (sa barre d'usure
  * compte les âmes qui restent). Elle échappe à l'échange équivalent : qui a laissé quelque chose à
- * la Porte s'en sert pour le reprendre à la Vérité, et chaque partie rendue lui coûte des âmes (voir
- * {@link Restoration}). Vide, elle tombe en poussière.
+ * la Porte s'en sert pour le racheter à la Vérité, devant sa Porte, et chaque partie rendue lui coûte
+ * des âmes (voir {@link Restoration} et {@link com.ajustor.fmab.gate.StoneBargain}). Vide, elle tombe
+ * en poussière.
  */
 public class PhilosopherStoneItem extends Item {
 	/** Les éclairs rouges d'une transmutation par la Pierre. */
@@ -47,24 +48,11 @@ public class PhilosopherStoneItem extends Item {
 
 	@Override
 	public InteractionResult use(Level level, Player player, InteractionHand hand) {
-		if (!(player instanceof ServerPlayer server)) {
-			return InteractionResult.SUCCESS;
-		}
-		GateState gate = server.getAttachedOrCreate(FmabAttachments.GATE);
-		if (gate.lost().isEmpty()) {
-			server.sendOverlayMessage(Component.translatable("item.fmab.philosopher_stone.pulses"));
-			return InteractionResult.SUCCESS;
-		}
-		ItemStack stone = player.getItemInHand(hand);
-		Restoration.Plan plan = Restoration.plan(gate.lost(), player.isCreative() ? Integer.MAX_VALUE : souls(stone));
-		if (plan.restored().isEmpty()) {
-			server.sendOverlayMessage(Component.translatable("item.fmab.philosopher_stone.too_weak", souls(stone)));
-			return InteractionResult.SUCCESS;
-		}
-		restore(server, gate, plan);
-		if (!player.isCreative()) {
-			stone.hurtAndBreak(plan.souls(), server.level(), server, broken -> server.sendSystemMessage(
-					Component.translatable("item.fmab.philosopher_stone.spent").withStyle(ChatFormatting.DARK_RED)));
+		if (player instanceof ServerPlayer server) {
+			// Seule la Vérité rend ce qu'elle a pris : on le lui rachète devant sa Porte (voir StoneBargain).
+			GateState gate = server.getAttachedOrCreate(FmabAttachments.GATE);
+			server.sendOverlayMessage(Component.translatable(gate.lost().isEmpty()
+					? "item.fmab.philosopher_stone.pulses" : "item.fmab.philosopher_stone.only_the_truth"));
 		}
 		return InteractionResult.SUCCESS;
 	}
@@ -73,7 +61,7 @@ public class PhilosopherStoneItem extends Item {
 	 * La Pierre paie ce que la Vérité exigerait. Une âme qui retrouve son corps quitte son armure,
 	 * qui reste debout, vide ; les automails des membres rendus retournent au sac.
 	 */
-	private static void restore(ServerPlayer player, GateState gate, Restoration.Plan plan) {
+	public static void restore(ServerPlayer player, GateState gate, Restoration.Plan plan) {
 		ServerLevel level = player.level();
 		if (plan.restored().contains(BodyPart.BODY) && gate.inArmor()) {
 			SoulBinding.leaveShell(player, false);
@@ -96,10 +84,6 @@ public class PhilosopherStoneItem extends Item {
 		for (BodyPart part : plan.restored()) {
 			player.sendSystemMessage(Component.translatable("item.fmab.philosopher_stone.restored",
 					Component.translatable(part.translationKey()), Restoration.cost(part)).withStyle(ChatFormatting.RED));
-		}
-		if (plan.restored().size() < gate.lost().size()) {
-			player.sendSystemMessage(Component.translatable("item.fmab.philosopher_stone.not_all")
-					.withStyle(ChatFormatting.GRAY));
 		}
 	}
 

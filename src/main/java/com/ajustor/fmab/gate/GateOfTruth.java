@@ -46,6 +46,9 @@ import java.util.Optional;
  * porte désormais, et l'alchimiste se réveille sur son cercle. Chaque alchimiste a sa Porte, à son
  * propre emplacement de l'Espace blanc.
  *
+ * <p>Qui porte une Pierre philosophale peut, le péage payé, racheter ce que la Vérité lui a pris
+ * (voir {@link StoneBargain}).
+ *
  * <p>Une âme qui a perdu son armure erre ici jusqu'à ce qu'un cercle d'âme l'appelle (voir
  * {@link SoulBinding}).
  */
@@ -67,6 +70,8 @@ public final class GateOfTruth {
 	private static final int OPENING = 190;
 	private static final int KNOWLEDGE = 250;
 	private static final int TOLL = 330;
+	/** Le péage payé, la Vérité propose de racheter ce qu'elle a pris contre les âmes d'une Pierre. */
+	private static final int BARGAIN = 350;
 	private static final int RETURN = 400;
 	/** Le temps que les bras noirs mettent à tirer l'alchimiste dans la Porte, depuis son cercle. */
 	public static final int PULL = 50;
@@ -157,6 +162,13 @@ public final class GateOfTruth {
 			return;
 		}
 		int t = visit.ticks();
+		if (t == BARGAIN && StoneBargain.offer(player)) {
+			say(player, "truth.fmab.bargain.offer");
+		}
+		if (t >= BARGAIN && StoneBargain.holds(player)) {
+			// On marchande : la Vérité attend que l'alchimiste ait fini.
+			return;
+		}
 		// Ce qu'elle dit dépend de combien de fois on est déjà venu la voir.
 		String tier = familiarity(gate.openings());
 		switch (t) {
