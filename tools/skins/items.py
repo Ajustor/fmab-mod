@@ -5,6 +5,7 @@ droite, éclaircit ceux du haut et de la gauche : la lumière vanilla vient d'en
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 
@@ -392,16 +393,49 @@ def darkness(eyes):
     return img
 
 
+def blinking(eyes, open_ticks):
+    """Les yeux seuls, sur fond transparent : le modèle les pose en pleine lumière par-dessus le noir.
+    Trois images empilées (ouverts, mi-clos, clos) que l'animation fait cligner de temps en temps."""
+    frames = Image.new("RGBA", (16, 48), (0, 0, 0, 0))
+    for k in range(3):
+        for kind, x0, y0 in eyes:
+            rows = EYES[kind]
+            shut = (len(rows) * k + 1) // 2
+            for dy, row in enumerate(rows):
+                for dx, ch in enumerate(row):
+                    if ch == ".":
+                        continue
+                    if dy < shut and ch != "s":
+                        ch = "L"
+                    elif k == 2 and ch != "s":
+                        ch = "L"
+                    frames.putpixel((x0 + dx, 16 * k + y0 + dy), rgb(EYE_COLORS[ch]))
+    meta = {"animation": {"frametime": 2, "frames": [{"index": 0, "time": open_ticks}, 1, 2, 2, 1]}}
+    return frames, meta
+
+
+GATE_EYES = {
+    "gate_darkness_eye": ([("big", 4, 5)], 70),
+    "gate_darkness_lidded": ([("lidded", 2, 10)], 45),
+    "gate_darkness_eyes": ([("small", 1, 2), ("small", 9, 10)], 110),
+}
 BLOCKS["gate_darkness"] = lambda: darkness([])
-BLOCKS["gate_darkness_eye"] = lambda: darkness([("big", 4, 5)])
-BLOCKS["gate_darkness_lidded"] = lambda: darkness([("lidded", 2, 10)])
-BLOCKS["gate_darkness_eyes"] = lambda: darkness([("small", 1, 2), ("small", 9, 10)])
+for _name, (_eyes, _ticks) in GATE_EYES.items():
+    BLOCKS[_name] = lambda: darkness([])
+    BLOCKS[_name + "_glow"] = (lambda e, n: lambda: blinking(e, n))(_eyes, _ticks)
 
 
 def build(names=None):
     for name in names or list(ITEMS) + list(BLOCKS):
         if name in BLOCKS:
-            BLOCKS[name]().save(os.path.join(OUT, "..", "block", name + ".png"))
+            img = BLOCKS[name]()
+            path = os.path.join(OUT, "..", "block", name + ".png")
+            if isinstance(img, tuple):
+                img, meta = img
+                with open(path + ".mcmeta", "w", encoding="utf-8", newline="\n") as f:
+                    json.dump(meta, f, indent=2)
+                    f.write("\n")
+            img.save(path)
         else:
             ITEMS[name]().save(os.path.join(OUT, name + ".png"))
         print("texture", name)

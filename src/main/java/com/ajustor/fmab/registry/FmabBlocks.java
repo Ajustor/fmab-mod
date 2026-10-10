@@ -32,6 +32,7 @@ public final class FmabBlocks {
 			BlockBehaviour.Properties.of()
 					.mapColor(MapColor.WOOD)
 					.strength(2.5f)
+					.noOcclusion()
 					.sound(SoundType.WOOD));
 
 	/** Le sol de l'Espace blanc : blanc à perte de vue, incassable. */
@@ -63,6 +64,7 @@ public final class FmabBlocks {
 			BlockBehaviour.Properties.of()
 					.mapColor(MapColor.METAL)
 					.strength(3.5f)
+					.noOcclusion()
 					.requiresCorrectToolForDrops()
 					.sound(SoundType.ANVIL));
 
@@ -95,6 +97,7 @@ public final class FmabBlocks {
 			BlockBehaviour.Properties.of()
 					.mapColor(MapColor.METAL)
 					.strength(3.0f, 6.0f)
+					.noOcclusion()
 					.requiresCorrectToolForDrops()
 					.sound(SoundType.COPPER));
 

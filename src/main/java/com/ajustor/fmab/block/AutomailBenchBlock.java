@@ -10,7 +10,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -18,7 +17,7 @@ import net.minecraft.world.phys.BlockHitResult;
  * Établi d'automail : on y pose soi-même un bras ou une jambe sur un membre perdu. Pour réparer,
  * il faut Winry.
  */
-public class AutomailBenchBlock extends Block {
+public class AutomailBenchBlock extends FurnitureBlock {
 	public AutomailBenchBlock(Properties properties) {
 		super(properties);
 	}

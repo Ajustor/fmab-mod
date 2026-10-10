@@ -541,12 +541,152 @@ def transmutation_circle(t):
         t.put(x, y, mix("#f4f2ec", "#b8b4aa", t.rng.random()))
 
 
+@block("alchemist_table_leg")
+def alchemist_table_leg(t):
+    """Les pieds tournés de la table : du chêne sombre, le fil vertical, une bague à mi-hauteur."""
+    for y in range(16):
+        for x in range(16):
+            grain = 0.35 + 0.25 * math.sin(x * 2.1 + y * 0.15) + t.rng.uniform(-0.06, 0.06)
+            t.put(x, y, ramp(["#3e2a16", "#5a3e22", "#6e4c2a"], grain))
+    for x in range(16):
+        t.put(x, 7, "#7e5a32")
+        t.put(x, 8, "#2e1e10")
+
+
+@block("alchemist_props")
+def alchemist_props(t):
+    """Ce qui traîne sur la table : un grimoire (reliure, pages), des fioles, une bougie, un encrier.
+    Une planche de 16x16 où les modèles vont piocher leurs morceaux."""
+    t.img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    # La reliure de cuir rouge (0..6, 0..4), dorée sur la tranche.
+    t.rect(0, 0, 6, 4, lambda i, j: shade("#7a1a1e", 1.1 - j * 0.06 + t.rng.uniform(-0.05, 0.05)))
+    t.rect(0, 0, 6, 1, "#c8a040")
+    # Les pages ouvertes (0..6, 4..8) : deux pages, des lignes d'écriture et un cercle.
+    t.rect(0, 4, 6, 4, "#efe6cc")
+    t.rect(3, 4, 1, 4, "#c8bc9c")
+    for y in (5, 6):
+        t.put(1, y, "#6a5a4a")
+        t.put(4, y, "#6a5a4a")
+    t.put(5, 6, "#8a2a2a")
+    t.put(1, 7, "#8a2a2a")
+    # Le flanc des pages (0..6, 8..9).
+    t.rect(0, 8, 6, 1, "#ddd2b2")
+    # Une fiole verte (8..11, 0..6) et une rouge (12..15, 0..6) : du verre, le liquide en bas.
+    for x0, liquid in ((8, "#3aa060"), (12, "#c02838")):
+        t.rect(x0, 0, 3, 6, lambda i, j: (190, 220, 230, 140))
+        t.rect(x0, 2, 3, 4, lambda i, j: shade(liquid, 1.15 if i == 0 else 0.9))
+        t.put(x0, 0, (240, 250, 255, 200))
+        t.put(x0 + 3, 0, "#8a6238")
+    # La bougie (8..9, 7..12), sa mèche et sa flamme (10..11, 7..9).
+    t.rect(8, 7, 2, 5, lambda i, j: "#f0e8d0" if i == 0 else "#d8ccac")
+    t.put(10, 7, "#fff4a0")
+    t.put(11, 7, "#fff4a0")
+    t.put(10, 8, "#ffb030")
+    t.put(11, 8, "#ffd060")
+    t.put(10, 9, "#e06010")
+    t.put(11, 9, "#202020")
+    # L'encrier (12..15, 7..10) : du verre noir et un col de laiton.
+    t.rect(12, 7, 3, 3, "#1c1c2a")
+    t.put(12, 7, "#4a4a6a")
+    t.rect(12, 10, 3, 1, "#b89040")
+    # La plume (0..6, 10..11) : blanche, la pointe noire.
+    t.rect(0, 10, 5, 1, "#f2eee2")
+    t.put(5, 10, "#202020")
+    t.rect(1, 11, 3, 1, "#d8d2c2")
+    # Des rouleaux de parchemin (0..6, 12..14).
+    t.rect(0, 12, 6, 2, lambda i, j: "#e8dcb8" if j == 0 else "#c8b890")
+    t.put(0, 12, "#a02838")
+    t.put(5, 13, "#a02838")
+
+
+@block("automail_props")
+def automail_props(t):
+    """Les pièces de l'établi d'automail : un étau, un avant-bras d'acier en montage, des câbles,
+    une boîte de boulons. Une planche que les modèles se partagent."""
+    t.img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    # L'acier poli de l'avant-bras (0..8, 0..4) : clair dessus, un liseré, des rivets.
+    t.rect(0, 0, 8, 4, lambda i, j: ramp(STEEL, 0.95 - j * 0.18))
+    for x in (1, 4, 7):
+        t.put(x, 1, "#e0e4ea")
+    t.rect(0, 3, 8, 1, "#3e4248")
+    # Les doigts articulés (0..8, 4..6) : phalanges et jointures sombres.
+    t.rect(0, 4, 8, 2, "#a9afb6")
+    for x in (1, 3, 5, 7):
+        t.put(x, 4, "#2c2e33")
+        t.put(x, 5, "#2c2e33")
+    # Les câbles rouge et bleu (0..8, 6..7).
+    t.rect(0, 6, 8, 1, "#b02828")
+    t.rect(0, 7, 8, 1, "#2848a0")
+    # L'étau (8..12, 0..6) : de la fonte peinte en vert, une mâchoire striée.
+    t.rect(8, 0, 4, 6, lambda i, j: shade("#3a5a46", 1.1 - j * 0.07))
+    t.rect(8, 0, 4, 1, "#6a7066")
+    t.rect(8, 1, 4, 1, "#2a2e2a")
+    # La vis de l'étau (12..16, 0..2) : du laiton.
+    t.rect(12, 0, 4, 2, lambda i, j: "#d8b850" if j == 0 else "#987028")
+    # La boîte de boulons (8..13, 8..12) : du bois, des têtes de boulons dessus.
+    t.rect(8, 8, 5, 4, "#7a5430")
+    t.rect(8, 8, 5, 1, "#9a6c3c")
+    for x, y in ((9, 9), (11, 9), (10, 10), (12, 11), (9, 11)):
+        t.put(x, y, "#b4b8c0")
+    # L'engrenage de laiton (0..6, 8..14).
+    for y in range(6):
+        for x in range(6):
+            d = math.hypot(x - 2.5, y - 2.5)
+            a = math.atan2(y - 2.5, x - 2.5)
+            if d <= 2.2 + (0.8 if math.cos(a * 6) > 0.3 else 0):
+                t.put(x, 8 + y, "#b89040" if d > 1.0 else "#3a3020")
+    t.put(1, 9, "#e8c870")
+    # Le bois brut des pieds (13..16, 4..16) : du chêne foncé taché d'huile.
+    t.rect(13, 4, 3, 12, lambda i, j: shade("#5a4028", 1.1 - i * 0.12 + t.rng.uniform(-0.05, 0.05)))
+    t.put(14, 9, "#2a2620")
+
+
+@block("father_pipe_flange")
+def father_pipe_flange(t):
+    """Le flanc d'une bride : de la fonte épaisse, une ligne de boulons, des coulures de rouille."""
+    for y in range(16):
+        for x in range(16):
+            t.put(x, y, shade(PIPE[3] if y < 1 else PIPE[2] if y < 2 else PIPE[5], t.rng.uniform(0.93, 1.07)))
+    for x in range(1, 16, 4):
+        t.put(x, 0, "#c8c8ce")
+        t.put(x, 1, "#36363a")
+    t.put(6, 1, "#6a3e24")
+
+
+def glow(base, keep):
+    """Ce qui luit d'une texture : ses pixels retenus, le reste transparent. Le modèle le pose par-dessus
+    le bloc avec une pleine lumière."""
+    img = Image.open(os.path.join(OUT, base + ".png")).convert("RGBA")
+    out = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    for y in range(img.height):
+        for x in range(img.width):
+            c = img.getpixel((x, y))
+            if keep(c):
+                out.putpixel((x, y), c)
+    return out
+
+
+def reddish(min_r, ratio=2.0):
+    return lambda c: c[0] >= min_r and c[0] > c[1] * ratio and c[0] > c[2] * ratio
+
+
+GLOWS = {
+    "father_seal_glow": ("father_seal", reddish(150)),
+    "blood_crest_glow": ("blood_crest", reddish(100, 3.0)),
+    "red_stone_ore_glow": ("red_stone_ore", reddish(170)),
+}
+
+
 def build(names=None):
     for name in names or BLOCKS:
         t = Tile(name)
         BLOCKS[name](t)
         t.img.save(os.path.join(OUT, name + ".png"))
         print("bloc", name)
+    for name, (base, keep) in GLOWS.items():
+        if not names or base in names or name in names:
+            glow(base, keep).save(os.path.join(OUT, name + ".png"))
+            print("lueur", name)
 
 
 if __name__ == "__main__":

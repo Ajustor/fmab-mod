@@ -1,7 +1,7 @@
 {
   "variants": {
     "axis=x": {
-      "model": "fmab:block/father_pipe_horizontal",
+      "model": "fmab:block/father_pipe",
       "x": 90,
       "y": 90
     },
@@ -9,7 +9,7 @@
       "model": "fmab:block/father_pipe"
     },
     "axis=z": {
-      "model": "fmab:block/father_pipe_horizontal",
+      "model": "fmab:block/father_pipe",
       "x": 90
     }
   }
