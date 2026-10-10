@@ -9,7 +9,6 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.Identifier;
 
 /**
@@ -20,7 +19,7 @@ public class HauntedArmorRenderer<T extends HauntedArmorEntity>
 		extends HumanoidMobRenderer<T, HauntedArmorRenderer.State, HauntedArmorRenderer.Model> {
 	private final Identifier texture;
 
-	public static class State extends HumanoidRenderState {
+	public static class State extends FigureRenderer.State {
 		boolean collapsed;
 	}
 
@@ -32,6 +31,7 @@ public class HauntedArmorRenderer<T extends HauntedArmorEntity>
 		@Override
 		public void setupAnim(State state) {
 			super.setupAnim(state);
+			Temper.ARMOR.apply(this, state, state.aggressive);
 			if (state.collapsed) {
 				// En morceaux : la tête décrochée, les bras de travers.
 				head.x += 6;
@@ -62,6 +62,7 @@ public class HauntedArmorRenderer<T extends HauntedArmorEntity>
 	@Override
 	public void extractRenderState(T entity, State state, float partialTicks) {
 		super.extractRenderState(entity, state, partialTicks);
+		state.aggressive = entity.isAggressive();
 		state.collapsed = entity.collapsed();
 	}
 

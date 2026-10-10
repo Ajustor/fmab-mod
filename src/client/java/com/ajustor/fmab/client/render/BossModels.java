@@ -73,6 +73,12 @@ public final class BossModels {
 				CubeListBuilder.create().texOffs(0, 32).addBox(-4.5f, -8.3f, 2.4f, 9, 14, 2), PartPose.ZERO);
 		PartDefinition body = mesh.getRoot().getChild("body");
 		FigureModels.bust(body, 24, 32, 7, 3, 3, -0.35f);
+		// Les doigts-lames : cinq ongles noirs au bout de la main droite, que le rendu allonge au coup.
+		CubeListBuilder lance = CubeListBuilder.create();
+		for (int finger = 0; finger < 5; finger++) {
+			lance.texOffs(52, 38).addBox(-2.2f + finger * 0.55f, 0, -0.5f - (finger % 2) * 0.4f, 0.3f, 4, 0.3f);
+		}
+		mesh.getRoot().getChild("right_arm").addOrReplaceChild("lance", lance, PartPose.offset(0, 9.5f, 0));
 		// Les hanches, plus larges que la taille : la robe s'évase en haut des cuisses.
 		body.addOrReplaceChild("hips",
 				CubeListBuilder.create().texOffs(24, 38).addBox(-4.5f, 9.5f, -2.5f, 9, 3, 5), PartPose.ZERO);
