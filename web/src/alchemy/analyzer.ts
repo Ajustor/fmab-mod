@@ -58,7 +58,6 @@ const INERT: ReadonlySet<IssueKind> = new Set<IssueKind>([
   "no_action",
   "no_element",
   "too_many_actions",
-  "rank_too_low",
   "knowledge_missing",
 ]);
 const MISCOMPOSED: ReadonlySet<IssueKind> = new Set<IssueKind>([
@@ -68,6 +67,14 @@ const MISCOMPOSED: ReadonlySet<IssueKind> = new Set<IssueKind>([
   "satellite_incomplete",
   "incomplete_formula",
 ]);
+
+/**
+ * Ce qu'il reste de stabilité au-delà d'une limite du rang : 1 en deçà, puis ((limite + 1) / (valeur + 1))².
+ * Au carré, pour qu'un dépassement ne rapporte jamais.
+ */
+export function within(value: number, limit: number): number {
+  return value <= limit ? 1 : ((limit + 1) / (value + 1)) ** 2;
+}
 
 function rankFor(value: number, limit: (r: RankInfo) => number): number {
   for (let i = 0; i < RANKS.length; i++) {
@@ -99,7 +106,11 @@ export class CircleAnalyzer {
     let concentration = 0;
     let satelliteCount = 0;
     let required = 0;
+    let glyphRank = 0;
     let stability = Number.POSITIVE_INFINITY;
+    // Ce que le cercle demande au-delà du rang : chaque dépassement le rend moins stable.
+    let strain = 1;
+    const mine = RANKS[rankIndex(rank)];
     let severity = 0;
     const unlearned = new Set<string>();
 
@@ -114,7 +125,7 @@ export class CircleAnalyzer {
       for (const g of written) {
         load += g.complexity;
         concentration += g.concentration;
-        required = Math.max(required, rankIndex(g.rank));
+        glyphRank = Math.max(glyphRank, rankIndex(g.rank));
       }
       if (known !== null) {
         for (const g of written) if (!known.has(g.id)) unlearned.add(g.id);
@@ -128,6 +139,7 @@ export class CircleAnalyzer {
       }
       required = Math.max(required, rankFor(stage.sides, (r) => r.maxPolygonSides));
       required = Math.max(required, rankFor(stage.polygons, (r) => r.maxPolygonsPerStage));
+      strain *= within(stage.sides, mine.maxPolygonSides) * within(stage.polygons, mine.maxPolygonsPerStage);
       if (stage.index > 0 && stage.link === "none" && load > 0) {
         issues.push(issue("unlinked_stage", null, String(stage.index)));
       }
@@ -136,13 +148,20 @@ export class CircleAnalyzer {
     concentration *= Math.max(1, parsed.stages.length);
     for (const id of unlearned) issues.push(issue("glyph_not_learned", null, id));
     const risk = Math.min(MAX_UNLEARNED_RISK, UNLEARNED_RISK * unlearned.size);
+    required = Math.max(required, glyphRank);
     required = Math.max(required, rankFor(parsed.stages.length, (r) => r.maxStages));
     required = Math.max(required, rankFor(complexity, (r) => r.complexityCap));
     required = Math.max(required, rankFor(satelliteCount, (r) => r.maxSatellites));
+    strain *=
+      (within(parsed.stages.length, mine.maxStages) *
+        within(complexity, mine.complexityCap) *
+        within(satelliteCount, mine.maxSatellites)) /
+      (1 + Math.max(0, glyphRank - rankIndex(rank))) ** 2;
+    // Le rang ne bloque pas : il dit ce que l'alchimiste tient. Au-delà, le cercle vacille.
     if (rankIndex(rank) < required) issues.push(issue("rank_too_low", null, RANKS[required].id));
     if (stability === Number.POSITIVE_INFINITY) {
       stability = 0;
-    } else if (stability < 1) {
+    } else if ((stability *= strain) < 1) {
       issues.push(issue("unstable"));
       severity = Math.max(severity, 1 - stability);
     }

@@ -28,8 +28,9 @@ import java.util.function.UnaryOperator;
  * Règles de calcul d'un cercle.
  *
  * <ul>
- *   <li>Complexité : somme des glyphes, modificateurs et satellites compris ; elle doit tenir sous
- *   le plafond du rang.</li>
+ *   <li>Complexité : somme des glyphes, modificateurs et satellites compris.</li>
+ *   <li>Rang : il ne bloque rien. Chaque limite qu'un cercle dépasse (complexité, étages, côtés,
+ *   polygones, satellites, glyphe d'un rang supérieur) multiplie sa stabilité par moins de 1.</li>
  *   <li>Stabilité : un étage supporte autant de complexité que ses polygones ont de côtés en tout
  *   (2 pour un anneau nu), un quart de plus si les glyphes sont disposés symétriquement.</li>
  *   <li>Concentration : somme des glyphes, multipliée par le nombre d'étages.</li>
@@ -52,7 +53,7 @@ public final class CircleAnalyzer {
 
 	/** Problèmes qui empêchent toute réaction. */
 	private static final Set<Kind> INERT = EnumSet.of(Kind.NO_RING, Kind.NO_ACTION, Kind.NO_ELEMENT,
-			Kind.TOO_MANY_ACTIONS, Kind.RANK_TOO_LOW, Kind.KNOWLEDGE_MISSING);
+			Kind.TOO_MANY_ACTIONS, Kind.KNOWLEDGE_MISSING);
 	/**
 	 * Chaque glyphe tracé sans être compris ajoute ce risque de rebond : on peut recopier un cercle
 	 * qu'on ne comprend pas, à ses risques.
@@ -90,7 +91,10 @@ public final class CircleAnalyzer {
 		int concentration = 0;
 		int satelliteCount = 0;
 		Rank required = Rank.APPRENTICE;
+		Rank glyphRank = Rank.APPRENTICE;
 		double stability = Double.POSITIVE_INFINITY;
+		// Ce que le cercle demande au-delà du rang : chaque dépassement le rend moins stable.
+		double strain = 1;
 		double severity = 0;
 		Set<String> unlearned = new LinkedHashSet<>();
 
@@ -110,7 +114,7 @@ public final class CircleAnalyzer {
 			for (Glyph g : written) {
 				load += g.complexity();
 				concentration += g.concentration();
-				required = max(required, g.rank());
+				glyphRank = max(glyphRank, g.rank());
 			}
 			if (known != null) {
 				written.stream().map(Glyph::id).filter(id -> !known.contains(id)).forEach(unlearned::add);
@@ -126,6 +130,7 @@ public final class CircleAnalyzer {
 			}
 			required = max(required, rankFor(stage.sides(), Rank::maxPolygonSides));
 			required = max(required, rankFor(stage.polygons(), Rank::maxPolygonsPerStage));
+			strain *= within(stage.sides(), rank.maxPolygonSides()) * within(stage.polygons(), rank.maxPolygonsPerStage());
 			if (stage.index() > 0 && stage.link() == LinkKind.NONE && load > 0) {
 				issues.add(new CircleIssue(Kind.UNLINKED_STAGE, null, Integer.toString(stage.index())));
 			}
@@ -142,15 +147,19 @@ public final class CircleAnalyzer {
 		}
 		unlearned.forEach(id -> issues.add(new CircleIssue(Kind.GLYPH_NOT_LEARNED, null, id)));
 		double risk = Math.min(MAX_UNLEARNED_RISK, UNLEARNED_RISK * unlearned.size());
+		required = max(required, glyphRank);
 		required = max(required, rankFor(parsed.stages().size(), Rank::maxStages));
 		required = max(required, rankFor(complexity, Rank::complexityCap));
 		required = max(required, rankFor(satelliteCount, Rank::maxSatellites));
+		strain *= within(parsed.stages().size(), rank.maxStages()) * within(complexity, rank.complexityCap())
+				* within(satelliteCount, rank.maxSatellites()) * reach(glyphRank, rank);
 		if (!rank.atLeast(required)) {
+			// Le rang ne bloque pas : il dit ce que l'alchimiste tient. Au-delà, le cercle vacille.
 			issues.add(new CircleIssue(Kind.RANK_TOO_LOW, null, required.serializedName()));
 		}
 		if (stability == Double.POSITIVE_INFINITY) {
 			stability = 0;
-		} else if (stability < 1) {
+		} else if ((stability *= strain) < 1) {
 			issues.add(CircleIssue.of(Kind.UNSTABLE));
 			severity = Math.max(severity, 1 - stability);
 		}
@@ -287,6 +296,21 @@ public final class CircleAnalyzer {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Ce qu'il reste de stabilité quand on dépasse une limite du rang : 1 en deçà, puis
+	 * {@code ((limite + 1) / (valeur + 1))²}. Au carré, pour qu'un dépassement ne rapporte jamais :
+	 * l'hexagone d'un Apprenti (4 côtés permis) tient moins qu'un carré. Six satellites pour un
+	 * Alchimiste qui en tient deux : (3/7)², soit 0,18.
+	 */
+	static double within(int value, int limit) {
+		return value <= limit ? 1 : Math.pow((limit + 1.0) / (value + 1.0), 2);
+	}
+
+	/** Un glyphe d'un rang au-dessus du sien : la stabilité divisée par (1 + écart)². */
+	static double reach(Rank glyph, Rank rank) {
+		return 1 / Math.pow(1 + Math.max(0, glyph.ordinal() - rank.ordinal()), 2);
 	}
 
 	/** Plus petit rang dont la limite admet {@code value}. */

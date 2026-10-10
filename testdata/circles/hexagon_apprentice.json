@@ -88,10 +88,10 @@
     }
   ],
   "expected": {
-    "outcome": "inert",
+    "outcome": "works",
     "complexity": 2,
     "concentration": 5,
-    "stability": 3.75,
+    "stability": 1.913,
     "required_rank": "alchemist",
     "rebound": 0.0,
     "stages": [
