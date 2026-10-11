@@ -4,6 +4,7 @@ import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.network.StoneChoicePayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.stone.PhilosopherStones;
+import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -35,7 +36,7 @@ public final class StoneChoice {
 	private record Pending(ResourceKey<Level> dimension, BlockPos circle, long since) {
 	}
 
-	private static final Map<UUID, Pending> PENDING = new HashMap<>();
+	private static final Map<UUID, Pending> PENDING = PlayerMaps.track(new HashMap<>());
 
 	private StoneChoice() {
 	}

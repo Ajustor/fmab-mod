@@ -6,10 +6,15 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Un bourg posé sur le relief : une liste d'emplacements autour du centre, chacun bâti à la hauteur
  * du sol en son milieu. Une maison habillée ({@code *_dressed}) prend une marge d'un bloc tout
- * autour de l'emprise donnée, pour ses abords.
+ * autour de l'emprise donnée, pour ses abords. Un chemin relie chaque porte à la place (ou, sans
+ * place, à la porte de la première maison).
  */
 final class Hamlet {
 	private Hamlet() {
@@ -31,7 +36,9 @@ final class Hamlet {
 	}
 
 	static void build(StructurePiecesBuilder builder, Structure.GenerationContext context, BlockPos center,
-			Spot[] layout) {
+			Spot[] layout, PathPiece.Style paths) {
+		List<ProceduralPiece> pieces = new ArrayList<>();
+		List<BlockPos> doors = new ArrayList<>();
 		for (Spot s : layout) {
 			int m = s.kind().endsWith("_dressed") ? Dressing.MARGIN : 0;
 			boolean turned = s.rotation() == Rotation.CLOCKWISE_90 || s.rotation() == Rotation.COUNTERCLOCKWISE_90;
@@ -40,8 +47,22 @@ final class Hamlet {
 			int wx = turned ? sz : sx, wz = turned ? sx : sz;
 			int y = height(context, x + wx / 2, z + wz / 2);
 			int sizeY = s.floors() == 0 ? (s.kind().endsWith("_tree") ? 10 : 5) : Blueprints.houseHeight(s.floors(), s.sz());
-			builder.addPiece(new ProceduralPiece(s.kind(), new BlockPos(x, y, z), sx, sizeY, sz, 3, s.rotation(),
-					context.random().nextLong()));
+			ProceduralPiece piece = new ProceduralPiece(s.kind(), new BlockPos(x, y, z), sx, sizeY, sz, 3, s.rotation(),
+					context.random().nextLong());
+			pieces.add(piece);
+			if (m > 0) {
+				// Le chemin part un pas devant le seuil, au-delà de la marge où l'habillage pose le sien.
+				BlockPos threshold = piece.worldAt(m + s.sx() / 2, 0);
+				BlockPos inside = piece.worldAt(m + s.sx() / 2, 1);
+				doors.add(threshold.offset(threshold.getX() - inside.getX(), 0, threshold.getZ() - inside.getZ()));
+			}
 		}
+		// Les chemins d'abord : les maisons, les champs et les arbres les recouvrent là où ils passent.
+		boolean square = Arrays.stream(layout).anyMatch(s -> s.kind().endsWith("_square"));
+		BlockPos hub = square || doors.isEmpty() ? center : doors.getFirst();
+		for (BlockPos door : doors) {
+			builder.addPiece(new PathPiece(paths, door.getX(), door.getZ(), hub.getX(), hub.getZ(), center.getY()));
+		}
+		pieces.forEach(builder::addPiece);
 	}
 }

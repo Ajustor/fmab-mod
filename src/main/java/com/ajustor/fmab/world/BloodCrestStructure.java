@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 public class BloodCrestStructure extends Structure {
 	public static final MapCodec<BloodCrestStructure> CODEC = simpleCodec(BloodCrestStructure::new);
-	private static final int SIZE = 15;
+	static final int SIZE = 15;
 
 	public BloodCrestStructure(StructureSettings settings) {
 		super(settings);

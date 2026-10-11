@@ -13,6 +13,7 @@ import com.ajustor.fmab.gate.GateOfTruth;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.Transmutation;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -30,6 +31,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Map;
+
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Une visite de la Porte, du début à la fin, sans Pierre : les bras jaillissent du cercle et
@@ -65,7 +68,8 @@ public class GateScenes implements FabricClientGameTest {
 				for (Glyph g : AlchemyRules.of(level.registryAccess()).glyphs()) {
 					data = data.learn(g.id());
 				}
-				p.setAttached(FmabAttachments.ALCHEMIST, data.withConcentration(data.maxConcentration()));
+				p.setAttached(FmabAttachments.ALCHEMIST, data);
+				Concentration.set(p, Concentration.max(p));
 				p.getInventory().clearContent();
 				return null;
 			});
@@ -158,12 +162,6 @@ public class GateScenes implements FabricClientGameTest {
 			ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
 			return action.run(player.level(), player);
 		});
-	}
-
-	private static void check(boolean condition, String message) {
-		if (!condition) {
-			throw new AssertionError(message);
-		}
 	}
 
 	/** Les ingrédients d'un corps, posés sur le cercle. */

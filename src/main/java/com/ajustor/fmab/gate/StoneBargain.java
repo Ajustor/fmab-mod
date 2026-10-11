@@ -5,6 +5,7 @@ import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.network.BargainPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,7 +29,7 @@ public final class StoneBargain {
 	/** La Vérité ne marchande pas plus de deux minutes. */
 	private static final int PATIENCE = 20 * 60 * 2;
 
-	private static final Map<UUID, Long> BARGAINING = new HashMap<>();
+	private static final Map<UUID, Long> BARGAINING = PlayerMaps.track(new HashMap<>());
 
 	private StoneBargain() {
 	}

@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.IntFunction;
 
 /**
  * Les plans des structures du mod, par sorte. Central : terrassement, muraille, voirie, fontaine,
@@ -122,6 +121,11 @@ public final class Blueprints {
 
 	public static Blueprint get(String kind) {
 		return plans().get(kind);
+	}
+
+	/** Toutes les sortes de plans enregistrées. */
+	static java.util.Set<String> kinds() {
+		return java.util.Set.copyOf(plans().keySet());
 	}
 
 	private static BlockState b(Block block) {
@@ -1947,185 +1951,6 @@ public final class Blueprints {
 		@Override
 		public List<Spawn> spawns(Plot p) {
 			return List.of(new Spawn(FmabEntities.MARCOH, new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2)));
-		}
-	}
-
-	/**
-	 * Liore, ville du désert : une place de grès, des maisons basses autour, et au nord le temple de
-	 * Leto, colonnes et dôme d'or, où le père Cornello fait ses « miracles ». Sous l'autel, la pierre
-	 * rouge ; sur le parvis, le point de sang de l'émeute.
-	 */
-	static final class Liore implements Blueprint {
-		/** Coins des maisons basses (7 sur 7), selon la taille de la parcelle. */
-		private static final IntFunction<int[][]> HOUSES = s -> new int[][]{{2, 4}, {s - 9, 4}, {2, s - 9}, {s - 9, s - 9}};
-
-		/**
-		 * L'intérieur d'une maison de Liore (coordonnées dans la maison, 1 à 5) : un tonneau et sa
-		 * lanterne près de la porte, un lit au fond à gauche, un poste de travail au fond à droite.
-		 */
-		private static BlockState lioreFurniture(int x, int y, int z, int job) {
-			if (x == 1 && z == 1) {
-				return y == 1 ? b(Blocks.BARREL) : y == 2 ? b(Blocks.LANTERN) : AIR;
-			}
-			if (y == 1 && z == 5 && x <= 2) {
-				return b(Blocks.BED.pick(DyeColor.ORANGE)).setValue(BedBlock.FACING, Direction.WEST)
-						.setValue(BedBlock.PART, x == 1 ? BedPart.HEAD : BedPart.FOOT);
-			}
-			if (y == 1 && z == 5 && x == 5) {
-				Block[] jobs = {Blocks.COMPOSTER, Blocks.CARTOGRAPHY_TABLE, Blocks.SMOKER, Blocks.LOOM,
-						Blocks.BREWING_STAND, Blocks.FLETCHING_TABLE};
-				BlockState state = b(jobs[job]);
-				return state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
-						? state.setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH) : state;
-			}
-			return AIR;
-		}
-
-		@Override
-		public BlockState at(int x, int y, int z, Plot p) {
-			int s = p.sizeX(), c = s / 2;
-			if (y < 0) {
-				return b(Blocks.SANDSTONE);
-			}
-			if (y == 0) {
-				return Math.abs(x - c) <= 2 || Math.abs(z - c) <= 2 ? b(Blocks.SMOOTH_SANDSTONE) : b(Blocks.SAND);
-			}
-			BlockState temple = temple(x, y, z, c);
-			if (temple != null) {
-				return temple;
-			}
-			// Des maisons basses de part et d'autre du temple, et aux coins sud.
-			for (int[] h : HOUSES.apply(s)) {
-				if (x >= h[0] && x < h[0] + 7 && z >= h[1] && z < h[1] + 7 && y <= 5) {
-					boolean edge = x == h[0] || x == h[0] + 6 || z == h[1] || z == h[1] + 6;
-					if (y == 5) {
-						return b(Blocks.SMOOTH_SANDSTONE_SLAB);
-					}
-					if (!edge) {
-						return lioreFurniture(x - h[0], y, z - h[1], p.noise(h[0], 0, h[1], 6));
-					}
-					boolean door = z == h[1] && x == h[0] + 3 && y <= 2;
-					boolean window = y == 3 && (x == h[0] + 3 || z == h[1] + 3);
-					if (door || window) {
-						return AIR;
-					}
-					// Un bandeau de pierre taillée sous le toit, des coins plus clairs.
-					boolean corner = (x == h[0] || x == h[0] + 6) && (z == h[1] || z == h[1] + 6);
-					return y == 4 || corner ? b(Blocks.CUT_SANDSTONE) : b(Blocks.SANDSTONE);
-				}
-				// Un auvent de toile au-dessus de la porte, et des jarres de part et d'autre.
-				if (z == h[1] - 1 && x >= h[0] + 2 && x <= h[0] + 4) {
-					if (y == 3) {
-						return b(Blocks.WOOL.pick(p.noise(h[0], 1, h[1], 2) == 0 ? DyeColor.ORANGE : DyeColor.RED));
-					}
-					if (y == 1 && x != h[0] + 3) {
-						return p.noise(x, 1, z, 2) == 0 ? b(Blocks.DECORATED_POT) : b(Blocks.BARREL);
-					}
-				}
-			}
-			BlockState palm = palm(x, y, z, s, p);
-			if (palm != null) {
-				return palm;
-			}
-			if (y == 1 && x == c && z == c + 4) {
-				return b(FmabBlocks.BLOOD_CREST);
-			}
-			return y <= 8 ? AIR : null;
-		}
-
-		/** Des palmiers au bord de la place, entre le temple et les maisons du sud. */
-		private static BlockState palm(int x, int y, int z, int s, Plot p) {
-			int c = s / 2;
-			for (int[] at : new int[][]{{c - 5, c - 2}, {c + 5, c - 2}, {c - 5, c + 6}, {c + 5, c + 6}}) {
-				int dx = x - at[0], dz = z - at[1], top = 6 + p.noise(at[0], 0, at[1], 2);
-				if (Math.abs(dx) > 2 || Math.abs(dz) > 2) {
-					continue;
-				}
-				if (dx == 0 && dz == 0) {
-					return y <= top ? b(Blocks.STRIPPED_JUNGLE_LOG) : y == top + 1 ? palmLeaf() : null;
-				}
-				int reach = Math.max(Math.abs(dx), Math.abs(dz));
-				boolean cross = dx == 0 || dz == 0 || Math.abs(dx) == Math.abs(dz);
-				if (cross && (y == top + 1 && reach == 1 || y == top && reach == 2)) {
-					return palmLeaf();
-				}
-			}
-			return null;
-		}
-
-		private static BlockState palmLeaf() {
-			return b(Blocks.JUNGLE_LEAVES).setValue(LeavesBlock.PERSISTENT, true);
-		}
-
-		/** Le temple de Leto : 13 de large, 11 de profond, colonnes, autel, dôme d'or. */
-		private static BlockState temple(int x, int y, int z, int c) {
-			int x0 = c - 6, x1 = c + 6, z0 = 1, z1 = 11;
-			if (x < x0 || x > x1 || z < z0 || z > z1 || y > 13) {
-				return null;
-			}
-			// Le plan est dessiné façade au nord ; on le retourne pour qu'elle regarde la place.
-			z = z0 + z1 - z;
-			boolean wall = x == x0 || x == x1 || z == z1;
-			if (y <= 7) {
-				if (z == z0) {
-					// La façade : des colonnes, la porte au milieu.
-					return (x - x0) % 3 == 0 ? b(Blocks.CUT_SANDSTONE) : AIR;
-				}
-				if (y == 7) {
-					return b(Blocks.SMOOTH_SANDSTONE);
-				}
-				if (wall) {
-					return y == 4 && (x - x0) % 3 == 1 ? b(Blocks.STAINED_GLASS.pick(DyeColor.RED)) : b(Blocks.SMOOTH_SANDSTONE);
-				}
-				// L'autel, la statue de Leto, la pierre rouge cachée dessous.
-				if (z == z1 - 2 && Math.abs(x - c) <= 1) {
-					if (y == 1) {
-						return b(Blocks.CHISELED_SANDSTONE);
-					}
-					if (y == 2 && x == c) {
-						return b(Blocks.GOLD_BLOCK);
-					}
-					if (y == 3 && x == c) {
-						return b(Blocks.GOLD_BLOCK);
-					}
-				}
-				if (y == 1 && Math.abs(x - c) <= 1 && z == z1 - 1) {
-					return b(FmabBlocks.RED_STONE_ORE);
-				}
-				return AIR;
-			}
-			// Le dôme d'or.
-			double d = Math.hypot(x - c, (z - (z0 + z1) / 2.0) * 1.2);
-			double r = 6 - (y - 8) * 1.2;
-			return r > 0 && d <= r && d > r - 1.2 ? b(Blocks.GOLD_BLOCK) : null;
-		}
-
-		@Override
-		public List<Chest> chests(Plot p) {
-			int c = p.sizeX() / 2;
-			return List.of(new Chest(new BlockPos(c + 4, 1, 3), Liore::offerings));
-		}
-
-		private static List<ItemStack> offerings(Plot p) {
-			List<ItemStack> out = new ArrayList<>();
-			out.add(new ItemStack(Items.GOLD_INGOT, 2 + p.noise(1, 0, 0, 5)));
-			out.add(new ItemStack(Items.CANDLE, 3 + p.noise(2, 0, 0, 4)));
-			if (p.noise(3, 0, 0, 2) == 0) {
-				out.add(new ItemStack(FmabItems.RED_STONE_SHARD));
-			}
-			return out;
-		}
-
-		@Override
-		public List<Spawn> spawns(Plot p) {
-			int c = p.sizeX() / 2;
-			int s = p.sizeX();
-			List<Spawn> out = new ArrayList<>();
-			out.add(new Spawn(FmabEntities.CORNELLO, new BlockPos(c, 1, 5)));
-			for (int[] h : HOUSES.apply(s)) {
-				out.add(new Spawn(EntityTypes.VILLAGER, new BlockPos(h[0] + 3, 1, h[1] + 3)));
-			}
-			return out;
 		}
 	}
 

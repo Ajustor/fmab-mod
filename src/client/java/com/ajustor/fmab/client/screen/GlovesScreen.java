@@ -12,6 +12,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -67,11 +68,18 @@ public class GlovesScreen extends Screen {
 					FADED, false);
 			ItemStack glove = gloves.get(leftHand);
 			if (glove.isEmpty()) {
-				graphics.text(font, Component.translatable("gloves.fmab.empty"), x, y + 14, INK, false);
+				// La place du gant, en pointillés, et ce qu'elle attend.
+				slot(graphics, x, y + 10);
+				graphics.text(font, Component.translatable("gloves.fmab.empty"), x + 22, y + 14, FADED, false);
 				continue;
 			}
 			graphics.item(glove, x, y + 10);
-			graphics.text(font, glove.getHoverName(), x + 20, y + 14, INK, false);
+			// Le nom passe à la ligne plutôt que de déborder sur l'autre main.
+			int lineY = y + 10;
+			for (FormattedCharSequence line : font.split(glove.getHoverName(), PANEL_WIDTH / 2 - 44)) {
+				graphics.text(font, line, x + 20, lineY, INK, false);
+				lineY += 9;
+			}
 			Drawing circle = glove.get(FmabComponents.GLOVE_CIRCLE);
 			if (circle != null && !circle.isEmpty()) {
 				graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(circle, INK), x + 10, y + 28, 0, 0,
@@ -82,6 +90,16 @@ public class GlovesScreen extends Screen {
 		graphics.centeredText(font, Component.translatable("gloves.fmab.hint"), left + PANEL_WIDTH / 2,
 				top + PANEL_HEIGHT - 40, FADED);
 		super.extractRenderState(graphics, mouseX, mouseY, a);
+	}
+
+	/** Un emplacement vide : un carré en pointillés de la taille d'une icône. */
+	private static void slot(GuiGraphicsExtractor graphics, int x, int y) {
+		for (int i = 0; i < 18; i += 2) {
+			graphics.fill(x - 1 + i, y - 1, x + i, y, FADED);
+			graphics.fill(x - 1 + i, y + 16, x + i, y + 17, FADED);
+			graphics.fill(x - 1, y - 1 + i, x, y + i, FADED);
+			graphics.fill(x + 16, y - 1 + i, x + 17, y + i, FADED);
+		}
 	}
 
 	@Override

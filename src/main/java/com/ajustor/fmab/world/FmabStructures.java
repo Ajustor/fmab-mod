@@ -15,6 +15,8 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 public final class FmabStructures {
 	public static final StructurePieceType PROCEDURAL_PIECE = Registry.register(BuiltInRegistries.STRUCTURE_PIECE,
 			Fmab.id("procedural"), (StructurePieceType.ContextlessType) ProceduralPiece::new);
+	public static final StructurePieceType PATH_PIECE = Registry.register(BuiltInRegistries.STRUCTURE_PIECE,
+			Fmab.id("path"), (StructurePieceType.ContextlessType) PathPiece::new);
 
 	public static final StructureType<CentralStructure> CENTRAL = type("central", CentralStructure.CODEC);
 	public static final StructureType<ResemboolStructure> RESEMBOOL = type("resembool", ResemboolStructure.CODEC);

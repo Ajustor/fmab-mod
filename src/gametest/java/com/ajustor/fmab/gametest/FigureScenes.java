@@ -6,8 +6,16 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.minecraft.client.CameraType;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 
+import com.ajustor.fmab.Fmab;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
+
 import java.util.List;
 import java.util.Locale;
+
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Les personnages du mod, en rang, pour juger leurs silhouettes : chacun de trois quarts, presque de
@@ -16,7 +24,7 @@ import java.util.Locale;
 public class FigureScenes implements FabricClientGameTest {
 	private static final List<String> FIGURES = List.of("lust", "izumi", "winry", "olivier", "may_chang", "hohenheim",
 			"amestrian_soldier", "briggs_soldier", "drachma_soldier", "state_examiner", "scar", "marcoh", "cornello",
-			"envy", "greed", "wrath", "gluttony", "sloth", "pride", "pride_revealed");
+			"envy", "greed", "wrath", "gluttony", "sloth", "pride", "pride_revealed", "chimera_beast", "chimera_crawler");
 	/** Les personnages sous une seconde forme : on les frappe une fois pour qu'ils se révèlent. */
 	private static final String REVEALED = "_revealed";
 	private static final int Y = -60;
@@ -63,6 +71,13 @@ public class FigureScenes implements FabricClientGameTest {
 				double x = i * STEP + 0.5;
 				look(sp, x - 1.5, Y + 2.0, -2.2, x, Y + 1.05, 0.5);
 				context.waitTicks(8);
+				// Vue de près : le client doit la voir à sa place (de loin, elle sortirait de son champ).
+				String name = FIGURES.get(i);
+				Identifier id = Fmab.id(name.endsWith(REVEALED) ? name.substring(0, name.length() - REVEALED.length()) : name);
+				AABB spot = new AABB(i * STEP, Y - 1, -1, i * STEP + 1, Y + 3, 2);
+				boolean seen = context.computeOnClient(mc -> !mc.level.getEntities((Entity) null, spot,
+						e -> BuiltInRegistries.ENTITY_TYPE.getKey(e.getType()).equals(id)).isEmpty());
+				check(seen, "le client devrait voir " + name + " à sa place");
 				context.takeScreenshot("figure_%02d_%s_0_front".formatted(i, FIGURES.get(i)));
 				look(sp, x - 2.4, Y + 1.35, -0.9, x, Y + 1.1, 0.5);
 				context.waitTicks(8);

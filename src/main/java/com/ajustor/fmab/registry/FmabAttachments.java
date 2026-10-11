@@ -93,6 +93,16 @@ public final class FmabAttachments {
 			.persistent(Belly.Swallowed.CODEC)
 			.buildAndRegister(Fmab.id("swallowed"));
 
+	/**
+	 * La concentration, à part du reste de l'alchimiste : elle se recharge chaque seconde, et seul ce
+	 * nombre part vers le client. Absente : pleine. Gardée à la mort, visible du joueur.
+	 */
+	public static final AttachmentType<Float> CONCENTRATION = AttachmentRegistry.<Float>builder()
+			.persistent(Codec.FLOAT)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.FLOAT, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("concentration"));
+
 	/** Le karma, de −100 à +100 : gardé à la mort, visible du joueur. */
 	public static final AttachmentType<Integer> KARMA = AttachmentRegistry.<Integer>builder()
 			.persistent(Codec.INT)
@@ -156,6 +166,14 @@ public final class FmabAttachments {
 	public static final AttachmentType<TransmutationPose> POSE = AttachmentRegistry.<TransmutationPose>builder()
 			.syncWith(TransmutationPose.STREAM_CODEC, AttachmentSyncPredicate.all())
 			.buildAndRegister(Fmab.id("pose"));
+
+	/**
+	 * Le fauteuil roulant dont le joueur tient les poignées (son identifiant d'entité) : posé et retiré
+	 * par le fauteuil, éphémère, visible de tous pour l'animer sans chercher le fauteuil autour de lui.
+	 */
+	public static final AttachmentType<Integer> PUSHING = AttachmentRegistry.<Integer>builder()
+			.syncWith(ByteBufCodecs.VAR_INT, AttachmentSyncPredicate.all())
+			.buildAndRegister(Fmab.id("pushing"));
 
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()

@@ -13,6 +13,7 @@ import com.ajustor.fmab.network.OpenBodyPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.transmutation.Concentration;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -25,8 +26,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 
+
 import java.util.EnumSet;
 import java.util.List;
+
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Une visite guidée des rendus du mod, en captures d'écran : le corps du joueur (membres perdus,
@@ -124,6 +128,8 @@ public class RenderShowcase implements FabricClientGameTest {
 
 		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GATE,
 				GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_LEG)));
+		check(context.computeOnClient(mc -> mc.player.getAttachedOrElse(FmabAttachments.GATE, GateState.NONE)
+				.lost(BodyPart.RIGHT_ARM)), "le client devrait savoir que le bras droit est perdu");
 		context.takeScreenshot("body_01_lost_right_arm_left_leg");
 
 		onPlayer(context, sp, p -> {
@@ -216,6 +222,8 @@ public class RenderShowcase implements FabricClientGameTest {
 					id, distance));
 			sp.getConnection().waitForClientboundPackets();
 			context.waitTicks(20);
+			check(context.computeOnClient(mc -> mc.level.getEntities(type, new net.minecraft.world.phys.AABB(-20, -70, -20, 20, -40, 30),
+					e -> true).size()) > 0, "le client devrait voir fmab:" + id);
 			context.takeScreenshot("entity_%02d_%s".formatted(index++, id));
 			if (type == FmabEntities.TRUTH) {
 				sp.getServer().runOnServer(server -> server.overworld().getEntities(FmabEntities.TRUTH, e -> true)
@@ -244,6 +252,9 @@ public class RenderShowcase implements FabricClientGameTest {
 
 		context.setScreen(NotebookScreen::new);
 		context.takeScreenshot("screen_notebook");
+		// Un gant à une main, l'autre vide : on voit les deux états de l'écran.
+		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GLOVES, com.ajustor.fmab.data.Gloves.NONE
+				.with(false, new ItemStack(FmabItems.SPARK_GLOVES))));
 		context.setScreen(GlovesScreen::new);
 		context.takeScreenshot("screen_gloves");
 		context.setScreen(TreatiseScreen::new);
@@ -272,8 +283,7 @@ public class RenderShowcase implements FabricClientGameTest {
 		context.runOnClient(mc -> mc.gui.hud.getChat().clearMessages(false));
 		context.waitTicks(5);
 		context.takeScreenshot("hud_00_alchemist_panel");
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.ALCHEMIST,
-				p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).withConcentration(5)));
+		onPlayer(context, sp, p -> Concentration.set(p, 5));
 		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.LIVING_STONE, 42));
 		context.takeScreenshot("hud_01_concentration_living_stone");
 		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GATE,

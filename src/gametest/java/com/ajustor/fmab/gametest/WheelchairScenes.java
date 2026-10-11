@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.minecraft.client.CameraType;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Pose;
@@ -21,10 +22,12 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Consumer;
 
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
+
 /**
  * Le fauteuil roulant en jeu : on rampe sans jambes, on s'assied, on roule à la force des bras ; un
  * bloc plein arrête, une dalle se franchit ; on ne saute pas ; un seul bras ne suffit pas, un
- * villageois payé pousse. Chaque règle est vérifiée, et capturée dans
+ * villageois payé pousse, un joueur aussi. Chaque règle est vérifiée, et capturée dans
  * {@code build/run/clientGameTest/screenshots}.
  */
 public class WheelchairScenes implements FabricClientGameTest {
@@ -51,6 +54,7 @@ public class WheelchairScenes implements FabricClientGameTest {
 			noJump(context, sp);
 			oneArm(context, sp);
 			villager(context, sp);
+			playerPushes(context, sp);
 		}
 	}
 
@@ -58,12 +62,6 @@ public class WheelchairScenes implements FabricClientGameTest {
 		sp.getServer().runOnServer(server -> action.accept(server.getPlayerList().getPlayers().getFirst()));
 		sp.getConnection().waitForClientboundPackets();
 		context.waitTicks(2);
-	}
-
-	private static void check(boolean condition, String message) {
-		if (!condition) {
-			throw new AssertionError(message);
-		}
 	}
 
 	private static Vec3 clientPosition(ClientGameTestContext context) {
@@ -228,6 +226,33 @@ public class WheelchairScenes implements FabricClientGameTest {
 				.getEntitiesOfClass(Villager.class, server.getPlayerList().getPlayers().getFirst().getBoundingBox().inflate(4))
 				.getFirst().position());
 		check(villager.x > west.x + 0.5, "le villageois devrait suivre derrière (à l'est) : " + villager + " / " + west);
+	}
+
+	/**
+	 * Un joueur aux deux bras prend les poignées du fauteuil où un villageois est assis : le client le
+	 * sait sans chercher le fauteuil autour de lui (ses mains sont prises), puis il les lâche.
+	 */
+	private static void playerPushes(ClientGameTestContext context, TestSingleplayerContext sp) {
+		onPlayer(context, sp, p -> {
+			WheelchairEntity chair = (WheelchairEntity) p.getVehicle();
+			p.stopRiding();
+			chair.letGo();
+			p.level().getEntitiesOfClass(Villager.class, p.getBoundingBox().inflate(6)).forEach(Villager::discard);
+			p.setAttached(FmabAttachments.GATE, GateState.NONE);
+			Villager rider = EntityTypes.VILLAGER.create(p.level(), EntitySpawnReason.COMMAND);
+			rider.snapTo(chair.getX(), chair.getY(), chair.getZ(), 0, 0);
+			p.level().addFreshEntity(rider);
+			rider.startRiding(chair);
+			p.teleportTo(chair.getX(), chair.getY(), chair.getZ() + 1.2);
+			p.interactOn(chair, InteractionHand.MAIN_HAND, Vec3.ZERO);
+		});
+		context.waitTicks(5);
+		check(context.computeOnClient(mc -> Wheelchairs.pushing(mc.player) != null),
+				"le client devrait savoir que le joueur pousse le fauteuil");
+		check(context.computeOnClient(mc -> Wheelchairs.handsBusy(mc.player)), "en poussant, les mains devraient être prises");
+		onPlayer(context, sp, p -> p.interactOn(Wheelchairs.pushing(p), InteractionHand.MAIN_HAND, Vec3.ZERO));
+		context.waitTicks(3);
+		check(context.computeOnClient(mc -> Wheelchairs.pushing(mc.player) == null), "les poignées lâchées, il ne pousse plus");
 	}
 
 	/**

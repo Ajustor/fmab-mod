@@ -19,6 +19,7 @@ import com.ajustor.fmab.network.RequestDesignsPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.world.InteractionHand;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.Transmutation;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -35,6 +36,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Fabriquer un objet par l'alchimie, en jeu : on décompose une pioche pour la comprendre (elle rend
@@ -266,12 +269,6 @@ public class RecompositionScenes implements FabricClientGameTest {
 		return result;
 	}
 
-	private static void check(boolean condition, String message) {
-		if (!condition) {
-			throw new AssertionError(message);
-		}
-	}
-
 	/** Pose un objet au centre du cercle, sans qu'on puisse le ramasser. */
 	private static void drop(ClientGameTestContext context, TestSingleplayerContext sp, ItemStack stack) {
 		server(context, sp, (level, p) -> {
@@ -298,7 +295,8 @@ public class RecompositionScenes implements FabricClientGameTest {
 				be.setDrawing(drawing);
 			}
 			AlchemistData data = p.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-			p.setAttached(FmabAttachments.ALCHEMIST, data.withConcentration(data.maxConcentration()));
+			p.setAttached(FmabAttachments.ALCHEMIST, data);
+			Concentration.set(p, Concentration.max(p));
 			return Transmutation.activate(level, CIRCLE, state, drawing, p, CircleSize.NORMAL);
 		});
 		context.waitTicks(20);

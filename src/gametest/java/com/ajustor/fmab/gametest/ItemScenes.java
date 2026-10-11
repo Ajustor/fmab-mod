@@ -6,8 +6,13 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.minecraft.client.CameraType;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.phys.AABB;
+
 import java.util.List;
 import java.util.Locale;
+
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Les objets du mod accrochés dans des cadres sur un mur, un porte-armure vêtu du plastron d'âme, et
@@ -42,6 +47,9 @@ public class ItemScenes implements FabricClientGameTest {
 			sp.getServer().runCommand(String.format(Locale.ROOT,
 					"summon armor_stand 10.5 %d -2.5 {Rotation:[200f,0f],ShowArms:1b,equipment:{chest:{id:\"fmab:soul_chestplate\",count:1},"
 							+ "mainhand:{id:\"fmab:stone_lance\",count:1}}}", Y));
+			int framed = sp.getServer().computeOnServer(server -> server.overworld().getEntitiesOfClass(ItemFrame.class,
+					new AABB(-2, Y - 1, -3, PER_ROW + 1, Y + 6, 1), frame -> !frame.getItem().isEmpty()).size());
+			check(framed == ITEMS.size(), "chaque objet devrait être dans son cadre : " + framed + " sur " + ITEMS.size());
 			sp.getServer().runCommand("gamemode spectator @p");
 			context.runOnClient(mc -> {
 				RenderShowcase.hideGui(mc, true);

@@ -6,6 +6,8 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.util.Modifiers;
+import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -20,7 +22,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -55,8 +56,8 @@ public final class Automails {
 	/** Le prix de la réparation : un lingot de fer par quart de l'usure. */
 	public static final int REPAIR_STEPS = 4;
 
-	private static final Map<UUID, Vec3> LAST_POSITIONS = new HashMap<>();
-	private static final Map<UUID, Double> WALKED = new HashMap<>();
+	private static final Map<UUID, Vec3> LAST_POSITIONS = PlayerMaps.track(new HashMap<>());
+	private static final Map<UUID, Double> WALKED = PlayerMaps.track(new HashMap<>());
 
 	private Automails() {
 	}
@@ -82,7 +83,12 @@ public final class Automails {
 
 	/** Usé jusqu'au bout : on garde la pièce, mais elle ne répond plus. */
 	public static boolean broken(ItemStack stack) {
-		return stack.isDamageableItem() && stack.getDamageValue() >= stack.getMaxDamage() - 1;
+		return stack.isDamageableItem() && broken(stack.getDamageValue(), stack.getMaxDamage());
+	}
+
+	/** Une pièce lâche à son dernier point d'usure. */
+	public static boolean broken(int damage, int maxDamage) {
+		return damage >= maxDamage - 1;
 	}
 
 	/** Un automail en état remplace-t-il ce membre ? */
@@ -206,10 +212,12 @@ public final class Automails {
 
 	/** Lingots de fer que demande la réparation d'une pièce. */
 	public static int repairCost(ItemStack stack) {
-		if (!stack.isDamaged()) {
-			return 0;
-		}
-		return (int) Math.ceil((double) stack.getDamageValue() * REPAIR_STEPS / stack.getMaxDamage());
+		return stack.isDamaged() ? repairCost(stack.getDamageValue(), stack.getMaxDamage()) : 0;
+	}
+
+	/** Un lingot par quart de l'usure, arrondi au-dessus : la moindre éraflure coûte un lingot. */
+	public static int repairCost(int damage, int maxDamage) {
+		return damage <= 0 ? 0 : (int) Math.ceil((double) damage * REPAIR_STEPS / maxDamage);
 	}
 
 	/** Winry répare une pièce contre des lingots de fer pris dans l'inventaire. */
@@ -255,14 +263,30 @@ public final class Automails {
 			return;
 		}
 		ItemStack worn = stack.copy();
-		int damage = Math.min(worn.getMaxDamage() - 1, worn.getDamageValue() + amount);
-		worn.setDamageValue(damage);
+		worn.setDamageValue(worn(worn.getDamageValue(), worn.getMaxDamage(), amount));
 		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(part, worn));
 		if (broken(worn)) {
 			player.level().playSound(null, player.blockPosition(), SoundEvents.ITEM_BREAK.value(), SoundSource.PLAYERS, 1, 0.8f);
 			player.sendSystemMessage(Component.translatable("automail.fmab.broke",
 					Component.translatable(part.translationKey())));
 		}
+	}
+
+	/** L'usure après un coup : elle s'arrête au dernier point, la pièce lâche sans disparaître. */
+	public static int worn(int damage, int maxDamage, int amount) {
+		return Math.min(maxDamage - 1, damage + amount);
+	}
+
+	/**
+	 * Ce que s'use une jambe tous les {@link #BLOCKS_PER_WEAR} blocs : deux points pour Rush Valley,
+	 * légère mais fragile ; un pour le fer ; pour Briggs, une fois sur deux (selon {@code coin}).
+	 */
+	public static int legWear(AutomailItem.Model model, boolean coin) {
+		return switch (model) {
+			case RUSH_VALLEY -> 2;
+			case BRIGGS -> coin ? 1 : 0;
+			default -> 1;
+		};
 	}
 
 	private static void tick(ServerPlayer player) {
@@ -324,11 +348,7 @@ public final class Automails {
 		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
 		for (BodyPart leg : new BodyPart[]{BodyPart.LEFT_LEG, BodyPart.RIGHT_LEG}) {
 			if (automail.get(leg).getItem() instanceof AutomailItem item) {
-				int wear = switch (item.model()) {
-					case RUSH_VALLEY -> 2;
-					case BRIGGS -> player.getRandom().nextBoolean() ? 1 : 0;
-					default -> 1;
-				};
+				int wear = legWear(item.model(), player.getRandom().nextBoolean());
 				if (wear > 0) {
 					wear(player, leg, wear);
 				}
@@ -342,16 +362,6 @@ public final class Automails {
 
 	private static void modifier(ServerPlayer player, Holder<Attribute> attribute, Identifier id, double amount,
 			AttributeModifier.Operation operation) {
-		AttributeInstance instance = player.getAttribute(attribute);
-		if (instance == null) {
-			return;
-		}
-		if (amount == 0) {
-			if (instance.getModifier(id) != null) {
-				instance.removeModifier(id);
-			}
-		} else {
-			instance.addOrUpdateTransientModifier(new AttributeModifier(id, amount, operation));
-		}
+		Modifiers.set(player, attribute, id, amount, operation);
 	}
 }

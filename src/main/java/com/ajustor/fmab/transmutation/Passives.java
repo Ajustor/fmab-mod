@@ -8,9 +8,10 @@ import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.tattoo.TattooSlot;
+import com.ajustor.fmab.util.Modifiers;
+import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,7 +20,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
@@ -55,7 +55,7 @@ public final class Passives {
 	private static final int CACHE_SIZE = 256;
 
 	/** Passifs actifs par joueur, recalculés toutes les deux secondes. */
-	private static final Map<UUID, Map<String, Integer>> ACTIVE = new HashMap<>();
+	private static final Map<UUID, Map<String, Integer>> ACTIVE = PlayerMaps.track(new HashMap<>());
 	/** Analyses des cercles portés : on ne relit pas un tracé inchangé toutes les deux secondes. */
 	private static final Map<CacheKey, Analysis> CACHE = new LinkedHashMap<>(64, 0.75f, true) {
 		@Override
@@ -79,7 +79,6 @@ public final class Passives {
 				apply(player, count(player));
 			}
 		});
-		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> ACTIVE.remove(handler.getPlayer().getUUID()));
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damage, blocked) -> {
 			if (entity instanceof ServerPlayer player && source.getEntity() instanceof LivingEntity attacker
 					&& attacker != player) {
@@ -142,14 +141,6 @@ public final class Passives {
 
 	private static void modifier(ServerPlayer player, Holder<Attribute> attribute, Identifier id, double amount,
 			AttributeModifier.Operation operation) {
-		AttributeInstance instance = player.getAttribute(attribute);
-		if (instance == null) {
-			return;
-		}
-		if (amount == 0) {
-			instance.removeModifier(id);
-		} else {
-			instance.addOrUpdateTransientModifier(new AttributeModifier(id, amount, operation));
-		}
+		Modifiers.set(player, attribute, id, amount, operation);
 	}
 }

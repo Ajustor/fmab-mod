@@ -5,7 +5,9 @@ import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
+import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.core.BlockPos;
@@ -39,7 +41,7 @@ public final class ScarArm {
 	private static final float ENTITY_COST = 2;
 	private static final float ENTITY_DAMAGE = 7;
 	private static final int COOLDOWN = 8;
-	private static final Map<UUID, Long> LAST = new HashMap<>();
+	private static final Map<UUID, Long> LAST = PlayerMaps.track(new HashMap<>());
 
 	private ScarArm() {
 	}
@@ -101,7 +103,7 @@ public final class ScarArm {
 	private static boolean ready(ServerPlayer player, ServerLevel level) {
 		long now = level.getGameTime();
 		Long last = LAST.get(player.getUUID());
-		if (last != null && now - last < COOLDOWN) {
+		if (last != null && now >= last && now - last < COOLDOWN) {
 			return false;
 		}
 		LAST.put(player.getUUID(), now);
@@ -117,12 +119,13 @@ public final class ScarArm {
 		Knowledge knowledge = AlchemyRules.of(player.level().registryAccess()).knowledge(data);
 		cost = (float) Math.max(0.5, cost - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
 		if (!player.isCreative()) {
-			if (data.concentration() < cost) {
+			float concentration = Concentration.of(player);
+			if (concentration < cost) {
 				player.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) Math.ceil(cost),
-						(int) data.concentration()));
+						(int) concentration));
 				return false;
 			}
-			data = data.withConcentration(data.concentration() - cost);
+			Concentration.set(player, concentration - cost);
 		}
 		player.setAttached(FmabAttachments.ALCHEMIST, data.addMastery(SCHOOL, 1));
 		return true;

@@ -47,7 +47,6 @@ import com.ajustor.fmab.client.screen.TreatiseScreen;
 import com.ajustor.fmab.client.screen.StoneChoiceScreen;
 import com.ajustor.fmab.client.screen.TruthScreen;
 import com.ajustor.fmab.client.screen.WinryScreen;
-import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Notebooks;
@@ -68,8 +67,10 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlockEntities;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabMenus;
 import com.ajustor.fmab.stone.Eclipse;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -88,12 +89,15 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 public class FmabClient implements ClientModInitializer {
@@ -247,6 +251,11 @@ public class FmabClient implements ClientModInitializer {
 	}
 
 	/** Le cercle suivant (ou précédent) du carnet devient la sélection, sans ouvrir la roue. */
+	private static final Identifier LOST_SIGHT = Fmab.id("textures/gui/hud/lost_sight.png");
+	private static final Identifier CONCENTRATION_ICON = Fmab.id("textures/gui/hud/concentration.png");
+	/** L'icône du compteur d'âmes, créée au premier affichage (les objets ne sont pas prêts au chargement). */
+	private static ItemStack soulsIcon;
+
 	private static void cycleCircle(Minecraft mc, int delta) {
 		if (mc.player == null) {
 			return;
@@ -279,23 +288,10 @@ public class FmabClient implements ClientModInitializer {
 		if (!blind) {
 			return;
 		}
+		// Un voile peint en dégradé doux, étiré à tout l'écran : le trou reste au centre, les bords se perdent.
 		int w = graphics.guiWidth();
 		int h = graphics.guiHeight();
-		int cx = w / 2;
-		int cy = h / 2;
-		double clear = Math.min(w, h) * 0.18;
-		double dark = Math.min(w, h) * 0.55;
-		int step = 6;
-		for (int y = 0; y < h; y += step) {
-			for (int x = 0; x < w; x += step) {
-				double d = Math.hypot(x + step / 2.0 - cx, (y + step / 2.0 - cy) * 1.2);
-				double t = Math.clamp((d - clear) / (dark - clear), 0, 1);
-				int alpha = (int) (t * 250);
-				if (alpha > 0) {
-					graphics.fill(x, y, x + step, y + step, alpha << 24);
-				}
-			}
-		}
+		graphics.blit(RenderPipelines.GUI_TEXTURED, LOST_SIGHT, 0, 0, 0, 0, w, h, 256, 256, 256, 256);
 	}
 
 	/** Pendant l'éclipse, le jour se teinte d'un crépuscule orangé et sombre. */
@@ -317,9 +313,16 @@ public class FmabClient implements ClientModInitializer {
 		if (souls == null || souls <= 0) {
 			return;
 		}
+		// La Pierre et son nombre d'âmes, sur un fond discret, au-dessus de la jauge de concentration.
 		int x = graphics.guiWidth() / 2 + 10;
-		int y = graphics.guiHeight() - 39 - 10 - 16;
-		graphics.text(mc.font, Component.translatable("hud.fmab.living_stone", souls), x, y, 0xFFE0303A, true);
+		int y = graphics.guiHeight() - 39 - 10 - 26;
+		Component text = Component.translatable("hud.fmab.living_stone", souls);
+		graphics.fill(x - 2, y - 1, x + 20 + mc.font.width(text) + 3, y + 17, 0x80000000);
+		if (soulsIcon == null) {
+			soulsIcon = new ItemStack(FmabItems.PHILOSOPHER_STONE);
+		}
+		graphics.item(soulsIcon, x, y);
+		graphics.text(mc.font, text, x + 19, y + 4, 0xFFFF5A5A, true);
 	}
 
 	/**
@@ -331,15 +334,23 @@ public class FmabClient implements ClientModInitializer {
 		if (mc.player == null) {
 			return;
 		}
-		AlchemistData data = mc.player.getAttached(FmabAttachments.ALCHEMIST);
-		if (data == null || data.concentration() >= data.maxConcentration()) {
+		float concentration = Concentration.of(mc.player), max = Concentration.max(mc.player);
+		if (concentration >= max) {
 			return;
 		}
 		int width = 81;
 		int x = graphics.guiWidth() / 2 + 10;
 		int y = graphics.guiHeight() - 39 - 10 - 4;
-		int filled = Math.round(width * data.concentration() / data.maxConcentration());
-		graphics.fill(x - 1, y - 1, x + width + 1, y + 4, 0xC0000000);
-		graphics.fill(x, y, x + filled, y + 3, 0xFF4FA3FF);
+		// Une jauge encadrée : son icône, un remplissage bleu à reflet, une graduation par quart.
+		int filled = Math.round(width * concentration / max);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, CONCENTRATION_ICON, x - 11, y - 3, 0, 0, 9, 9, 9, 9, 9, 9);
+		graphics.fill(x - 2, y - 2, x + width + 2, y + 5, 0xFF1A1E28);
+		graphics.fill(x - 1, y - 1, x + width + 1, y + 4, 0xFF39414F);
+		graphics.fill(x, y, x + width, y + 3, 0xFF141820);
+		graphics.fill(x, y, x + filled, y + 3, 0xFF3C8CE6);
+		graphics.fill(x, y, x + filled, y + 1, 0xFF9ED0FF);
+		for (int quarter = 1; quarter < 4; quarter++) {
+			graphics.fill(x + width * quarter / 4, y, x + width * quarter / 4 + 1, y + 3, 0x80000000);
+		}
 	}
 }

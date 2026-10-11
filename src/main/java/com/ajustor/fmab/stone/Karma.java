@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.gossip.GossipType;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.npc.villager.Villager;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Le karma : une jauge morale de −100 à +100. Fabriquer des Pierres, tuer des innocents la fait
@@ -41,12 +42,35 @@ public final class Karma {
 			return;
 		}
 		int before = of(player);
-		int after = Math.clamp(before + delta, MIN, MAX);
+		int after = shifted(before, delta);
 		player.setAttached(FmabAttachments.KARMA, after);
-		// On ne prévient qu'aux paliers : le karma se sent plus qu'il ne se compte.
-		if (before / 25 != after / 25 || Integer.signum(before) != Integer.signum(after)) {
+		if (crossesTier(before, after)) {
 			player.sendOverlayMessage(Component.translatable(after < before ? "karma.fmab.falls" : "karma.fmab.rises"));
 		}
+	}
+
+	/** Le karma après un écart, gardé entre {@link #MIN} et {@link #MAX}. */
+	public static int shifted(int karma, int delta) {
+		return Math.clamp(karma + delta, MIN, MAX);
+	}
+
+	/** On ne prévient qu'aux paliers de 25, et en changeant de signe : le karma se sent plus qu'il ne se compte. */
+	public static boolean crossesTier(int before, int after) {
+		return before / 25 != after / 25 || Integer.signum(before) != Integer.signum(after);
+	}
+
+	/**
+	 * Ce que les villageois se racontent d'un joueur à ce karma : rien entre −25 et +25, une mauvaise
+	 * réputation (majeure dès −50) ou une bonne.
+	 */
+	public static @Nullable GossipType reputation(int karma) {
+		if (Math.abs(karma) < 25) {
+			return null;
+		}
+		if (karma < 0) {
+			return karma <= -50 ? GossipType.MAJOR_NEGATIVE : GossipType.MINOR_NEGATIVE;
+		}
+		return GossipType.MINOR_POSITIVE;
 	}
 
 	public static void set(ServerPlayer player, int value) {
@@ -88,16 +112,12 @@ public final class Karma {
 	 */
 	private static void gossip(ServerPlayer player) {
 		int karma = of(player);
-		if (Math.abs(karma) < 25) {
+		GossipType reputation = reputation(karma);
+		if (reputation == null) {
 			return;
 		}
 		for (Villager villager : player.level().getEntitiesOfClass(Villager.class, player.getBoundingBox().inflate(24))) {
-			if (karma < 0) {
-				villager.getGossips().add(player.getUUID(), karma <= -50 ? GossipType.MAJOR_NEGATIVE : GossipType.MINOR_NEGATIVE,
-						Math.abs(karma) / 10);
-			} else {
-				villager.getGossips().add(player.getUUID(), GossipType.MINOR_POSITIVE, karma / 10);
-			}
+			villager.getGossips().add(player.getUUID(), reputation, Math.abs(karma) / 10);
 		}
 	}
 }
