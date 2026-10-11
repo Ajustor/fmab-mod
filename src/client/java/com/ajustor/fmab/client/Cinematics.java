@@ -40,6 +40,10 @@ public final class Cinematics {
 	private static final int CIRCLE_SIZE = CircleTextures.SIZE;
 	/** Les glyphes qu'on voit défiler derrière la Porte : tous ceux du monde, tracés comme dans le Traité. */
 	private static List<Identifier> glyphs = List.of();
+	/** Les tracés épinglés dans le cache pendant la cinématique : ils ne seront pas libérés en route. */
+	private static final List<Drawing> PINNED = new ArrayList<>();
+	private static final int GLYPH_INK = 0xFFF2F0EA;
+	private static final int TUNNEL_INK = 0xFFD8D4CC;
 	/** Le voile noir : un dégradé radial calculé une fois, qu'on étire à l'écran (voir {@link #vignette}). */
 	private static final int VIGNETTE_SIZE = 128;
 	private static Identifier vignette;
@@ -66,6 +70,7 @@ public final class Cinematics {
 			// Les glyphes du savoir se tracent maintenant, devant la Porte encore fermée, plutôt qu'au
 			// moment où ils doivent défiler.
 			glyphs = glyphTextures();
+			pin(ForbiddenCircles.HUMAN_TRANSMUTATION);
 			return;
 		}
 		kind = payload.kind();
@@ -86,7 +91,8 @@ public final class Cinematics {
 			Drawing d = new Drawing(g.primitives().stream()
 					.map(p -> p.map(v -> v.scale(13).add(new Vec2(Drawing.CENTER, Drawing.CENTER))))
 					.toList());
-			out.add(CircleTextures.get(d, 0xFFF2F0EA));
+			out.add(CircleTextures.pin(d, GLYPH_INK));
+			PINNED.add(d);
 		}
 		return out;
 	}
@@ -122,6 +128,27 @@ public final class Cinematics {
 		if (kind != null && ++age > length) {
 			kind = null;
 		}
+		if (!active()) {
+			unpinAll();
+		}
+	}
+
+	/** Le cercle du tunnel, épinglé pour toute la cinématique. */
+	private static void pin(Drawing drawing) {
+		CircleTextures.pin(drawing, TUNNEL_INK);
+		PINNED.add(drawing);
+	}
+
+	/** La cinématique est finie : ses textures redeviennent des textures comme les autres. */
+	private static void unpinAll() {
+		if (PINNED.isEmpty()) {
+			return;
+		}
+		for (Drawing d : PINNED) {
+			CircleTextures.unpin(d, d == ForbiddenCircles.HUMAN_TRANSMUTATION ? TUNNEL_INK : GLYPH_INK);
+		}
+		PINNED.clear();
+		glyphs = List.of();
 	}
 
 	public static void stop() {
@@ -129,6 +156,7 @@ public final class Cinematics {
 		kind = null;
 		backgroundLength = 0;
 		backgroundAge = 0;
+		unpinAll();
 	}
 
 	/** Le dessin d'une image de la cinématique en cours. */
@@ -335,7 +363,7 @@ public final class Cinematics {
 
 	/** Le cercle qui l'a amené ici, répété en anneaux qui foncent vers lui en tournant. */
 	private static void tunnel(GuiGraphicsExtractor graphics, float cx, float cy, float diagonal, float t, float rush) {
-		Identifier circle = CircleTextures.get(ForbiddenCircles.HUMAN_TRANSMUTATION, 0xFFD8D4CC);
+		Identifier circle = CircleTextures.get(ForbiddenCircles.HUMAN_TRANSMUTATION, TUNNEL_INK);
 		int rings = 5;
 		float speed = 0.016f + rush * 0.04f;
 		for (int i = 0; i < rings; i++) {
