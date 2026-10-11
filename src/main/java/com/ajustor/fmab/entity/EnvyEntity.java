@@ -153,6 +153,12 @@ public class EnvyEntity extends HomunculusEntity {
 		});
 	}
 
+	/** Démasqué, il se bat : il ne disparaît plus. */
+	@Override
+	protected boolean mayVanish() {
+		return form().disguised();
+	}
+
 	@Override
 	protected boolean showBossBar() {
 		return !form().disguised();

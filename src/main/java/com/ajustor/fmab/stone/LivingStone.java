@@ -259,6 +259,7 @@ public final class LivingStone {
 		if (hunter instanceof EnvyEntity envy) {
 			envy.disguiseAs(player);
 		}
+		hunter.markWanderer();
 		level.addFreshEntity(hunter);
 		hunter.setTarget(player);
 		player.sendSystemMessage(Component.translatable(hunter instanceof LustEntity
