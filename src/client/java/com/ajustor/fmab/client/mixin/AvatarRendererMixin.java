@@ -52,9 +52,10 @@ public abstract class AvatarRendererMixin {
 		long now = entity.level().getGameTime();
 		PoseHolder holder = (PoseHolder) state;
 		if (pose == null || !pose.active(now)) {
-			holder.fmab$setPose(TransmutationPose.Kind.NONE, 0);
+			holder.fmab$setPose(TransmutationPose.Kind.NONE, 0, 0);
 		} else {
-			holder.fmab$setPose(pose.kind(), pose.until() - now - partialTicks);
+			float elapsed = pose.start() == 0 ? Float.MAX_VALUE : now - pose.start() + partialTicks;
+			holder.fmab$setPose(pose.kind(), pose.until() - now - partialTicks, elapsed);
 		}
 		fmab$extractBody(entity, (BodyHolder) state);
 		((BodyHolder) state).fmab$setWheelchair(fmab$wheelchairPose(entity));

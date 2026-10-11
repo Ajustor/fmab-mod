@@ -25,6 +25,8 @@ public abstract class AvatarRenderStateMixin implements PoseHolder, BodyHolder {
 	@Unique
 	private float fmab$remaining;
 	@Unique
+	private float fmab$elapsed;
+	@Unique
 	private Set<BodyPart> fmab$lostLimbs = Set.of();
 	@Unique
 	private Map<BodyPart, AutomailItem.Model> fmab$automails = Map.of();
@@ -46,9 +48,15 @@ public abstract class AvatarRenderStateMixin implements PoseHolder, BodyHolder {
 	}
 
 	@Override
-	public void fmab$setPose(TransmutationPose.Kind pose, float remaining) {
+	public float fmab$elapsed() {
+		return fmab$elapsed;
+	}
+
+	@Override
+	public void fmab$setPose(TransmutationPose.Kind pose, float remaining, float elapsed) {
 		fmab$pose = pose;
 		fmab$remaining = remaining;
+		fmab$elapsed = elapsed;
 	}
 
 	@Override
