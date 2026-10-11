@@ -221,6 +221,7 @@ public class FmabClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(OpenTattooPayload.TYPE,
 				(payload, context) -> context.client().gui.setScreen(new TattooScreen(payload)));
 		ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> {
+			ItemHints.append(stack, lines);
 			if (stack.has(FmabComponents.EMBROIDERY)) {
 				lines.add(Component.translatable("item.fmab.embroidered").withStyle(ChatFormatting.DARK_AQUA));
 			}
