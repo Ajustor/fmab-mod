@@ -130,6 +130,15 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("greed_pact"));
 
+	/**
+	 * La réponse à l'offre de Père ({@link com.ajustor.fmab.stone.Recruitment}) : acceptée ou refusée,
+	 * une fois pour toutes. Gardée à la mort.
+	 */
+	public static final AttachmentType<String> RECRUITMENT = AttachmentRegistry.<String>builder()
+			.persistent(Codec.STRING)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("recruitment"));
+
 	/** Reconnu allié de Briggs par Olivier Armstrong : gardé à la mort. */
 	public static final AttachmentType<Boolean> BRIGGS_ALLY = AttachmentRegistry.<Boolean>builder()
 			.persistent(Codec.BOOL)
