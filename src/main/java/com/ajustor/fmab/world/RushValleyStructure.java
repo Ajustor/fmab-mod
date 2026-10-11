@@ -50,7 +50,8 @@ public class RushValleyStructure extends Structure {
 			return Optional.empty();
 		}
 		BlockPos center = new BlockPos(cx, y, cz);
-		return Optional.of(new GenerationStub(center, builder -> Hamlet.build(builder, context, center, LAYOUT)));
+		return Optional.of(new GenerationStub(center, builder -> Hamlet.build(builder, context, center, LAYOUT,
+				PathPiece.Style.RUSH_VALLEY)));
 	}
 
 	@Override

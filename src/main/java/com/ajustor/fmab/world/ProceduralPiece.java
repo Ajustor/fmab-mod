@@ -70,6 +70,11 @@ public class ProceduralPiece extends StructurePiece {
 		this.seed = tag.getLongOr("seed", 0);
 	}
 
+	/** Position du monde d'un point du plan (x, z), au niveau de son sol. */
+	BlockPos worldAt(int x, int z) {
+		return toWorld(new BlockPos(x, 0, z));
+	}
+
 	private static BoundingBox box(BlockPos origin, int sx, int sy, int sz, int ground, Rotation rotation) {
 		boolean turned = rotation == Rotation.CLOCKWISE_90 || rotation == Rotation.COUNTERCLOCKWISE_90;
 		int wx = turned ? sz : sx;
