@@ -1,6 +1,7 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.item.BriggsSabreItem;
+import com.ajustor.fmab.item.FirearmItem;
 import com.ajustor.fmab.homunculus.HomunculusRules;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
@@ -88,6 +89,10 @@ public abstract class HomunculusEntity extends Monster {
 			return false;
 		}
 		float dealt = damage * weakness(source);
+		// Les balles ne font guère que les ralentir : la Pierre referme la plaie.
+		if (source.is(FirearmItem.BULLET)) {
+			dealt *= FirearmItem.HOMUNCULUS_FACTOR;
+		}
 		ItemStack weapon = source.getWeaponItem();
 		if (weapon != null && weapon.getItem() instanceof BriggsSabreItem) {
 			dealt *= BriggsSabreItem.HOMUNCULUS_BONUS;

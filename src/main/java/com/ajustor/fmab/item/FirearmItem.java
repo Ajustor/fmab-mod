@@ -36,10 +36,17 @@ import java.util.function.Consumer;
 /**
  * Une arme à feu de l'armée d'Amestris, celles de Riza Hawkeye : le tir part en ligne droite et
  * touche le premier obstacle. Chaque tir consomme une cartouche. Les balles sont des projectiles :
- * King Bradley les voit venir.
+ * King Bradley les voit venir. La balle perd de sa force avec la distance ({@link #damageAt}), et ne
+ * fait guère que ralentir un homonculus (voir {@link #HOMUNCULUS_FACTOR}).
  */
 public class FirearmItem extends Item {
 	public static final ResourceKey<DamageType> BULLET = ResourceKey.create(Registries.DAMAGE_TYPE, Fmab.id("bullet"));
+	/** Jusqu'à cette part de la portée, la balle garde toute sa force. */
+	private static final double FULL_DAMAGE_SHARE = 0.3;
+	/** Ce qu'il lui reste au bout de la portée. */
+	private static final float FAR_DAMAGE = 0.5f;
+	/** Ce qu'une balle fait à un homonculus : la Pierre referme la plaie aussitôt. */
+	public static final float HOMUNCULUS_FACTOR = 0.3f;
 
 	private final float damage;
 	private final double range;
@@ -113,17 +120,35 @@ public class FirearmItem extends Item {
 		if (entity != null) {
 			Entity target = entity.getEntity();
 			DamageSource bullet = new DamageSource(level.damageSources().damageTypes.getOrThrow(BULLET), shooter, shooter);
-			target.hurtServer(level, bullet, damage);
+			target.hurtServer(level, bullet, damageAt(damage, eye.distanceTo(end), range));
 		} else if (block.getType() == HitResult.Type.BLOCK) {
 			level.sendParticles(ParticleTypes.SMOKE, end.x, end.y, end.z, 4, 0.05, 0.05, 0.05, 0.01);
 		}
 	}
 
+	/**
+	 * Les dégâts d'une balle à cette distance : entiers jusqu'à {@link #FULL_DAMAGE_SHARE} de la
+	 * portée, puis de moins en moins, jusqu'à {@link #FAR_DAMAGE} au bout.
+	 */
+	public static float damageAt(float damage, double distance, double range) {
+		double full = range * FULL_DAMAGE_SHARE;
+		if (distance <= full) {
+			return damage;
+		}
+		double k = Math.min(1, (distance - full) / (range - full));
+		return (float) (damage * (1 - k * (1 - FAR_DAMAGE)));
+	}
+
+	/** Dégâts par seconde au plus près, pour comparer aux armes de corps à corps. */
+	public float damagePerSecond() {
+		return damage * 20f / cooldown;
+	}
+
 	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
 			Consumer<Component> tooltip, TooltipFlag flag) {
-		tooltip.accept(Component.translatable("item.fmab.firearm.stats", (int) damage, (int) range)
-				.withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.translatable("item.fmab.firearm.stats", (int) damage, (int) range,
+				String.format(java.util.Locale.ROOT, "%.1f", cooldown / 20f)).withStyle(ChatFormatting.GRAY));
 		tooltip.accept(Component.translatable("item.fmab.firearm.tooltip").withStyle(ChatFormatting.DARK_GRAY));
 	}
 }
