@@ -173,36 +173,36 @@ public class ProceduralPiece extends StructurePiece {
 
 	/** Position locale (x, z) d'une position relative au coin de la boîte englobante. */
 	private int[] toLocal(int dx, int dz) {
-		return switch (rotation) {
-			case NONE -> new int[]{dx, dz};
-			case CLOCKWISE_90 -> new int[]{dz, sizeZ - 1 - dx};
-			case CLOCKWISE_180 -> new int[]{sizeX - 1 - dx, sizeZ - 1 - dz};
-			case COUNTERCLOCKWISE_90 -> new int[]{sizeX - 1 - dz, dx};
-		};
+		return local(rotation, sizeX, sizeZ, dx, dz);
 	}
 
 	/** Position du monde d'une position locale (y compté depuis le sol). */
 	private BlockPos toWorld(BlockPos local) {
-		int lx = local.getX(), lz = local.getZ();
-		int dx, dz;
-		switch (rotation) {
-			case CLOCKWISE_90 -> {
-				dx = sizeZ - 1 - lz;
-				dz = lx;
-			}
-			case CLOCKWISE_180 -> {
-				dx = sizeX - 1 - lx;
-				dz = sizeZ - 1 - lz;
-			}
-			case COUNTERCLOCKWISE_90 -> {
-				dx = lz;
-				dz = sizeX - 1 - lx;
-			}
-			default -> {
-				dx = lx;
-				dz = lz;
-			}
-		}
-		return new BlockPos(boundingBox.minX() + dx, boundingBox.minY() + ground + local.getY(), boundingBox.minZ() + dz);
+		int[] d = offset(rotation, sizeX, sizeZ, local.getX(), local.getZ());
+		return new BlockPos(boundingBox.minX() + d[0], boundingBox.minY() + ground + local.getY(), boundingBox.minZ() + d[1]);
+	}
+
+	/**
+	 * Position locale (x, z) dans un plan de {@code sx} sur {@code sz}, tourné de {@code rotation}, d'une
+	 * position (dx, dz) relative au coin de sa boîte englobante (qui mesure {@code sz} sur {@code sx}
+	 * quand le plan est tourné d'un quart).
+	 */
+	static int[] local(Rotation rotation, int sx, int sz, int dx, int dz) {
+		return switch (rotation) {
+			case NONE -> new int[]{dx, dz};
+			case CLOCKWISE_90 -> new int[]{dz, sz - 1 - dx};
+			case CLOCKWISE_180 -> new int[]{sx - 1 - dx, sz - 1 - dz};
+			case COUNTERCLOCKWISE_90 -> new int[]{sx - 1 - dz, dx};
+		};
+	}
+
+	/** L'inverse de {@link #local} : la position relative au coin de la boîte d'une position locale. */
+	static int[] offset(Rotation rotation, int sx, int sz, int lx, int lz) {
+		return switch (rotation) {
+			case NONE -> new int[]{lx, lz};
+			case CLOCKWISE_90 -> new int[]{sz - 1 - lz, lx};
+			case CLOCKWISE_180 -> new int[]{sx - 1 - lx, sz - 1 - lz};
+			case COUNTERCLOCKWISE_90 -> new int[]{lz, sx - 1 - lx};
+		};
 	}
 }

@@ -124,6 +124,11 @@ public final class Blueprints {
 		return plans().get(kind);
 	}
 
+	/** Toutes les sortes de plans enregistrées. */
+	static java.util.Set<String> kinds() {
+		return java.util.Set.copyOf(plans().keySet());
+	}
+
 	private static BlockState b(Block block) {
 		return block.defaultBlockState();
 	}

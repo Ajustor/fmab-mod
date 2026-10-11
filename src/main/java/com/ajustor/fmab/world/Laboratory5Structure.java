@@ -15,11 +15,11 @@ import java.util.Optional;
  */
 public class Laboratory5Structure extends Structure {
 	public static final MapCodec<Laboratory5Structure> CODEC = simpleCodec(Laboratory5Structure::new);
-	private static final int SIZE_X = 25;
-	private static final int SIZE_Z = 21;
+	static final int SIZE_X = 25;
+	static final int SIZE_Z = 21;
 	/** Profondeur du laboratoire sous la surface, et hauteur du bâtiment au-dessus. */
-	private static final int DEPTH = -Blueprints.Laboratory5.HALL_FLOOR;
-	private static final int ABOVE = Blueprints.Laboratory5.SURFACE_TOP + 1;
+	static final int DEPTH = -Blueprints.Laboratory5.HALL_FLOOR;
+	static final int ABOVE = Blueprints.Laboratory5.SURFACE_TOP + 1;
 
 	public Laboratory5Structure(StructureSettings settings) {
 		super(settings);
