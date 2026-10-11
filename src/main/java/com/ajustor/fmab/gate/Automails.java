@@ -6,6 +6,7 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -55,8 +56,8 @@ public final class Automails {
 	/** Le prix de la réparation : un lingot de fer par quart de l'usure. */
 	public static final int REPAIR_STEPS = 4;
 
-	private static final Map<UUID, Vec3> LAST_POSITIONS = new HashMap<>();
-	private static final Map<UUID, Double> WALKED = new HashMap<>();
+	private static final Map<UUID, Vec3> LAST_POSITIONS = PlayerMaps.track(new HashMap<>());
+	private static final Map<UUID, Double> WALKED = PlayerMaps.track(new HashMap<>());
 
 	private Automails() {
 	}

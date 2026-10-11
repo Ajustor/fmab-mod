@@ -20,6 +20,7 @@ import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
 import com.ajustor.fmab.training.Trainings;
+import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -285,7 +286,7 @@ public final class Transmutation {
 	private record Channel(BlockPos circle, long last, int growth) {
 	}
 
-	private static final Map<UUID, Channel> CHANNELS = new HashMap<>();
+	private static final Map<UUID, Channel> CHANNELS = PlayerMaps.track(new HashMap<>());
 	/** Le jeu répète le geste toutes les quatre ticks tant qu'on maintient le clic. */
 	private static final int CHANNEL_GAP = 8;
 	/** Au-delà, l'ouvrage ne grandit plus. */
