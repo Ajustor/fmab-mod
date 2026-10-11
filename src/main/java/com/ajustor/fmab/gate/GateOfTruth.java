@@ -456,7 +456,8 @@ public final class GateOfTruth {
 
 	/**
 	 * La Vérité prend son dû et le porte. La première fois qu'elle prend le corps, l'âme se retrouve
-	 * dans une armure de fer ; à une âme déjà dans une armure, elle prend le sceau, et l'âme erre.
+	 * dans une armure de fer ; à une âme déjà dans une armure, elle arrache le sceau : l'âme le retrace
+	 * en revenant, et son armure en sort cabossée.
 	 */
 	private static GateState toll(ServerLevel space, ServerPlayer player, GateState gate, GateState.Visit visit) {
 		if (LivingStone.souls(player) > 0) {
@@ -468,10 +469,11 @@ public final class GateOfTruth {
 		GateState paid;
 		if (part == BodyPart.BODY && gate.soulBound()) {
 			paid = gate.payWithSeal();
-			for (EquipmentSlot slot : SoulArmor.SLOTS) {
-				player.setItemSlot(slot, ItemStack.EMPTY);
-			}
+			// L'armure n'est plus détruite : l'âme y revient, sans dépendre d'une armure laissée ailleurs.
+			SoulArmor.batter(player);
 			say(player, "truth.fmab.toll.seal");
+			player.sendSystemMessage(Component.translatable("gate.fmab.soul.seal_redrawn")
+					.withStyle(s -> s.withColor(0xB0201A)));
 		} else {
 			paid = gate.pay(part);
 			say(player, "truth.fmab.toll." + familiarity(gate.openings()));

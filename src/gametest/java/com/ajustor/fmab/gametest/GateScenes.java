@@ -9,7 +9,9 @@ import com.ajustor.fmab.block.TransmutationCircleBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.GateOfTruth;
+import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.transmutation.AlchemyRules;
@@ -24,6 +26,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -143,7 +146,46 @@ public class GateScenes implements FabricClientGameTest {
 			check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).visit().isEmpty()),
 					"la visite devrait être terminée");
 			context.takeScreenshot("gate_10_back_home");
+
+			// 4. Une âme en armure, qui n'a plus que son sceau à donner, rouvre la Porte : la Vérité
+			// l'arrache, mais l'âme revient dans sa propre armure, cabossée, sans avoir rien laissé
+			// derrière elle.
+			soulReturns(context, sp);
 		}
+	}
+
+	private static void soulReturns(ClientGameTestContext context, TestSingleplayerContext sp) {
+		server(sp, (level, p) -> {
+			GateState everything = GateState.NONE;
+			for (BodyPart part : BodyPart.values()) {
+				everything = everything.pay(part);
+			}
+			p.setAttached(FmabAttachments.GATE, everything);
+			SoulArmor.bindFirstTime(p);
+			Concentration.set(p, Concentration.max(p));
+			return null;
+		});
+		check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).inArmor()),
+				"l'alchimiste devrait être une âme dans son armure");
+		body(context, sp);
+		cast(context, sp);
+		context.waitFor(mc -> mc.player != null && mc.player.level().dimension() == GateOfTruth.WHITE_SPACE, 20 * 15);
+		context.waitFor(mc -> mc.player != null && mc.player.level().dimension() != GateOfTruth.WHITE_SPACE, 20 * 40);
+		context.waitTicks(20);
+		check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).visit().isEmpty()),
+				"la seconde visite devrait être terminée");
+		check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).openings() == BodyPart.values().length + 1),
+				"la Vérité devrait avoir pris le sceau (une ouverture de plus)");
+		check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).inArmor()),
+				"l'âme devrait revenir dans son armure, sans errer devant la Porte");
+		check(server(sp, (level, p) -> SoulArmor.sealIntact(p)), "le sceau devrait être retracé dans le plastron");
+		check(server(sp, (level, p) -> {
+			ItemStack chest = p.getItemBySlot(EquipmentSlot.CHEST);
+			return chest.getDamageValue() >= chest.getMaxDamage() / 2;
+		}), "le plastron devrait revenir cabossé");
+		context.runOnClient(mc -> mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT));
+		context.waitTicks(5);
+		context.takeScreenshot("gate_11_soul_back_in_armor");
 	}
 
 	/** Où en est la visite : -1 tant qu'il n'est pas devant sa Porte. */

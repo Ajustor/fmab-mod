@@ -440,7 +440,7 @@
   "treatise.fmab.ch11.p3": "L'alkahestry de Xing, elle, puise au flux du dragon, qui court partout : Père ne l'arrête pas. Dans les jungles et les cerisaies, May Chang l'enseigne à qui a bon cœur. Lancez cinq kunaï autour d'une zone : ils y dessinent un cercle qui soigne les vôtres, ou qui piège et blesse vos ennemis (accroupi, clic droit, pour choisir).",
   "treatise.fmab.ch11.p4": "Au nord, dans les montagnes enneigées, Fort Briggs barre la passe face à Drachma, dont les soldats rôdent la nuit au pied du mur. La générale Olivier Armstrong y reconnaît ses alliés à leurs actes, et leur confie un sabre de Briggs : une lame lourde qui mord plus fort les homonculus, et qui ne doit rien à l'alchimie.",
   "treatise.fmab.ch11.p5": "Le cercle national tient par ses points de sang, laissés par les massacres d'Amestris : des champs de ruines où le sang bat encore (les cartographes en vendent la carte). Plantez-y un kunaï d'alkahestry, ou gravez-y un contre-cercle au burin si vous êtes Alchimiste d'État. Tant que le cercle tient, chaque éclipse est un Jour promis : la zone de Père double, et il se régénère. Scellez sept points, et le cercle se brise : sa zone s'effondre.",
-  "treatise.fmab.ch8.p5": "La première fois que la Vérité prend le corps entier, l'âme se retrouve aussitôt dans une armure de fer, fixée par un sceau de sang tracé dans le plastron. L'armure est vide : on ne voit qu'elle. L'âme n'a ni faim ni souffle et ne mange pas. Les coups usent les pièces : une pièce qui cède se refait (sans heaume on voit mal, sans jambières on avance mal). Accroupie, l'âme transmute dans son armure le matériau qu'elle tient (un lingot de fer pour du fer) et la répare.\n\nSi le plastron cède, le sceau est effacé : l'âme retourne errer devant sa Porte.",
+  "treatise.fmab.ch8.p5": "La première fois que la Vérité prend le corps entier, l'âme se retrouve aussitôt dans une armure de fer, fixée par un sceau de sang tracé dans le plastron. L'armure est vide : on ne voit qu'elle. L'âme n'a ni faim ni souffle et ne mange pas. Les coups usent les pièces : une pièce qui cède se refait (sans heaume on voit mal, sans jambières on avance mal). Accroupie, l'âme transmute dans son armure le matériau qu'elle tient (un lingot de fer pour du fer) et la répare.\n\nSi le plastron cède, le sceau est effacé : l'âme retourne errer devant sa Porte. Rouvrir la Porte n'est pas si grave : la Vérité arrache le sceau, mais l'âme le retrace en revenant, dans son armure, qui en sort cabossée.",
 
   "block.fmab.white_floor": "Sol de l'Espace blanc",
   "block.fmab.gate_stone": "Pierre de la Porte",
@@ -549,6 +549,7 @@
   "gate.fmab.soul.no_anchor": "Aucun de vos sceaux ne répond. Il faudra que quelqu'un trace votre cercle d'âme.",
   "gate.fmab.soul.searching": "La Vérité cherche vos sceaux…",
   "truth.fmab.toll.seal": "« Tu n'as plus de corps à me donner. Alors je prends le sceau. »",
+  "gate.fmab.soul.seal_redrawn": "La Vérité vous arrache votre sceau. Vous le retracez dans votre armure en revenant : elle en sort cabossée.",
   "gate.fmab.seal_erased": "Le sceau de sang est effacé. Votre armure s'effondre, et votre âme retourne devant la Porte…",
   "truth.fmab.opening": "« Voici ta Porte. Tu as frappé : elle s'ouvre. »",
   "truth.fmab.reclaim": "La Vérité : « Où crois-tu aller ? Tu n'as plus de corps pour partir. »",

@@ -116,8 +116,13 @@ public record GateState(int openings, Set<BodyPart> lost, boolean adrift, Option
 		return new GateState(openings, rest, adrift && rest.contains(BodyPart.BODY), visit);
 	}
 
-	/** Une ouverture de plus, sans rien à prendre que le sceau : l'âme perd son armure. */
+	/**
+	 * Une ouverture de plus, sans rien à prendre que le sceau : la Vérité l'arrache, mais l'âme le
+	 * retrace en revenant, dans sa propre armure (qui en sort cabossée, voir
+	 * {@link com.ajustor.fmab.gate.SoulArmor#batter}). Elle n'erre pas : nul besoin d'une armure
+	 * laissée en attente pour revenir.
+	 */
 	public GateState payWithSeal() {
-		return new GateState(openings + 1, lost, true, visit);
+		return new GateState(openings + 1, lost, adrift, visit);
 	}
 }
