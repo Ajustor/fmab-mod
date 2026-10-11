@@ -6,6 +6,7 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.util.Modifiers;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -20,7 +21,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -342,16 +342,6 @@ public final class Automails {
 
 	private static void modifier(ServerPlayer player, Holder<Attribute> attribute, Identifier id, double amount,
 			AttributeModifier.Operation operation) {
-		AttributeInstance instance = player.getAttribute(attribute);
-		if (instance == null) {
-			return;
-		}
-		if (amount == 0) {
-			if (instance.getModifier(id) != null) {
-				instance.removeModifier(id);
-			}
-		} else {
-			instance.addOrUpdateTransientModifier(new AttributeModifier(id, amount, operation));
-		}
+		Modifiers.set(player, attribute, id, amount, operation);
 	}
 }

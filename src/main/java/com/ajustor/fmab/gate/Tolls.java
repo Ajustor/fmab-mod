@@ -4,6 +4,7 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
+import com.ajustor.fmab.util.Modifiers;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -25,7 +26,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -349,18 +349,7 @@ public final class Tolls {
 	}
 
 	private static void modifier(ServerPlayer player, Holder<Attribute> attribute, Identifier id, double amount) {
-		AttributeInstance instance = player.getAttribute(attribute);
-		if (instance == null) {
-			return;
-		}
-		if (amount == 0) {
-			if (instance.getModifier(id) != null) {
-				instance.removeModifier(id);
-			}
-		} else {
-			instance.addOrUpdateTransientModifier(new AttributeModifier(id, amount,
-					attribute == Attributes.MAX_HEALTH ? AttributeModifier.Operation.ADD_VALUE
-							: AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
-		}
+		Modifiers.set(player, attribute, id, amount, attribute == Attributes.MAX_HEALTH
+				? AttributeModifier.Operation.ADD_VALUE : AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 	}
 }
