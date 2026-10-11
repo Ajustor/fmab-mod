@@ -16,7 +16,7 @@ import java.util.Locale;
 public class FigureScenes implements FabricClientGameTest {
 	private static final List<String> FIGURES = List.of("lust", "izumi", "winry", "olivier", "may_chang", "hohenheim",
 			"amestrian_soldier", "briggs_soldier", "drachma_soldier", "state_examiner", "scar", "marcoh", "cornello",
-			"envy", "greed", "wrath", "gluttony", "sloth", "pride", "pride_revealed");
+			"envy", "greed", "wrath", "gluttony", "sloth", "pride", "pride_revealed", "chimera_beast", "chimera_crawler");
 	/** Les personnages sous une seconde forme : on les frappe une fois pour qu'ils se révèlent. */
 	private static final String REVEALED = "_revealed";
 	private static final int Y = -60;

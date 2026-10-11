@@ -24,7 +24,7 @@ import java.util.Locale;
 public class AnimationScenes implements FabricClientGameTest {
 	private static final List<String> FIGURES = List.of("lust", "gluttony", "sloth", "greed", "wrath", "envy", "pride",
 			"izumi", "winry", "may_chang", "olivier", "hohenheim", "marcoh", "cornello", "scar", "amestrian_soldier",
-			"immortal_soldier");
+			"immortal_soldier", "chimera_beast", "chimera_crawler");
 	private static final int Y = -60;
 	private static final int STEP = 3;
 

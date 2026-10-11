@@ -36,94 +36,112 @@ def stitches(s, part, f, x, y, length, vertical=True, color="#5a1e1e"):
 
 # --- chimères -----------------------------------------------------------------------------------
 @creature("chimera_beast", (128, 64), {
-    "head": (0, 0, 7, 7, 7), "mouth": (0, 44, 5, 3, 3), "ear": (26, 0, 2, 2, 1),
-    "body": (0, 19, 14, 14, 11), "upper": (39, 0, 12, 12, 10),
-    "hind": (50, 22, 4, 10, 8), "fore": (50, 40, 4, 10, 6)})
+    "body": (0, 0, 10, 10, 18), "mane": (56, 0, 12, 12, 6), "head": (92, 0, 8, 8, 6), "snout": (92, 14, 5, 4, 3),
+    "ear": (108, 14, 2, 2, 1), "fore": (0, 28, 4, 10, 4), "hind": (16, 28, 4, 10, 4),
+    "tail1": (32, 28, 3, 3, 6), "tail2": (50, 28, 2, 2, 5), "tail3": (64, 28, 2, 2, 4), "snake": (76, 28, 3, 2, 4)})
 def chimera_beast(s):
-    """Une chimère de Tucker : avant-train et crinière de lion, arrière-train de loup gris, cousus."""
-    lion, mane, wolf = "#c08a44", "#6e4424", "#7d7a74"
-    s.fill("head", lion, "fur")
-    s.fill("upper", mane, "fur")
-    s.fill("ear", mane, "fur")
-    s.fill("fore", lion, "fur")
+    """Une chimère de Tucker : un torse de lion à crinière, un arrière-train de loup gris cousu en
+    travers, et une queue de serpent écaillée qui finit en tête, langue fourchue."""
+    lion, mane, wolf, scale = "#c08a44", "#6e4424", "#7d7a74", "#4e6a3a"
     s.fill("body", lion, "fur")
-    s.fill("hind", wolf, "fur")
-    # Le corps est couché dans le modèle (pivoté d'un quart de tour) : le haut de la texture des
-    # côtés est vers la tête, le « dessus » de la boîte est le poitrail, le « dessous » la croupe.
-    # L'arrière passe au pelage de loup ; la couture marque la jointure.
-    s.material("body", "bottom", wolf, "fur")
-    s.material("body", "front", mix(lion, "#f0dcb0", 0.35), "fur")
-    for f in SIDES:
+    # L'arrière (face du fond) et le dessus de la croupe passent au pelage de loup, une couture en travers.
+    s.material("body", "back", wolf, "fur")
+    w, h = s.size("body", "top")
+    s.material("body", "top", wolf, "fur", y=h // 2, h=h - h // 2)
+    stitches(s, "body", "top", 0, h // 2, w, vertical=False)
+    for f in ("right", "left"):
         w, h = s.size("body", f)
-        s.material("body", f, wolf, "fur", y=h // 2, h=h - h // 2)
-        stitches(s, "body", f, 0, h // 2, w, vertical=False)
-    # La crinière déborde sur le crâne, la tête garde un ventre plus clair sous la gueule.
+        stitches(s, "body", f, w // 2, 0, h)
+    s.material("body", "bottom", mix(lion, "#f0dcb0", 0.35), "fur")
+    s.fill("mane", mane, "fur")
+    s.material("mane", "front", shade(mane, 0.8), "fur")
+    s.fill("head", lion, "fur")
     s.material("head", "top", mane, "fur")
-    for f in ("right", "left", "back"):
-        s.material("head", f, mane, "fur", h=3)
-    s.material("head", "front", mane, "fur", h=1)
     # Les yeux jaunes à pupille fendue, l'arcade sombre.
-    s.rect("head", "front", 1, 2, 2, 1, "#e8c020")
-    s.rect("head", "front", 4, 2, 2, 1, "#e8c020")
-    s.px("head", "front", 2, 2, "#1a1208")
-    s.px("head", "front", 4, 2, "#1a1208")
-    s.tint("head", "front", 0, 1, 7, 1, 0.75)
-    s.fill("mouth", "#dcb27a", "fur")
-    s.rect("mouth", "top", 1, 0, 3, 1, "#2a1a14")
-    s.rect("mouth", "front", 1, 0, 3, 1, "#2a1a14")
-    s.rect("mouth", "front", 0, 2, 5, 1, "#3a1a18")
-    s.px("mouth", "front", 0, 2, "#f0eadc")
-    s.px("mouth", "front", 4, 2, "#f0eadc")
-    # Une couture en travers du museau et une autre au cou : on voit qu'il a été assemblé.
-    stitches(s, "head", "right", 0, 3, 7, vertical=False)
-    stitches(s, "head", "left", 0, 3, 7, vertical=False)
-    for f in SIDES:
-        w, h = s.size("upper", f)
-        stitches(s, "upper", f, 0, h - 1, w, vertical=False)
-    # Les pattes : des griffes claires.
-    for leg in ("hind", "fore"):
+    s.rect("head", "front", 1, 3, 2, 1, "#e8c020")
+    s.rect("head", "front", 5, 3, 2, 1, "#e8c020")
+    s.px("head", "front", 2, 3, "#1a1208")
+    s.px("head", "front", 5, 3, "#1a1208")
+    s.tint("head", "front", 0, 2, 8, 1, 0.75)
+    stitches(s, "head", "right", 0, 5, 6, vertical=False)
+    stitches(s, "head", "left", 0, 5, 6, vertical=False)
+    s.fill("snout", "#dcb27a", "fur")
+    s.rect("snout", "front", 1, 0, 3, 1, "#2a1a14")
+    s.rect("snout", "front", 0, 3, 5, 1, "#3a1a18")
+    s.px("snout", "front", 0, 3, "#f0eadc")
+    s.px("snout", "front", 4, 3, "#f0eadc")
+    s.fill("ear", mane, "fur")
+    # Les pattes : lion devant, loup derrière, des griffes claires.
+    s.fill("fore", lion, "fur")
+    s.fill("hind", wolf, "fur")
+    for leg in ("fore", "hind"):
         s.band(leg, 9, 1, shade(s.pget(leg, "front", 1, 5), 0.75), "fur")
         for x in (0, 2):
             s.px(leg, "front", x, 9, "#e6dccb")
         s.material(leg, "bottom", "#3a2a22", "leather")
+    # La queue de serpent : des écailles vertes, un ventre clair, la tête aux yeux rouges.
+    for seg in ("tail1", "tail2", "tail3", "snake"):
+        s.fill(seg, scale, "stone")
+        s.material(seg, "bottom", "#c8c49a", "skin")
+        for f in ("right", "left", "top"):
+            w, h = s.size(seg, f)
+            for x in range(0, w, 2):
+                s.tint(seg, f, x, 0, 1, h, 0.8)
+    stitches(s, "tail1", "top", 0, 0, 3, vertical=False)
+    s.px("snake", "front", 0, 0, "#e02020")
+    s.px("snake", "front", 2, 0, "#e02020")
+    s.px("snake", "front", 1, 1, "#c03050")
 
 
-@creature("chimera_crawler", (64, 32), {
-    "head": (32, 4, 8, 8, 8), "neck": (0, 0, 6, 6, 6), "body": (0, 12, 10, 8, 12), "leg": (18, 0, 16, 2, 2)})
+@creature("chimera_crawler", (64, 64), {
+    "head": (0, 0, 8, 8, 8), "neck": (32, 0, 4, 4, 4), "body": (0, 16, 8, 6, 12),
+    "dog": (40, 16, 3, 8, 3), "arm": (52, 16, 3, 10, 3), "leg": (0, 34, 16, 2, 2)})
 def chimera_crawler(s):
-    """La chimère rampante : un pelage de chien pelé sur un corps d'araignée, des pattes de chitine."""
+    """La chimère rampante : un tronc de chien pelé et cousu, une tête de chien aux orbites rouges,
+    des pattes de chien, des bras d'homme et des pattes de chitine."""
     fur, skin, chitin = "#7a5a3e", "#b88a72", "#2a2420"
     s.fill("head", fur, "fur")
     s.fill("neck", fur, "fur")
     s.fill("body", fur, "fur")
-    # Des plaques de peau nue là où le pelage est tombé.
-    for part, f, x, y, w, h in (("body", "top", 2, 3, 3, 4), ("body", "top", 6, 7, 2, 3), ("body", "right", 3, 2, 3, 2),
-                                ("body", "left", 6, 4, 2, 2), ("head", "top", 1, 2, 2, 2), ("body", "back", 4, 1, 3, 2)):
+    # Des plaques de peau nue là où le pelage est tombé, et des coutures.
+    for part, f, x, y, w, h in (("body", "top", 2, 3, 3, 4), ("body", "top", 5, 8, 2, 3), ("body", "right", 3, 2, 3, 2),
+                                ("body", "left", 6, 1, 2, 2), ("head", "top", 1, 2, 2, 2)):
         s.material(part, f, skin, "skin", x=x, y=y, w=w, h=h)
-    for f in SIDES:
+    for f in ("right", "left"):
         w, h = s.size("body", f)
-        stitches(s, "body", f, 0, 3, w, vertical=False)
-    # Le visage : un museau de chien et les orbites où la couche des yeux allume le rouge.
+        stitches(s, "body", f, 4, 0, h)
+        stitches(s, "body", f, 8, 0, h)
+    w, h = s.size("body", "top")
+    stitches(s, "body", "top", 0, 4, w, vertical=False)
+    stitches(s, "body", "top", 0, 8, w, vertical=False)
+    # Le visage : un museau de chien, des orbites où brûle le rouge.
     s.material("head", "front", mix(fur, skin, 0.4), "fur")
-    for x, y in ((1, 0), (6, 0), (2, 1), (5, 1), (0, 2), (7, 2), (0, 3), (7, 3), (2, 3), (3, 3), (4, 3), (5, 3),
-                 (2, 4), (3, 4), (4, 4), (5, 4)):
-        s.px("head", "front", x, y, "#1a0e0c")
+    for x, y in ((1, 2), (2, 2), (5, 2), (6, 2)):
+        s.px("head", "front", x, y, "#e02818")
+    s.rect("head", "front", 1, 3, 2, 1, "#1a0e0c")
+    s.rect("head", "front", 5, 3, 2, 1, "#1a0e0c")
     s.rect("head", "front", 2, 5, 4, 2, "#d8b8a0")
     s.rect("head", "front", 3, 5, 2, 1, "#1a1214")
     s.rect("head", "front", 2, 7, 4, 1, "#3a1416")
     s.px("head", "front", 2, 7, "#ece2d0")
     s.px("head", "front", 5, 7, "#ece2d0")
-    # Les oreilles tombantes sur les côtés.
     s.material("head", "right", shade(fur, 0.7), "fur", x=3, w=3, y=0, h=4)
     s.material("head", "left", shade(fur, 0.7), "fur", x=2, w=3, y=0, h=4)
-    # Les pattes : chitine luisante, articulations plus claires, pointes acérées.
+    # Pattes de chien, bras d'homme (une couture au coude), pattes de chitine luisantes.
+    s.fill("dog", fur, "fur")
+    s.material("dog", "bottom", "#2a1a14", "leather")
+    s.fill("arm", skin, "skin")
+    s.band("arm", 0, 2, fur, "fur")
+    for f in SIDES:
+        w, h = s.size("arm", f)
+        stitches(s, "arm", f, 0, 5, w, vertical=False)
+    s.material("arm", "bottom", shade(skin, 0.85), "skin")
     s.fill("leg", chitin, "metal")
     for f in ("front", "back", "top", "bottom"):
         w, h = s.size("leg", f)
         for x in (4, 9):
             if x < w:
                 s.tint("leg", f, x, 0, 1, h, 1.6)
-        s.tint("leg", f, w - 2, 0, 2, h, 0.6)
 
 
 # --- le golem de pierre ---------------------------------------------------------------------------
