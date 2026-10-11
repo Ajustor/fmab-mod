@@ -54,7 +54,7 @@ public class PrideEntity extends HomunculusEntity {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 40)
+				.add(Attributes.MAX_HEALTH, 120)
 				.add(Attributes.MOVEMENT_SPEED, 0.25)
 				.add(Attributes.ATTACK_DAMAGE, 3)
 				.add(Attributes.FOLLOW_RANGE, 24)

@@ -80,7 +80,7 @@ public class FatherEntity extends HomunculusEntity {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 260)
+				.add(Attributes.MAX_HEALTH, 560)
 				.add(Attributes.MOVEMENT_SPEED, 0.27)
 				.add(Attributes.ATTACK_DAMAGE, 10)
 				.add(Attributes.FOLLOW_RANGE, 40)

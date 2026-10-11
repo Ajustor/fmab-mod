@@ -88,6 +88,20 @@ Les sept homonculus sont nés des péchés que Père a expulsés de lui-même ; 
 
 Traduction gameplay : boss final en trois phases (vieillard, forme sans visage avec mini-soleil, forme divine instable). Gimmick : zone « anti-alchimie » où seules les techniques d'alkahestry ou les armes classiques fonctionnent.
 
+**Courbe des boss.** Les PV effectifs (PV max × vies, une vie par âme plus la dernière) croissent dans l'ordre où on les rencontre. Les mécaniques propres s'y ajoutent sans entrer dans le chiffre, sauf quand elles changent la quantité de dégâts à encaisser.
+
+| Ordre | Boss | PV max | Vies | PV effectifs | Ce qui s'y ajoute |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Barry le Boucher | 70 | 1 | 70 | armure habitée |
+| 2 | Lust | 60 | 7 | 420 | lames qui percent les boucliers |
+| 3 | Gluttony | 70 | 8 | 560 | aspire, avale dans le Ventre |
+| 4 | Greed | 100 | 6 | 600 | invulnérable hors de ses attaques |
+| 5 | Envy | 50 humain, 90 géant, 8 lézard | 11 (5 + 5 + 1) | 708 | déguisé jusqu'au premier coup |
+| 6 | Sloth | 150 | 6 | 900 | charges, pauses |
+| 7 | Pride | 120 | 8 | 960 | ne craint que le noir complet ou la pleine lumière |
+| 8 | Wrath | 550 | 1 | ~1 000 | esquive 45 % des coups de face (550 / 0,55) |
+| 9 | Père | 560 | 3 formes | ~1 570 | la forme divine encaisse 25 % de plus (560 + 560 + 448), mais perd ses PV sans âmes |
+
 **Mobs mineurs liés :** chimères (Tucker et militaires), soldats immortels (corps sans âme animés par du sang), armures habitées (Barry le Boucher, Slicer frères).
 
 ## Personnages et alchimistes d'État

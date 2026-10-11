@@ -54,7 +54,7 @@ public class SlothEntity extends HomunculusEntity {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 250)
+				.add(Attributes.MAX_HEALTH, 150)
 				.add(Attributes.MOVEMENT_SPEED, 0.22)
 				.add(Attributes.ATTACK_DAMAGE, 16)
 				.add(Attributes.ATTACK_KNOCKBACK, 2.5)
