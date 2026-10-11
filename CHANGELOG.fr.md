@@ -1,5 +1,38 @@
 # Journal des modifications
 
+## 1.2.0 — 2026-10-11
+
+### Nouveautés
+
+- HUD redessiné : le compteur d'âmes a l'icône de la Pierre, la concentration une jauge encadrée, la vue perdue un voile doux
+- Les chimères de Tucker ont leurs propres corps : lion, loup et serpent pour la grande, six membres cousus pour la rampante.
+- Liore devient une vraie ville du désert : enceinte, allée du temple, place à fontaine, marché couvert et une vingtaine de maisons à terrasse.
+- Les gestes de transmutation se voient aussi à la première personne : les mains claquent devant soi, plongent sur le cercle ou se tendent vers une âme.
+- Des chemins relient les maisons de Resembool, Dublith et Rush Valley à leur place, bordés de réverbères.
+- Faire de Greed un allié suffit pour « Les sept péchés », et de nouveaux progrès récompensent le pacte avec Greed, le tatouage d'Ishval, Cornello démasqué, les notes de Marcoh, Hohenheim et le dispensaire de Marcoh.
+- La montre d'État, le noyau de Pierre, le sang cristallisé, le fil, l'encre et la cartouche ont une infobulle qui dit à quoi ils servent.
+- Avec un karma très bas, Lust vient d'abord vous faire l'offre de Père : l'accepter met fin aux traques, la refuser les déclenche.
+- Barry le Boucher a sa propre mécanique : coup de hachoir en arc annoncé, ruée une fois blessé, et un sceau qui tient au premier effondrement.
+- Commandes de test /fmab karma [valeur] et /fmab offer (opérateurs).
+
+### Corrections
+
+- Après un changement de monde en solo, le bras de Scar et le marché de la Pierre ne restent plus bloqués ; les états par joueur ne s'accumulent plus sur un serveur
+- Le sommaire du Traité ne coupe plus les titres des chapitres ; Winry montre l'usure de chaque automail en barre ; l'écran des gants est plus lisible
+- Les cercles portés (broderies, tatouages) ne cumulent plus un même effet au-delà de trois, et se taisent dans la zone de Père.
+- Envy ne revient plus hanter qui l'a vaincu, les homonculus errants repartent quand personne ne les approche, et seul le premier de chaque sorte laisse un noyau de Pierre.
+- La difficulté des boss suit l'ordre de progression : Gluttony et Sloth s'adoucissent, Pride, Wrath et surtout Père deviennent les plus coriaces.
+- Les cercles ne disparaissent plus pendant la cinématique de la Porte, et beaucoup de cercles à l'écran ne font plus saccader le jeu.
+- Le pistolet tire moins vite, ses balles faiblissent avec la distance et ne font guère que ralentir les homonculus.
+- Pride démasqué vous traque et fuit vers la pénombre quand ses ombres meurent ; ses ombres ne traversent plus les murs et épargnent vos chimères, vos bêtes et les villageois.
+- L'arme transmutée de l'examen d'État ne s'effrite plus près de l'examinateur, et lancer une arme sans le savoir requis dit lequel manque et comment l'obtenir.
+- Une âme qui rouvre la Porte revient dans sa propre armure, cabossée, au lieu de la perdre et d'avoir à laisser une armure sans défense en attente.
+
+### Performances
+
+- Moins de trafic réseau pour les joueurs amputés, appareillés ou portant des passifs : leurs attributs ne sont plus renvoyés à chaque tick
+- Le rendu des joueurs est plus léger : plus de recherche du fauteuil poussé ni de reconstruction du corps à chaque image.
+- La recharge de la concentration n'envoie plus toutes les données d'alchimiste au client chaque seconde.
 ## 1.1.0 — 2026-10-11
 
 ### Nouveautés

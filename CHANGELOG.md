@@ -1,5 +1,38 @@
 # Changelog
 
+## 1.2.0 — 2026-10-11
+
+### New features
+
+- Redrawn HUD: the soul counter shows the Stone's icon, concentration a framed gauge, lost sight a soft veil
+- Tucker's chimeras get bodies of their own: lion, wolf and snake for the beast, six stitched limbs for the crawler.
+- Liore becomes a real desert town: walls, temple avenue, fountain square, covered market and some twenty houses with roof terraces.
+- Transmutation gestures now show in first person too: hands clap in front of you, plunge onto the circle or reach for a soul.
+- Paths now link the houses of Resembool, Dublith and Rush Valley to their square, lined with lamp posts.
+- Making Greed an ally is enough for "The Seven Sins", and new advancements reward the pact with Greed, the Ishvalan tattoo, exposing Cornello, Marcoh's notes, Hohenheim and Marcoh's clinic.
+- The State watch, the Stone core, crystallized blood, thread, ink and cartridges have a tooltip explaining what they are for.
+- With very low karma, Lust first comes to make you Father's offer: accepting ends the hunts, refusing starts them.
+- Barry the Chopper has his own mechanics: a telegraphed cleaver sweep, a charge once wounded, and a seal that holds the first time he falls.
+- Test commands /fmab karma [value] and /fmab offer (operators).
+
+### Fixes
+
+- After switching worlds in single player, Scar's arm and the Stone's bargain no longer get stuck; per-player state no longer piles up on a server
+- The Treatise contents no longer cut chapter titles; Winry shows each automail's wear as a bar; the gloves screen is easier to read
+- Worn circles (embroidery, tattoos) no longer stack the same effect beyond three, and fall silent in Father's zone.
+- Envy no longer haunts those who defeated him, wandering homunculi leave when nobody comes near, and only the first of each kind leaves a Stone core.
+- Boss difficulty now follows the progression order: Gluttony and Sloth get easier, Pride, Wrath and above all Father become the toughest.
+- Circles no longer vanish during the Gate cinematic, and many circles on screen no longer make the game stutter.
+- The pistol fires slower, its bullets weaken with distance and barely slow homunculi down.
+- Unmasked Pride hunts you and flees to the dusk when his shadows die; his shadows no longer pass through walls and spare your chimeras, your animals and villagers.
+- The State exam's transmuted weapon no longer crumbles near the examiner, and casting a weapon without the required knowledge names it and how to get it.
+- A soul that opens the Gate again comes back in its own armor, battered, instead of losing it and having to leave a defenseless armor waiting.
+
+### Performance
+
+- Less network traffic for players with lost limbs, automail or worn passives: their attributes are no longer resent every tick
+- Player rendering is lighter: no more per-frame search for the pushed wheelchair or rebuilding of the body.
+- Recharging concentration no longer sends all the alchemist data to the client every second.
 ## 1.1.0 — 2026-10-11
 
 ### New features
