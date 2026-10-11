@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 public class YockIslandStructure extends Structure {
 	public static final MapCodec<YockIslandStructure> CODEC = simpleCodec(YockIslandStructure::new);
-	private static final int SIZE = 25;
+	static final int SIZE = 25;
 	private static final int MAX_DEPTH = 40;
 
 	public YockIslandStructure(StructureSettings settings) {
