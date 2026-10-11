@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_liore",
+  "criteria": {
+    "cornello_exposed": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "cornello_exposed"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:red_stone_shard"
+    },
+    "title": {
+      "translate": "advancements.fmab.cornello_exposed.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.cornello_exposed.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "cornello_exposed"
+    ]
+  ]
+}

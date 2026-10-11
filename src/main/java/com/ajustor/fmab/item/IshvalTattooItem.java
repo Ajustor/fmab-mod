@@ -1,6 +1,7 @@
 package com.ajustor.fmab.item;
 
 import com.ajustor.fmab.alchemy.glyph.Rank;
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.registry.FmabAttachments;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -42,6 +43,7 @@ public class IshvalTattooItem extends Item {
 			return InteractionResult.SUCCESS;
 		}
 		p.setAttached(FmabAttachments.SCAR_ARM, true);
+		Milestones.reach(p, "scar_tattoo");
 		p.getItemInHand(hand).consume(1, p);
 		p.hurtServer(p.level(), p.level().damageSources().magic(), 4);
 		p.level().playSound(null, p.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, 1, 0.7f);

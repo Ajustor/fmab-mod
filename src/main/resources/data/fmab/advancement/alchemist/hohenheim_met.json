@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/transmuted",
+  "criteria": {
+    "hohenheim_met": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "hohenheim_met"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:clock"
+    },
+    "title": {
+      "translate": "advancements.fmab.hohenheim_met.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.hohenheim_met.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "hohenheim_met"
+    ]
+  ]
+}

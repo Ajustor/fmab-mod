@@ -124,6 +124,12 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("alkahestry"));
 
+	/** Allié de Greed, par un pacte scellé d'or : gardé à la mort, même si le pacte est rompu depuis. */
+	public static final AttachmentType<Boolean> GREED_PACT = AttachmentRegistry.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("greed_pact"));
+
 	/** Reconnu allié de Briggs par Olivier Armstrong : gardé à la mort. */
 	public static final AttachmentType<Boolean> BRIGGS_ALLY = AttachmentRegistry.<Boolean>builder()
 			.persistent(Codec.BOOL)
