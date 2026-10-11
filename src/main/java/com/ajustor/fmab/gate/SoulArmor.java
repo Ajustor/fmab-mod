@@ -118,6 +118,24 @@ public final class SoulArmor {
 	}
 
 	/** Le sceau tient-il encore : le plastron scellé au nom du joueur est-il porté ? */
+	/**
+	 * La Vérité a arraché le sceau : chaque pièce portée en sort usée de moitié au moins, sans
+	 * jamais céder (voir {@link #battered}).
+	 */
+	public static void batter(ServerPlayer player) {
+		for (EquipmentSlot slot : SLOTS) {
+			ItemStack piece = player.getItemBySlot(slot);
+			if (!piece.isEmpty() && piece.isDamageableItem()) {
+				piece.setDamageValue(battered(piece.getDamageValue(), piece.getMaxDamage()));
+			}
+		}
+	}
+
+	/** L'usure d'une pièce après le péage du sceau : la moitié au moins, jamais jusqu'à céder. */
+	public static int battered(int damage, int maxDamage) {
+		return Math.min(maxDamage - 1, Math.max(damage, maxDamage / 2));
+	}
+
 	public static boolean sealIntact(ServerPlayer player) {
 		ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
 		return chest.is(FmabItems.SOUL_CHESTPLATE)
