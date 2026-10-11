@@ -25,8 +25,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 
+
 import java.util.EnumSet;
 import java.util.List;
+
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Une visite guidée des rendus du mod, en captures d'écran : le corps du joueur (membres perdus,
@@ -124,6 +127,8 @@ public class RenderShowcase implements FabricClientGameTest {
 
 		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GATE,
 				GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_LEG)));
+		check(context.computeOnClient(mc -> mc.player.getAttachedOrElse(FmabAttachments.GATE, GateState.NONE)
+				.lost(BodyPart.RIGHT_ARM)), "le client devrait savoir que le bras droit est perdu");
 		context.takeScreenshot("body_01_lost_right_arm_left_leg");
 
 		onPlayer(context, sp, p -> {
@@ -216,6 +221,8 @@ public class RenderShowcase implements FabricClientGameTest {
 					id, distance));
 			sp.getConnection().waitForClientboundPackets();
 			context.waitTicks(20);
+			check(context.computeOnClient(mc -> mc.level.getEntities(type, new net.minecraft.world.phys.AABB(-20, -70, -20, 20, -40, 30),
+					e -> true).size()) > 0, "le client devrait voir fmab:" + id);
 			context.takeScreenshot("entity_%02d_%s".formatted(index++, id));
 			if (type == FmabEntities.TRUTH) {
 				sp.getServer().runOnServer(server -> server.overworld().getEntities(FmabEntities.TRUTH, e -> true)

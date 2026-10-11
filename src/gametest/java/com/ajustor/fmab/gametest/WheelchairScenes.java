@@ -21,6 +21,8 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Consumer;
 
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
+
 /**
  * Le fauteuil roulant en jeu : on rampe sans jambes, on s'assied, on roule à la force des bras ; un
  * bloc plein arrête, une dalle se franchit ; on ne saute pas ; un seul bras ne suffit pas, un
@@ -58,12 +60,6 @@ public class WheelchairScenes implements FabricClientGameTest {
 		sp.getServer().runOnServer(server -> action.accept(server.getPlayerList().getPlayers().getFirst()));
 		sp.getConnection().waitForClientboundPackets();
 		context.waitTicks(2);
-	}
-
-	private static void check(boolean condition, String message) {
-		if (!condition) {
-			throw new AssertionError(message);
-		}
 	}
 
 	private static Vec3 clientPosition(ClientGameTestContext context) {

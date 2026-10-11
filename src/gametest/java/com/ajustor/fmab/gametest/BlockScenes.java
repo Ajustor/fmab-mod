@@ -6,11 +6,15 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 
+
 import java.util.List;
 import java.util.Locale;
+
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Les blocs du mod, chacun dans sa vignette : trois exemplaires en équerre (pour voir comment les
@@ -96,6 +100,12 @@ public class BlockScenes implements FabricClientGameTest {
 			List<Identifier> ids = blocks();
 			for (int i = 0; i < ids.size(); i++) {
 				vignette(sp, i * STEP, ids.get(i).toString());
+			}
+			for (int i = 0; i < ids.size(); i++) {
+				BlockPos at = new BlockPos(i * STEP, Y, 0);
+				Identifier placed = sp.getServer().computeOnServer(server ->
+						BuiltInRegistries.BLOCK.getKey(server.overworld().getBlockState(at).getBlock()));
+				check(placed.equals(ids.get(i)), "le bloc " + ids.get(i) + " devrait être posé, on trouve " + placed);
 			}
 			// En spectateur : il reste où on le pose, sans tomber.
 			sp.getServer().runCommand("gamemode spectator @p");

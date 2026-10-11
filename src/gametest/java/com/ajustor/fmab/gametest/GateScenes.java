@@ -31,6 +31,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Map;
 
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
+
 /**
  * Une visite de la Porte, du début à la fin, sans Pierre : les bras jaillissent du cercle et
  * l'aspirent, la Vérité l'accueille, la Porte s'ouvre et ses bras viennent le chercher, le savoir
@@ -158,12 +160,6 @@ public class GateScenes implements FabricClientGameTest {
 			ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
 			return action.run(player.level(), player);
 		});
-	}
-
-	private static void check(boolean condition, String message) {
-		if (!condition) {
-			throw new AssertionError(message);
-		}
 	}
 
 	/** Les ingrédients d'un corps, posés sur le cercle. */
