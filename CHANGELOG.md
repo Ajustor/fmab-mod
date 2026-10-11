@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.1.0 — 2026-10-11
+
+### New features
+
+- Wheelchair: without legs you crawl or roll, both arms to move, ramps to climb, and a player or a villager can push you
+- Craft objects through alchemy: break an object down to understand it, then recompose it from a model with the matter it holds
+- Design page (J key): think of the object to create, no model needed; the Philosopher's Stone creates without matter; extra matter makes the object sturdier
+- Wood and Fiber glyphs: recompose chests, boats, beds, bows… ("On Wood and Fiber" tome from librarians)
+- 14 new glyphs (Carbon, Crystal, Sulfur, Mercury, Lime, Plant, Flesh, Silver, Tin, Lead, Zinc, Nickel, Aluminium, Netherite): everything can be transmuted, other mods' materials included
+- New human transmutation circle with six satellites (State Alchemist); the chimera needs Human + Flesh, detonation Fire + Sulfur
+- Rank no longer blocks a circle: beyond it, the circle loses stability and may rebound (a Philosopher's Stone holds it)
+- Human transmutation with a Philosopher's Stone: open the Gate and buy your parts back with the Stone's souls, or create a being by giving it a soul; a Gate initiate can clap with a Stone in hand
+- The form of a being created with a Stone can be chosen (human, dog, cat, horse, parrot); the Stone only gives back lost parts before the Gate
+- New textures for every creature (characters, homunculi, chimeras, golem, automail), portrait spawn eggs and redrawn weapons
+- The Gate teaches every glyph; it opens and closes as two doors, its arms undulate and have real hands; new cinematic (shadow arms, eye, tunnel of circles and glyphs) with the Truth's lines as subtitles
+- The mod's blocks are redrawn (bricks, Gluttony's flesh, crystallized blood, red stone, Father's lair, seals, alchemist table, automail bench, Gate stone)
+- Towns are denser and livelier: houses with eaves, shutters, window boxes and chimneys, trees, markets, a sheep pasture in Resembool, palms and awnings in Liore and Rush Valley
+- The State Alchemist watch, leather gloves and red stone shard are redrawn
+- Alchemist table, automail bench and Father's pipes modelled in 3D; seals and red stone glow in the dark, the Gate's eyes blink
+- Characters have recognisable silhouettes: Lust's bust and hips, Izumi's, Winry's and Olivier's bust, ponytails, May Chang's buns and braids, soldiers' visors
+- Cornello wears his medallion and priest's robe, Marcoh his satchel, Olivier her long hair down her back; Briggs soldiers have their fur collar and pack, Drachma soldiers their ushanka and greatcoat
+- Scar has a wrestler's shoulders; Pride has a child's head and, once revealed, a shadow mask and more blades
+- Redrawn icons (inks, books, chalk, gloves, crimson seals, Philosopher's Stone); the soul chestplate looks like Alphonse's armour, the stone lance has its own look; stone golem spawn egg
+- An automail arm can be transmuted into a blade (Arm blade) like Ed's, then restored; a broad blade springs from a riveted cuff, is visible and cuts bare-handed
+- Characters breathe, walk their own way and strike poses (crossed arms, hands behind their back, fists on hips), then a guard in combat; Lust points and shoots out her finger blades, Gluttony's belly wobbles
+- The mod's creatures have a voice (idle, hurt, death), and some their own footsteps
+- Drachma soldiers, immortals, chimeras, empty armours, Barry and the stone golem now drop loot
+- Fort Briggs (buttresses, loopholes, banner, portcullis gate, lit barracks) and Laboratory 5 (abandoned compound, barbed wall, brick building) are rebuilt
+- The player's transmutation gestures (clap, palms on the circle, soul reach) are animated with wind-up and follow-through
 ## 1.0.1 — 2026-10-09
 
 ### New features
