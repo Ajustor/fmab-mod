@@ -56,8 +56,8 @@ jobs:
           path: ${{ steps.jar.outputs.path }}
           if-no-files-found: error
 
-  # Les textures sont dessinées en code (tools/skins) : les PNG commités doivent être exactement ceux
-  # que donnent les générateurs, sinon quelqu'un a retouché une image à la main ou oublié de régénérer.
+  # Les textures sont dessinées en code (tools/skins) : les PNG commités doivent être ceux que donnent
+  # les générateurs, sinon quelqu'un a retouché une image à la main ou oublié de régénérer.
   textures:
     runs-on: ubuntu-24.04
     steps:
@@ -71,15 +71,10 @@ jobs:
           cache-dependency-path: tools/skins/requirements.txt
       - name: install
         run: pip install -r tools/skins/requirements.txt
-      - name: regenerate
-        run: python tools/skins/all.py
-      - name: compare
-        run: |
-          if [ -n "$(git status --porcelain -- src/main/resources)" ]; then
-            git status --porcelain -- src/main/resources
-            echo "::error::Les textures ne correspondent pas aux générateurs : lancer python tools/skins/all.py et committer."
-            exit 1
-          fi
+      # Régénère tout, puis compare les images pixel à pixel : la compression des PNG varie d'une
+      # machine à l'autre sans rien changer aux textures.
+      - name: regenerate and compare
+        run: python tools/skins/check.py
 
   # L'éditeur web rejoue les mêmes cercles de test (testdata/circles) avec son portage TypeScript.
   editor:
