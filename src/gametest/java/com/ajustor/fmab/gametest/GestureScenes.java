@@ -14,6 +14,8 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
+
 /**
  * Les gestes de transmutation du joueur, image par image : les mains qui claquent, les paumes qui
  * plongent sur le cercle. Vus de trois quarts, à la troisième personne, puis de ses propres yeux
@@ -63,6 +65,9 @@ public class GestureScenes implements FabricClientGameTest {
 				context.waitTicks(10);
 				sp.getServer().runOnServer(server -> TransmutationPose.strike(server.getPlayerList().getPlayers().getFirst(),
 						kind, 14));
+				sp.getConnection().waitForClientboundPackets();
+				check(context.computeOnClient(mc -> mc.player.getAttachedOrElse(FmabAttachments.POSE, TransmutationPose.NONE)
+						.kind()) == kind, "le client devrait recevoir le geste " + kind);
 				int at = 0;
 				for (int frame : FRAMES) {
 					context.waitTicks(frame - at);
