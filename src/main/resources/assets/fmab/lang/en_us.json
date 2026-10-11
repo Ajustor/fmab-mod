@@ -949,6 +949,8 @@
   "stone.fmab.absorbed": "+%s souls (%s)",
   "stone.fmab.being_drained": "Your souls are being torn out! %s remain.",
   "stone.fmab.drained_dry": "Another Stone drained you of your souls.",
+  "command.fmab.karma": "Karma: %s",
+  "command.fmab.offer": "Answer to Father's offer forgotten; the homunculi are coming (depending on karma).",
   "stone.fmab.offer": "Lust: \"Father has noticed what you do. He has a place for you.\" (right-click her to accept; striking her or walking away means no)",
   "stone.fmab.offer_accepted": "Lust: \"A wise choice. Here is an advance. None of us will come for you again.\"",
   "stone.fmab.offer_refused": "Lust: \"Pity. Humans are so predictable.\"",

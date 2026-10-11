@@ -71,10 +71,13 @@ public class FoeScenes implements FabricClientGameTest {
 		LustEntity[] lust = new LustEntity[1];
 		onPlayer(context, sp, p -> {
 			homunculi(p).forEach(HomunculusEntity::discard);
-			p.removeAttached(FmabAttachments.RECRUITMENT);
 			p.setHealth(p.getMaxHealth());
-			Karma.set(p, -80);
-			LivingStone.visit(p);
+		});
+		// Les commandes de test : régler le karma, oublier la réponse et faire venir les homonculus.
+		sp.getServer().runCommand("execute as @p run fmab karma -80");
+		sp.getServer().runCommand("execute as @p run fmab offer");
+		onPlayer(context, sp, p -> {
+			check(Karma.of(p) == -80, "/fmab karma -80 devrait régler le karma, pas " + Karma.of(p));
 			List<HomunculusEntity> came = homunculi(p);
 			check(came.size() == 1 && came.getFirst() instanceof LustEntity,
 					"une âme noire qui n'a pas répondu devrait recevoir Lust seule, pas " + came);

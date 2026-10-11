@@ -120,7 +120,9 @@ Configuration du serveur : `config/fmab.json`, créé au premier lancement.
 toute sa progression d'alchimiste ; à `false`, elle ne retrouve que son corps.
 
 Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab forget_all`,
-`/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`.
+`/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`, `/fmab karma [valeur]` (lire ou régler
+le karma, de −100 à 100), `/fmab offer` (oublier la réponse à l'offre de Père et faire venir les
+homonculus tout de suite).
 
 ### Développement
 

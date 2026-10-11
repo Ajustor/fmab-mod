@@ -949,6 +949,8 @@
   "stone.fmab.absorbed": "+%s âmes (%s)",
   "stone.fmab.being_drained": "On vous arrache vos âmes ! Il en reste %s.",
   "stone.fmab.drained_dry": "Une autre Pierre vous a vidé de vos âmes.",
+  "command.fmab.karma": "Karma : %s",
+  "command.fmab.offer": "Réponse à l'offre de Père oubliée ; les homonculus viennent (selon le karma).",
   "stone.fmab.offer": "Lust : « Père a remarqué ce que tu fais. Il a une place pour toi. » (clic droit sur elle pour accepter ; la frapper ou partir, c'est refuser)",
   "stone.fmab.offer_accepted": "Lust : « Sage décision. Voici un acompte. Plus aucun de nous ne viendra te chercher. »",
   "stone.fmab.offer_refused": "Lust : « Dommage. Les humains sont si prévisibles. »",
