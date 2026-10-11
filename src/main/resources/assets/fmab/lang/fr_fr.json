@@ -349,7 +349,7 @@
   "exam.fmab.not_eligible": "L'examen d'État est ouvert aux Alchimistes. Revenez quand vous en serez un.",
   "exam.fmab.already_passed": "Vous êtes déjà Alchimiste d'État. Portez votre montre avec honneur.",
   "exam.fmab.ready_to_fight": "Objets reçus. L'épreuve : un golem de pierre, lié à un cercle gravé. Tant que le cercle tient, il se relève.",
-  "exam.fmab.req.weapon": "Une arme transmutée (lance de pierre ou lame-bras), à transmuter sur place : elle s'effrite en une minute",
+  "exam.fmab.req.weapon": "Une arme transmutée : lance de pierre (Terre) ou lame-bras (Métal), ouvertes à 45 de maîtrise ou par le combat d'entraînement contre Izumi. Près de l'examinateur, elle ne s'effrite pas",
   "exam.fmab.req.ice": "Glace ou neige (blocs)",
   "exam.fmab.req.fee": "Lingots de fer (droit d'examen)",
   "exam.fmab.give": "Remettre les objets",
@@ -1001,6 +1001,7 @@
 
   "transmutation.fmab.understood": "Vous comprenez comment %s est fait : vous pouvez le recomposer d'après modèle",
   "transmutation.fmab.copy.no_model": "Rien à recomposer : posez sur le cercle l'objet à copier",
+  "transmutation.fmab.weapon.locked": "Le savoir « %s » vous manque : atteignez %3$s de maîtrise à l'%2$s, ou tenez tête à Izumi en combat d'entraînement.",
   "transmutation.fmab.copy.not_understood": "Vous ne comprenez pas comment %s est fait : décomposez-en un sur un cercle d'abord",
   "transmutation.fmab.copy.wrong_element": "%s est surtout fait de %s : ce cercle ne le vise pas",
   "transmutation.fmab.copy.gold": "%s contient de l'or : l'État interdit d'en fabriquer",
