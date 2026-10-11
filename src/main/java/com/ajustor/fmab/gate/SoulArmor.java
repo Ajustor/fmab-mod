@@ -1,5 +1,6 @@
 package com.ajustor.fmab.gate;
 
+import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.drawing.SoulSeal;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Notebooks;
@@ -9,6 +10,7 @@ import com.ajustor.fmab.transmutation.AlchemyRules;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
@@ -18,6 +20,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 
 import java.util.ArrayList;
@@ -32,11 +35,13 @@ import java.util.UUID;
  * solerets sont des pièces d'armure ordinaires, qu'on refait quand elles cèdent.
  */
 public final class SoulArmor {
-	/** L'acier d'un plastron d'âme, sous l'apparence du fer. */
+	/** L'apparence portée du plastron : l'acier bleuté de l'armure d'Alphonse. */
+	public static final ResourceKey<EquipmentAsset> ASSET = ResourceKey.create(EquipmentAssets.ROOT_ID, Fmab.id("soul"));
+	/** L'acier d'un plastron d'âme. */
 	public static final ArmorMaterial MATERIAL = new ArmorMaterial(24,
 			Map.of(ArmorType.BOOTS, 2, ArmorType.LEGGINGS, 5, ArmorType.CHESTPLATE, 6, ArmorType.HELMET, 2,
 					ArmorType.BODY, 5),
-			9, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F, ItemTags.REPAIRS_IRON_ARMOR, EquipmentAssets.IRON);
+			9, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F, ItemTags.REPAIRS_IRON_ARMOR, ASSET);
 
 	/** Les emplacements que l'armure occupe, le plastron (le sceau) compris. */
 	public static final List<EquipmentSlot> SLOTS = List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST,

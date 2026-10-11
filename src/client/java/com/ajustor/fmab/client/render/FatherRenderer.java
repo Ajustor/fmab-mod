@@ -9,7 +9,6 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
 
@@ -24,7 +23,7 @@ public class FatherRenderer extends HumanoidMobRenderer<FatherEntity, FatherRend
 			Fmab.id("textures/entity/father_faceless.png"),
 			Fmab.id("textures/entity/father_divine.png")};
 
-	public static class State extends HumanoidRenderState {
+	public static class State extends FigureRenderer.State {
 		int phase;
 		boolean forging;
 	}
@@ -37,6 +36,7 @@ public class FatherRenderer extends HumanoidMobRenderer<FatherEntity, FatherRend
 		@Override
 		public void setupAnim(State state) {
 			super.setupAnim(state);
+			Temper.FATHER.apply(this, state, state.aggressive);
 			if (state.forging) {
 				// Les deux mains levées au-dessus de la tête, autour du soleil.
 				rightArm.xRot = (float) Math.PI;
@@ -72,6 +72,7 @@ public class FatherRenderer extends HumanoidMobRenderer<FatherEntity, FatherRend
 	@Override
 	public void extractRenderState(FatherEntity entity, State state, float partialTicks) {
 		super.extractRenderState(entity, state, partialTicks);
+		state.aggressive = entity.isAggressive();
 		state.phase = Math.clamp(entity.phase(), 0, FORMS.length - 1);
 		state.forging = entity.sun() > 0;
 	}

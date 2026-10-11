@@ -8,15 +8,21 @@ import com.ajustor.fmab.data.Automail;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.entity.WheelchairEntity;
+import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Wheelchairs;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +41,7 @@ import java.util.Set;
 /**
  * Recopie dans l'état de rendu ce que le serveur a donné au joueur : son geste de transmutation, les
  * membres que la Porte lui a pris et les automails posés dessus. À la première personne, le bras perdu
- * disparaît, ou montre son automail.
+ * disparaît, ou montre son automail, et sa lame s'il l'a transmuté.
  */
 @Mixin(AvatarRenderer.class)
 public abstract class AvatarRendererMixin {
@@ -46,9 +52,10 @@ public abstract class AvatarRendererMixin {
 		long now = entity.level().getGameTime();
 		PoseHolder holder = (PoseHolder) state;
 		if (pose == null || !pose.active(now)) {
-			holder.fmab$setPose(TransmutationPose.Kind.NONE, 0);
+			holder.fmab$setPose(TransmutationPose.Kind.NONE, 0, 0);
 		} else {
-			holder.fmab$setPose(pose.kind(), pose.until() - now - partialTicks);
+			float elapsed = pose.start() == 0 ? Float.MAX_VALUE : now - pose.start() + partialTicks;
+			holder.fmab$setPose(pose.kind(), pose.until() - now - partialTicks, elapsed);
 		}
 		fmab$extractBody(entity, (BodyHolder) state);
 		((BodyHolder) state).fmab$setWheelchair(fmab$wheelchairPose(entity));
@@ -69,6 +76,7 @@ public abstract class AvatarRendererMixin {
 	@Unique
 	private static void fmab$extractBody(Avatar entity, BodyHolder holder) {
 		GateState gate = entity instanceof Player ? entity.getAttached(FmabAttachments.GATE) : null;
+		holder.fmab$setBlades(Set.of());
 		if (gate == null || gate.lost().isEmpty()) {
 			holder.fmab$setBody(Set.of(), Map.of());
 			return;
@@ -76,6 +84,7 @@ public abstract class AvatarRendererMixin {
 		Automail automail = entity.getAttached(FmabAttachments.AUTOMAIL);
 		Set<BodyPart> lost = EnumSet.noneOf(BodyPart.class);
 		Map<BodyPart, AutomailItem.Model> automails = new EnumMap<>(BodyPart.class);
+		Set<BodyPart> blades = EnumSet.noneOf(BodyPart.class);
 		for (BodyPart part : gate.lost()) {
 			if (!part.limb()) {
 				continue;
@@ -83,9 +92,13 @@ public abstract class AvatarRendererMixin {
 			lost.add(part);
 			if (automail != null && automail.get(part).getItem() instanceof AutomailItem item && item.fits(part)) {
 				automails.put(part, item.model());
+				if (Automails.bladed(automail.get(part))) {
+					blades.add(part);
+				}
 			}
 		}
 		holder.fmab$setBody(lost, automails);
+		holder.fmab$setBlades(blades);
 	}
 
 	@Inject(method = "renderRightHand", at = @At("HEAD"), cancellable = true)
@@ -125,6 +138,35 @@ public abstract class AvatarRendererMixin {
 	@ModifyVariable(method = "renderLeftHand", at = @At("HEAD"), argsOnly = true)
 	private boolean fmab$leftSleeve(boolean sleeve) {
 		return sleeve && fmab$handAutomail(BodyPart.LEFT_ARM) == null;
+	}
+
+	/** À la première personne, la lame transmutée sort de l'avant-bras d'automail. */
+	@Inject(method = "renderRightHand", at = @At("TAIL"))
+	private void fmab$rightBlade(PoseStack poseStack, SubmitNodeCollector collector, int light, Identifier skin,
+			boolean sleeve, CallbackInfo ci) {
+		fmab$blade(BodyPart.RIGHT_ARM, poseStack, collector, light);
+	}
+
+	@Inject(method = "renderLeftHand", at = @At("TAIL"))
+	private void fmab$leftBlade(PoseStack poseStack, SubmitNodeCollector collector, int light, Identifier skin,
+			boolean sleeve, CallbackInfo ci) {
+		fmab$blade(BodyPart.LEFT_ARM, poseStack, collector, light);
+	}
+
+	@Unique
+	private void fmab$blade(BodyPart arm, PoseStack poseStack, SubmitNodeCollector collector, int light) {
+		AutomailItem.Model model = fmab$handAutomail(arm);
+		Player player = Minecraft.getInstance().player;
+		Automail automail = player == null ? null : player.getAttached(FmabAttachments.AUTOMAIL);
+		if (model == null || automail == null || !Automails.bladed(automail.get(arm))) {
+			return;
+		}
+		PlayerModel skeleton = (PlayerModel) ((LivingEntityRenderer<?, ?, ?>) (Object) this).getModel();
+		ModelPart bone = arm == BodyPart.RIGHT_ARM ? skeleton.rightArm : skeleton.leftArm;
+		ModelPart blade = AutomailLayer.handBlade(arm);
+		blade.loadPose(bone.storePose());
+		collector.submitModelPart(blade, poseStack, RenderTypes.entityCutout(AutomailLayer.BLADE_TEXTURE), light,
+				OverlayTexture.NO_OVERLAY, null);
 	}
 
 	/** Le bras que le joueur voit à la première personne est-il perdu, sans automail ? */

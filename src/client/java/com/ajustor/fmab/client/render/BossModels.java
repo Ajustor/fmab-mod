@@ -63,11 +63,25 @@ public final class BossModels {
 		return bake(mesh);
 	}
 
-	/** Lust : une longue chevelure noire qui tombe jusqu'aux reins. */
+	/**
+	 * Lust : une longue chevelure noire qui tombe jusqu'aux reins, et une silhouette de femme fatale :
+	 * la poitrine haute et marquée sous le décolleté de sa robe, la taille fine, les hanches rondes.
+	 */
 	public static ModelPart lust() {
 		MeshDefinition mesh = slimBase();
 		mesh.getRoot().getChild("head").addOrReplaceChild("hair",
 				CubeListBuilder.create().texOffs(0, 32).addBox(-4.5f, -8.3f, 2.4f, 9, 14, 2), PartPose.ZERO);
+		PartDefinition body = mesh.getRoot().getChild("body");
+		FigureModels.bust(body, 24, 32, 7, 3, 3, -0.35f);
+		// Les doigts-lames : cinq ongles noirs au bout de la main droite, que le rendu allonge au coup.
+		CubeListBuilder lance = CubeListBuilder.create();
+		for (int finger = 0; finger < 5; finger++) {
+			lance.texOffs(52, 38).addBox(-2.2f + finger * 0.55f, 0, -0.5f - (finger % 2) * 0.4f, 0.3f, 4, 0.3f);
+		}
+		mesh.getRoot().getChild("right_arm").addOrReplaceChild("lance", lance, PartPose.offset(0, 9.5f, 0));
+		// Les hanches, plus larges que la taille : la robe s'évase en haut des cuisses.
+		body.addOrReplaceChild("hips",
+				CubeListBuilder.create().texOffs(24, 38).addBox(-4.5f, 9.5f, -2.5f, 9, 3, 5), PartPose.ZERO);
 		return bake(mesh);
 	}
 
@@ -96,16 +110,23 @@ public final class BossModels {
 	}
 
 	/**
-	 * Pride : derrière l'enfant, ses ombres, des lames noires qui se dressent dans son dos. Elles ne
-	 * se montrent qu'une fois qu'il s'est révélé.
+	 * Pride : derrière l'enfant, ses ombres, des lames noires qui se dressent dans son dos et s'écartent
+	 * de part et d'autre, et un masque noir aux yeux ronds qui lui mange le visage. Elles ne se
+	 * montrent qu'une fois qu'il s'est révélé.
 	 */
 	public static ModelPart pride() {
 		MeshDefinition mesh = base();
 		PartDefinition body = mesh.getRoot().getChild("body");
-		body.addOrReplaceChild("shadows", CubeListBuilder.create()
+		PartDefinition shadows = body.addOrReplaceChild("shadows", CubeListBuilder.create()
 				.texOffs(0, 32).addBox(-6, -10, 2.5f, 2, 14, 1)
 				.texOffs(6, 32).addBox(-1, -14, 3, 2, 16, 1)
 				.texOffs(12, 32).addBox(4, -9, 2.5f, 2, 13, 1), PartPose.ZERO);
+		shadows.addOrReplaceChild("left_blade", CubeListBuilder.create().texOffs(18, 32).addBox(-1, -15, 0, 2, 15, 1),
+				PartPose.offsetAndRotation(4, 3, 3, 0, 0, 0.7f));
+		shadows.addOrReplaceChild("right_blade", CubeListBuilder.create().texOffs(24, 32).addBox(-1, -12, 0, 2, 12, 1),
+				PartPose.offsetAndRotation(-4, 4, 3, 0, 0, -0.8f));
+		mesh.getRoot().getChild("head").addOrReplaceChild("mask",
+				CubeListBuilder.create().texOffs(32, 32).addBox(-4, -8, -4.6f, 8, 8, 0), PartPose.ZERO);
 		return bake(mesh);
 	}
 

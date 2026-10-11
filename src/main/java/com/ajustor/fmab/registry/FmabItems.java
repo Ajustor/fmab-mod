@@ -228,6 +228,8 @@ public final class FmabItems {
 
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
+	public static final Item STONE_GOLEM_SPAWN_EGG = register("stone_golem_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.STONE_GOLEM));
 
 	public static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Fmab.id("alchemy"));
 
@@ -278,6 +280,7 @@ public final class FmabItems {
 					output.accept(WHEELCHAIR);
 					output.accept(WINRY_SPAWN_EGG);
 					output.accept(TRUTH_SPAWN_EGG);
+					output.accept(STONE_GOLEM_SPAWN_EGG);
 					output.accept(PHILOSOPHER_STONE_CORE);
 					output.accept(PHILOSOPHER_STONE);
 					output.accept(CRYSTALLIZED_BLOOD);

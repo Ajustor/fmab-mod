@@ -46,3 +46,11 @@ run-alt/
 # journaux du jeu lancé depuis la racine
 
 logs/
+
+# python
+
+__pycache__/
+
+# captures en jeu (tests de rendu)
+
+captures/

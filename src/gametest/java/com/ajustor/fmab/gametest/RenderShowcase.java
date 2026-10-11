@@ -210,8 +210,10 @@ public class RenderShowcase implements FabricClientGameTest {
 			float pitch = (float) Math.toDegrees(Math.atan2(1.62 - centre, distance));
 			clear(context, sp);
 			command(sp, "tp @p 0 -60 0 0 " + pitch);
-			command(sp, "summon fmab:%s 0.5 -60 %.2f {NoAI:1b,NoGravity:1b,Silent:1b,Invulnerable:1b,Rotation:[150f,0f]}"
-					.formatted(id, distance));
+			// Locale.ROOT : sous une locale française, %.2f écrirait « 4,85 » et la commande échouerait.
+			command(sp, String.format(java.util.Locale.ROOT,
+					"summon fmab:%s 0.5 -60 %.2f {NoAI:1b,NoGravity:1b,Silent:1b,Invulnerable:1b,Rotation:[150f,0f]}",
+					id, distance));
 			sp.getConnection().waitForClientboundPackets();
 			context.waitTicks(20);
 			context.takeScreenshot("entity_%02d_%s".formatted(index++, id));

@@ -10,16 +10,16 @@ import net.minecraft.world.level.levelgen.structure.StructureType;
 import java.util.Optional;
 
 /**
- * Le Laboratoire 5 : un poste de garde en ruine, et sous lui la salle où l'armée fabriquait des
- * Pierres philosophales. Lust et Gluttony le gardent.
+ * Le Laboratoire 5 : un complexe de l'armée à l'abandon, et sous lui la salle où l'armée fabriquait
+ * des Pierres philosophales. Lust et Gluttony le gardent.
  */
 public class Laboratory5Structure extends Structure {
 	public static final MapCodec<Laboratory5Structure> CODEC = simpleCodec(Laboratory5Structure::new);
 	private static final int SIZE_X = 25;
 	private static final int SIZE_Z = 21;
-	/** Profondeur du laboratoire sous la surface, et hauteur du poste de garde au-dessus. */
+	/** Profondeur du laboratoire sous la surface, et hauteur du bâtiment au-dessus. */
 	private static final int DEPTH = -Blueprints.Laboratory5.HALL_FLOOR;
-	private static final int ABOVE = 6;
+	private static final int ABOVE = Blueprints.Laboratory5.SURFACE_TOP + 1;
 
 	public Laboratory5Structure(StructureSettings settings) {
 		super(settings);

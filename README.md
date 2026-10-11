@@ -60,11 +60,13 @@ d'État à Central, la Porte, les homonculus, puis Père.
   vêtements brodés, tatouages par rituel, aux passifs permanents.
 - **La Porte** : la transmutation humaine échoue toujours et happe l'alchimiste dans l'Espace blanc,
   où la Vérité prend son péage (un bras, une jambe, les organes, la vue... ou le corps entier : l'âme
-  vit alors dans une armure scellée de son sang). En échange, l'Initié transmute sans cercle. Le cercle
+  vit alors dans une armure scellée de son sang). En échange, l'Initié comprend tous les glyphes et transmute sans cercle. Le cercle
   n'est dans aucun traité : on le recompose soi-même, ou on trouve de très rares **Notes sur la
   transmutation humaine**.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : à l'établi ou dans l'onglet Corps,
-  usure, réparation et retrait chez **Winry**.
+  usure, réparation et retrait chez **Winry**. Un alchimiste qui connaît la Lame-bras peut transmuter
+  son bras d'automail (Fer et Recomposer) : une lame en sort, qui tranche à mains nues, et la même
+  transmutation la fait rentrer.
 - **Fauteuil roulant** (craft, ou chez un forgeron d'outils) : sans jambes, on rampe, ou l'on s'y assied.
   Il ne saute pas et ne franchit qu'une demi-hauteur (dalles, escaliers : il faut des rampes) ; il faut
   deux bras pour faire tourner ses roues, qui prennent alors les mains. Un autre joueur peut le pousser
@@ -79,7 +81,9 @@ d'État à Central, la Porte, les homonculus, puis Père.
 - **Autres arts et armes** : alkahestry de Xing (kunaï, May Chang), bras de Scar, mines de Kimblee,
   pistolet et fusil, couteaux, sabre de Briggs, épée de Xing.
 - **Villes habitées** : villageois (leur métier vient du poste de travail de leur maison), maisons
-  meublées, gardes aux portes de Central ; les cartographes vendent les cartes des lieux du mod.
+  meublées aux abords soignés (avant-toits, volets, jardinières, cheminées), arbres, marchés, pré à
+  moutons à Resembool, gardes aux portes de Central ; les cartographes vendent les cartes des lieux
+  du mod.
 - **Finition** : cinématiques (la Porte, le Jour promis, la chute de Père), éclipse dans le ciel,
   sons propres (CC0), modèles des boss, textes en français et en anglais.
 
@@ -208,7 +212,9 @@ Central, the Gate, the homunculi, then Father.
   a blood-sealed armor). In exchange, initiates transmute without a circle. The circle is in no
   treatise: work it out yourself, or find very rare **Notes on Human Transmutation**.
 - **Automail** (iron, Rush Valley, Briggs) on lost limbs: fitted at the bench or in the Body tab,
-  wears out, repaired and removed by **Winry**.
+  wears out, repaired and removed by **Winry**. An alchemist who knows the Arm blade can transmute
+  their automail arm (Iron and Recompose): a blade springs out and cuts bare-handed, and the same
+  transmutation draws it back in.
 - **Wheelchair** (crafted, or bought from a toolsmith): without legs you crawl, or sit in one. It
   cannot jump and only climbs half a block (slabs, stairs: you need ramps); turning its wheels takes
   both arms, and keeps your hands busy. Another player can push it (right-click it, sneak to let go),
@@ -221,8 +227,9 @@ Central, the Gate, the homunculi, then Father.
   a fight has begun.
 - **Other arts and weapons**: Xing alkahestry (kunai, May Chang), Scar's arm, Kimblee's mines,
   pistol and rifle, throwing knives, Briggs sabre, Xing sword.
-- **Lived-in towns**: villagers whose trade comes from their house's workstation, furnished houses,
-  guards at Central's gates; cartographers sell maps to the mod's places.
+- **Lived-in towns**: villagers whose trade comes from their house's workstation, furnished houses
+  with dressed surroundings (eaves, shutters, window boxes, chimneys), trees, markets, a sheep
+  pasture in Resembool, guards at Central's gates; cartographers sell maps to the mod's places.
 - **Polish**: cinematics (the Gate, the Promised Day, Father's fall), an eclipse in the sky, the mod's
   own sounds (CC0), boss models, texts in French and English.
 

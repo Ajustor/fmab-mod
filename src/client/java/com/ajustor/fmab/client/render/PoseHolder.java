@@ -12,5 +12,8 @@ public interface PoseHolder {
 	/** Ticks restants avant la fin du geste, pour qu'il retombe en douceur. */
 	float fmab$remaining();
 
-	void fmab$setPose(TransmutationPose.Kind pose, float remaining);
+	/** Ticks écoulés depuis le début du geste, pour son élan (grand si on ne sait pas quand il a commencé). */
+	float fmab$elapsed();
+
+	void fmab$setPose(TransmutationPose.Kind pose, float remaining, float elapsed);
 }

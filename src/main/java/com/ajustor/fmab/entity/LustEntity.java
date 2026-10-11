@@ -3,6 +3,9 @@ package com.ajustor.fmab.entity;
 import com.ajustor.fmab.Fmab;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -41,6 +44,16 @@ public class LustEntity extends HomunculusEntity {
 	private static final int SOULS = 6;
 	private static final double LANCE_RANGE = 16;
 	private static final float LANCE_DAMAGE = 9;
+	/** Le geste des doigts-lames, pour le rendu : rien, la main qui vise, les lames lancées. */
+	public enum Lance {
+		NONE, AIMING, STRIKING
+	}
+
+	private static final EntityDataAccessor<Integer> LANCE_STATE = SynchedEntityData.defineId(LustEntity.class,
+			EntityDataSerializers.INT);
+	/** Les lames restent tendues un instant après le coup. */
+	private static final int STRIKE_SHOWN = 8;
+	private int striking;
 
 	public LustEntity(EntityType<? extends Monster> type, Level level) {
 		super(type, level, SOULS);
@@ -53,6 +66,28 @@ public class LustEntity extends HomunculusEntity {
 				.add(Attributes.ATTACK_DAMAGE, 6)
 				.add(Attributes.FOLLOW_RANGE, 32)
 				.add(Attributes.ARMOR, 4);
+	}
+
+	@Override
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(LANCE_STATE, Lance.NONE.ordinal());
+	}
+
+	public Lance lance() {
+		return Lance.values()[entityData.get(LANCE_STATE)];
+	}
+
+	private void lance(Lance lance) {
+		entityData.set(LANCE_STATE, lance.ordinal());
+	}
+
+	@Override
+	public void aiStep() {
+		super.aiStep();
+		if (striking > 0 && --striking == 0 && lance() == Lance.STRIKING) {
+			lance(Lance.NONE);
+		}
 	}
 
 	@Override
@@ -105,6 +140,7 @@ public class LustEntity extends HomunculusEntity {
 		@Override
 		public void start() {
 			windup = WINDUP;
+			lance(Lance.AIMING);
 			getNavigation().stop();
 			if (level() instanceof ServerLevel level) {
 				level.playSound(null, blockPosition(), SoundEvents.TRIDENT_RIPTIDE_1.value(), SoundSource.HOSTILE, 1, 1.6f);
@@ -121,6 +157,15 @@ public class LustEntity extends HomunculusEntity {
 			if (--windup == 0 && aim != null && level() instanceof ServerLevel level) {
 				strike(level, aim);
 				cooldown = COOLDOWN;
+				lance(Lance.STRIKING);
+				striking = STRIKE_SHOWN;
+			}
+		}
+
+		@Override
+		public void stop() {
+			if (lance() == Lance.AIMING) {
+				lance(Lance.NONE);
 			}
 		}
 
