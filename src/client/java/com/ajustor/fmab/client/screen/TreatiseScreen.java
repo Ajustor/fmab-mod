@@ -18,8 +18,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.io.Reader;
@@ -42,8 +45,21 @@ public class TreatiseScreen extends Screen {
 	private static final int INK = 0xFF2B2B40;
 	private static final int FADED = 0xFF7A6A50;
 	private static final int IMAGE = 96;
+	/** Le fond d'un titre du sommaire survolé. */
+	private static final int HOVER = 0x336B4F2A;
 
 	/** Une page affichée : son chapitre et ce qu'elle montre. */
+	/** Un titre du sommaire : sa place, et ses lignes une fois coupé à la largeur de la colonne. */
+	private record Link(int chapter, int x, int y, int width, int height, List<FormattedCharSequence> lines) {
+		boolean contains(double mouseX, double mouseY) {
+			return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
+		}
+	}
+
+	/** La hauteur d'un titre du sommaire : de quoi tenir sur deux lignes. */
+	private static final int LINK_HEIGHT = 20;
+	private final List<Link> links = new ArrayList<>();
+
 	private record Entry(int chapter, Treatise.Page page, Glyph glyph) {
 	}
 
@@ -81,15 +97,17 @@ public class TreatiseScreen extends Screen {
 		contentsButtons.add(addRenderableWidget(Button.builder(Component.translatable("knowledge.fmab.title"),
 				b -> minecraft.gui.setScreen(new KnowledgeScreen(this)))
 				.bounds(left + BOOK_WIDTH - 90, top + 6, 80, 16).build()));
-		// Deux colonnes : le sommaire tient au-dessus des flèches du bas, même avec beaucoup de chapitres.
+		// Le sommaire, comme dans un livre : deux colonnes de titres qui passent à la ligne plutôt que d'être
+		// coupés, et qu'on clique.
+		links.clear();
 		int rows = (treatise.chapters().size() + 1) / 2;
 		int column = (BOOK_WIDTH - 24) / 2;
+		int row = rows == 0 ? LINK_HEIGHT : Math.min(LINK_HEIGHT, (BOOK_HEIGHT - 58) / rows);
 		for (int c = 0; c < treatise.chapters().size(); c++) {
-			int chapter = c;
 			int x = left + 10 + (c / rows) * (column + 4);
-			Button b = addRenderableWidget(Button.builder(Component.translatable(treatise.chapters().get(c).titleKey()),
-					btn -> go(firstPageOf(chapter))).bounds(x, top + 26 + (c % rows) * 19, column, 17).build());
-			contentsButtons.add(b);
+			List<FormattedCharSequence> lines = font.split(Component.translatable(treatise.chapters().get(c).titleKey()),
+					column - 6);
+			links.add(new Link(c, x, top + 26 + (c % rows) * row, column, row, lines));
 		}
 		go(index);
 	}
@@ -118,6 +136,20 @@ public class TreatiseScreen extends Screen {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (index < 0 && event.button() == 0) {
+			for (Link link : links) {
+				if (link.contains(event.x(), event.y())) {
+					minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
+					go(firstPageOf(link.chapter()));
+					return true;
+				}
+			}
+		}
+		return super.mouseClicked(event, doubleClick);
 	}
 
 	private int firstPageOf(int chapter) {
@@ -219,6 +251,17 @@ public class TreatiseScreen extends Screen {
 		Entry e = current();
 		if (e == null) {
 			graphics.centeredText(font, title, left + BOOK_WIDTH / 2, top + 12, INK);
+			for (Link link : links) {
+				boolean hovered = link.contains(mouseX, mouseY);
+				if (hovered) {
+					graphics.fill(link.x() - 2, link.y() - 1, link.x() + link.width(), link.y() + link.height() - 1, HOVER);
+				}
+				int lineY = link.y() + (link.height() - Math.min(2, link.lines().size()) * 9) / 2;
+				for (FormattedCharSequence line : link.lines().subList(0, Math.min(2, link.lines().size()))) {
+					graphics.text(font, line, link.x() + 2, lineY, hovered ? EDGE : INK, false);
+					lineY += 9;
+				}
+			}
 		} else {
 			Component chapter = Component.translatable(treatise.chapters().get(e.chapter()).titleKey());
 			graphics.centeredText(font, chapter, left + BOOK_WIDTH / 2, top + 10, FADED);

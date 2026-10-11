@@ -134,10 +134,29 @@ public class WinryScreen extends Screen {
 				status = Component.translatable("entity.fmab.winry.intact");
 				color = FADED;
 			}
-			graphics.text(font, status, left + 18, y + 16, color, false);
+			if (!stack.isEmpty()) {
+				// La pièce, et sa barre d'usure qui vire du vert au rouge.
+				graphics.item(stack, left + 10, y + 11);
+				graphics.text(font, status, left + 30, y + 12, color, false);
+				int health = 100 - Math.round(100f * stack.getDamageValue() / stack.getMaxDamage());
+				int barX = left + 30, barY = y + 24, barWidth = 120;
+				graphics.fill(barX - 1, barY - 1, barX + barWidth + 1, barY + 3, EDGE);
+				graphics.fill(barX, barY, barX + barWidth, barY + 2, 0xFF3A3A3A);
+				graphics.fill(barX, barY, barX + barWidth * health / 100, barY + 2, wear(health));
+			} else {
+				graphics.text(font, status, left + 18, y + 16, color, false);
+			}
 			y += ROW;
 		}
 		super.extractRenderState(graphics, mouseX, mouseY, a);
+	}
+
+	/** La couleur de la barre d'usure : vert neuve, jaune à mi-vie, rouge usée. */
+	private static int wear(int health) {
+		float k = Math.clamp(health / 100f, 0, 1);
+		int red = (int) (k < 0.5f ? 220 : 220 * (1 - k) * 2);
+		int green = (int) (k > 0.5f ? 190 : 190 * k * 2);
+		return 0xFF000000 | red << 16 | green << 8 | 40;
 	}
 
 	@Override

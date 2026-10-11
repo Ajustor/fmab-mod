@@ -244,6 +244,9 @@ public class RenderShowcase implements FabricClientGameTest {
 
 		context.setScreen(NotebookScreen::new);
 		context.takeScreenshot("screen_notebook");
+		// Un gant à une main, l'autre vide : on voit les deux états de l'écran.
+		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GLOVES, com.ajustor.fmab.data.Gloves.NONE
+				.with(false, new ItemStack(FmabItems.SPARK_GLOVES))));
 		context.setScreen(GlovesScreen::new);
 		context.takeScreenshot("screen_gloves");
 		context.setScreen(TreatiseScreen::new);
