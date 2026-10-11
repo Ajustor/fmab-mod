@@ -92,7 +92,7 @@ Traduction gameplay : boss final en trois phases (vieillard, forme sans visage a
 
 | Ordre | Boss | PV max | Vies | PV effectifs | Ce qui s'y ajoute |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Barry le Boucher | 70 | 1 | 70 | armure habitée |
+| 1 | Barry le Boucher | 70 | 2 | 140 | armure habitée : sceau gardé au premier effondrement, hachoir en arc annoncé, ruée |
 | 2 | Lust | 60 | 7 | 420 | lames qui percent les boucliers |
 | 3 | Gluttony | 70 | 8 | 560 | aspire, avale dans le Ventre |
 | 4 | Greed | 100 | 6 | 600 | invulnérable hors de ses attaques |

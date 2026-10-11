@@ -41,9 +41,11 @@ public class HauntedArmorEntity extends Monster {
 			SynchedEntityData.defineId(HauntedArmorEntity.class, EntityDataSerializers.BOOLEAN);
 	private static final DustParticleOptions SEAL = new DustParticleOptions(0xA01020, 1.0f);
 	/** Le temps qu'elle met à se reformer, en ticks. */
-	private static final int REFORM = 20 * 15;
+	protected static final int REFORM = 20 * 15;
 
 	private int collapsedFor;
+	/** Combien de fois elle est tombée en morceaux. */
+	private int collapses;
 	/** Le sceau est effacé : le prochain coup est le dernier. */
 	private boolean released;
 
@@ -78,7 +80,12 @@ public class HauntedArmorEntity extends Monster {
 		goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.1, true) {
 			@Override
 			public boolean canUse() {
-				return !collapsed() && super.canUse();
+				return !collapsed() && !busy() && super.canUse();
+			}
+
+			@Override
+			public boolean canContinueToUse() {
+				return !collapsed() && !busy() && super.canContinueToUse();
 			}
 		});
 		goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 12));
@@ -102,17 +109,39 @@ public class HauntedArmorEntity extends Monster {
 		return super.hurtServer(level, source, damage);
 	}
 
+	/** Occupée à autre chose qu'au corps à corps ordinaire (Barry qui lève son hachoir, qui fonce). */
+	protected boolean busy() {
+		return false;
+	}
+
+	/** Combien de fois elle est tombée en morceaux, l'effondrement en cours compris. */
+	public int collapses() {
+		return collapses;
+	}
+
+	/** Le sceau peut-il être effacé maintenant ? Celui de Barry tient au premier effondrement. */
+	public boolean sealExposed() {
+		return true;
+	}
+
+	/** Le temps qu'elle met à se reformer, en ticks. */
+	protected int reformTime() {
+		return REFORM;
+	}
+
 	/** Elle tombe en morceaux ; le sceau, lui, tient encore. */
 	private void collapse(ServerLevel level) {
 		entityData.set(COLLAPSED, true);
 		collapsedFor = 0;
+		collapses++;
 		setHealth(1);
 		setTarget(null);
 		getNavigation().stop();
 		level.playSound(null, blockPosition(), FmabSounds.ARMOR_COLLAPSE, SoundSource.HOSTILE, 1.5f, 0.9f);
 		level.playSound(null, blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.HOSTILE, 0.6f, 1.6f);
 		for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(16))) {
-			p.sendOverlayMessage(Component.translatable("entity.fmab.haunted_armor.collapsed"));
+			p.sendOverlayMessage(Component.translatable(sealExposed()
+					? "entity.fmab.haunted_armor.collapsed" : "entity.fmab.haunted_armor.seal_guarded"));
 		}
 	}
 
@@ -121,6 +150,10 @@ public class HauntedArmorEntity extends Monster {
 	protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 		if (!collapsed()) {
 			return InteractionResult.PASS;
+		}
+		if (!sealExposed()) {
+			player.sendOverlayMessage(Component.translatable("entity.fmab.haunted_armor.seal_guarded"));
+			return InteractionResult.SUCCESS;
 		}
 		if (level() instanceof ServerLevel level) {
 			level.sendParticles(SEAL, getX(), getY(0.5), getZ(), 40, 0.4, 0.4, 0.4, 0);
@@ -143,7 +176,7 @@ public class HauntedArmorEntity extends Monster {
 		if (tickCount % 10 == 0) {
 			level.sendParticles(SEAL, getX(), getY(0.2), getZ(), 3, 0.2, 0.05, 0.2, 0);
 		}
-		if (++collapsedFor >= REFORM) {
+		if (++collapsedFor >= reformTime()) {
 			entityData.set(COLLAPSED, false);
 			setHealth(getMaxHealth());
 			level.playSound(null, blockPosition(), SoundEvents.ARMOR_EQUIP_NETHERITE.value(), SoundSource.HOSTILE, 1.5f,
@@ -161,6 +194,7 @@ public class HauntedArmorEntity extends Monster {
 		super.addAdditionalSaveData(output);
 		output.putBoolean("collapsed", collapsed());
 		output.putInt("collapsed_for", collapsedFor);
+		output.putInt("collapses", collapses);
 	}
 
 	@Override
@@ -168,5 +202,6 @@ public class HauntedArmorEntity extends Monster {
 		super.readAdditionalSaveData(input);
 		entityData.set(COLLAPSED, input.getBooleanOr("collapsed", false));
 		collapsedFor = input.getIntOr("collapsed_for", 0);
+		collapses = input.getIntOr("collapses", 0);
 	}
 }
