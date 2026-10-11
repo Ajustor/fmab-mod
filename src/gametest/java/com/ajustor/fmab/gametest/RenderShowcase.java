@@ -13,6 +13,7 @@ import com.ajustor.fmab.network.OpenBodyPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.transmutation.Concentration;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -282,8 +283,7 @@ public class RenderShowcase implements FabricClientGameTest {
 		context.runOnClient(mc -> mc.gui.hud.getChat().clearMessages(false));
 		context.waitTicks(5);
 		context.takeScreenshot("hud_00_alchemist_panel");
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.ALCHEMIST,
-				p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).withConcentration(5)));
+		onPlayer(context, sp, p -> Concentration.set(p, 5));
 		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.LIVING_STONE, 42));
 		context.takeScreenshot("hud_01_concentration_living_stone");
 		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GATE,

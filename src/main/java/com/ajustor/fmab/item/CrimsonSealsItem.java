@@ -1,10 +1,9 @@
 package com.ajustor.fmab.item;
 
-import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.entity.AlchemicalMineEntity;
 import com.ajustor.fmab.homunculus.AntiAlchemy;
-import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
+import com.ajustor.fmab.transmutation.Concentration;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
@@ -94,13 +93,13 @@ public class CrimsonSealsItem extends Item {
 		if (player.isCreative()) {
 			return true;
 		}
-		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-		if (data.concentration() < COST) {
+		float concentration = Concentration.of(player);
+		if (concentration < COST) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) COST,
-					(int) data.concentration()));
+					(int) concentration));
 			return false;
 		}
-		player.setAttached(FmabAttachments.ALCHEMIST, data.withConcentration(data.concentration() - COST));
+		Concentration.set(player, concentration - COST);
 		return true;
 	}
 

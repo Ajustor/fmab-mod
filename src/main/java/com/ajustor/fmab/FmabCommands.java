@@ -5,6 +5,7 @@ import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -71,7 +72,7 @@ public final class FmabCommands {
 										})))
 						.then(Commands.literal("rest").executes(c -> {
 							ServerPlayer p = c.getSource().getPlayerOrException();
-							update(p, data(p).withConcentration(data(p).maxConcentration()));
+							Concentration.set(p, Concentration.max(p));
 							return 1;
 						}))));
 	}

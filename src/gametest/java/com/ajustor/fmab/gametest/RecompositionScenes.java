@@ -19,6 +19,7 @@ import com.ajustor.fmab.network.RequestDesignsPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.world.InteractionHand;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.Transmutation;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -294,7 +295,8 @@ public class RecompositionScenes implements FabricClientGameTest {
 				be.setDrawing(drawing);
 			}
 			AlchemistData data = p.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-			p.setAttached(FmabAttachments.ALCHEMIST, data.withConcentration(data.maxConcentration()));
+			p.setAttached(FmabAttachments.ALCHEMIST, data);
+			Concentration.set(p, Concentration.max(p));
 			return Transmutation.activate(level, CIRCLE, state, drawing, p, CircleSize.NORMAL);
 		});
 		context.waitTicks(20);
