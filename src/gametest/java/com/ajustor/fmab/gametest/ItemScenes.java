@@ -1,14 +1,18 @@
 package com.ajustor.fmab.gametest;
 
+import com.ajustor.fmab.client.ItemHints;
+import com.ajustor.fmab.registry.FmabItems;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
-
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,6 +54,13 @@ public class ItemScenes implements FabricClientGameTest {
 			int framed = sp.getServer().computeOnServer(server -> server.overworld().getEntitiesOfClass(ItemFrame.class,
 					new AABB(-2, Y - 1, -3, PER_ROW + 1, Y + 6, 1), frame -> !frame.getItem().isEmpty()).size());
 			check(framed == ITEMS.size(), "chaque objet devrait être dans son cadre : " + framed + " sur " + ITEMS.size());
+			// La montre dit ce qu'elle fait, et qu'elle ne sert à rien à qui n'est pas Alchimiste d'État.
+			List<String> watch = context.computeOnClient(mc -> {
+				List<Component> lines = new ArrayList<>();
+				ItemHints.append(new ItemStack(FmabItems.STATE_WATCH), lines);
+				return lines.stream().map(Component::getString).toList();
+			});
+			check(watch.size() == 2, "la montre devrait avoir son effet et son avertissement : " + watch);
 			sp.getServer().runCommand("gamemode spectator @p");
 			context.runOnClient(mc -> {
 				RenderShowcase.hideGui(mc, true);

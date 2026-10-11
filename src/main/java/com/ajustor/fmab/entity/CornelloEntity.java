@@ -1,6 +1,7 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.alchemy.glyph.Rank;
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
@@ -100,6 +101,7 @@ public class CornelloEntity extends PathfinderMob {
 	private void expose(ServerLevel level, ServerPlayer by) {
 		entityData.set(EXPOSED, true);
 		by.sendSystemMessage(Component.translatable("npc.fmab.cornello.exposed"));
+		Milestones.reach(by, "cornello_exposed");
 		level.playSound(null, blockPosition(), SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.HOSTILE, 1.5f, 0.8f);
 		ChimeraBeastEntity chimera = FmabEntities.CHIMERA_BEAST.create(level, EntitySpawnReason.MOB_SUMMONED);
 		if (chimera != null) {

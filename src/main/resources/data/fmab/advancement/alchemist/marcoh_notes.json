@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_marcoh_clinic",
+  "criteria": {
+    "marcoh_notes": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "marcoh_notes"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:ciphered_notes"
+    },
+    "title": {
+      "translate": "advancements.fmab.marcoh_notes.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.marcoh_notes.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "marcoh_notes"
+    ]
+  ]
+}

@@ -3,6 +3,7 @@ package com.ajustor.fmab.entity;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.Gifts;
 import com.ajustor.fmab.item.Tomes;
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.promised.NationalCircle;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.world.Maps;
@@ -68,6 +69,7 @@ public class HohenheimEntity extends PathfinderMob {
 		if (!(player instanceof ServerPlayer p) || !(level() instanceof ServerLevel level)) {
 			return InteractionResult.SUCCESS;
 		}
+		Milestones.reach(p, "hohenheim_met");
 		if (LivingStone.souls(p) > 0) {
 			p.sendSystemMessage(Component.translatable("npc.fmab.hohenheim.kin"));
 		} else {

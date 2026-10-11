@@ -1,5 +1,7 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.progress.Milestones;
+import com.ajustor.fmab.registry.FmabAttachments;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -221,6 +223,8 @@ public class GreedEntity extends HomunculusEntity {
 		nextWage = level().getGameTime() + WAGE_PERIOD;
 		setTarget(null);
 		player.sendSystemMessage(Component.translatable("homunculus.fmab.greed_pact"));
+		player.setAttached(FmabAttachments.GREED_PACT, true);
+		Milestones.reach(player, "greed_pact");
 		level().playSound(null, blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.NEUTRAL, 1, 0.7f);
 	}
 

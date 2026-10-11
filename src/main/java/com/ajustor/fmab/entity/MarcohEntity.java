@@ -1,6 +1,7 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.item.CipheredNotesItem;
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -70,6 +71,7 @@ public class MarcohEntity extends PathfinderMob {
 				p.drop(tome, false);
 			}
 			p.sendSystemMessage(Component.translatable("npc.fmab.marcoh.deciphers"));
+			Milestones.reach(p, "marcoh_notes");
 			level.playSound(null, blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1, 1);
 			return InteractionResult.SUCCESS;
 		}
