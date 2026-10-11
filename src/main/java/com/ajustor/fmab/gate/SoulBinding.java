@@ -10,6 +10,7 @@ import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.EffectContext;
 import com.ajustor.fmab.transmutation.Effects;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
+import com.ajustor.fmab.util.PlayerMaps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -62,9 +63,9 @@ public final class SoulBinding {
 	/** Temps laissé au monde pour charger un sceau éloigné, en ticks. */
 	private static final int RECALL_PATIENCE = 100;
 	/** Âmes errantes, par ordre d'arrivée devant la Porte. */
-	private static final Map<UUID, Long> ADRIFT_SINCE = new HashMap<>();
+	private static final Map<UUID, Long> ADRIFT_SINCE = PlayerMaps.track(new HashMap<>());
 	/** Rappels en cours : l'âme, les sceaux qui restent à essayer, le temps passé sur le premier. */
-	private static final Map<UUID, Recall> RECALLS = new HashMap<>();
+	private static final Map<UUID, Recall> RECALLS = PlayerMaps.track(new HashMap<>());
 
 	private record Recall(List<Anchors.Anchor> left, int ticks) {
 	}

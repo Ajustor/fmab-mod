@@ -37,6 +37,7 @@ import com.ajustor.fmab.transmutation.GoldTransmutation;
 import com.ajustor.fmab.transmutation.Passives;
 import com.ajustor.fmab.transmutation.Transmutation;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
+import com.ajustor.fmab.util.PlayerMaps;
 import com.ajustor.fmab.world.FmabStructures;
 import com.ajustor.fmab.xing.Alkahestry;
 import net.fabricmc.api.ModInitializer;
@@ -93,6 +94,7 @@ public class Fmab implements ModInitializer {
 		Milestones.register();
 		AlchemistTableBlock.registerSealing();
 		ScarArm.register();
+		PlayerMaps.register();
 		IslandTrial.register();
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			equip(handler.getPlayer());
