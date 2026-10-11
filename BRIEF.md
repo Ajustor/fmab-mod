@@ -347,30 +347,37 @@ Choix retenu : un mod Fabric uniquement, d'identifiant « fmab » (Fabric Loader
 | Élément | Version minimale | Note |
 | --- | --- | --- |
 | Java (JDK) | 25 | Requis depuis Minecraft 26.1 |
-| Fabric Loader | 0.19.3 | Loader unique du mod |
-| Fabric API | 0.152.0 | Dépendance obligatoire (réseau, rendu, événements, attachements de données) |
-| Fabric Loom | Variante no-remap | Le jeu n'est plus obfusqué depuis 26.1 |
+| Fabric Loader | 0.19.3 (développé avec 0.19.5) | Loader unique du mod |
+| Fabric API | 0.161.0 | Dépendance obligatoire (réseau, rendu, événements, attachements de données) |
+| Fabric Loom | 1.18 | Sans remappage : le jeu n'est plus obfusqué depuis 26.1 |
 | Data pack / resource pack | 107.1 / 88.0 | Formats de la 26.2 |
 
 Sources : [docs Architectury 26.2](https://docs.architectury.dev/api/getting-started/setup), [notes techniques 26.2 (Teramont)](https://teramont.net/blog/minecraft-26-2-notes-technical-changes-recommended-hosting).
 
-**Architecture du code proposée.**
+**Architecture du code.** Paquet `com.ajustor.fmab`, deux points d'entrée dans `fabric.mod.json` (`main` : `Fmab`, `client` : `client.FmabClient`), pas de génération de données : les JSON sont écrits à la main dans `src/main/resources`.
 
-- `registry/` : registres (items, blocs, entités, types de recette), via les helpers de Fabric API.
-- `alchemy/`, `karma/`, `knowledge/` : logique de transmutation, karma et savoir, côté serveur.
-- `client/` : point d'entrée client (`ClientModInitializer`), rendus, HUD de concentration, shaders.
-- Données joueur (rang, savoir, membres perdus, karma) : Data Attachments de Fabric API, synchronisés par paquets réseau Fabric.
-- Entrées déclarées dans `fabric.mod.json` (main, client, datagen) ; génération des JSON via Fabric Data Generation.
+- `registry/` : blocs, objets, entités, blocs-entités, composants d'objet, attachements, sons, menus, butin, étiquettes, et les registres dynamiques du mod (`FmabRegistries`).
+- `alchemy/` : le cœur de la transmutation, sans dépendance au monde : dessin des cercles (`drawing`, `circle`), reconnaissance des glyphes (`glyph`), règles et analyse d'un cercle (`rules`), valeur d'échange (`exchange`), savoir (`knowledge`), Traité.
+- `transmutation/` : la transmutation en jeu (cercles posés, canalisation, effets, concentration, gants, recomposition, éclairs, transmutations de l'or et des chimères).
+- `gate/` : la Porte de la Vérité, la transmutation humaine, les péages, les automails, le fauteuil roulant, l'armure d'âme.
+- `stone/` : Pierres philosophales, Pierre vivante, karma, éclipse. `homunculus/` : le Ventre de Gluttony, le retour d'Envy, la zone anti-alchimie de Père. `promised/` : le cercle national du Jour promis. `arts/`, `xing/` : le bras de Scar, l'alkahestry.
+- `state/`, `training/`, `tattoo/`, `progress/` : l'examen d'Alchimiste d'État, les épreuves d'Izumi (dont l'île de Yock), les tatouages, les jalons de progression.
+- `entity/`, `block/`, `item/` : les créatures, blocs et objets eux-mêmes. `network/` : les paquets. `data/` : les données attachées au joueur ou aux objets (alchimiste, automails, Porte, gants, tatouages…).
+- `world/` : les structures, **procédurales** : un `Blueprint` dit quel bloc poser à chaque position locale, une `ProceduralPiece` le pose chunk par chunk avec sa rotation ; les bourgs (`Hamlet`) placent leurs maisons sur le relief. Les lieux et leur fréquence sont en JSON (`worldgen/structure`, `structure_set`).
+- `client/` : HUD, écrans (Carnet, Traité, gants, corps, Winry…), rendus et modèles des créatures, mixins de rendu du joueur (gestes, automails, membres perdus).
+- Données joueur (rang, savoir, membres perdus, automails, karma, concentration…) : Data Attachments de Fabric API, synchronisés au client par Fabric quand ils changent.
 
-**Tout ce qui peut être data-driven doit l'être.** Recettes de transmutation sous forme de type de recette JSON personnalisé (motif du cercle, entrées, sortie, coût, rang requis) : ajouter du contenu ne demande alors pas de recompiler, et les packs de la communauté peuvent étendre le mod. Idem pour la valeur d'échange (tags de famille + masse en JSON), les structures (Jigsaw) et la dimension Espace blanc (dimension type + noise settings en JSON).
+**Data-driven là où c'est utile.** Les glyphes, leurs combinaisons, l'arbre de savoir, les groupes d'échange et les alliages sont des registres dynamiques chargés depuis `data/fmab/fmab/` : ajouter un glyphe ne demande pas de recompiler. Les recettes d'artisanat, le butin, les avancements, les biomes des lieux et la dimension Espace blanc sont des JSON vanilla. Les bâtiments, eux, sont décrits en code (`world/Blueprints.java`), pour rester déterministes et légers à générer.
+
+**Textures.** Toutes les textures sont dessinées en code par les générateurs Python de `tools/skins/` (voir CONTRIBUTING.md) ; la CI vérifie que les PNG commités en sont bien issus.
 
 **Cercles personnalisés.** Chaque glyphe est un fichier JSON (motif sur la grille, élément ou action, coût, rang requis). Le cercle dessiné est stocké comme une matrice dans le Carnet (composant d'item) et dans le bloc-entité au sol ; le parseur le découpe en couches, identifie les glyphes avec une tolérance (rotation, léger décalage) et assemble l'effet. Les cercles enregistrés sont synchronisés via Data Attachments pour la transmutation sans cercle.
 
-**Supports et rendu.** Emplacement gants : vérifier si Trinkets ou Accessories existe pour Fabric 26.2, sinon un emplacement maison via Data Attachments et un onglet d'inventaire. Le rendu repose sur une texture dynamique générée depuis la matrice du cercle. Elle s'applique en décalcomanie sur les faces de blocs (bloc-entité), en couche de rendu sur le modèle du joueur (tatouages, gants, vêtements) et sur les items gravés. Les tatouages et vêtements brodés sont stockés dans les Data Attachments du joueur, les gants et armes dans un composant d'item.
+**Supports et rendu.** Emplacement gants : un emplacement maison (attachement `Gloves` et écran dédié, ouvert par un onglet de l'inventaire), sans dépendre de Trinkets ni d'Accessories. Le rendu repose sur une texture dynamique générée depuis la matrice du cercle. Elle s'applique en décalcomanie sur les faces de blocs (bloc-entité), en couche de rendu sur le modèle du joueur (tatouages, gants, vêtements) et sur les items gravés. Les tatouages et vêtements brodés sont stockés dans les Data Attachments du joueur, les gants et armes dans un composant d'item.
 
-**Livre (Traité d'alchimie).** Patchouli ou un équivalent n'est pas garanti sur Fabric 26.2 : à vérifier au démarrage, sinon prévoir un écran de livre maison qui lit des pages JSON. Pages débloquées par avancements (advancements) liés au savoir.
+**Livre (Traité d'alchimie).** Un écran de livre maison (`TreatiseScreen`), sans Patchouli : son plan (chapitres, pages, glyphes illustrés) est lu depuis `assets/fmab/treatise/treatise.json`, les textes viennent des fichiers de langue.
 
-**Localisation français et anglais dès la v0.1.** Aucun texte en dur : tout passe par des clés de traduction dans `assets/fmab/lang/fr_fr.json` et `en_us.json` (items, blocs, mobs, messages, interface du carnet, pages du Traité, dialogues de la Vérité et des PNJ). Terminologie fixée dans un glossaire : Luxure / Lust, Gourmandise / Gluttony, Envie / Envy, Avarice / Greed, Paresse / Sloth, Colère / Wrath, Orgueil / Pride, Pierre philosophale / Philosopher's Stone, Porte de la Vérité / Gate of Truth, automail / automail. La langue suit le réglage du client ; un test CI peut vérifier que les deux fichiers ont les mêmes clés.
+**Localisation français et anglais dès la v0.1.** Aucun texte en dur : tout passe par des clés de traduction dans `assets/fmab/lang/fr_fr.json` et `en_us.json` (items, blocs, mobs, messages, interface du carnet, pages du Traité, dialogues de la Vérité et des PNJ). Terminologie fixée dans un glossaire : Luxure / Lust, Gourmandise / Gluttony, Envie / Envy, Avarice / Greed, Paresse / Sloth, Colère / Wrath, Orgueil / Pride, Pierre philosophale / Philosopher's Stone, Porte de la Vérité / Gate of Truth, automail / automail. La langue suit le réglage du client ; un test (`LocalizationTest`) vérifie que les deux fichiers ont les mêmes clés.
 
 **Release au tag.** Chaque tag de version poussé sur GitHub (format `v1.0.0`, avec un suffixe `-alpha` ou `-beta` pour les préversions) déclenche un workflow GitHub Actions :
 
