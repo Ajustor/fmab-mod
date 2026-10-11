@@ -127,9 +127,14 @@ Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab 
 JDK 25 ou plus récent :
 
 ```sh
-./gradlew build        # jar dans build/libs/, tests compris
-./gradlew runClient    # lancer le jeu de développement
+./gradlew build                # jar dans build/libs/, tests compris
+./gradlew runClient            # lancer le jeu de développement
+./gradlew runClientGameTest    # scènes en jeu : vérifications et captures
+python tools/skins/all.py      # régénérer les textures, dessinées en code
 ```
+
+Le détail (tests, gametests, générateurs de textures, conventions de commit) est dans
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 L'**éditeur de cercles** (`web/`) porte le même parseur en TypeScript, vérifié contre le Java sur
 des cercles de test communs (`testdata/circles`) : `cd web && npm install && npm run dev`. Ces
@@ -241,7 +246,10 @@ Use `/locate structure fmab:<id>`: `central`, `resembool`, `dublith`, `rush_vall
 
 ### Development and releases
 
-Build with JDK 25+ (`./gradlew build`, jar in `build/libs/`; `./gradlew runClient` to play). The web
+Build with JDK 25+ (`./gradlew build`, jar in `build/libs/`; `./gradlew runClient` to play;
+`./gradlew runClientGameTest` for the in-game scenes and their screenshots). Textures are drawn in
+code by `tools/skins` (`pip install -r tools/skins/requirements.txt && python tools/skins/all.py`);
+see [CONTRIBUTING.md](CONTRIBUTING.md), in French. The web
 circle editor (`web/`) ports the parser to TypeScript and is checked against the Java one on shared
 test circles. Every pull request and push on `master` builds the mod and the editor; the jar is in
 the build artifacts. Pushing a `vX.Y.Z` tag (`vX.Y.Z-beta` for a pre-release) publishes a GitHub
