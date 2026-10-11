@@ -381,7 +381,7 @@ Sources : [docs Architectury 26.2](https://docs.architectury.dev/api/getting-sta
 - `client/` : HUD, écrans (Carnet, Traité, gants, corps, Winry…), rendus et modèles des créatures, mixins de rendu du joueur (gestes, automails, membres perdus).
 - Données joueur (rang, savoir, membres perdus, automails, karma, concentration…) : Data Attachments de Fabric API, synchronisés au client par Fabric quand ils changent.
 
-**Data-driven là où c'est utile.** Les glyphes, leurs combinaisons, l'arbre de savoir, les groupes d'échange et les alliages sont des registres dynamiques chargés depuis `data/fmab/fmab/` : ajouter un glyphe ne demande pas de recompiler. Les recettes d'artisanat, le butin, les avancements, les biomes des lieux et la dimension Espace blanc sont des JSON vanilla. Les bâtiments, eux, sont décrits en code (`world/Blueprints.java`), pour rester déterministes et légers à générer.
+**Data-driven là où c'est utile.** Les glyphes, leurs combinaisons, l'arbre de savoir, les groupes d'échange et les alliages sont des registres dynamiques chargés depuis `data/fmab/fmab/` : ajouter un glyphe ne demande pas de recompiler. Les recettes d'artisanat, le butin, les avancements, les biomes des lieux et la dimension Espace blanc sont des JSON vanilla. Les bâtiments, eux, sont décrits en code, un fichier par plan dans `world/` (la table des plans et les palettes dans `Blueprints.java`), pour rester déterministes et légers à générer ; `BlueprintsFingerprintTest` garde l'empreinte de tous les plans, bloc à bloc.
 
 **Textures.** Toutes les textures sont dessinées en code par les générateurs Python de `tools/skins/` (voir CONTRIBUTING.md) ; la CI vérifie que les PNG commités en sont bien issus.
 

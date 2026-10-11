@@ -39,7 +39,7 @@ class BlueprintsTest {
 	}
 
 	/** Les tailles où chaque sorte est posée (voir les lieux qui la posent). */
-	private static Map<String, List<Blueprint.Plot>> plots() throws IOException {
+	static Map<String, List<Blueprint.Plot>> plots() throws IOException {
 		Map<String, List<Blueprint.Plot>> out = new HashMap<>();
 		int city = 2 * Blueprints.CITY_RADIUS + 1;
 		put(out, "central_ground", city, 24, city, 6);
@@ -49,14 +49,14 @@ class BlueprintsTest {
 		put(out, "central_hq", 31, 14, 23, 1);
 		put(out, "central_library", 21, 11, 15, 1);
 		put(out, "bradley_residence", 15, Blueprints.houseHeight(2, 11), 11, 1);
-		int depth = -Blueprints.SlothTunnel.FLOOR;
+		int depth = -SlothTunnel.FLOOR;
 		put(out, "sloth_tunnel", city, depth + 1, 7, depth);
-		put(out, "father_lair", 33, 1, 41, -Blueprints.FatherLair.ROOM_FLOOR);
+		put(out, "father_lair", 33, 1, 41, -FatherLair.ROOM_FLOOR);
 		put(out, "laboratory_5", Laboratory5Structure.SIZE_X, Laboratory5Structure.DEPTH + Laboratory5Structure.ABOVE,
 				Laboratory5Structure.SIZE_Z, Laboratory5Structure.DEPTH);
 		put(out, "devils_nest", DevilsNestStructure.SIZE_X, Blueprints.houseHeight(1, DevilsNestStructure.SIZE_Z),
 				DevilsNestStructure.SIZE_Z, 0);
-		put(out, "fort_briggs", Blueprints.FortBriggs.SIZE_X, Blueprints.FortBriggs.SIZE_Y, Blueprints.FortBriggs.SIZE_Z, 0);
+		put(out, "fort_briggs", FortBriggs.SIZE_X, FortBriggs.SIZE_Y, FortBriggs.SIZE_Z, 0);
 		put(out, "blood_crest", BloodCrestStructure.SIZE, 6, BloodCrestStructure.SIZE, 0);
 		put(out, "xing_pavilion", XingStructure.SIZE, 12, XingStructure.SIZE, 0);
 		put(out, "yock_island", YockIslandStructure.SIZE, 10, YockIslandStructure.SIZE, 4);
