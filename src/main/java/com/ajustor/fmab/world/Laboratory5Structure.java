@@ -18,8 +18,8 @@ public class Laboratory5Structure extends Structure {
 	static final int SIZE_X = 25;
 	static final int SIZE_Z = 21;
 	/** Profondeur du laboratoire sous la surface, et hauteur du bâtiment au-dessus. */
-	static final int DEPTH = -Blueprints.Laboratory5.HALL_FLOOR;
-	static final int ABOVE = Blueprints.Laboratory5.SURFACE_TOP + 1;
+	static final int DEPTH = -Laboratory5.HALL_FLOOR;
+	static final int ABOVE = Laboratory5.SURFACE_TOP + 1;
 
 	public Laboratory5Structure(StructureSettings settings) {
 		super(settings);

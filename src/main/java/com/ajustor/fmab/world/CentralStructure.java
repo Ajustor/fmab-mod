@@ -74,13 +74,13 @@ public class CentralStructure extends Structure {
 		builder.addPiece(new ProceduralPiece("bradley_residence", new BlockPos(cx - 33, y, cz + 11), 15,
 				Blueprints.houseHeight(2, 11), 11, 1, Rotation.NONE, seed));
 		// Sous la ville, le tunnel de Sloth ; on y descend par un puits au milieu de l'avenue sud.
-		int depth = -Blueprints.SlothTunnel.FLOOR;
+		int depth = -SlothTunnel.FLOOR;
 		builder.addPiece(new ProceduralPiece("sloth_tunnel", new BlockPos(cx - R, y, cz + 30), size, depth + 1, 7, depth,
 				Rotation.NONE, seed));
 		// Plus bas encore, derrière une porte scellée de la paroi sud du tunnel : le repaire de Père.
 		builder.addPiece(new ProceduralPiece("father_lair",
-				new BlockPos(cx + Blueprints.SlothTunnel.FATHER_DOOR - Blueprints.FatherLair.DOOR_X, y, cz + 36), 33, 1, 41,
-				-Blueprints.FatherLair.ROOM_FLOOR, Rotation.NONE, seed));
+				new BlockPos(cx + SlothTunnel.FATHER_DOOR - FatherLair.DOOR_X, y, cz + 36), 33, 1, 41,
+				-FatherLair.ROOM_FLOOR, Rotation.NONE, seed));
 		List<Rect> taken = new ArrayList<>(MONUMENTS);
 		// Le marché : quatre étals autour de la fontaine, tournés vers elle.
 		for (int[] at : new int[][]{{6, 6}, {-9, 6}, {6, -9}, {-9, -9}}) {

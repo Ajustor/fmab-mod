@@ -32,7 +32,7 @@ public class FortBriggsStructure extends Structure {
 		if (y <= context.chunkGenerator().getSeaLevel()) {
 			return Optional.empty();
 		}
-		int sx = Blueprints.FortBriggs.SIZE_X, sz = Blueprints.FortBriggs.SIZE_Z;
+		int sx = FortBriggs.SIZE_X, sz = FortBriggs.SIZE_Z;
 		Rotation rotation = Rotation.values()[context.random().nextInt(4)];
 		boolean turned = rotation == Rotation.CLOCKWISE_90 || rotation == Rotation.COUNTERCLOCKWISE_90;
 		int wx = turned ? sz : sx, wz = turned ? sx : sz;
@@ -52,7 +52,7 @@ public class FortBriggsStructure extends Structure {
 		// Le terrain se cale sur le plancher (« beard_box ») : pas de fondation dessous.
 		int ground = 0;
 		return Optional.of(new GenerationStub(new BlockPos(cx, y, cz), builder -> builder.addPiece(
-				new ProceduralPiece("fort_briggs", corner, sx, Blueprints.FortBriggs.SIZE_Y, sz, ground, rotation, seed))));
+				new ProceduralPiece("fort_briggs", corner, sx, FortBriggs.SIZE_Y, sz, ground, rotation, seed))));
 	}
 
 	@Override
