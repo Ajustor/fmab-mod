@@ -157,6 +157,14 @@ public final class FmabAttachments {
 			.syncWith(TransmutationPose.STREAM_CODEC, AttachmentSyncPredicate.all())
 			.buildAndRegister(Fmab.id("pose"));
 
+	/**
+	 * Le fauteuil roulant dont le joueur tient les poignées (son identifiant d'entité) : posé et retiré
+	 * par le fauteuil, éphémère, visible de tous pour l'animer sans chercher le fauteuil autour de lui.
+	 */
+	public static final AttachmentType<Integer> PUSHING = AttachmentRegistry.<Integer>builder()
+			.syncWith(ByteBufCodecs.VAR_INT, AttachmentSyncPredicate.all())
+			.buildAndRegister(Fmab.id("pushing"));
+
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()
 			.persistent(Codec.BOOL)

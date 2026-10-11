@@ -1,6 +1,7 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.gate.Wheelchairs;
+import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -117,6 +118,25 @@ public class WheelchairEntity extends Mob {
 
 	private void grab(LivingEntity pusher) {
 		entityData.set(PUSHER, pusher.getId());
+		if (pusher instanceof Player player) {
+			player.setAttached(FmabAttachments.PUSHING, getId());
+		}
+	}
+
+	/** Le joueur qui tenait les poignées ne les tient plus. */
+	private void releasePlayer() {
+		if (pusher() instanceof Player player && Integer.valueOf(getId()).equals(player.getAttached(FmabAttachments.PUSHING))) {
+			player.removeAttached(FmabAttachments.PUSHING);
+		}
+	}
+
+	/** Replié, démonté ou déchargé : celui qui le poussait a les mains libres. */
+	@Override
+	public void remove(RemovalReason reason) {
+		if (!level().isClientSide()) {
+			releasePlayer();
+		}
+		super.remove(reason);
 	}
 
 	/** Les poignées sont lâchées ; l'occupant en est prévenu. */
@@ -124,6 +144,7 @@ public class WheelchairEntity extends Mob {
 		if (entityData.get(PUSHER) < 0) {
 			return;
 		}
+		releasePlayer();
 		entityData.set(PUSHER, -1);
 		hiredUntil = 0;
 		if (getFirstPassenger() instanceof ServerPlayer rider) {

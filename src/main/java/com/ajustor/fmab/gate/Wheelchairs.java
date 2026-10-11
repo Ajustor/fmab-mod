@@ -1,6 +1,7 @@
 package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.entity.WheelchairEntity;
+import com.ajustor.fmab.registry.FmabAttachments;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -25,9 +26,6 @@ import org.jspecify.annotations.Nullable;
  * {@link #mustCrawl}), testées à part ; le reste les applique au joueur.
  */
 public final class Wheelchairs {
-	/** Jusqu'où chercher le fauteuil qu'un joueur pousse. */
-	private static final double PUSH_SEARCH = 4;
-
 	private Wheelchairs() {
 	}
 
@@ -92,11 +90,16 @@ public final class Wheelchairs {
 		return pushing(player) != null;
 	}
 
-	/** Le fauteuil dont ce joueur tient les poignées. */
+	/**
+	 * Le fauteuil dont ce joueur tient les poignées : celui que le joueur retient ({@link
+	 * FmabAttachments#PUSHING}), s'il est toujours là et le reconnaît pour pousseur.
+	 */
 	public static @Nullable WheelchairEntity pushing(Player player) {
-		return player.level().getEntitiesOfClass(WheelchairEntity.class,
-						player.getBoundingBox().inflate(PUSH_SEARCH), chair -> chair.pushedBy(player))
-				.stream().findFirst().orElse(null);
+		Integer id = player.getAttached(FmabAttachments.PUSHING);
+		if (id == null) {
+			return null;
+		}
+		return player.level().getEntity(id) instanceof WheelchairEntity chair && chair.pushedBy(player) ? chair : null;
 	}
 
 	/** Les deux jambes manquent, sans automail en état pour les remplacer. */

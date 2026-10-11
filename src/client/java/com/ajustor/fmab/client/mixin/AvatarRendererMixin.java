@@ -1,14 +1,12 @@
 package com.ajustor.fmab.client.mixin;
 
 import com.ajustor.fmab.client.render.AutomailLayer;
+import com.ajustor.fmab.client.render.BodyCache;
 import com.ajustor.fmab.client.render.BodyHolder;
 import com.ajustor.fmab.client.render.PoseHolder;
 import com.ajustor.fmab.client.render.WheelchairPose;
-import com.ajustor.fmab.data.Automail;
-import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.entity.WheelchairEntity;
-import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Wheelchairs;
 import com.ajustor.fmab.item.AutomailItem;
@@ -32,11 +30,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Recopie dans l'état de rendu ce que le serveur a donné au joueur : son geste de transmutation, les
@@ -73,32 +66,12 @@ public abstract class AvatarRendererMixin {
 		return WheelchairPose.NONE;
 	}
 
+	/** Le corps du joueur, tiré du cache : rien n'est recalculé tant que la Porte et les automails restent les mêmes. */
 	@Unique
 	private static void fmab$extractBody(Avatar entity, BodyHolder holder) {
-		GateState gate = entity instanceof Player ? entity.getAttached(FmabAttachments.GATE) : null;
-		holder.fmab$setBlades(Set.of());
-		if (gate == null || gate.lost().isEmpty()) {
-			holder.fmab$setBody(Set.of(), Map.of());
-			return;
-		}
-		Automail automail = entity.getAttached(FmabAttachments.AUTOMAIL);
-		Set<BodyPart> lost = EnumSet.noneOf(BodyPart.class);
-		Map<BodyPart, AutomailItem.Model> automails = new EnumMap<>(BodyPart.class);
-		Set<BodyPart> blades = EnumSet.noneOf(BodyPart.class);
-		for (BodyPart part : gate.lost()) {
-			if (!part.limb()) {
-				continue;
-			}
-			lost.add(part);
-			if (automail != null && automail.get(part).getItem() instanceof AutomailItem item && item.fits(part)) {
-				automails.put(part, item.model());
-				if (Automails.bladed(automail.get(part))) {
-					blades.add(part);
-				}
-			}
-		}
-		holder.fmab$setBody(lost, automails);
-		holder.fmab$setBlades(blades);
+		BodyCache.Body body = BodyCache.of(entity);
+		holder.fmab$setBody(body.lost(), body.automails());
+		holder.fmab$setBlades(body.blades());
 	}
 
 	@Inject(method = "renderRightHand", at = @At("HEAD"), cancellable = true)
@@ -155,10 +128,8 @@ public abstract class AvatarRendererMixin {
 
 	@Unique
 	private void fmab$blade(BodyPart arm, PoseStack poseStack, SubmitNodeCollector collector, int light) {
-		AutomailItem.Model model = fmab$handAutomail(arm);
 		Player player = Minecraft.getInstance().player;
-		Automail automail = player == null ? null : player.getAttached(FmabAttachments.AUTOMAIL);
-		if (model == null || automail == null || !Automails.bladed(automail.get(arm))) {
+		if (player == null || !BodyCache.of(player).blades().contains(arm)) {
 			return;
 		}
 		PlayerModel skeleton = (PlayerModel) ((LivingEntityRenderer<?, ?, ?>) (Object) this).getModel();
@@ -173,19 +144,17 @@ public abstract class AvatarRendererMixin {
 	@Unique
 	private static boolean fmab$bareStump(BodyPart arm) {
 		Player player = Minecraft.getInstance().player;
-		GateState gate = player == null ? null : player.getAttached(FmabAttachments.GATE);
-		return gate != null && gate.lost(arm) && fmab$handAutomail(arm) == null;
+		if (player == null) {
+			return false;
+		}
+		BodyCache.Body body = BodyCache.of(player);
+		return body.lost().contains(arm) && !body.automails().containsKey(arm);
 	}
 
 	/** Le modèle d'automail posé sur ce bras du joueur, s'il l'a perdu et remplacé. */
 	@Unique
 	private static AutomailItem.Model fmab$handAutomail(BodyPart arm) {
 		Player player = Minecraft.getInstance().player;
-		GateState gate = player == null ? null : player.getAttached(FmabAttachments.GATE);
-		Automail automail = player == null ? null : player.getAttached(FmabAttachments.AUTOMAIL);
-		if (gate == null || !gate.lost(arm) || automail == null) {
-			return null;
-		}
-		return automail.get(arm).getItem() instanceof AutomailItem item && item.fits(arm) ? item.model() : null;
+		return player == null ? null : BodyCache.of(player).automails().get(arm);
 	}
 }
