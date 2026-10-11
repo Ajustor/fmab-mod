@@ -71,7 +71,7 @@ public class GreedEntity extends HomunculusEntity {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 80)
+				.add(Attributes.MAX_HEALTH, 100)
 				.add(Attributes.MOVEMENT_SPEED, 0.3)
 				.add(Attributes.ATTACK_DAMAGE, 10)
 				.add(Attributes.FOLLOW_RANGE, 24)

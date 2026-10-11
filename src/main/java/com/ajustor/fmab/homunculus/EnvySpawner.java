@@ -18,7 +18,9 @@ import java.util.List;
 
 /**
  * Envy erre dans le monde : de temps à autre, il apparaît non loin d'un joueur, sous les traits de
- * quelqu'un d'autre. Jamais plus d'un Envy autour d'un même joueur.
+ * quelqu'un d'autre. Jamais plus d'un Envy autour d'un même joueur, plus jamais une fois que ce
+ * joueur l'a vu tomber ({@link HomunculusRules#envyHaunts}) ; et un Envy encore déguisé que personne
+ * n'approche finit par repartir.
  */
 public final class EnvySpawner {
 	/** Toutes les cinq minutes, une chance sur six par joueur. */
@@ -48,7 +50,8 @@ public final class EnvySpawner {
 		RandomSource random = level.getRandom();
 		if (!player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.ALCHEMIST)
 				|| player.isCreative() || player.isSpectator() || level.dimension() == GateOfTruth.WHITE_SPACE
-				|| level.dimension() == Belly.BELLY || random.nextInt(CHANCE) != 0) {
+				|| level.dimension() == Belly.BELLY || random.nextInt(CHANCE) != 0
+				|| !HomunculusRules.envyHaunts(player.getAttachedOrCreate(FmabAttachments.SLAIN))) {
 			return;
 		}
 		if (!level.getEntitiesOfClass(EnvyEntity.class, player.getBoundingBox().inflate(ALONE)).isEmpty()) {
@@ -68,6 +71,7 @@ public final class EnvySpawner {
 		}
 		envy.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, random.nextFloat() * 360, 0);
 		disguise(envy, server, player, random);
+		envy.markWanderer();
 		level.addFreshEntity(envy);
 	}
 

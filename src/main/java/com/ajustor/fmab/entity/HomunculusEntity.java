@@ -1,6 +1,7 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.item.BriggsSabreItem;
+import com.ajustor.fmab.homunculus.HomunculusRules;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -41,6 +42,10 @@ public abstract class HomunculusEntity extends Monster {
 	private final ServerBossEvent bossEvent;
 	private int souls;
 	private int regenerating;
+	/** Apparu de lui-même (rôdeur, traqueur) plutôt que gardien d'un lieu : il peut repartir. */
+	private boolean wanderer;
+	/** Depuis combien de ticks aucun joueur n'est venu près de lui. */
+	private int alone;
 
 	protected HomunculusEntity(EntityType<? extends Monster> type, Level level, int souls) {
 		super(type, level);
@@ -48,6 +53,16 @@ public abstract class HomunculusEntity extends Monster {
 		this.bossEvent = new ServerBossEvent(Mth.createInsecureUUID(random), getDisplayName(),
 				BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.NOTCHED_10);
 		setPersistenceRequired();
+	}
+
+	/** Un homonculus venu de lui-même, qui repartira si personne ne l'approche. */
+	public void markWanderer() {
+		wanderer = true;
+	}
+
+	/** Peut-il s'en aller maintenant ? Envy, seulement tant qu'il n'est pas démasqué. */
+	protected boolean mayVanish() {
+		return true;
 	}
 
 	/**
@@ -142,12 +157,26 @@ public abstract class HomunculusEntity extends Monster {
 			}
 		}
 		BossBars.update(bossEvent, this, showBossBar() && BossBars.engaged(this));
+		// Un rôdeur que personne n'approche finit par partir : ils ne s'accumulent pas dans le monde.
+		if (wanderer && tickCount % 20 == 0) {
+			boolean near = level.getNearestPlayer(this, HomunculusRules.NEAR) != null;
+			alone = mayVanish() ? HomunculusRules.alone(alone, near, 20) : 0;
+			if (HomunculusRules.vanishes(alone)) {
+				discard();
+			}
+		}
 	}
 
 	@Override
 	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean killedByPlayer) {
 		super.dropCustomDeathLoot(level, source, killedByPlayer);
-		spawnAtLocation(level, new ItemStack(FmabItems.PHILOSOPHER_STONE_CORE));
+		// Le noyau ne tombe que du premier homonculus de cette sorte que le joueur abat : pas de Pierres
+		// à la chaîne avec les rôdeurs et les traqueurs.
+		Set<String> slain = getLastHurtByPlayer() instanceof ServerPlayer killer
+				? killer.getAttachedOrCreate(FmabAttachments.SLAIN) : Set.of();
+		if (HomunculusRules.dropsCore(slain, BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath())) {
+			spawnAtLocation(level, new ItemStack(FmabItems.PHILOSOPHER_STONE_CORE));
+		}
 	}
 
 	@Override
@@ -191,6 +220,8 @@ public abstract class HomunculusEntity extends Monster {
 		super.addAdditionalSaveData(output);
 		output.putInt("souls", souls);
 		output.putInt("regenerating", regenerating);
+		output.putBoolean("wanderer", wanderer);
+		output.putInt("alone", alone);
 	}
 
 	@Override
@@ -198,6 +229,8 @@ public abstract class HomunculusEntity extends Monster {
 		super.readAdditionalSaveData(input);
 		souls = input.getIntOr("souls", souls);
 		regenerating = input.getIntOr("regenerating", 0);
+		wanderer = input.getBooleanOr("wanderer", false);
+		alone = input.getIntOr("alone", 0);
 		bossEvent.setName(getDisplayName());
 	}
 
