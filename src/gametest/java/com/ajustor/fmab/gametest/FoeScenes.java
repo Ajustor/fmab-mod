@@ -1,8 +1,11 @@
 package com.ajustor.fmab.gametest;
 
+import com.ajustor.fmab.entity.BarryEntity;
+import com.ajustor.fmab.entity.Butcher;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.LustEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
@@ -14,6 +17,7 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -23,7 +27,8 @@ import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Les adversaires qui ont leurs règles à eux, joués pour de vrai : l'offre de Père à une âme noire
- * (Lust vient sans combattre ; accepter ou refuser change la suite). Chaque règle est vérifiée, et
+ * (Lust vient sans combattre ; accepter ou refuser change la suite), Barry le Boucher (le hachoir
+ * levé avant de balayer, le sceau qui tient au premier effondrement). Chaque règle est vérifiée, et
  * capturée dans {@code build/run/clientGameTest/screenshots}.
  */
 public class FoeScenes implements FabricClientGameTest {
@@ -47,6 +52,7 @@ public class FoeScenes implements FabricClientGameTest {
 
 			offerAccepted(context, sp);
 			offerRefused(context, sp);
+			barry(context, sp);
 		}
 	}
 
@@ -74,7 +80,7 @@ public class FoeScenes implements FabricClientGameTest {
 					"une âme noire qui n'a pas répondu devrait recevoir Lust seule, pas " + came);
 			lust[0] = (LustEntity) came.getFirst();
 			check(lust[0].envoy() && lust[0].getTarget() == null, "Lust devrait venir porter l'offre, sans viser le joueur");
-			lust[0].snapTo(p.getX(), p.getY(), p.getZ() + 4, 180, 0);
+			lust[0].snapTo(p.getX() - 2.5, p.getY(), p.getZ() + 4, 150, 0);
 		});
 		context.waitTicks(40);
 		onPlayer(context, sp, p -> {
@@ -122,6 +128,47 @@ public class FoeScenes implements FabricClientGameTest {
 					"après un refus, la visite devrait être une traque hostile");
 			came.forEach(HomunculusEntity::discard);
 			p.setHealth(p.getMaxHealth());
+		});
+	}
+
+	/** Barry lève son hachoir avant de frapper ; son sceau tient au premier effondrement. */
+	private static void barry(ClientGameTestContext context, TestSingleplayerContext sp) {
+		BarryEntity[] barry = new BarryEntity[1];
+		onPlayer(context, sp, p -> {
+			p.setHealth(p.getMaxHealth());
+			barry[0] = FmabEntities.BARRY.create(p.level(), EntitySpawnReason.COMMAND);
+			barry[0].snapTo(p.getX() - 2.2, p.getY(), p.getZ() + 3, 145, 0);
+			p.level().addFreshEntity(barry[0]);
+			barry[0].setTarget(p);
+		});
+		boolean raised = false;
+		for (int t = 0; t < 80 && !raised; t += 2) {
+			context.waitTicks(2);
+			raised = sp.getServer().computeOnServer(server -> barry[0].windingUp());
+		}
+		check(raised, "Barry devrait lever son hachoir avant de frapper, son joueur à portée");
+		float[] before = new float[1];
+		onPlayer(context, sp, p -> before[0] = p.getHealth());
+		context.takeScreenshot("foes_02_barry_windup");
+		context.waitTicks(Butcher.SWEEP_WINDUP + 4);
+		onPlayer(context, sp, p -> {
+			check(p.getHealth() < before[0], "le coup de hachoir devrait toucher le joueur resté dans l'arc");
+			p.setHealth(p.getMaxHealth());
+			barry[0].hurtServer(p.level(), p.damageSources().playerAttack(p), 1000);
+			check(barry[0].collapsed() && !barry[0].sealExposed(), "au premier effondrement, le sceau de Barry devrait tenir");
+			p.interactOn(barry[0], InteractionHand.MAIN_HAND, Vec3.ZERO);
+			check(barry[0].isAlive() && barry[0].collapsed(), "effacer le sceau ne devrait pas marcher au premier effondrement");
+		});
+		context.takeScreenshot("foes_03_barry_seal_guarded");
+		context.waitTicks(Butcher.FIRST_REFORM + 10);
+		onPlayer(context, sp, p -> {
+			check(!barry[0].collapsed() && barry[0].getHealth() == barry[0].getMaxHealth(),
+					"Barry devrait se relever vite, toute sa vie revenue");
+			p.setHealth(p.getMaxHealth());
+			barry[0].hurtServer(p.level(), p.damageSources().playerAttack(p), 1000);
+			check(barry[0].collapsed() && barry[0].sealExposed(), "au second effondrement, le sceau devrait pouvoir s'effacer");
+			p.interactOn(barry[0], InteractionHand.MAIN_HAND, Vec3.ZERO);
+			check(!barry[0].isAlive(), "le sceau effacé, Barry devrait être vaincu");
 		});
 	}
 }
