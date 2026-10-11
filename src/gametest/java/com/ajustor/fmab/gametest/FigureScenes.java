@@ -68,17 +68,16 @@ public class FigureScenes implements FabricClientGameTest {
 			sp.getConnection().waitForClientboundPackets();
 			context.waitTicks(40);
 			for (int i = 0; i < FIGURES.size(); i++) {
+				double x = i * STEP + 0.5;
+				look(sp, x - 1.5, Y + 2.0, -2.2, x, Y + 1.05, 0.5);
+				context.waitTicks(8);
+				// Vue de près : le client doit la voir à sa place (de loin, elle sortirait de son champ).
 				String name = FIGURES.get(i);
 				Identifier id = Fmab.id(name.endsWith(REVEALED) ? name.substring(0, name.length() - REVEALED.length()) : name);
 				AABB spot = new AABB(i * STEP, Y - 1, -1, i * STEP + 1, Y + 3, 2);
 				boolean seen = context.computeOnClient(mc -> !mc.level.getEntities((Entity) null, spot,
 						e -> BuiltInRegistries.ENTITY_TYPE.getKey(e.getType()).equals(id)).isEmpty());
 				check(seen, "le client devrait voir " + name + " à sa place");
-			}
-			for (int i = 0; i < FIGURES.size(); i++) {
-				double x = i * STEP + 0.5;
-				look(sp, x - 1.5, Y + 2.0, -2.2, x, Y + 1.05, 0.5);
-				context.waitTicks(8);
 				context.takeScreenshot("figure_%02d_%s_0_front".formatted(i, FIGURES.get(i)));
 				look(sp, x - 2.4, Y + 1.35, -0.9, x, Y + 1.1, 0.5);
 				context.waitTicks(8);
