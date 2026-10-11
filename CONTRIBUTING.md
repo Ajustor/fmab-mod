@@ -55,10 +55,12 @@ python tools/skins/items.py state_watch   # ou un générateur, quelques texture
 | `blocks.py` | les autres textures de blocs (`textures/block`) |
 | `cinematic.py` | les images des cinématiques |
 | `skinlib.py` | la boîte à outils commune (couleurs, ombrage, patrons de peau) |
+| `all.py`, `check.py` | tout régénérer ; vérifier que les images commitées en sont bien issues |
 
-Les générateurs sont déterministes : relancer `all.py` ne doit rien changer aux PNG commités. La
-CI le vérifie (job `textures` de `build.yml`) ; un nouveau générateur posé dans le dossier est pris
-en compte tout seul.
+Les générateurs sont déterministes : relancer `all.py` ne doit rien changer aux images commitées.
+`python tools/skins/check.py` le vérifie (pixel à pixel : la compression des PNG varie d'une machine
+à l'autre), et la CI aussi (job `textures` de `build.yml`). Un nouveau générateur posé dans le
+dossier est pris en compte tout seul.
 
 ## L'éditeur web
 
