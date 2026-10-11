@@ -96,6 +96,26 @@ public class AnimationScenes implements FabricClientGameTest {
 		}
 	}
 
+	/** Les ennemis qui lâchent un butin : leurs tables se chargent, et ne sont pas vides. */
+	private static void loot(TestSingleplayerContext sp) {
+		String empty = sp.getServer().computeOnServer(server -> {
+			StringBuilder out = new StringBuilder();
+			for (String name : List.of("drachma_soldier", "immortal_soldier", "chimera_beast", "chimera_crawler",
+					"haunted_armor", "barry", "stone_golem")) {
+				var key = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE,
+						com.ajustor.fmab.Fmab.id("entities/" + name));
+				if (server.reloadableRegistries().getLootTable(key)
+						== net.minecraft.world.level.storage.loot.LootTable.EMPTY) {
+					out.append(name).append(' ');
+				}
+			}
+			return out.toString();
+		});
+		if (!empty.isEmpty()) {
+			throw new AssertionError("Tables de butin introuvables : " + empty);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	private static void lance(TestSingleplayerContext sp, LustEntity.Lance lance) {
 		sp.getServer().runOnServer(server -> server.overworld().getEntities(com.ajustor.fmab.registry.FmabEntities.LUST,
@@ -134,6 +154,7 @@ public class AnimationScenes implements FabricClientGameTest {
 			sp.getConnection().waitForClientboundPackets();
 			context.waitTicks(40);
 			voices(sp);
+			loot(sp);
 			row(context, sp, "0_idle");
 
 			sp.getServer().runOnServer(server -> server.overworld().getAllEntities().forEach(e -> {
