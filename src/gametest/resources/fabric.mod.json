@@ -16,7 +16,8 @@
 			"com.ajustor.fmab.gametest.FigureScenes",
 			"com.ajustor.fmab.gametest.ItemScenes",
 			"com.ajustor.fmab.gametest.AutomailBladeScenes",
-			"com.ajustor.fmab.gametest.AnimationScenes"
+			"com.ajustor.fmab.gametest.AnimationScenes",
+			"com.ajustor.fmab.gametest.GestureScenes"
 		]
 	},
 	"depends": {
