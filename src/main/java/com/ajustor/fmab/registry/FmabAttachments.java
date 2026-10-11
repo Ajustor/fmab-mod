@@ -93,6 +93,16 @@ public final class FmabAttachments {
 			.persistent(Belly.Swallowed.CODEC)
 			.buildAndRegister(Fmab.id("swallowed"));
 
+	/**
+	 * La concentration, à part du reste de l'alchimiste : elle se recharge chaque seconde, et seul ce
+	 * nombre part vers le client. Absente : pleine. Gardée à la mort, visible du joueur.
+	 */
+	public static final AttachmentType<Float> CONCENTRATION = AttachmentRegistry.<Float>builder()
+			.persistent(Codec.FLOAT)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.FLOAT, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("concentration"));
+
 	/** Le karma, de −100 à +100 : gardé à la mort, visible du joueur. */
 	public static final AttachmentType<Integer> KARMA = AttachmentRegistry.<Integer>builder()
 			.persistent(Codec.INT)

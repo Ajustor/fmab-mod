@@ -5,6 +5,7 @@ import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
@@ -117,12 +118,13 @@ public final class ScarArm {
 		Knowledge knowledge = AlchemyRules.of(player.level().registryAccess()).knowledge(data);
 		cost = (float) Math.max(0.5, cost - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
 		if (!player.isCreative()) {
-			if (data.concentration() < cost) {
+			float concentration = Concentration.of(player);
+			if (concentration < cost) {
 				player.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) Math.ceil(cost),
-						(int) data.concentration()));
+						(int) concentration));
 				return false;
 			}
-			data = data.withConcentration(data.concentration() - cost);
+			Concentration.set(player, concentration - cost);
 		}
 		player.setAttached(FmabAttachments.ALCHEMIST, data.addMastery(SCHOOL, 1));
 		return true;

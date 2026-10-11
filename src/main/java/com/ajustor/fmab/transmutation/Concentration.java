@@ -4,10 +4,13 @@ import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 /**
- * La concentration se recharge au repos : lentement en marchant, vite accroupi et immobile.
- * Mise à jour une fois par seconde, ce qui limite aussi la synchronisation.
+ * La concentration de l'alchimiste : sa réserve d'énergie, de 0 au maximum de son rang. Elle se
+ * recharge au repos : lentement en marchant, vite accroupi et immobile ; mise à jour une fois par
+ * seconde. Elle a son propre attachement ({@link FmabAttachments#CONCENTRATION}) : la recharge
+ * n'envoie au client que ce nombre, pas tout ce que l'alchimiste sait.
  */
 public final class Concentration {
 	private static final float PER_SECOND = 0.5f;
@@ -16,19 +19,36 @@ public final class Concentration {
 	private Concentration() {
 	}
 
+	/** Le maximum, selon le rang. */
+	public static float max(Player player) {
+		AlchemistData data = player.getAttached(FmabAttachments.ALCHEMIST);
+		return (data == null ? AlchemistData.NEW : data).maxConcentration();
+	}
+
+	/** La réserve du joueur ; pleine s'il n'a encore rien dépensé, jamais au-delà du maximum de son rang. */
+	public static float of(Player player) {
+		Float value = player.getAttached(FmabAttachments.CONCENTRATION);
+		float max = max(player);
+		return value == null ? max : Math.min(value, max);
+	}
+
+	/** Pose la réserve, gardée entre 0 et le maximum. */
+	public static void set(Player player, float value) {
+		player.setAttached(FmabAttachments.CONCENTRATION, Math.clamp(value, 0, max(player)));
+	}
+
 	public static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			if (server.getTickCount() % 20 != 0) {
 				return;
 			}
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-				if (data.concentration() >= data.maxConcentration()) {
+				float now = of(player);
+				if (now >= max(player)) {
 					continue;
 				}
 				boolean resting = player.isShiftKeyDown() && player.getDeltaMovement().horizontalDistanceSqr() < 1e-4;
-				player.setAttached(FmabAttachments.ALCHEMIST,
-						data.withConcentration(data.concentration() + (resting ? RESTING_PER_SECOND : PER_SECOND)));
+				set(player, now + (resting ? RESTING_PER_SECOND : PER_SECOND));
 			}
 		});
 	}

@@ -13,6 +13,7 @@ import com.ajustor.fmab.gate.GateOfTruth;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.Transmutation;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -65,7 +66,8 @@ public class GateScenes implements FabricClientGameTest {
 				for (Glyph g : AlchemyRules.of(level.registryAccess()).glyphs()) {
 					data = data.learn(g.id());
 				}
-				p.setAttached(FmabAttachments.ALCHEMIST, data.withConcentration(data.maxConcentration()));
+				p.setAttached(FmabAttachments.ALCHEMIST, data);
+				Concentration.set(p, Concentration.max(p));
 				p.getInventory().clearContent();
 				return null;
 			});

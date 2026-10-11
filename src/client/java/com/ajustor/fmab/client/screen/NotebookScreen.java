@@ -17,6 +17,7 @@ import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.network.SaveNotebookPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -332,8 +333,9 @@ public class NotebookScreen extends Screen {
 				Component.translatable(a.requiredRank().translationKey())), a.complexity() > cap ? BAD : DIM));
 		out.add(new Line(Component.translatable("notebook.fmab.stability", Math.round(a.stability() * 100)),
 				a.stability() < 1 ? WARN : DIM));
+		float concentration = minecraft.player == null ? me.maxConcentration() : Concentration.of(minecraft.player);
 		out.add(new Line(Component.translatable("notebook.fmab.concentration", a.concentration(),
-				(int) me.concentration()), a.concentration() > me.concentration() ? BAD : DIM));
+				(int) concentration), a.concentration() > concentration ? BAD : DIM));
 		return out;
 	}
 

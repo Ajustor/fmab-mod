@@ -179,17 +179,17 @@ public final class Transmutation {
 		double fusion = fused ? FUSION_POWER : 1;
 		int cost = amplified ? 0 : (int) Math.ceil(StateWatch.cost(analysis.concentration(), watch) * size.cost()
 				* (fused ? 0.5 : 1));
-		if (alchemist.concentration() < cost) {
+		float concentration = Concentration.of(caster);
+		if (concentration < cost) {
 			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired",
-					cost, (int) alchemist.concentration()));
+					cost, (int) concentration));
 			return Result.TIRED;
 		}
 		if (inscribed && !remote) {
 			touch(level, circle, caster);
 			partner.ifPresent(id -> fuse(level, circle, caster, id));
 		}
-		caster.setAttached(FmabAttachments.ALCHEMIST,
-				alchemist.withConcentration(alchemist.concentration() - cost));
+		Concentration.set(caster, concentration - cost);
 		// L'énergie est partie : quoi qu'il arrive, on s'est familiarisé avec les glyphes tracés.
 		practiceGlyphs(caster, rules, analysis);
 
@@ -318,12 +318,13 @@ public final class Transmutation {
 		Analysis analysis = rules.analyze(drawing, alchemist);
 		boolean amplified = PhilosopherStones.held(caster).isPresent() || LivingStone.souls(caster) > 0;
 		if (!amplified) {
-			if (alchemist.concentration() < 1) {
+			float concentration = Concentration.of(caster);
+			if (concentration < 1) {
 				caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", 1, 0));
 				CHANNELS.remove(caster.getUUID());
 				return true;
 			}
-			caster.setAttached(FmabAttachments.ALCHEMIST, alchemist.withConcentration(alchemist.concentration() - 1));
+			Concentration.set(caster, concentration - 1);
 		}
 		int growth = channel.growth() + 1;
 		CircleFrame frame = CircleFrame.of(state);

@@ -47,7 +47,6 @@ import com.ajustor.fmab.client.screen.TreatiseScreen;
 import com.ajustor.fmab.client.screen.StoneChoiceScreen;
 import com.ajustor.fmab.client.screen.TruthScreen;
 import com.ajustor.fmab.client.screen.WinryScreen;
-import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Notebooks;
@@ -70,6 +69,7 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabMenus;
 import com.ajustor.fmab.stone.Eclipse;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -331,14 +331,14 @@ public class FmabClient implements ClientModInitializer {
 		if (mc.player == null) {
 			return;
 		}
-		AlchemistData data = mc.player.getAttached(FmabAttachments.ALCHEMIST);
-		if (data == null || data.concentration() >= data.maxConcentration()) {
+		float concentration = Concentration.of(mc.player), max = Concentration.max(mc.player);
+		if (concentration >= max) {
 			return;
 		}
 		int width = 81;
 		int x = graphics.guiWidth() / 2 + 10;
 		int y = graphics.guiHeight() - 39 - 10 - 4;
-		int filled = Math.round(width * data.concentration() / data.maxConcentration());
+		int filled = Math.round(width * concentration / max);
 		graphics.fill(x - 1, y - 1, x + width + 1, y + 4, 0xC0000000);
 		graphics.fill(x, y, x + filled, y + 3, 0xFF4FA3FF);
 	}
