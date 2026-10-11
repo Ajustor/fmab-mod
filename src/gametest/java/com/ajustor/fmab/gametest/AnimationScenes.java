@@ -74,6 +74,28 @@ public class AnimationScenes implements FabricClientGameTest {
 		return server.overworld().getEntitiesOfClass(Mob.class, new AABB(x - 1, Y - 1, -4, x + 1, Y + 4, 2)).getFirst();
 	}
 
+	/** Les voix branchées par mixin : Lust crie comme une sorcière, Sloth comme un ravageur. */
+	private static void voices(TestSingleplayerContext sp) {
+		String heard = sp.getServer().computeOnServer(server -> {
+			StringBuilder out = new StringBuilder();
+			for (int i : new int[]{FIGURES.indexOf("lust"), FIGURES.indexOf("sloth")}) {
+				try {
+					var hurt = net.minecraft.world.entity.LivingEntity.class.getDeclaredMethod("getHurtSound",
+							net.minecraft.world.damagesource.DamageSource.class);
+					hurt.setAccessible(true);
+					Mob mob = mob(server, i);
+					out.append(hurt.invoke(mob, server.overworld().damageSources().generic())).append(' ');
+				} catch (ReflectiveOperationException e) {
+					throw new AssertionError(e);
+				}
+			}
+			return out.toString();
+		});
+		if (!heard.contains("witch.hurt") || !heard.contains("ravager.hurt")) {
+			throw new AssertionError("Les voix ne sont pas branchées : " + heard);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	private static void lance(TestSingleplayerContext sp, LustEntity.Lance lance) {
 		sp.getServer().runOnServer(server -> server.overworld().getEntities(com.ajustor.fmab.registry.FmabEntities.LUST,
@@ -111,6 +133,7 @@ public class AnimationScenes implements FabricClientGameTest {
 			}
 			sp.getConnection().waitForClientboundPackets();
 			context.waitTicks(40);
+			voices(sp);
 			row(context, sp, "0_idle");
 
 			sp.getServer().runOnServer(server -> server.overworld().getAllEntities().forEach(e -> {

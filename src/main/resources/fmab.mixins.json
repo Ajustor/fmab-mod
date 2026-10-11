@@ -4,7 +4,11 @@
 	"package": "com.ajustor.fmab.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
-		"PlayerMixin"
+		"AmbientVoiceMixin",
+		"MonsterVoiceMixin",
+		"PlayerMixin",
+		"StepMixin",
+		"VoiceMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
