@@ -368,7 +368,7 @@
   "block.fmab.alchemist_table.no_seal": "Sélectionnez dans votre carnet le sceau de sang à tracer : le vôtre (Traité, chapitre VIII) ou celui d'un ami.",
   "block.fmab.alchemist_table.sealed": "Le sceau est tracé dans le plastron. Posez-le sur un porte-armure, au-dessus d'un cercle d'âme.",
   "tattoo.fmab.title": "Rituel du tatouage",
-  "tattoo.fmab.intro": "Le cercle tracé au sol passera dans la peau. Le rituel fait mal. Une paume tatouée se lance comme un gant ; ailleurs, le cercle agit en permanence.",
+  "tattoo.fmab.intro": "Le cercle tracé au sol passera dans la peau. Le rituel fait mal. Une paume tatouée se lance comme un gant ; ailleurs, le cercle agit en permanence (un même effet ne compte que trois fois, tous cercles portés confondus).",
   "tattoo.fmab.here": "Tatouer ici",
   "tattoo.fmab.erase": "Effacer",
   "tattoo.fmab.active": "Se lance (G) — %s étage(s)",
@@ -383,7 +383,7 @@
   "tattoo.fmab.slot.forearm_right": "Avant-bras droit",
   "tattoo.fmab.slot.back": "Dos",
   "tattoo.fmab.slot.chest": "Torse",
-  "treatise.fmab.ch4.p12": "Cercles portés.\n\nUn cercle brodé sur un vêtement de cuir (un étage) ou tatoué ailleurs que sur les paumes agit en permanence : Terre et Fixer renforcent, Eau et Fixer protègent du feu, Air et Projeter allègent le pas, Fer et Réparer ressoudent les plaies, Terre et Projeter piquent qui vous frappe.\n\nLe tatouage : tracez le cercle au sol, puis utilisez l'encre alchimique dessus.",
+  "treatise.fmab.ch4.p12": "Cercles portés.\n\nUn cercle brodé sur un vêtement de cuir (un étage) ou tatoué ailleurs que sur les paumes agit en permanence : Terre et Fixer renforcent, Eau et Fixer protègent du feu, Air et Projeter allègent le pas, Fer et Réparer ressoudent les plaies, Terre et Projeter piquent qui vous frappe.\n\nUn même effet ne compte que trois fois, quel que soit le nombre de cercles qui le portent ; et près de Père, plus aucun ne répond.\n\nLe tatouage : tracez le cercle au sol, puis utilisez l'encre alchimique dessus.",
   "treatise.fmab.ch4.hold": "Gardez la main sur le cercle après l'avoir activé : l'énergie continue de couler. Un mur monte, une pique s'allonge tant qu'il reste de la matière à prendre ; un jet de flammes ou une rafale se répète. Chaque instant coûte un peu de concentration.",
 
   "treatise.fmab.ch5.title": "V. Cercles à recopier",

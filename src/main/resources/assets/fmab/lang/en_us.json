@@ -368,7 +368,7 @@
   "block.fmab.alchemist_table.no_seal": "Select in your notebook the blood seal to trace: yours (Treatise, chapter VIII) or a friend's.",
   "block.fmab.alchemist_table.sealed": "The seal is traced inside the breastplate. Set it on an armor stand, above a soul circle.",
   "tattoo.fmab.title": "Tattoo ritual",
-  "tattoo.fmab.intro": "The circle drawn on the ground will pass into the skin. The ritual hurts. A tattooed palm is cast like a glove; elsewhere, the circle acts permanently.",
+  "tattoo.fmab.intro": "The circle drawn on the ground will pass into the skin. The ritual hurts. A tattooed palm is cast like a glove; elsewhere, the circle acts permanently (the same effect only counts three times across all worn circles).",
   "tattoo.fmab.here": "Tattoo here",
   "tattoo.fmab.erase": "Erase",
   "tattoo.fmab.active": "Cast (G) — %s stage(s)",
@@ -383,7 +383,7 @@
   "tattoo.fmab.slot.forearm_right": "Right forearm",
   "tattoo.fmab.slot.back": "Back",
   "tattoo.fmab.slot.chest": "Chest",
-  "treatise.fmab.ch4.p12": "Worn circles.\n\nA circle embroidered on a leather garment (one stage) or tattooed anywhere but the palms acts permanently: Earth and Fix reinforce, Water and Fix ward off fire, Air and Project lighten your step, Iron and Repair close wounds, Earth and Project sting whoever strikes you.\n\nThe tattoo: draw the circle on the ground, then use alchemical ink on it.",
+  "treatise.fmab.ch4.p12": "Worn circles.\n\nA circle embroidered on a leather garment (one stage) or tattooed anywhere but the palms acts permanently: Earth and Fix reinforce, Water and Fix ward off fire, Air and Project lighten your step, Iron and Repair close wounds, Earth and Project sting whoever strikes you.\n\nThe same effect only counts three times, however many circles carry it; and near Father, none of them answers.\n\nThe tattoo: draw the circle on the ground, then use alchemical ink on it.",
   "treatise.fmab.ch4.hold": "Keep your hand on the circle after activating it: the energy keeps flowing. A wall rises, a spike grows longer as long as there is matter to take; a jet of flame or a gust repeats. Each moment costs a little concentration.",
 
   "treatise.fmab.ch5.title": "V. Circles to copy",

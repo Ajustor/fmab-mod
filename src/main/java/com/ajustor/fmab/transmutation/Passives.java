@@ -5,6 +5,7 @@ import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Tattoos;
+import com.ajustor.fmab.homunculus.AntiAlchemy;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.tattoo.TattooSlot;
@@ -41,6 +42,9 @@ import java.util.UUID;
  *   <li>{@code fmab:mending} : le corps se répare lentement ;</li>
  *   <li>{@code fmab:thorns} : qui frappe le porteur est blessé en retour.</li>
  * </ul>
+ *
+ * Un même passif ne compte que {@link #MAX_PER_PASSIVE} fois, quel que soit le nombre de cercles qui
+ * le portent ; et dans la zone de Père (cercle national intact), plus aucun ne répond.
  */
 public final class Passives {
 	private static final int PERIOD = 40;
@@ -53,6 +57,8 @@ public final class Passives {
 	private static final EquipmentSlot[] WORN = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS,
 			EquipmentSlot.FEET};
 	private static final int CACHE_SIZE = 256;
+	/** Au-delà, un cercle de plus portant le même passif n'ajoute rien. */
+	public static final int MAX_PER_PASSIVE = 3;
 
 	/** Passifs actifs par joueur, recalculés toutes les deux secondes. */
 	private static final Map<UUID, Map<String, Integer>> ACTIVE = PlayerMaps.track(new HashMap<>());
@@ -76,7 +82,9 @@ public final class Passives {
 				return;
 			}
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				apply(player, count(player));
+				// Dans la salle du trône, l'alchimie d'Amestris ne répond plus : ni gant, ni broderie, ni tatouage.
+				boolean silenced = AntiAlchemy.suppressed(player.level(), player.blockPosition());
+				apply(player, silenced ? Map.of() : capped(count(player)));
 			}
 		});
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damage, blocked) -> {
@@ -124,6 +132,18 @@ public final class Passives {
 		return out;
 	}
 
+	/** Chaque passif plafonné à {@link #MAX_PER_PASSIVE} cercles. */
+	public static Map<String, Integer> capped(Map<String, Integer> counts) {
+		Map<String, Integer> out = new HashMap<>();
+		counts.forEach((passive, n) -> out.put(passive, Math.min(n, MAX_PER_PASSIVE)));
+		return out;
+	}
+
+	/** Les points de vie que rendent, toutes les deux secondes, ces cercles de Réparation (plafond compris). */
+	public static float mending(int circles) {
+		return MENDING_PER_PERIOD * Math.min(circles, MAX_PER_PASSIVE);
+	}
+
 	private static void apply(ServerPlayer player, Map<String, Integer> passives) {
 		ACTIVE.put(player.getUUID(), passives);
 		modifier(player, Attributes.ARMOR, ARMOR, ARMOR_PER_CIRCLE * passives.getOrDefault("fmab:reinforce", 0),
@@ -135,7 +155,7 @@ public final class Passives {
 		}
 		int mending = passives.getOrDefault("fmab:mending", 0);
 		if (mending > 0 && player.getHealth() < player.getMaxHealth()) {
-			player.heal(MENDING_PER_PERIOD * mending);
+			player.heal(mending(mending));
 		}
 	}
 
