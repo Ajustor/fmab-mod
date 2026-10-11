@@ -765,7 +765,7 @@
   "item.fmab.rifle": "Fusil de précision",
   "item.fmab.cartridge": "Cartouche",
   "item.fmab.firearm.empty": "Clic. Plus de cartouches.",
-  "item.fmab.firearm.stats": "%s dégâts, %s blocs",
+  "item.fmab.firearm.stats": "%s dégâts, %s blocs, un tir toutes les %s s",
   "item.fmab.firearm.tooltip": "Une cartouche par tir.",
   "item.fmab.throwing_knife": "Couteau de lancer",
   "item.fmab.xing_sword": "Épée de Xing",
@@ -777,7 +777,7 @@
   "treatise.fmab.ch13.title": "XIII. Arts et armes",
   "treatise.fmab.ch13.p1": "Le bras de Scar unit l'alchimie et l'alkahestry, mais n'en garde que la décomposition. Gravé d'après les notes de son frère, il réduit en poussière, main nue, le bloc ou la créature qu'il frappe ; il ne craint pas la zone de Père.",
   "treatise.fmab.ch13.p2": "Kimblee transmute la matière en explosif. Ses cercles écarlates font d'un bloc une mine, qui saute au passage d'une créature ou quand on claque des mains (accroupi). Mustang, lui, claque des doigts : ses gants à étincelle portent loin, mais la pluie les rend inutiles.",
-  "treatise.fmab.ch13.p3": "Riza Hawkeye se passe d'alchimie : pistolet et fusil de précision, une cartouche par tir. King Bradley voit pourtant venir les balles. Maes Hughes lance ses couteaux, légers et bon marché.",
+  "treatise.fmab.ch13.p3": "Riza Hawkeye se passe d'alchimie : pistolet et fusil de précision, une cartouche par tir. La balle faiblit avec la distance, et ne fait guère que ralentir un homonculus : sa Pierre referme la plaie. King Bradley voit pourtant venir les balles. Maes Hughes lance ses couteaux, légers et bon marché.",
   "treatise.fmab.ch13.p4": "L'épée de Xing de Ling Yao est rapide : enchaînez les coups sans pause, chacun frappe plus fort que le précédent. Accroupi, l'épée en main, on perçoit le qi de tout ce qui vit alentour, même à travers les murs.",
 
   "entity.fmab.cornello": "Père Cornello",

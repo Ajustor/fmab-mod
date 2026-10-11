@@ -765,7 +765,7 @@
   "item.fmab.rifle": "Sniper rifle",
   "item.fmab.cartridge": "Cartridge",
   "item.fmab.firearm.empty": "Click. Out of cartridges.",
-  "item.fmab.firearm.stats": "%s damage, %s blocks",
+  "item.fmab.firearm.stats": "%s damage, %s blocks, one shot every %s s",
   "item.fmab.firearm.tooltip": "One cartridge per shot.",
   "item.fmab.throwing_knife": "Throwing knife",
   "item.fmab.xing_sword": "Xing sword",
@@ -777,7 +777,7 @@
   "treatise.fmab.ch13.title": "XIII. Arts and Arms",
   "treatise.fmab.ch13.p1": "Scar's arm unites alchemy and alkahestry, but keeps only decomposition. Engraved from his brother's notes, it turns to dust, bare-handed, the block or creature it strikes; it does not fear Father's zone.",
   "treatise.fmab.ch13.p2": "Kimblee transmutes matter into explosives. His crimson seals turn a block into a mine, which blows when a creature passes or when you clap your hands (sneaking). Mustang snaps his fingers instead: his spark gloves reach far, but rain makes them useless.",
-  "treatise.fmab.ch13.p3": "Riza Hawkeye does without alchemy: pistol and sniper rifle, one cartridge per shot. King Bradley still sees the bullets coming. Maes Hughes throws his knives, light and cheap.",
+  "treatise.fmab.ch13.p3": "Riza Hawkeye does without alchemy: pistol and sniper rifle, one cartridge per shot. A bullet weakens with distance, and barely slows a homunculus down: its Stone closes the wound. King Bradley still sees the bullets coming. Maes Hughes throws his knives, light and cheap.",
   "treatise.fmab.ch13.p4": "Ling Yao's Xing sword is fast: chain blows without pause, each strikes harder than the last. Sneaking with the sword in hand, you sense the qi of everything alive nearby, even through walls.",
 
   "entity.fmab.cornello": "Father Cornello",

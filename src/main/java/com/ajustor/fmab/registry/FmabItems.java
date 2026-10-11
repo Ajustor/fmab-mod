@@ -184,8 +184,8 @@ public final class FmabItems {
 	/** Les cercles écarlates de Kimblee : des mines alchimiques. */
 	public static final Item CRIMSON_SEALS = register("crimson_seals", CrimsonSealsItem::new,
 			new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
-	/** Le pistolet de l'armée : 7 dégâts, 40 blocs. */
-	public static final Item PISTOL = register("pistol", p -> new FirearmItem(7, 40, 10, 0.02f, p),
+	/** Le pistolet de l'armée : 7 dégâts, 40 blocs, un tir toutes les 1,25 s (moins qu'une épée de diamant). */
+	public static final Item PISTOL = register("pistol", p -> new FirearmItem(7, 40, 25, 0.02f, p),
 			new Item.Properties().durability(400));
 	/** Le fusil de précision de Hawkeye : 16 dégâts, 96 blocs, lent. */
 	public static final Item RIFLE = register("rifle", p -> new FirearmItem(16, 96, 40, 0.002f, p),
