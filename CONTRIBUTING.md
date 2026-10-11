@@ -15,9 +15,12 @@ Il faut un **JDK 25** (ou plus récent).
 ## Les tests
 
 - **Tests unitaires** (`src/test`, JUnit 5), lancés par `./gradlew build` ou `./gradlew test` :
-  parseur et reconnaissance des cercles, savoir et apprentissage, règles du fauteuil roulant,
+  parseur et reconnaissance des cercles, savoir et apprentissage, règles du jeu (fauteuil roulant,
+  karma, usure des automails), rotations des structures, balayage de tous les plans de bâtiments,
   disposition des données, clés de langue fr/en, exemples du Traité. Une règle de jeu testable
-  s'écrit en fonction pure, que le code en jeu appelle (voir `Wheelchairs.canPropel`).
+  s'écrit en fonction pure, que le code en jeu appelle (voir `Wheelchairs.canPropel`, `Karma.shifted`).
+  `TestBootstrap` amorce Minecraft et les registres du mod pour les tests qui touchent aux blocs ; les
+  piles d'objets restent hors de portée (leurs composants ne sont liés qu'au chargement des données).
 - **Cercles de test** (`testdata/circles`) : partagés avec l'éditeur web ; le Java fait référence,
   `./gradlew test -PwriteFixtures=true` les régénère.
 - **Gametests client** (`src/gametest`) : le vrai jeu tourne, chaque scène vérifie un état et prend
@@ -32,8 +35,8 @@ Il faut un **JDK 25** (ou plus récent).
   Scènes : `showcase`, `blocks`, `towns`, `figures`, `items`, `automail_blade`, `animations`,
   `gestures`, `gate`, `stonegate`, `wheelchair`, `recomposition`. Pour tout ce qui se voit en jeu
   (modèle, texture, animation, lieu), regarder les captures avant et après ; ajouter une scène si
-  aucune ne montre ce qu'on a changé. Une `AssertionError` fait échouer le gametest : une scène
-  vérifie ce qu'elle montre, en plus de le photographier.
+  aucune ne montre ce qu'on a changé. Chaque scène vérifie ce qu'elle montre, en plus de le
+  photographier, avec `GametestAsserts.check` : une règle qui ne tient pas fait échouer le gametest.
 
 ## Les textures
 
@@ -85,6 +88,8 @@ cd web && npm install && npm run dev   # npm test pour les tests
 
 - `build.yml`, à chaque pull request et push sur `master` : build et tests du mod, jar en artefact,
   tests et build de l'éditeur web, vérification des textures.
+- `gametest.yml`, sur les pull requests qui touchent au rendu ou aux scènes, ou à la demande (avec un
+  choix de scènes) : les gametests client sous un écran virtuel, captures en artefact.
 - `commits.yml` : la convention des titres et des lignes de changelog.
 - `pages.yml` : le site GitHub Pages (éditeur de cercles, versions, changelog).
 - `release.yml`, au tag `vX.Y.Z` : la version publiée (voir le README).
