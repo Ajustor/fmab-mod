@@ -64,7 +64,9 @@ d'État à Central, la Porte, les homonculus, puis Père.
   n'est dans aucun traité : on le recompose soi-même, ou on trouve de très rares **Notes sur la
   transmutation humaine**.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : à l'établi ou dans l'onglet Corps,
-  usure, réparation et retrait chez **Winry**.
+  usure, réparation et retrait chez **Winry**. Un alchimiste qui connaît la Lame-bras peut transmuter
+  son bras d'automail (Fer et Recomposer) : une lame en sort, qui tranche à mains nues, et la même
+  transmutation la fait rentrer.
 - **Fauteuil roulant** (craft, ou chez un forgeron d'outils) : sans jambes, on rampe, ou l'on s'y assied.
   Il ne saute pas et ne franchit qu'une demi-hauteur (dalles, escaliers : il faut des rampes) ; il faut
   deux bras pour faire tourner ses roues, qui prennent alors les mains. Un autre joueur peut le pousser
@@ -210,7 +212,9 @@ Central, the Gate, the homunculi, then Father.
   a blood-sealed armor). In exchange, initiates transmute without a circle. The circle is in no
   treatise: work it out yourself, or find very rare **Notes on Human Transmutation**.
 - **Automail** (iron, Rush Valley, Briggs) on lost limbs: fitted at the bench or in the Body tab,
-  wears out, repaired and removed by **Winry**.
+  wears out, repaired and removed by **Winry**. An alchemist who knows the Arm blade can transmute
+  their automail arm (Iron and Recompose): a blade springs out and cuts bare-handed, and the same
+  transmutation draws it back in.
 - **Wheelchair** (crafted, or bought from a toolsmith): without legs you crawl, or sit in one. It
   cannot jump and only climbs half a block (slabs, stairs: you need ramps); turning its wheels takes
   both arms, and keeps your hands busy. Another player can push it (right-click it, sneak to let go),
