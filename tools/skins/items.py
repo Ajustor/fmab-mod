@@ -746,6 +746,284 @@ def soul_chestplate():
     put(img, ((4, 6), (11, 6), (4, 10), (11, 10)), "#eef2f6")
     return light(img)
 
+# --- les tenues ------------------------------------------------------------------------------------
+# Quatre silhouettes communes (couvre-chef, haut, bas, bottes), chaque tenue y met ses couleurs.
+EDWARD = dict(R="#b8242a", r="#8a1a20", K="#1e1c22", k="#141216", W="#e8e4dc", S="#d0d4da", B="#1c1b20",
+              b="#2c2a30")
+STEEL_ICON = dict(M="#9aa6b6", L="#d8e0ea", D="#5e6a7a", S="#5a6676", P="#6e7a8a", K="#1c1e24", W="#ecebe2",
+                  C="#6d5f4c", R="#eef2f6")
+OFFICER = dict(U="#2f4f93", u="#223a6e", G="#d9b440", g="#a8862c", K="#151519", V="#0d0d10", B="#1c1b20",
+               b="#2c2a30")
+GREATCOAT_ICON = dict(C="#262a33", c="#1a1d24", L="#3a404c", U="#2f4f93", S="#c9ccd2")
+
+
+@item("alchemist_coat")
+def alchemist_coat():
+    """Le manteau rouge d'Edward, ouvert sur la veste noire, ses longs pans jusqu'en bas."""
+    return light(sprite([
+        "................",
+        "....rRRKKRRr....",
+        "..rRRRRKKRRRRr..",
+        ".rRRRRWKKWRRRRr.",
+        ".RRRrRWKKWRrRRR.",
+        ".RRRrRWKKWRrRRR.",
+        ".RRRrRWKKWRrRRR.",
+        ".WWRrRWKKWRrRWW.",
+        "....rRWKKWRr....",
+        "....rRRKKRRr....",
+        "....rRR..RRr....",
+        "....rRR..RRr....",
+        "....rRR..RRr....",
+        "....rRR..RRr....",
+        "....rrr..rrr....",
+        "................",
+    ], EDWARD))
+
+
+@item("alchemist_trousers")
+def alchemist_trousers():
+    """Le pantalon de cuir noir, la ceinture à boucle d'argent."""
+    return light(sprite([
+        "................",
+        "...kkkkSSkkkk...",
+        "...KKKKKKKKKK...",
+        "...KKKKKKKKKK...",
+        "...KKKKK.KKKK...",
+        "...KKKK..KKKK...",
+        "...KKKK..KKKK...",
+        "...KKKK..KKKK...",
+        "...KKKK..KKKK...",
+        "...KKKK..KKKK...",
+        "...KKKK..KKKK...",
+        "...KKKK..KKKK...",
+        "...KKKK..KKKK...",
+        "...kkkk..kkkk...",
+        "................",
+        "................",
+    ], EDWARD))
+
+
+BOOTS = [
+    "................",
+    "................",
+    "................",
+    "...bbbb..bbbb...",
+    "...BBBB..BBBB...",
+    "...BBBB..BBBB...",
+    "...BBBB..BBBB...",
+    "...BBBB..BBBB...",
+    "...BBBB..BBBB...",
+    "..BBBBB..BBBBB..",
+    ".BBBBBB..BBBBBB.",
+    ".BBBBBB..BBBBBB.",
+    ".kkkkkk..kkkkkk.",
+    "................",
+    "................",
+    "................",
+]
+
+
+@item("alchemist_boots")
+def alchemist_boots():
+    return light(sprite(BOOTS, EDWARD))
+
+
+@item("steel_helmet")
+def steel_helmet():
+    """Le heaume d'Alphonse : la pointe, le plumet qui retombe, la fente sombre."""
+    return light(sprite([
+        ".......LL.......",
+        ".......LMWW.....",
+        ".....SMMMMWW....",
+        "....SLLMMMMWW...",
+        "...SMLLMMMMDWW..",
+        "...SMMMLMMMDSW..",
+        "...SKKKKKKKKSW..",
+        "...SKRKKKKRKS...",
+        "...SMMMLMMMDS...",
+        "...SMDMLMDMDS...",
+        "...SMMMLMMMDS...",
+        "....SMMLMMDS....",
+        ".....SSSSSS.....",
+        "................",
+        "................",
+        "................",
+    ], STEEL_ICON))
+
+
+@item("steel_chestplate")
+def steel_chestplate():
+    """Le plastron d'Alphonse, sans sceau : acier bleuté, épaulières rondes, arête et lames du ventre."""
+    img = sprite([
+        "................",
+        ".SSSS.....SSSS..",
+        "SLLLSS...SSLLLS.",
+        "SLMMMSKKKSMMMDS.",
+        ".SMMMSMMMSMMMDS.",
+        ".SSMMMMLMMMMMSS.",
+        "...MMMMLMMMMD...",
+        "...MLMMLMMMMD...",
+        "...MMMMLMMMMD...",
+        "...PPPPPPPPPP...",
+        "...MMMMLMMMMD...",
+        "...PPPPPPPPPP...",
+        "....MMMLMMMD....",
+        ".....MMMMMD.....",
+        "................",
+        "................",
+    ], STEEL_ICON)
+    put(img, ((4, 6), (11, 6), (4, 10), (11, 10)), "#eef2f6")
+    return light(img)
+
+
+@item("steel_leggings")
+def steel_leggings():
+    """Les cuissards : la ceinture de plaques, le pagne, les genouillères."""
+    return light(sprite([
+        "................",
+        "...PPPPPPPPPP...",
+        "...MMMCCCCMMD...",
+        "...MLMCCCCMMD...",
+        "...MLMMC.MMMD...",
+        "...MLMM..MLMD...",
+        "...DDDD..DDDD...",
+        "...RLMM..MLMR...",
+        "...MLMD..MLMD...",
+        "...MLMD..MLMD...",
+        "...MLMD..MLMD...",
+        "...DDDD..DDDD...",
+        "................",
+        "................",
+        "................",
+        "................",
+    ], STEEL_ICON))
+
+
+@item("steel_boots")
+def steel_boots():
+    """Les solerets, en lames d'acier."""
+    return light(sprite([
+        "................",
+        "................",
+        "................",
+        "...DDDD..DDDD...",
+        "...MLMM..MLMM...",
+        "...MLMD..MLMD...",
+        "...PPPP..PPPP...",
+        "...MLMD..MLMD...",
+        "..MMLMD..MLMMD..",
+        ".MMMLMD..MLMMMD.",
+        ".MLLLMD..MLLLMD.",
+        ".SSSSSS..SSSSSS.",
+        "................",
+        "................",
+        "................",
+        "................",
+    ], STEEL_ICON))
+
+
+@item("officer_cap")
+def officer_cap():
+    """La casquette d'officier : calotte bleue, bandeau noir, insigne d'or, visière vernie."""
+    return light(sprite([
+        "................",
+        "................",
+        "................",
+        "................",
+        "....uUUUUUUu....",
+        "..uUUUUUUUUUUu..",
+        "..UUUUUUUUUUUU..",
+        "..UUUUUGgUUUUU..",
+        "..KKKKKKKKKKKK..",
+        "..KKKKKKKKKKKK..",
+        "...VVVVVVVVVVVV.",
+        "....VVVVVVVVVV..",
+        "................",
+        "................",
+        "................",
+        "................",
+    ], OFFICER))
+
+
+@item("officer_jacket")
+def officer_jacket():
+    """La vareuse bleue : col droit, boutons et pattes d'épaule d'or, ceinturon."""
+    return light(sprite([
+        "................",
+        ".GGGu.....uGGG..",
+        "UUUUUuuuuuUUUUU.",
+        "UUUUUUuGuUUUUUU.",
+        ".UUUUUUUUUUUUU..",
+        ".UUUUUUGUUUUUU..",
+        "..UUUUUUUUUUU...",
+        "..UUUUUUGUUUUU..",
+        "..UUUUUUUUUUUU..",
+        "..KKKKKKGgKKKK..",
+        "..UUUUUUUUUUUU..",
+        "..uuuuuuuuuuuu..",
+        "................",
+        "................",
+        "................",
+        "................",
+    ], OFFICER))
+
+
+@item("officer_trousers")
+def officer_trousers():
+    """Le pantalon bleu, son passepoil sombre."""
+    return light(sprite([
+        "................",
+        "...uuuuuuuuuu...",
+        "...UUUUUUUUUU...",
+        "...UUUUUUUUUU...",
+        "...UuUUU.UUuU...",
+        "...UuUU..UUuU...",
+        "...UuUU..UUuU...",
+        "...UuUU..UUuU...",
+        "...UuUU..UUuU...",
+        "...UuUU..UUuU...",
+        "...UuUU..UUuU...",
+        "...UuUU..UUuU...",
+        "...uuuu..uuuu...",
+        "................",
+        "................",
+        "................",
+    ], OFFICER))
+
+
+@item("officer_boots")
+def officer_boots():
+    """Les hautes bottes de cuir noir, une boucle d'or."""
+    rows = list(BOOTS)
+    rows[1] = "...bbbb..bbbb..."
+    rows[2] = "...BBBB..BBBB..."
+    img = sprite(rows, dict(OFFICER, k="#0e0d10"))
+    put(img, ((5, 6), (10, 6)), OFFICER["G"])
+    return light(img)
+
+
+@item("officer_greatcoat")
+def officer_greatcoat():
+    """Le long manteau d'officier : drap sombre, grand col, deux rangs de boutons d'argent."""
+    return light(sprite([
+        "................",
+        "....LLLUULLL....",
+        "..cCLLLUULLLCc..",
+        ".cCCCLLUULLCCCc.",
+        ".CCCCCSCCSCCCCC.",
+        ".CCCcCCCCCCcCCC.",
+        ".CCCcCSCCSCcCCC.",
+        ".CCCcCCCCCCcCCC.",
+        "....cCSCCSCc....",
+        "....cCCCCCCc....",
+        "....cCCCCCCc....",
+        "....cCCCcCCc....",
+        "....cCCCcCCc....",
+        "....cCCCcCCc....",
+        "....cccccccc....",
+        "................",
+    ], GREATCOAT_ICON))
+
 
 LANCE = dict(H="#e2ddd0", L="#bdb8ac", M="#8e897e", D="#4e4b46", S="#9a958a", s="#6e6a62")
 

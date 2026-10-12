@@ -1261,6 +1261,213 @@ def soul_armor(s):
         s.material("rarm", f, shade(steel, 0.82), "metal", y=9, h=3)
 
 
+# --- les tenues, portées ----------------------------------------------------------------------------
+# Une armure se peint sur le gabarit 64x32 : la tête et sa surcouche, le torse, le bras et la jambe
+# droits (le gauche en est le miroir). La couche des jambières ne montre que la taille et les jambes ;
+# celle de l'armure ne montre des jambes que les bottes. Les volumes en plus (capuche, pans,
+# épaulières, plumet, visière) ont leur propre texture, au gabarit d'OutfitLayer.
+ARMOR = (64, 32)
+# Pour les peintres pensés pour une peau entière : les membres gauches retombent sur ceux de droite.
+MIRRORED = {"larm": (40, 16, 4, 12, 4), "lleg": (0, 16, 4, 12, 4)}
+EXTRAS = {"hood": (0, 0, 8, 4, 2), "visor": (24, 0, 8, 1, 3), "spike": (48, 0, 2, 3, 2),
+          "pauldron": (0, 8, 5, 3, 7), "plume": (48, 8, 2, 7, 3), "tails": (0, 20, 4, 9, 4),
+          "long_tails": (16, 20, 4, 11, 4)}
+EDWARD_RED = "#b3242b"
+GREATCOAT = "#262a33"
+ALPHONSE_STEEL, ALPHONSE_TRIM = "#8f9aa6", "#5d6670"
+
+
+def clear_rows(s, part, y, h):
+    """Rend transparentes ces rangées tout autour de la partie : la peau ou le vêtement dessous se voit."""
+    for f in SIDES:
+        w, _ = s.size(part, f)
+        s.rect(part, f, 0, y, w, h, None)
+
+
+def flamel(s, part, f, x, y, color="#1a1416"):
+    """La croix de Flamel, en 5x8 : la couronne, les ailes, la croix et le serpent enroulé."""
+    for dx, dy in ((1, 0), (3, 0), (2, 1), (0, 2), (4, 2), (2, 2), (1, 3), (2, 3), (3, 3), (2, 4),
+                   (1, 5), (2, 5), (3, 6), (2, 6), (1, 7), (2, 7)):
+        s.px(part, f, x + dx, y + dy, color)
+
+
+def coat_sleeves(s, color, cuff, mat="cloth"):
+    """Des manches de manteau jusqu'au poignet ; la main reste nue (ou gantée, par les gants du mod)."""
+    s.fill("rarm", color, mat)
+    s.band("rarm", 9, 1, cuff, mat)
+    s.outline_edges("rarm", 0.9)
+    clear_rows(s, "rarm", 10, 2)
+    s.clear("rarm", faces=("bottom",))
+
+
+def armor_boots(s, color, rows, band, mat="leather", sole="#0e0d10"):
+    """Les bottes, seules visibles aux jambes de l'armure."""
+    clear_rows(s, "rleg", 0, 12 - rows)
+    for f in SIDES:
+        s.material("rleg", f, color, mat, y=12 - rows, h=rows)
+    s.band("rleg", 12 - rows, 1, band, mat)
+    s.material("rleg", "bottom", sole, mat)
+    s.clear("rleg", faces=("top",))
+    s.tint("rleg", "front", 0, 11, 4, 1, 1.15)
+
+
+@skin("equipment/humanoid/alchemist", size=ARMOR, volume=False)
+def alchemist_outfit(s):
+    """Le manteau rouge d'Edward, ouvert sur la veste noire, la croix de Flamel dans le dos ; et ses
+    bottes noires."""
+    red, deep = EDWARD_RED, shade(EDWARD_RED, 0.7)
+    s.fill("body", red, "cloth")
+    # Devant, le manteau s'ouvre sur la veste noire, bordée de blanc, et son col montant.
+    s.material("body", "front", BLACK_CLOTH, "cloth", x=2, w=4)
+    s.seam("body", "front", 2, 0, 12, "#e8e4dc")
+    s.seam("body", "front", 5, 0, 12, "#e8e4dc")
+    s.rect("body", "front", 2, 0, 4, 1, "#2a282e")
+    s.tint("body", "front", 1, 0, 1, 12, 0.85)
+    s.tint("body", "front", 6, 0, 1, 12, 0.85)
+    s.band("body", 0, 1, deep, "cloth", faces=("right", "left", "back"))
+    flamel(s, "body", "back", 2, 3)
+    coat_sleeves(s, red, deep)
+    armor_boots(s, BOOT, 4, "#2c2a30")
+
+
+@skin("equipment/humanoid_leggings/alchemist", size=ARMOR, volume=False)
+def alchemist_trousers(s):
+    """Le pantalon de cuir noir d'Edward, sa ceinture et sa boucle d'argent."""
+    pants(s, "#232127", "leather")
+    s.seam("rleg", "front", 2, 0, 12, None, k=0.85)
+    for f in SIDES:
+        s.material("body", f, "#232127", "leather", y=8, h=4)
+    belt(s, y=8, color="#141216", buckle="#d0d4da")
+
+
+@skin("outfit/alchemist", size=(64, 64), parts=EXTRAS, volume=False)
+def alchemist_extras(s):
+    """La capuche rabattue et les pans du manteau d'Edward, jusqu'aux genoux, ouverts devant."""
+    red, deep = EDWARD_RED, shade(EDWARD_RED, 0.7)
+    s.fill("hood", red, "cloth")
+    s.material("hood", "front", deep, "cloth")
+    s.material("hood", "top", shade(red, 0.85), "cloth")
+    s.tint("hood", "back", 0, 3, 8, 1, 0.8)
+    s.fill("tails", red, "cloth")
+    s.band("tails", 8, 1, deep, "cloth")
+    # L'ouverture devant : le pan s'écarte de la jambe intérieure.
+    s.rect("tails", "front", 2, 0, 2, 9, None)
+    s.tint("tails", "front", 1, 0, 1, 9, 0.85)
+    s.fill("tails", deep, "cloth", faces=("top",))
+
+
+@skin("equipment/humanoid/steel_armor", size=ARMOR, volume=False, parts=MIRRORED)
+def steel_armor(s):
+    """L'armure d'Alphonse, pour un vivant : le heaume à fente, le plastron à arête, les lames du
+    ventre, les gantelets ; et des solerets aux jambes."""
+    armor(s, ALPHONSE_STEEL, ALPHONSE_TRIM, eye="#1a1c22")
+    light_ = "#d8e0ea"
+    s.seam("body", "front", 4, 1, 6, light_)
+    for y in (8, 10):
+        s.band_tint("body", y, 1, 1.12)
+    # Le heaume : la corne du front, au-dessus de la fente sombre (il y a un visage derrière).
+    s.px("head", "front", 3, 1, light_)
+    s.px("head", "front", 4, 1, light_)
+    s.px("head", "front", 3, 2, shade(ALPHONSE_STEEL, 0.75))
+    s.px("head", "front", 4, 2, shade(ALPHONSE_STEEL, 0.75))
+    # Les jambes ne portent ici que les solerets.
+    clear_rows(s, "rleg", 0, 7)
+    s.clear("rleg", faces=("top",))
+    s.band("rleg", 7, 1, ALPHONSE_TRIM, "metal")
+
+
+@skin("equipment/humanoid_leggings/steel_armor", size=ARMOR, volume=False)
+def steel_leggings(s):
+    """Les cuissards : des plaques sur les cuisses, les genouillères, et le pagne de tissu à la taille."""
+    for f in SIDES:
+        s.material("rleg", f, ALPHONSE_STEEL, "metal", y=0, h=9)
+    s.material("rleg", "top", ALPHONSE_STEEL, "metal")
+    s.band("rleg", 4, 1, ALPHONSE_TRIM, "metal")
+    s.tint("rleg", "front", 0, 5, 4, 2, 1.2)
+    s.band("rleg", 8, 1, shade(ALPHONSE_STEEL, 0.8), "metal")
+    for f in SIDES:
+        s.material("body", f, shade(ALPHONSE_STEEL, 0.85), "metal", y=8, h=4)
+    s.band("body", 8, 1, ALPHONSE_TRIM, "metal")
+    # Le pagne, devant et derrière.
+    s.material("body", "front", "#6d5f4c", "cloth", x=2, y=9, w=4, h=3)
+    s.material("body", "back", "#6d5f4c", "cloth", x=2, y=9, w=4, h=3)
+
+
+@skin("outfit/steel", size=(64, 64), parts=EXTRAS, volume=False)
+def steel_extras(s):
+    """Les épaulières rondes et rivetées, la pointe du heaume et son plumet blanc."""
+    steel, light_ = ALPHONSE_STEEL, "#d8e0ea"
+    s.fill("pauldron", shade(steel, 1.08), "metal")
+    s.material("pauldron", "top", light_, "metal")
+    s.band("pauldron", 2, 1, ALPHONSE_TRIM, "metal")
+    for f, x in (("front", 2), ("back", 2), ("right", 3), ("left", 3)):
+        s.px("pauldron", f, x, 1, "#eef2f6")
+    s.fill("pauldron", shade(steel, 0.6), "metal", faces=("bottom",))
+    s.fill("spike", light_, "metal")
+    s.fill("plume", "#ecebe2", "hair")
+    s.tint("plume", "back", 0, 5, 2, 2, 0.85)
+
+
+@skin("equipment/humanoid/officer", size=ARMOR, volume=False, parts=MIRRORED)
+def officer_uniform(s):
+    """L'uniforme bleu d'officier d'Amestris : casquette, vareuse aux boutons d'or et aiguillette,
+    bottes de cuir noir."""
+    amestris_uniform(s, officer=True, legs=False)
+    clear_rows(s, "rarm", 10, 2)
+    s.clear("rarm", faces=("bottom",))
+    # La casquette, sur la tête de l'armure : calotte, bandeau noir, insigne d'or ; le visage reste nu.
+    s.material("head", "top", AMESTRIS_BLUE, "cloth")
+    for f in SIDES:
+        s.material("head", f, AMESTRIS_BLUE, "cloth", y=0, h=2)
+        s.material("head", f, "#151519", "leather", y=2, h=1)
+    s.px("head", "front", 3, 1, GOLD)
+    s.px("head", "front", 4, 1, shade(GOLD, 0.8))
+    armor_boots(s, BOOT, 5, "#2c2a30")
+
+
+@skin("equipment/humanoid_leggings/officer", size=ARMOR, volume=False)
+def officer_trousers(s):
+    """Le pantalon bleu, son passepoil sombre sur le côté."""
+    pants(s, AMESTRIS_BLUE)
+    s.seam("rleg", "right", 2, 0, 12, shade(AMESTRIS_BLUE, 0.55))
+    for f in SIDES:
+        s.material("body", f, AMESTRIS_BLUE, "cloth", y=9, h=3)
+
+
+@skin("outfit/officer", size=(64, 64), parts=EXTRAS, volume=False)
+def officer_extras(s):
+    """La visière de la casquette : du cuir verni, un reflet sur le bord."""
+    s.fill("visor", "#0d0d10", "leather")
+    s.tint("visor", "top", 0, 2, 8, 1, 1.8)
+
+
+@skin("equipment/humanoid/officer_greatcoat", size=ARMOR, volume=False)
+def officer_greatcoat(s):
+    """Le long manteau d'officier, à la Mustang : drap sombre croisé, deux rangs de boutons d'argent,
+    le grand col rabattu sur le col bleu de la vareuse."""
+    coat, collar = GREATCOAT, shade(GREATCOAT, 1.35)
+    s.fill("body", coat, "cloth")
+    s.material("body", "front", collar, "cloth", x=1, w=6, h=2)
+    s.rect("body", "front", 3, 0, 2, 2, AMESTRIS_BLUE)
+    s.band("body", 0, 1, collar, "cloth", faces=("right", "left", "back"))
+    for y in (3, 5, 7, 9):
+        s.px("body", "front", 2, y, "#c9ccd2")
+        s.px("body", "front", 5, y, "#c9ccd2")
+    s.seam("body", "front", 4, 2, 10, None, k=0.75)
+    coat_sleeves(s, coat, shade(coat, 0.75))
+
+
+@skin("outfit/greatcoat", size=(64, 64), parts=EXTRAS, volume=False)
+def greatcoat_extras(s):
+    """Les pans du manteau d'officier, jusqu'aux chevilles, la fente dans le dos."""
+    coat = GREATCOAT
+    s.fill("long_tails", coat, "cloth")
+    s.band("long_tails", 10, 1, shade(coat, 0.75), "cloth")
+    s.rect("long_tails", "front", 3, 0, 1, 11, shade(coat, 0.7))
+    s.rect("long_tails", "back", 3, 4, 1, 7, shade(coat, 0.6))
+    s.fill("long_tails", shade(coat, 0.7), "cloth", faces=("top",))
+
+
 def build(names=None):
     os.makedirs(OUT, exist_ok=True)
     for name in names or SKINS:

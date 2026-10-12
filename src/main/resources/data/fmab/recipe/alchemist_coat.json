@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "R R",
+    "RBR",
+    "RRR"
+  ],
+  "key": {
+    "R": "minecraft:red_wool",
+    "B": "minecraft:black_wool"
+  },
+  "result": {
+    "id": "fmab:alchemist_coat",
+    "count": 1
+  }
+}

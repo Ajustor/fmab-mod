@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "BBB",
+    "B B",
+    "L L"
+  ],
+  "key": {
+    "B": "minecraft:black_wool",
+    "L": "minecraft:leather"
+  },
+  "result": {
+    "id": "fmab:alchemist_trousers",
+    "count": 1
+  }
+}
