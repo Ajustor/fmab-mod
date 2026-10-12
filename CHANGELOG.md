@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0 — 2026-10-12
+
+### New features
+
+- New outfits: Edward's red alchemist coat (with trousers and boots), Alphonse's steel armour, the Amestrian officer's uniform and the long officer's greatcoat, with hood, coat tails, pauldrons, plume and cap visor.
 ## 1.2.0 — 2026-10-11
 
 ### New features

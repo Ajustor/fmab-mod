@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.3.0 — 2026-10-12
+
+### Nouveautés
+
+- Nouvelles tenues : le manteau rouge d'alchimiste d'Edward (avec pantalon et bottes), l'armure d'acier d'Alphonse, l'uniforme d'officier d'Amestris et le long manteau d'officier, avec capuche, pans, épaulières, plumet et visière.
 ## 1.2.0 — 2026-10-11
 
 ### Nouveautés
