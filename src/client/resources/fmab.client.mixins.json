@@ -8,6 +8,7 @@
 		"AvatarRenderStateMixin",
 		"AvatarRendererMixin",
 		"ClientLevelMixin",
+		"EntityRenderDispatcherMixin",
 		"HudMixin",
 		"ItemInHandRendererMixin",
 		"PlayerModelMixin",

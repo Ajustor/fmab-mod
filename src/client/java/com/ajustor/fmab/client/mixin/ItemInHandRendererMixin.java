@@ -1,6 +1,7 @@
 package com.ajustor.fmab.client.mixin;
 
 import com.ajustor.fmab.client.render.FirstPersonGestures;
+import com.ajustor.fmab.gate.Shells;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
@@ -21,6 +22,15 @@ public abstract class ItemInHandRendererMixin {
 	@Invoker("renderPlayerArm")
 	abstract void fmab$renderPlayerArm(PoseStack poseStack, SubmitNodeCollector collector, int light,
 			float inverseArmHeight, float attackValue, HumanoidArm arm);
+
+	/** Dans l'armure d'une âme, ses mains à soi restent dedans : on ne voit que par la fente du heaume. */
+	@Inject(method = "submitHandsWithItems", at = @At("HEAD"), cancellable = true)
+	private void fmab$insideShell(float partialTicks, PoseStack poseStack, SubmitNodeCollector collector,
+			LocalPlayer player, int light, CallbackInfo ci) {
+		if (Shells.inside(player)) {
+			ci.cancel();
+		}
+	}
 
 	@Inject(method = "submitHandsWithItems", at = @At("HEAD"), cancellable = true)
 	private void fmab$gestures(float partialTicks, PoseStack poseStack, SubmitNodeCollector collector, LocalPlayer player,

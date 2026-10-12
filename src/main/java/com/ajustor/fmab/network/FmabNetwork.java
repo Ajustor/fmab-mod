@@ -15,6 +15,7 @@ import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyMenu;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Rebirth;
+import com.ajustor.fmab.gate.Shells;
 import com.ajustor.fmab.gate.SoulBinding;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.state.StateExam;
@@ -40,6 +41,7 @@ public final class FmabNetwork {
 				1 << 20);
 		PayloadTypeRegistry.serverboundPlay().register(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(ShellKeyPayload.TYPE, ShellKeyPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(WinryActionPayload.TYPE, WinryActionPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(TruthChoicePayload.TYPE, TruthChoicePayload.CODEC);
@@ -76,6 +78,8 @@ public final class FmabNetwork {
 				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
 		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,
 				(payload, context) -> removeGlove(context.player(), payload.left()));
+		ServerPlayNetworking.registerGlobalReceiver(ShellKeyPayload.TYPE,
+				(payload, context) -> Shells.press(context.player()));
 		ServerPlayNetworking.registerGlobalReceiver(StoneChosenPayload.TYPE,
 				(payload, context) -> StoneChoice.answer(context.player(), payload.choice()));
 		ServerPlayNetworking.registerGlobalReceiver(BargainAnswerPayload.TYPE,
