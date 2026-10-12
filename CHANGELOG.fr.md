@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.4.0 — 2026-10-12
+
+### Nouveautés
+
+- Une âme en armure peut se figer (touche V) : un autre joueur revêt alors l'armure et la fait marcher ; si l'âme se remet à bouger, il est enfermé dedans jusqu'à ce qu'elle le relâche, à l'abri des coups.
 ## 1.3.0 — 2026-10-12
 
 ### Nouveautés

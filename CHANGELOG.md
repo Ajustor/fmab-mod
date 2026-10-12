@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.0 — 2026-10-12
+
+### New features
+
+- A soul in armour can stand still (V key): another player can then put the armour on and walk it around; if the soul moves again, they are locked inside until it releases them, safe from blows.
 ## 1.3.0 — 2026-10-12
 
 ### New features
