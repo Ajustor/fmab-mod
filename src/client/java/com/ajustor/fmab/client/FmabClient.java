@@ -2,6 +2,7 @@ package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.client.render.AutomailLayer;
+import com.ajustor.fmab.client.render.OutfitLayer;
 import com.ajustor.fmab.client.render.BossModels;
 import com.ajustor.fmab.client.render.ChimeraBeastRenderer;
 import com.ajustor.fmab.client.render.ChimeraCrawlerRenderer;
@@ -187,6 +188,10 @@ public class FmabClient implements ClientModInitializer {
 			if (renderer instanceof AvatarRenderer avatar) {
 				helper.register(new AutomailLayer(avatar, context));
 			}
+			// Les volumes des tenues (capuche, pans, épaulières...), sur tout corps humanoïde qui les porte.
+			if (renderer.getModel() instanceof net.minecraft.client.model.HumanoidModel<?>) {
+				registerOutfits(helper, renderer);
+			}
 		});
 		ClientPlayNetworking.registerGlobalReceiver(CinematicPayload.TYPE, (payload, context) -> Cinematics.start(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> Cinematics.tick());
@@ -353,5 +358,11 @@ public class FmabClient implements ClientModInitializer {
 		for (int quarter = 1; quarter < 4; quarter++) {
 			graphics.fill(x + width * quarter / 4, y, x + width * quarter / 4 + 1, y + 3, 0x80000000);
 		}
+	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	private static void registerOutfits(LivingEntityRenderLayerRegistrationCallback.RegistrationHelper helper,
+			net.minecraft.client.renderer.entity.LivingEntityRenderer<?, ?, ?> renderer) {
+		helper.register(new OutfitLayer((net.minecraft.client.renderer.entity.RenderLayerParent) renderer));
 	}
 }
