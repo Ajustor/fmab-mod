@@ -7,6 +7,7 @@ import com.ajustor.fmab.data.ExamProgress;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.data.Shell;
 import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.data.TransmutationPose;
@@ -15,10 +16,12 @@ import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public final class FmabAttachments {
 	/** Rang, savoir et concentration du joueur ; gardés à la mort, visibles de lui seul. */
@@ -195,6 +198,19 @@ public final class FmabAttachments {
 			.persistent(Codec.BOOL)
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("equipped"));
+
+	/**
+	 * L'armure d'une âme comme coquille : figée ou non, et qui est dedans. Éphémère (on ne se
+	 * reconnecte pas prisonnier), visible de tous pour savoir qui cacher et quelle armure ne bouge plus.
+	 */
+	public static final AttachmentType<Shell> SHELL = AttachmentRegistry.<Shell>builder()
+			.syncWith(Shell.STREAM_CODEC, AttachmentSyncPredicate.all())
+			.buildAndRegister(Fmab.id("shell"));
+
+	/** Le joueur est dans l'armure de cette âme : on ne le dessine plus, il ne se vise plus. */
+	public static final AttachmentType<UUID> INSIDE = AttachmentRegistry.<UUID>builder()
+			.syncWith(UUIDUtil.STREAM_CODEC, AttachmentSyncPredicate.all())
+			.buildAndRegister(Fmab.id("inside"));
 
 	private FmabAttachments() {
 	}

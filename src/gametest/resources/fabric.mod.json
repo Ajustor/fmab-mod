@@ -19,6 +19,7 @@
 			"com.ajustor.fmab.gametest.AnimationScenes",
 			"com.ajustor.fmab.gametest.GestureScenes",
 			"com.ajustor.fmab.gametest.FoeScenes",
+			"com.ajustor.fmab.gametest.ShellScenes",
 			"com.ajustor.fmab.gametest.OutfitScenes"
 		]
 	},

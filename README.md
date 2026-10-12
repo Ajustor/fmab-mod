@@ -27,6 +27,7 @@ Toutes réglables dans Options → Commandes → Touches, catégorie « Alchimie
 | R (maintenue) | Roue des cercles : pointer un cercle et relâcher ; 1 à 9 pour choisir sans viser ; un clic gauche joint aussitôt les mains (Initiés de la Porte) |
 | G / Maj+G | Lancer le cercle des gants / joindre les mains (les deux gants, ou sans cercle pour un Initié) |
 | H | Écran des gants |
+| V | Âme en armure : se figer (une armure qu'un autre joueur revêt d'un clic main nue), s'éveiller, ou relâcher celui qui est dedans |
 | — | Cercle suivant / précédent (sans touche par défaut) |
 
 Dans l'inventaire de survie, l'onglet **Corps** montre les membres, les automails et les gants.
@@ -184,6 +185,7 @@ All rebindable under Options → Controls → Key Binds, "Alchemy" category.
 | R (hold) | Circle wheel: point at a circle and release; 1 to 9 to pick without aiming; a left click joins the hands at once (Gate initiates) |
 | G / Shift+G | Cast the gloves' circle / join hands (both gloves, or no circle for an initiate) |
 | H | Gloves screen |
+| V | Soul in armour: stand still (an armour another player puts on with an empty-hand click), wake up, or release whoever is inside |
 | — | Next / previous circle (unbound by default) |
 
 In the survival inventory, the **Body** tab shows limbs, automail and gloves.

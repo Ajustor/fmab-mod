@@ -3,6 +3,8 @@ package com.ajustor.fmab.client;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.client.render.AutomailLayer;
 import com.ajustor.fmab.client.render.OutfitLayer;
+import com.ajustor.fmab.gate.Shells;
+import com.ajustor.fmab.network.ShellKeyPayload;
 import com.ajustor.fmab.client.render.BossModels;
 import com.ajustor.fmab.client.render.ChimeraBeastRenderer;
 import com.ajustor.fmab.client.render.ChimeraCrawlerRenderer;
@@ -126,7 +128,13 @@ public class FmabClient implements ClientModInitializer {
 				new KeyMapping("key.fmab.next_circle", InputConstants.UNKNOWN.getValue(), category));
 		KeyMapping previous = KeyMappingHelper.registerKeyMapping(
 				new KeyMapping("key.fmab.previous_circle", InputConstants.UNKNOWN.getValue(), category));
+		// L'âme en armure se fige (une armure qu'on peut revêtir), s'éveille, ou relâche qui est dedans.
+		KeyMapping shell = KeyMappingHelper.registerKeyMapping(
+				new KeyMapping("key.fmab.shell", GLFW.GLFW_KEY_V, category));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
+			while (shell.consumeClick()) {
+				ClientPlayNetworking.send(ShellKeyPayload.INSTANCE);
+			}
 			while (cast.consumeClick()) {
 				// Maj : joindre les mains, les deux gants agissent.
 				ClientPlayNetworking.send(new CastGlovesPayload(mc.hasShiftDown()));
@@ -248,6 +256,8 @@ public class FmabClient implements ClientModInitializer {
 				(graphics, delta) -> concentrationBar(graphics));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("lost_sight"),
 				(graphics, delta) -> lostSight(graphics));
+		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("shell_slit"),
+				(graphics, delta) -> shellSlit(graphics));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("eclipse"),
 				(graphics, delta) -> eclipse(graphics));
 		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("living_stone"),
@@ -298,6 +308,27 @@ public class FmabClient implements ClientModInitializer {
 		int w = graphics.guiWidth();
 		int h = graphics.guiHeight();
 		graphics.blit(RenderPipelines.GUI_TEXTURED, LOST_SIGHT, 0, 0, 0, 0, w, h, 256, 256, 256, 256);
+	}
+
+	/**
+	 * Dans l'armure d'une âme, on voit par la fente du heaume : le haut et le bas de l'écran dans le
+	 * noir, une bande claire au milieu, ses bords fondus.
+	 */
+	private static void shellSlit(GuiGraphicsExtractor graphics) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null || !Shells.inside(mc.player)) {
+			return;
+		}
+		int w = graphics.guiWidth();
+		int h = graphics.guiHeight();
+		int top = h * 2 / 5;
+		int bottom = h * 3 / 5;
+		int fade = Math.max(4, h / 14);
+		int dark = 0xF0050608;
+		graphics.fill(0, 0, w, top - fade, dark);
+		graphics.fill(0, bottom + fade, w, h, dark);
+		graphics.fillGradient(0, top - fade, w, top, dark, 0x00050608);
+		graphics.fillGradient(0, bottom, w, bottom + fade, 0x00050608, dark);
 	}
 
 	/** Pendant l'éclipse, le jour se teinte d'un crépuscule orangé et sombre. */
