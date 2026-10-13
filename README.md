@@ -17,6 +17,12 @@ Minecraft 26.2, [Fabric Loader](https://fabricmc.net/) ≥ 0.19.3, [Fabric API](
 [Releases](https://github.com/Ajustor/fmab-mod/releases) ; chaque build de `master` en produit un
 aussi, dans les artefacts de l'onglet Actions.
 
+Avec [Mod Menu](https://modrinth.com/mod/modmenu) (facultatif), le bouton de réglages du mod permet de
+choisir la **langue du mod**, indépendamment de celle du jeu (le jeu en anglais, le mod en français, ou
+l'inverse), d'afficher ou non le cercle sélectionné et les infobulles des objets, et de régler les mondes
+solo. Sans Mod Menu, ces réglages sont dans `config/fmab-client.json` (`language` : `""` pour suivre le
+jeu, `"fr_fr"`, `"en_us"`…).
+
 ### Touches
 
 Toutes réglables dans Options → Commandes → Touches, catégorie « Alchimie ».
@@ -174,6 +180,12 @@ changelog).
 Minecraft 26.2, Fabric Loader ≥ 0.19.3, Fabric API ≥ 0.161.0 and Java 25. Drop the mod jar into
 `mods/`. Jars are on the [Releases](https://github.com/Ajustor/fmab-mod/releases) page; every
 `master` build also produces one in the Actions artifacts.
+
+With [Mod Menu](https://modrinth.com/mod/modmenu) (optional), the mod's settings button lets you pick the
+**mod language**, separately from the game's (game in English, mod in French, or the other way round),
+show or hide the selected circle and the item hints, and set single-player worlds. Without Mod Menu,
+these settings are in `config/fmab-client.json` (`language`: `""` to follow the game, `"fr_fr"`,
+`"en_us"`…).
 
 ### Controls
 

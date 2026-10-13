@@ -1152,5 +1152,20 @@
   "tome.fmab.planetary_metals": "On the Planetary Metals",
   "tome.fmab.deep_metals": "On the Deep Metals",
   "tag.item.fmab.composition_catalysts": "Catalysts (not part of an item's composition)",
-  "circle.fmab.issue.incomplete_formula": "The formula is incomplete: satellites must infuse every element it calls for."
+  "circle.fmab.issue.incomplete_formula": "The formula is incomplete: satellites must infuse every element it calls for.",
+
+  "config.fmab.title": "FMAB — Settings",
+  "config.fmab.section.interface": "Display",
+  "config.fmab.section.world": "Single-player worlds",
+  "config.fmab.language": "Mod language",
+  "config.fmab.language.game": "Game language",
+  "config.fmab.language.tooltip": "The language of this mod's texts only, whatever the game's language: keep the game in English and the mod in your own language, or the other way round.",
+  "config.fmab.circle_hud": "Selected circle on screen",
+  "config.fmab.circle_hud.tooltip": "Shows the circle selected in the notebook in the top-left corner when it can be used.",
+  "config.fmab.item_hints": "Item hints",
+  "config.fmab.item_hints.tooltip": "Explanations in the tooltips of key items (State Alchemist watch, Stone core, alchemical thread and ink…).",
+  "config.fmab.restart_wipes_progress": "Starting over wipes progress",
+  "config.fmab.restart_wipes_progress.tooltip": "Starting over before the Truth also erases all alchemist progress (rank, glyphs, mastery, trials, tattoos, karma); otherwise only the body is returned. A dedicated server keeps its own config/fmab.json.",
+  "modmenu.summaryTranslation.fmab": "Fullmetal Alchemist: Brotherhood fan mod: equivalent exchange, hand-drawn transmutation circles, the Gate of Truth.",
+  "modmenu.descriptionTranslation.fmab": "Fan-made Fullmetal Alchemist: Brotherhood mod: equivalent exchange, player-drawn transmutation circles, the Gate of Truth. Not affiliated with Hiromu Arakawa, Square Enix, Bones or Aniplex; Fullmetal Alchemist and all related names belong to their rights holders."
 }

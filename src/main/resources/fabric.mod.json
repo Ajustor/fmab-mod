@@ -12,6 +12,7 @@
 		"issues": "https://github.com/Ajustor/fmab-mod/issues"
 	},
 	"license": "All-Rights-Reserved",
+	"icon": "assets/fmab/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -19,6 +20,9 @@
 		],
 		"client": [
 			"com.ajustor.fmab.client.FmabClient"
+		],
+		"modmenu": [
+			"com.ajustor.fmab.client.config.ModMenuIntegration"
 		]
 	},
 	"mixins": [
@@ -33,6 +37,9 @@
 		"minecraft": "~26.2",
 		"java": ">=25",
 		"fabric-api": ">=0.161.0"
+	},
+	"suggests": {
+		"modmenu": "*"
 	},
 	"custom": {
 		"fmab:disclaimer": {
