@@ -1152,5 +1152,20 @@
   "tome.fmab.planetary_metals": "Des métaux planétaires",
   "tome.fmab.deep_metals": "Des métaux des profondeurs",
   "tag.item.fmab.composition_catalysts": "Catalyseurs (n'entrent pas dans la composition)",
-  "circle.fmab.issue.incomplete_formula": "La formule est incomplète : des satellites doivent infuser chacun des éléments qu'elle demande."
+  "circle.fmab.issue.incomplete_formula": "La formule est incomplète : des satellites doivent infuser chacun des éléments qu'elle demande.",
+
+  "config.fmab.title": "FMAB — Réglages",
+  "config.fmab.section.interface": "Affichage",
+  "config.fmab.section.world": "Mondes solo",
+  "config.fmab.language": "Langue du mod",
+  "config.fmab.language.game": "Langue du jeu",
+  "config.fmab.language.tooltip": "La langue des textes de ce mod seulement, quelle que soit celle du jeu : garder le jeu en anglais et le mod dans sa langue, ou l'inverse.",
+  "config.fmab.circle_hud": "Cercle sélectionné à l'écran",
+  "config.fmab.circle_hud.tooltip": "Affiche en haut à gauche le cercle sélectionné dans le carnet, quand on peut s'en servir.",
+  "config.fmab.item_hints": "Infobulles des objets",
+  "config.fmab.item_hints.tooltip": "Les explications dans les infobulles des objets clés (montre d'Alchimiste d'État, noyau de Pierre, fil et encre alchimiques…).",
+  "config.fmab.restart_wipes_progress": "Repartir de zéro efface tout",
+  "config.fmab.restart_wipes_progress.tooltip": "Repartir de zéro devant la Vérité efface aussi toute la progression d'alchimiste (rang, glyphes, maîtrise, épreuves, tatouages, karma) ; sinon, seul le corps est rendu. Un serveur dédié garde son propre config/fmab.json.",
+  "modmenu.summaryTranslation.fmab": "Mod de fan Fullmetal Alchemist: Brotherhood : échange équivalent, cercles de transmutation tracés à la main, la Porte de la Vérité.",
+  "modmenu.descriptionTranslation.fmab": "Mod de fan Fullmetal Alchemist: Brotherhood : échange équivalent, cercles de transmutation tracés par le joueur, la Porte de la Vérité. Non affilié à Hiromu Arakawa, Square Enix, Bones ni Aniplex ; Fullmetal Alchemist et les noms associés appartiennent à leurs ayants droit."
 }

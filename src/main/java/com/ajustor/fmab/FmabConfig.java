@@ -28,20 +28,38 @@ public record FmabConfig(boolean restartWipesProgress) {
 	}
 
 	public static void load() {
-		Path file = FabricLoader.getInstance().getConfigDir().resolve("fmab.json");
+		Path file = file();
 		try {
 			if (Files.exists(file)) {
 				JsonObject json = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
 				current = new FmabConfig(json.has("restart_wipes_progress")
 						? json.get("restart_wipes_progress").getAsBoolean() : DEFAULT.restartWipesProgress());
 			}
-			JsonObject out = new JsonObject();
-			out.addProperty("restart_wipes_progress", current.restartWipesProgress());
-			Files.createDirectories(file.getParent());
-			Files.writeString(file, GSON.toJson(out));
 		} catch (IOException | RuntimeException e) {
 			Fmab.LOGGER.error("Configuration {} illisible : valeurs par défaut", file, e);
 			current = DEFAULT;
 		}
+		save(current);
+	}
+
+	/**
+	 * Retient ces réglages et les écrit dans le fichier : depuis le menu des mods, ils valent pour les
+	 * mondes solo ; un serveur dédié garde son propre fichier.
+	 */
+	public static void save(FmabConfig config) {
+		current = config;
+		Path file = file();
+		try {
+			JsonObject out = new JsonObject();
+			out.addProperty("restart_wipes_progress", config.restartWipesProgress());
+			Files.createDirectories(file.getParent());
+			Files.writeString(file, GSON.toJson(out));
+		} catch (IOException e) {
+			Fmab.LOGGER.error("Impossible d'écrire {}", file, e);
+		}
+	}
+
+	private static Path file() {
+		return FabricLoader.getInstance().getConfigDir().resolve("fmab.json");
 	}
 }

@@ -1,6 +1,7 @@
 package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.FmabClientConfig;
 import com.ajustor.fmab.client.render.AutomailLayer;
 import com.ajustor.fmab.client.render.OutfitLayer;
 import com.ajustor.fmab.gate.Shells;
@@ -106,6 +107,8 @@ import org.lwjgl.glfw.GLFW;
 public class FmabClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
+		// Avant le premier chargement des langues : celle choisie pour le mod s'y applique déjà.
+		FmabClientConfig.load();
 		Fmab.setClientHooks((kind, hand) -> {
 			switch (kind) {
 				case TREATISE -> Minecraft.getInstance().gui.setScreen(new TreatiseScreen());

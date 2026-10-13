@@ -7,6 +7,7 @@
 		"AbstractContainerScreenAccessor",
 		"AvatarRenderStateMixin",
 		"AvatarRendererMixin",
+		"ClientLanguageMixin",
 		"ClientLevelMixin",
 		"EntityRenderDispatcherMixin",
 		"HudMixin",

@@ -1,5 +1,6 @@
 package com.ajustor.fmab.client;
 
+import com.ajustor.fmab.FmabClientConfig;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.gate.Restoration;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -22,6 +23,9 @@ public final class ItemHints {
 	}
 
 	public static void append(ItemStack stack, List<Component> lines) {
+		if (!FmabClientConfig.get().itemHints()) {
+			return;
+		}
 		if (stack.is(FmabItems.STATE_WATCH)) {
 			lines.add(hint("item.fmab.state_watch.hint", StateWatch.RANGE_BONUS, Math.round(StateWatch.SAVING * 100)));
 			var player = Minecraft.getInstance().player;
