@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0 — 2026-10-13
+
+### New features
+
+- The mod has an icon, settings in Mod Menu, and its language can differ from the game's (for example the game in English and the mod in French).
 ## 1.4.0 — 2026-10-12
 
 ### New features

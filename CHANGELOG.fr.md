@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.5.0 — 2026-10-13
+
+### Nouveautés
+
+- Le mod a une icône, des réglages dans Mod Menu, et sa langue peut différer de celle du jeu (par exemple le jeu en anglais et le mod en français).
 ## 1.4.0 — 2026-10-12
 
 ### Nouveautés
