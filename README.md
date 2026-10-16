@@ -72,11 +72,11 @@ d'État à Central, la Porte, les homonculus, puis Père.
   rebond, et s'apprend par l'usage ou par les tomes.
 - **Cercles portés** : gants brodés ou gravés (dont les gants à silex de Mustang et les gantelets),
   vêtements brodés, tatouages par rituel, aux passifs permanents.
-- **La Porte** : la transmutation humaine échoue toujours et happe l'alchimiste dans l'Espace blanc,
-  où la Vérité prend son péage (un bras, une jambe, les organes, la vue... ou le corps entier : l'âme
-  vit alors dans une armure scellée de son sang). En échange, l'Initié comprend tous les glyphes et transmute sans cercle. Le cercle
-  n'est dans aucun traité : on le recompose soi-même, ou on trouve de très rares **Notes sur la
-  transmutation humaine**.
+- **La Porte** : sans Pierre philosophale, la transmutation humaine échoue toujours et happe
+  l'alchimiste dans l'Espace blanc, où la Vérité prend son péage (un bras, une jambe, les organes, la
+  vue... ou le corps entier : l'âme vit alors dans une armure scellée de son sang). En échange,
+  l'Initié comprend tous les glyphes et transmute sans cercle. Le cercle n'est dans aucun traité : on
+  le recompose soi-même, ou on trouve de très rares **Notes sur la transmutation humaine**.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : à l'établi ou dans l'onglet Corps,
   usure, réparation et retrait chez **Winry**. Un alchimiste qui connaît la Lame-bras peut transmuter
   son bras d'automail (Fer et Recomposer) : une lame en sort, qui tranche à mains nues, et la même
@@ -242,10 +242,11 @@ Central, the Gate, the homunculi, then Father.
   a rebound risk and are learned through use or tomes.
 - **Worn circles**: embroidered or engraved gloves (including Mustang's spark gloves and
   gauntlets), embroidered clothes, ritual tattoos with permanent passives.
-- **The Gate**: human transmutation always fails and drags the alchemist into the White Space, where
-  Truth takes its toll (an arm, a leg, the organs, the sight... or the whole body, leaving the soul in
-  a blood-sealed armor). In exchange, initiates transmute without a circle. The circle is in no
-  treatise: work it out yourself, or find very rare **Notes on Human Transmutation**.
+- **The Gate**: without a Philosopher's Stone, human transmutation always fails and drags the
+  alchemist into the White Space, where Truth takes its toll (an arm, a leg, the organs, the sight...
+  or the whole body, leaving the soul in a blood-sealed armor). In exchange, initiates understand
+  every glyph and transmute without a circle. The circle is in no treatise: work it out yourself, or
+  find very rare **Notes on Human Transmutation**.
 - **Automail** (iron, Rush Valley, Briggs) on lost limbs: fitted at the bench or in the Body tab,
   wears out, repaired and removed by **Winry**. An alchemist who knows the Arm blade can transmute
   their automail arm (Iron and Recompose): a blade springs out and cuts bare-handed, and the same
@@ -254,7 +255,8 @@ Central, the Gate, the homunculi, then Father.
   cannot jump and only climbs half a block (slabs, stairs: you need ramps); turning its wheels takes
   both arms, and keeps your hands busy. Another player can push it (right-click it, sneak to let go),
   or a villager for an emerald.
-- **Philosopher's Stone**: restores what the Gate took, amplifies transmutations, made by sacrifice.
+- **Philosopher's Stone**: before the Gate, buys back from Truth what it took; brings to life the
+  being of a human transmutation, amplifies transmutations, made by sacrifice.
   **Karma**, an **eclipse** every eighth day, the **Living Stone**.
 - **Homunculi** that reconstitute while their Stone holds souls: Lust, Gluttony (and his Belly),
   Envy in disguise, Greed (a possible ally), Sloth, Wrath, Pride; finally **Father** and his
