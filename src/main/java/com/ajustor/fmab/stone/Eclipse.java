@@ -2,6 +2,7 @@ package com.ajustor.fmab.stone;
 
 import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.promised.NationalCircle;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -20,6 +21,8 @@ public final class Eclipse {
 	private static final int END = 8000;
 	/** La montée et la descente de l'éclipse, en ticks. */
 	private static final int RAMP = 200;
+	/** L'heure de la dernière annonce : un cycle jour/nuit figé pile à cette heure ne la répète pas à chaque tick. */
+	private static long announced = Long.MIN_VALUE;
 
 	private Eclipse() {
 	}
@@ -51,27 +54,49 @@ public final class Eclipse {
 		return Math.floorMod(day, PERIOD_DAYS) == PERIOD_DAYS - 1 && hour >= START && hour < END;
 	}
 
+	/** Ce que les joueurs apprennent de l'éclipse : le matin du jour, puis son début et sa fin. */
+	public enum Announcement { NONE, TODAY, BEGINS, ENDS }
+
+	/**
+	 * L'annonce due à cette heure de l'horloge du monde.
+	 *
+	 * @param last l'heure de la dernière annonce : elle ne se répète pas
+	 */
+	public static Announcement announcement(long clock, long last) {
+		if (clock == last) {
+			return Announcement.NONE;
+		}
+		long hour = Math.floorMod(clock, 24000L);
+		if (Math.floorMod(Math.floorDiv(clock, 24000L), PERIOD_DAYS) != PERIOD_DAYS - 1) {
+			return Announcement.NONE;
+		}
+		if (hour == 0) {
+			return Announcement.TODAY;
+		}
+		if (hour == START) {
+			return Announcement.BEGINS;
+		}
+		return hour == END ? Announcement.ENDS : Announcement.NONE;
+	}
+
 	public static void register() {
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> announced = Long.MIN_VALUE);
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			ServerLevel overworld = server.overworld();
-			long hour = Math.floorMod(overworld.getOverworldClockTime(), 24000L);
-			if (hour == 0 && Math.floorMod(Math.floorDiv(overworld.getOverworldClockTime(), 24000L), PERIOD_DAYS)
-					== PERIOD_DAYS - 1) {
+			long clock = overworld.getOverworldClockTime();
+			Announcement announcement = announcement(clock, announced);
+			if (announcement == Announcement.NONE) {
+				return;
+			}
+			announced = clock;
+			if (announcement == Announcement.TODAY) {
 				// Le matin du jour de l'éclipse, on le sent venir.
 				for (ServerPlayer p : overworld.players()) {
 					p.sendSystemMessage(Component.translatable("eclipse.fmab.today").withStyle(ChatFormatting.GOLD));
 				}
 				return;
 			}
-			if (hour != START && hour != END) {
-				return;
-			}
-			boolean starting = hour == START && now(overworld);
-			boolean ending = hour == END && Math.floorMod(Math.floorDiv(overworld.getOverworldClockTime(), 24000L),
-					PERIOD_DAYS) == PERIOD_DAYS - 1;
-			if (!starting && !ending) {
-				return;
-			}
+			boolean starting = announcement == Announcement.BEGINS;
 			NationalCircle circle = NationalCircle.get(server);
 			for (ServerPlayer p : overworld.players()) {
 				p.sendSystemMessage(Component.translatable(starting ? "eclipse.fmab.begins" : "eclipse.fmab.ends"));
