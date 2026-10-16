@@ -83,6 +83,15 @@ public final class FmabAttachments {
 			.syncWith(GateState.STREAM_CODEC, AttachmentSyncPredicate.all())
 			.buildAndRegister(Fmab.id("gate"));
 
+	/**
+	 * L'heure de jeu à laquelle l'âme s'est mise à errer devant sa Porte : sa place dans la file des
+	 * âmes errantes, gardée à la déconnexion, au redémarrage du serveur et à la mort.
+	 */
+	public static final AttachmentType<Long> ADRIFT_SINCE = AttachmentRegistry.<Long>builder()
+			.persistent(Codec.LONG)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("adrift_since"));
+
 	/** Les automails posés sur les membres perdus, visibles de tous sur le corps du joueur. */
 	public static final AttachmentType<Automail> AUTOMAIL = AttachmentRegistry.<Automail>builder()
 			.persistent(Automail.CODEC)

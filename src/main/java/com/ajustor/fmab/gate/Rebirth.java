@@ -27,6 +27,7 @@ public final class Rebirth {
 	public static void restart(ServerPlayer player) {
 		boolean wipe = FmabConfig.get().restartWipesProgress();
 		player.setAttached(FmabAttachments.GATE, GateState.NONE);
+		player.removeAttached(FmabAttachments.ADRIFT_SINCE);
 		player.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE);
 		player.removeAttached(FmabAttachments.LIVING_STONE);
 		if (wipe) {
