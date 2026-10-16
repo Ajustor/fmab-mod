@@ -218,8 +218,9 @@ button.glyph {
   background: var(--paper);
 }
 
-button.glyph.locked {
-  opacity: 0.4;
+button.glyph.above-rank {
+  position: relative;
+  box-shadow: inset 0 0 0 2px #c07a2c;
 }
 
 .sheet ul {

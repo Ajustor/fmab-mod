@@ -139,7 +139,10 @@ export function renderAnalysis(root: HTMLElement, a: Analysis | null, ctx: Panel
   if (a.issues.length > 0) {
     const issues = el("ul", { class: "issues" });
     for (const i of a.issues) {
-      const li = el("li", {}, t(`circle.fmab.issue.${i.kind}`));
+      // La formule incomplète nomme les éléments qui lui manquent.
+      const args =
+        i.kind === "incomplete_formula" ? [i.detail.split("+").map((e) => t(`material.fmab.${e}`)).join(", ")] : [];
+      const li = el("li", {}, t(`circle.fmab.issue.${i.kind}`, ...args));
       if (i.where) {
         li.classList.add("located");
         li.addEventListener("mouseenter", () => {
@@ -177,7 +180,7 @@ export function glyphSheet(g: Glyph, combinations: readonly Combination[]): HTML
   return sheet;
 }
 
-/** Palette filtrée par couche et par rang : un clic arme l'outil « tampon ». */
+/** Palette par couche, les glyphes au-dessus du rang signalés : un clic arme l'outil « tampon ». */
 export function renderPalette(root: HTMLElement, sheet: HTMLElement, ctx: PanelContext, onPick: (g: Glyph) => void): void {
   root.replaceChildren();
   const rank = rankIndex(ctx.rank());
@@ -185,8 +188,10 @@ export function renderPalette(root: HTMLElement, sheet: HTMLElement, ctx: PanelC
     const row = el("div", { class: "palette-row" });
     row.append(el("span", { class: "layer" }, t(`treatise.fmab.layer.${layer}`)));
     for (const g of ctx.glyphs.filter((x) => x.layer === layer)) {
-      const locked = rankIndex(g.rank) > rank;
-      const button = el("button", { class: locked ? "glyph locked" : "glyph", title: t(g.nameKey), type: "button" });
+      // Le rang ne bloque rien : un glyphe au-dessus est seulement signalé (il retire de la stabilité).
+      const above = rankIndex(g.rank) > rank;
+      const title = above ? `${t(g.nameKey)} — ${t("editor.fmab.above_rank")}` : t(g.nameKey);
+      const button = el("button", { class: above ? "glyph above-rank" : "glyph", title, type: "button" });
       button.append(glyphThumbnail(g));
       button.addEventListener("mouseenter", () => sheet.replaceChildren(glyphSheet(g, ctx.combinations)));
       button.addEventListener("click", () => onPick(g));

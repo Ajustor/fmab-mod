@@ -18,6 +18,7 @@ import com.ajustor.fmab.network.SaveNotebookPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
+import com.ajustor.fmab.transmutation.IssueText;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -345,15 +346,17 @@ public class NotebookScreen extends Screen {
 	 */
 	private void addIssues(List<Line> out, Analysis a) {
 		Map<CircleIssue.Kind, Integer> counts = new LinkedHashMap<>();
+		Map<CircleIssue.Kind, CircleIssue> firsts = new LinkedHashMap<>();
 		List<String> hints = new ArrayList<>();
 		for (CircleIssue issue : a.issues()) {
 			counts.merge(issue.kind(), 1, Integer::sum);
+			firsts.putIfAbsent(issue.kind(), issue);
 			if (issue.kind() == CircleIssue.Kind.UNKNOWN_GLYPH) {
 				hints.add(issue.detail());
 			}
 		}
 		for (Map.Entry<CircleIssue.Kind, Integer> e : counts.entrySet()) {
-			Component text = Component.translatable(e.getKey().translationKey());
+			Component text = IssueText.of(firsts.get(e.getKey()));
 			if (e.getValue() > 1) {
 				text = Component.translatable("notebook.fmab.issue_count", text, e.getValue());
 			}
