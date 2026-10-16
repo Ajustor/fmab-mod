@@ -14,6 +14,7 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.tattoo.TattooSlot;
+import com.ajustor.fmab.util.Throttle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -38,6 +39,8 @@ public final class GloveCasting {
 	private static final int REBOUND_WEAR = 8;
 	/** Délai entre deux frappes de gantelet, en ticks. */
 	private static final int STRIKE_COOLDOWN = 20;
+	/** Un lancer de gants ou un claquement de mains par demi-seconde : le serveur ne suit pas un client plus pressé. */
+	private static final Throttle CASTS = new Throttle(10);
 
 	private GloveCasting() {
 	}
@@ -46,6 +49,10 @@ public final class GloveCasting {
 	 * @param combine joindre les mains : les cercles des deux gants agissent l'un après l'autre
 	 */
 	public static void cast(ServerPlayer player, boolean combine) {
+		if (!player.isAlive() || player.isSpectator()
+				|| !CASTS.pass(player.getUUID(), player.level().getGameTime())) {
+			return;
+		}
 		if (Wheelchairs.handsBusy(player)) {
 			// Les mains font tourner des roues, ou tiennent des poignées.
 			player.sendOverlayMessage(Component.translatable("wheelchair.fmab.hands_busy"));

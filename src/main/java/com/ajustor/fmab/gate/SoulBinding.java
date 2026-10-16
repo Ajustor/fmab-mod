@@ -62,8 +62,6 @@ import java.util.UUID;
 public final class SoulBinding {
 	/** Temps laissé au monde pour charger un sceau éloigné, en ticks. */
 	private static final int RECALL_PATIENCE = 100;
-	/** Âmes errantes, par ordre d'arrivée devant la Porte. */
-	private static final Map<UUID, Long> ADRIFT_SINCE = PlayerMaps.track(new HashMap<>());
 	/** Rappels en cours : l'âme, les sceaux qui restent à essayer, le temps passé sur le premier. */
 	private static final Map<UUID, Recall> RECALLS = PlayerMaps.track(new HashMap<>());
 
@@ -90,7 +88,9 @@ public final class SoulBinding {
 
 	/** Une âme vient de perdre son armure : elle prend son tour dans la file. */
 	public static void drift(ServerPlayer soul) {
-		ADRIFT_SINCE.putIfAbsent(soul.getUUID(), soul.level().getGameTime());
+		if (!soul.hasAttached(FmabAttachments.ADRIFT_SINCE)) {
+			soul.setAttached(FmabAttachments.ADRIFT_SINCE, soul.level().getGameTime());
+		}
 	}
 
 	private static Effects.Result apply(EffectContext ctx) {
@@ -134,8 +134,13 @@ public final class SoulBinding {
 		}
 		return server.getPlayerList().getPlayers().stream()
 				.filter(SoulBinding::adrift)
-				.min((a, b) -> Long.compare(ADRIFT_SINCE.getOrDefault(a.getUUID(), Long.MAX_VALUE),
-						ADRIFT_SINCE.getOrDefault(b.getUUID(), Long.MAX_VALUE)));
+				.min((a, b) -> Long.compare(adriftSince(a), adriftSince(b)));
+	}
+
+	/** Les âmes errantes passent par ordre d'arrivée devant la Porte. */
+	private static long adriftSince(ServerPlayer soul) {
+		Long since = soul.getAttached(FmabAttachments.ADRIFT_SINCE);
+		return since == null ? Long.MAX_VALUE : since;
 	}
 
 	private static boolean inArmor(ServerPlayer player) {
@@ -177,7 +182,7 @@ public final class SoulBinding {
 		pieces.put(EquipmentSlot.CHEST, SoulArmor.sealOf(chest).isPresent() ? chest
 				: SoulArmor.sealed(level.registryAccess(), soul.getUUID(), chest));
 		soul.setAttached(FmabAttachments.GATE, soul.getAttachedOrCreate(FmabAttachments.GATE).withAdrift(false));
-		ADRIFT_SINCE.remove(soul.getUUID());
+		soul.removeAttached(FmabAttachments.ADRIFT_SINCE);
 		RECALLS.remove(soul.getUUID());
 		GateOfTruth.leaveTruth(soul);
 		soul.teleport(new TeleportTransition(level, at, Vec3.ZERO, soul.getYRot(), 0,

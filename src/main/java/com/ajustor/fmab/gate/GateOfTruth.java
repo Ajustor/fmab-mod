@@ -91,6 +91,26 @@ public final class GateOfTruth {
 	private GateOfTruth() {
 	}
 
+	/** Ce que fait la visite arrivée au marché ({@link #BARGAIN}). */
+	enum AtBargain {
+		/** La Vérité propose le marché, s'il y a de quoi racheter et une Pierre pour payer. */
+		OFFER,
+		/** Elle attend : l'alchimiste marchande, ou il revient en pleine visite et son écran n'est pas prêt. */
+		WAIT,
+		/** Le marché est réglé : la visite reprend, sans le reproposer. */
+		GO
+	}
+
+	static AtBargain atBargain(boolean open, boolean settled, boolean clientLoaded) {
+		if (open) {
+			return AtBargain.WAIT;
+		}
+		if (settled) {
+			return AtBargain.GO;
+		}
+		return clientLoaded ? AtBargain.OFFER : AtBargain.WAIT;
+	}
+
 	public static void register() {
 		// Revenu en pleine visite : la cinématique reprend là où elle en était.
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -169,12 +189,24 @@ public final class GateOfTruth {
 			return;
 		}
 		int t = visit.ticks();
-		if (t == BARGAIN && StoneBargain.offer(player)) {
-			say(player, "truth.fmab.bargain.offer");
-		}
-		if (t >= BARGAIN && StoneBargain.holds(player)) {
-			// On marchande : la Vérité attend que l'alchimiste ait fini.
-			return;
+		if (t == BARGAIN) {
+			// La visite reste à cet instant tant qu'on marchande. Revenu en pleine visite (le marché oublié
+			// à la déconnexion), l'alchimiste se le voit reproposer.
+			boolean open = StoneBargain.holds(player);
+			switch (atBargain(open, StoneBargain.settled(player), player.connection.hasClientLoaded())) {
+				case WAIT -> {
+					return;
+				}
+				case OFFER -> {
+					if (StoneBargain.offer(player)) {
+						say(player, "truth.fmab.bargain.offer");
+						return;
+					}
+				}
+				case GO -> {
+				}
+			}
+			StoneBargain.forget(player);
 		}
 		// Ce qu'elle dit dépend de combien de fois on est déjà venu la voir.
 		String tier = familiarity(gate.openings());

@@ -13,11 +13,14 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -120,8 +123,28 @@ public final class MaterialPool {
 		return remaining <= 0;
 	}
 
+	/** Les valeurs d'échange déjà lues, par objet : valables tant que les tags ne changent pas. */
+	private static final Map<Item, Optional<ExchangeValue>> VALUES = new HashMap<>();
+	private static @Nullable RecipeManager valuesFor;
+
 	/** Valeur d'échange d'un objet : son identifiant d'abord, puis ses tags. */
-	public static Optional<ExchangeValue> valueOf(ServerLevel level, ItemStack stack) {
+	public static synchronized Optional<ExchangeValue> valueOf(ServerLevel level, ItemStack stack) {
+		// Un /reload, comme un autre monde, recrée le gestionnaire de recettes : les tags ont pu changer.
+		RecipeManager recipes = level.getServer().getRecipeManager();
+		if (recipes != valuesFor) {
+			VALUES.clear();
+			valuesFor = recipes;
+		}
+		return VALUES.computeIfAbsent(stack.getItem(), item -> lookup(level, stack));
+	}
+
+	/** Le monde fermé, on ne garde rien de ses tags. */
+	static synchronized void forget() {
+		VALUES.clear();
+		valuesFor = null;
+	}
+
+	private static Optional<ExchangeValue> lookup(ServerLevel level, ItemStack stack) {
 		Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
 		for (ExchangeGroup group : level.registryAccess().lookupOrThrow(FmabRegistries.EXCHANGE)) {
 			Integer direct = group.values().get(id.toString());

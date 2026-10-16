@@ -29,7 +29,12 @@ public final class StoneBargain {
 	/** La Vérité ne marchande pas plus de deux minutes. */
 	private static final int PATIENCE = 20 * 60 * 2;
 
-	private static final Map<UUID, Long> BARGAINING = PlayerMaps.track(new HashMap<>());
+	/** Un marché ouvert depuis {@code since}, ou réglé (fini, quitté, ou la Vérité s'est lassée). */
+	private record Bargain(long since, boolean open) {
+	}
+
+	/** Oubliés à la déconnexion : revenu en pleine visite, l'alchimiste se voit reproposer le marché. */
+	private static final Map<UUID, Bargain> BARGAINS = PlayerMaps.track(new HashMap<>());
 
 	private StoneBargain() {
 	}
@@ -44,22 +49,38 @@ public final class StoneBargain {
 		if (gate.lost().isEmpty() || souls(player) <= 0) {
 			return false;
 		}
-		BARGAINING.putIfAbsent(player.getUUID(), player.level().getGameTime());
+		BARGAINS.put(player.getUUID(), new Bargain(player.level().getGameTime(), true));
 		send(player, gate);
 		return true;
 	}
 
-	/** Le marché tient-il encore la visite ? */
+	/** Le marché tient-il encore la visite ? Passé deux minutes, la Vérité le règle d'elle-même. */
 	public static boolean holds(ServerPlayer player) {
-		Long since = BARGAINING.get(player.getUUID());
-		if (since == null) {
+		Bargain bargain = BARGAINS.get(player.getUUID());
+		if (bargain == null || !bargain.open()) {
 			return false;
 		}
-		if (player.level().getGameTime() - since > PATIENCE) {
-			BARGAINING.remove(player.getUUID());
+		if (player.level().getGameTime() - bargain.since() > PATIENCE) {
+			settle(player);
+			ServerPlayNetworking.send(player, BargainPayload.CLOSE);
 			return false;
 		}
 		return true;
+	}
+
+	/** Le marché a-t-il été réglé pendant cette visite ? Il ne se rouvre pas. */
+	public static boolean settled(ServerPlayer player) {
+		Bargain bargain = BARGAINS.get(player.getUUID());
+		return bargain != null && !bargain.open();
+	}
+
+	/** La visite a passé le marché : on l'oublie, la prochaine pourra en proposer un autre. */
+	public static void forget(ServerPlayer player) {
+		BARGAINS.remove(player.getUUID());
+	}
+
+	private static void settle(ServerPlayer player) {
+		BARGAINS.computeIfPresent(player.getUUID(), (id, bargain) -> new Bargain(bargain.since(), false));
 	}
 
 	/** L'alchimiste rachète une partie, ou (partie vide) s'en va. */
@@ -70,7 +91,7 @@ public final class StoneBargain {
 		Optional<BodyPart> part = part(partName);
 		GateState gate = player.getAttachedOrCreate(FmabAttachments.GATE);
 		if (part.isEmpty() || !gate.lost().contains(part.get())) {
-			BARGAINING.remove(player.getUUID());
+			settle(player);
 			return;
 		}
 		int cost = Restoration.cost(part.get());
@@ -85,7 +106,7 @@ public final class StoneBargain {
 		PhilosopherStoneItem.restore(player, gate, new Restoration.Plan(EnumSet.of(part.get()), cost));
 		GateState after = player.getAttachedOrCreate(FmabAttachments.GATE);
 		if (after.lost().isEmpty() || souls(player) <= 0) {
-			BARGAINING.remove(player.getUUID());
+			settle(player);
 			player.sendSystemMessage(Component.translatable("truth.fmab.bargain.done")
 					.withStyle(s -> s.withItalic(true).withColor(0x9A9A9A)));
 			ServerPlayNetworking.send(player, BargainPayload.CLOSE);
