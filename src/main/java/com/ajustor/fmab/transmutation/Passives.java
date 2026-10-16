@@ -12,6 +12,7 @@ import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.util.Modifiers;
 import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
@@ -77,6 +78,8 @@ public final class Passives {
 	}
 
 	public static void register() {
+		// Les analyses valent pour les glyphes d'un monde : un autre monde (en solo) peut en avoir d'autres.
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> CACHE.clear());
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			if (server.getTickCount() % PERIOD != 0) {
 				return;
