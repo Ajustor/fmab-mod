@@ -87,7 +87,8 @@ d'État à Central, la Porte, les homonculus, puis Père.
   (clic droit dessus, accroupi pour lâcher), ou un villageois contre une émeraude.
 - **Pierre philosophale** : devant la Porte, elle rachète à la Vérité ce qu'elle a pris ; elle anime
   l'être d'une transmutation humaine, amplifie les transmutations, se fabrique par sacrifice.
-  **Karma**, **éclipse** tous les huit jours, **Pierre vivante**.
+  **Karma**, **éclipse** tous les huit jours, **Pierre vivante** : elle transmute sans attendre, et les
+  projectiles qui la visent se défont en matière dans ses poches.
 - **Homonculus** qui se reconstituent tant que leur Pierre a des âmes : Lust, Gluttony (et son Ventre),
   Envy le déguisé, Greed (allié possible), Sloth, Wrath, Pride ; enfin **Père** et sa zone
   anti-alchimie, au bout de la quête des sept **points de sang**. Barres de boss une fois le combat
@@ -257,7 +258,8 @@ Central, the Gate, the homunculi, then Father.
   or a villager for an emerald.
 - **Philosopher's Stone**: before the Gate, buys back from Truth what it took; brings to life the
   being of a human transmutation, amplifies transmutations, made by sacrifice.
-  **Karma**, an **eclipse** every eighth day, the **Living Stone**.
+  **Karma**, an **eclipse** every eighth day, the **Living Stone**: it transmutes without waiting,
+  and projectiles aimed at it come apart into matter in its pockets.
 - **Homunculi** that reconstitute while their Stone holds souls: Lust, Gluttony (and his Belly),
   Envy in disguise, Greed (a possible ally), Sloth, Wrath, Pride; finally **Father** and his
   anti-alchemy zone, at the end of the quest for the seven **blood crests**. Boss bars only show once
