@@ -25,6 +25,7 @@ import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Recomposition;
+import com.ajustor.fmab.util.Throttle;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
@@ -32,6 +33,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
 public final class FmabNetwork {
+	/** La page de conception parcourt tout ce que le joueur a compris : une par seconde suffit. */
+	private static final Throttle DESIGNS = new Throttle(20);
+
 	private FmabNetwork() {
 	}
 
@@ -65,7 +69,7 @@ public final class FmabNetwork {
 		PayloadTypeRegistry.clientboundPlay().registerLarge(OpenDesignsPayload.TYPE, OpenDesignsPayload.CODEC, 1 << 20);
 
 		ServerPlayNetworking.registerGlobalReceiver(RequestDesignsPayload.TYPE,
-				(payload, context) -> ServerPlayNetworking.send(context.player(), Recomposition.designs(context.player())));
+				(payload, context) -> designs(context.player()));
 		ServerPlayNetworking.registerGlobalReceiver(ChooseDesignPayload.TYPE,
 				(payload, context) -> Recomposition.choose(context.player(), payload.item()));
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
@@ -195,6 +199,12 @@ public final class FmabNetwork {
 			case ALREADY_THERE -> "notebook.fmab.already";
 			case FULL -> "notebook.fmab.full";
 		}));
+	}
+
+	private static void designs(ServerPlayer player) {
+		if (DESIGNS.pass(player.getUUID(), player.level().getGameTime())) {
+			ServerPlayNetworking.send(player, Recomposition.designs(player));
+		}
 	}
 
 	/** La roue des cercles : une page devient la sélection, et l'Initié peut joindre aussitôt les mains. */
