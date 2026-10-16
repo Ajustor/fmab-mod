@@ -46,10 +46,19 @@ loom {
 	}
 }
 
+repositories {
+	// Mod Menu : facultatif en jeu, seulement compilé contre son API (bouton de réglages du mod).
+	maven {
+		name = 'TerraformersMC'
+		url = 'https://maven.terraformersmc.com/releases/'
+	}
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	clientCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 
 	testImplementation platform('org.junit:junit-bom:5.13.4')
 	testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -109,5 +118,15 @@ fabricApi {
 		enableGameTests = false
 		enableClientGameTests = true
 		eula = true
+	}
+}
+
+// ./gradlew runClientGameTest -PfmabGametest=gate,showcase : ne joue que ces scènes (voir RenderShowcase.selected).
+loom.runs.matching { it.name == 'clientGameTest' }.configureEach {
+	if (project.hasProperty('fmabGametest')) {
+		vmArg "-Dfmab.gametest=${project.property('fmabGametest')}"
+	}
+	if (project.hasProperty('fmabTowns')) {
+		vmArg "-Dfmab.towns=${project.property('fmabTowns')}"
 	}
 }

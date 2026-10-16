@@ -15,6 +15,7 @@ import com.ajustor.fmab.item.HumanTransmutationNotesItem;
 import com.ajustor.fmab.item.InscriptionItem;
 import com.ajustor.fmab.item.IshvalTattooItem;
 import com.ajustor.fmab.item.KunaiItem;
+import com.ajustor.fmab.item.Outfit;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.item.RedStoneShardItem;
 import com.ajustor.fmab.item.ScreenItem;
@@ -94,6 +95,20 @@ public final class FmabItems {
 	 */
 	public static final Item SOUL_CHESTPLATE = register("soul_chestplate", Item::new,
 			new Item.Properties().humanoidArmor(SoulArmor.MATERIAL, ArmorType.CHESTPLATE));
+
+	// Les tenues d'Amestris : le manteau d'Edward, l'armure d'Alphonse, l'uniforme et le manteau d'officier.
+	public static final Item ALCHEMIST_COAT = outfit("alchemist_coat", Outfit.ALCHEMIST, ArmorType.CHESTPLATE);
+	public static final Item ALCHEMIST_TROUSERS = outfit("alchemist_trousers", Outfit.ALCHEMIST, ArmorType.LEGGINGS);
+	public static final Item ALCHEMIST_BOOTS = outfit("alchemist_boots", Outfit.ALCHEMIST, ArmorType.BOOTS);
+	public static final Item STEEL_HELMET = outfit("steel_helmet", Outfit.STEEL, ArmorType.HELMET);
+	public static final Item STEEL_CHESTPLATE = outfit("steel_chestplate", Outfit.STEEL, ArmorType.CHESTPLATE);
+	public static final Item STEEL_LEGGINGS = outfit("steel_leggings", Outfit.STEEL, ArmorType.LEGGINGS);
+	public static final Item STEEL_BOOTS = outfit("steel_boots", Outfit.STEEL, ArmorType.BOOTS);
+	public static final Item OFFICER_CAP = outfit("officer_cap", Outfit.OFFICER, ArmorType.HELMET);
+	public static final Item OFFICER_JACKET = outfit("officer_jacket", Outfit.OFFICER, ArmorType.CHESTPLATE);
+	public static final Item OFFICER_TROUSERS = outfit("officer_trousers", Outfit.OFFICER, ArmorType.LEGGINGS);
+	public static final Item OFFICER_BOOTS = outfit("officer_boots", Outfit.OFFICER, ArmorType.BOOTS);
+	public static final Item OFFICER_GREATCOAT = outfit("officer_greatcoat", Outfit.GREATCOAT, ArmorType.CHESTPLATE);
 
 	public static final Item AUTOMAIL_BENCH = register("automail_bench",
 			p -> new BlockItem(FmabBlocks.AUTOMAIL_BENCH, p), new Item.Properties().useBlockDescriptionPrefix());
@@ -184,8 +199,8 @@ public final class FmabItems {
 	/** Les cercles écarlates de Kimblee : des mines alchimiques. */
 	public static final Item CRIMSON_SEALS = register("crimson_seals", CrimsonSealsItem::new,
 			new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
-	/** Le pistolet de l'armée : 7 dégâts, 40 blocs. */
-	public static final Item PISTOL = register("pistol", p -> new FirearmItem(7, 40, 10, 0.02f, p),
+	/** Le pistolet de l'armée : 7 dégâts, 40 blocs, un tir toutes les 1,25 s (moins qu'une épée de diamant). */
+	public static final Item PISTOL = register("pistol", p -> new FirearmItem(7, 40, 25, 0.02f, p),
 			new Item.Properties().durability(400));
 	/** Le fusil de précision de Hawkeye : 16 dégâts, 96 blocs, lent. */
 	public static final Item RIFLE = register("rifle", p -> new FirearmItem(16, 96, 40, 0.002f, p),
@@ -228,10 +243,16 @@ public final class FmabItems {
 
 	public static final Item TRUTH_SPAWN_EGG = register("truth_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.TRUTH));
+	public static final Item STONE_GOLEM_SPAWN_EGG = register("stone_golem_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.STONE_GOLEM));
 
 	public static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Fmab.id("alchemy"));
 
 	private FmabItems() {
+	}
+
+	private static Item outfit(String name, Outfit outfit, ArmorType type) {
+		return register(name, Item::new, new Item.Properties().humanoidArmor(outfit.material(), type));
 	}
 
 	private static Item automail(String name, AutomailItem.Model model, boolean arm, int durability) {
@@ -266,6 +287,18 @@ public final class FmabItems {
 					output.accept(SPARK_GLOVES);
 					output.accept(IRON_GAUNTLETS);
 					output.accept(STATE_GLOVES);
+					output.accept(ALCHEMIST_COAT);
+					output.accept(ALCHEMIST_TROUSERS);
+					output.accept(ALCHEMIST_BOOTS);
+					output.accept(STEEL_HELMET);
+					output.accept(STEEL_CHESTPLATE);
+					output.accept(STEEL_LEGGINGS);
+					output.accept(STEEL_BOOTS);
+					output.accept(OFFICER_CAP);
+					output.accept(OFFICER_JACKET);
+					output.accept(OFFICER_TROUSERS);
+					output.accept(OFFICER_BOOTS);
+					output.accept(OFFICER_GREATCOAT);
 					output.accept(IZUMI_SPAWN_EGG);
 					output.accept(STATE_EXAMINER_SPAWN_EGG);
 					output.accept(AUTOMAIL_BENCH);
@@ -278,6 +311,7 @@ public final class FmabItems {
 					output.accept(WHEELCHAIR);
 					output.accept(WINRY_SPAWN_EGG);
 					output.accept(TRUTH_SPAWN_EGG);
+					output.accept(STONE_GOLEM_SPAWN_EGG);
 					output.accept(PHILOSOPHER_STONE_CORE);
 					output.accept(PHILOSOPHER_STONE);
 					output.accept(CRYSTALLIZED_BLOOD);

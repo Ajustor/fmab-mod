@@ -42,6 +42,9 @@ public class ProceduralPiece extends StructurePiece {
 	private final int ground;
 	private final Rotation rotation;
 	private final long seed;
+	/** Les coffres et les créatures du plan, calculés au premier chunk (pas sauvegardés). */
+	private List<Blueprint.Chest> chests;
+	private List<Blueprint.Spawn> spawns;
 
 	/**
 	 * @param origin coin de la pièce au niveau du sol (le bas des fondations est {@code ground}
@@ -68,6 +71,11 @@ public class ProceduralPiece extends StructurePiece {
 		this.ground = tag.getIntOr("ground", 0);
 		this.rotation = Rotation.values()[Math.floorMod(tag.getIntOr("rot", 0), Rotation.values().length)];
 		this.seed = tag.getLongOr("seed", 0);
+	}
+
+	/** Position du monde d'un point du plan (x, z), au niveau de son sol. */
+	BlockPos worldAt(int x, int z) {
+		return toWorld(new BlockPos(x, 0, z));
 	}
 
 	private static BoundingBox box(BlockPos origin, int sx, int sy, int sz, int ground, Rotation rotation) {
@@ -107,9 +115,11 @@ public class ProceduralPiece extends StructurePiece {
 		List<BlockPos> connected = new ArrayList<>();
 		for (int wx = minX; wx <= maxX; wx++) {
 			for (int wz = minZ; wz <= maxZ; wz++) {
-				int[] local = toLocal(wx - boundingBox.minX(), wz - boundingBox.minZ());
+				// Sans tableau par colonne : la génération appelle ceci pour chaque colonne de chaque chunk.
+				int dx = wx - boundingBox.minX(), dz = wz - boundingBox.minZ();
+				int lx = localX(rotation, sizeX, sizeZ, dx, dz), lz = localZ(rotation, sizeX, sizeZ, dx, dz);
 				for (int wy = minY; wy <= maxY; wy++) {
-					BlockState state = blueprint.at(local[0], wy - boundingBox.minY() - ground, local[1], plot);
+					BlockState state = blueprint.at(lx, wy - boundingBox.minY() - ground, lz, plot);
 					if (state == null) {
 						continue;
 					}
@@ -129,13 +139,18 @@ public class ProceduralPiece extends StructurePiece {
 			BlockState shaped = Block.updateFromNeighbourShapes(level.getBlockState(at), level, at);
 			level.setBlock(at, shaped, 2);
 		}
-		for (Blueprint.Chest chest : blueprint.chests(plot)) {
+		if (chests == null) {
+			// Coffres et créatures se calculent une fois par pièce, pas à chaque chunk qu'elle traverse.
+			chests = blueprint.chests(plot);
+			spawns = blueprint.spawns(plot);
+		}
+		for (Blueprint.Chest chest : chests) {
 			BlockPos at = toWorld(chest.local());
 			if (chunkBB.isInside(at)) {
 				fill(level, at, chest.contents().apply(plot));
 			}
 		}
-		for (Blueprint.Spawn spawn : blueprint.spawns(plot)) {
+		for (Blueprint.Spawn spawn : spawns) {
 			BlockPos at = toWorld(spawn.local());
 			if (chunkBB.isInside(at)) {
 				spawn(level, spawn, at);
@@ -171,38 +186,48 @@ public class ProceduralPiece extends StructurePiece {
 		level.addFreshEntityWithPassengers(entity);
 	}
 
-	/** Position locale (x, z) d'une position relative au coin de la boîte englobante. */
-	private int[] toLocal(int dx, int dz) {
+	/** Position du monde d'une position locale (y compté depuis le sol). */
+	private BlockPos toWorld(BlockPos local) {
+		int[] d = offset(rotation, sizeX, sizeZ, local.getX(), local.getZ());
+		return new BlockPos(boundingBox.minX() + d[0], boundingBox.minY() + ground + local.getY(), boundingBox.minZ() + d[1]);
+	}
+
+	/**
+	 * Position locale (x, z) dans un plan de {@code sx} sur {@code sz}, tourné de {@code rotation}, d'une
+	 * position (dx, dz) relative au coin de sa boîte englobante (qui mesure {@code sz} sur {@code sx}
+	 * quand le plan est tourné d'un quart).
+	 */
+	static int[] local(Rotation rotation, int sx, int sz, int dx, int dz) {
+		return new int[]{localX(rotation, sx, sz, dx, dz), localZ(rotation, sx, sz, dx, dz)};
+	}
+
+	/** Le x local de {@link #local}, sans tableau. */
+	static int localX(Rotation rotation, int sx, int sz, int dx, int dz) {
 		return switch (rotation) {
-			case NONE -> new int[]{dx, dz};
-			case CLOCKWISE_90 -> new int[]{dz, sizeZ - 1 - dx};
-			case CLOCKWISE_180 -> new int[]{sizeX - 1 - dx, sizeZ - 1 - dz};
-			case COUNTERCLOCKWISE_90 -> new int[]{sizeX - 1 - dz, dx};
+			case NONE -> dx;
+			case CLOCKWISE_90 -> dz;
+			case CLOCKWISE_180 -> sx - 1 - dx;
+			case COUNTERCLOCKWISE_90 -> sx - 1 - dz;
 		};
 	}
 
-	/** Position du monde d'une position locale (y compté depuis le sol). */
-	private BlockPos toWorld(BlockPos local) {
-		int lx = local.getX(), lz = local.getZ();
-		int dx, dz;
-		switch (rotation) {
-			case CLOCKWISE_90 -> {
-				dx = sizeZ - 1 - lz;
-				dz = lx;
-			}
-			case CLOCKWISE_180 -> {
-				dx = sizeX - 1 - lx;
-				dz = sizeZ - 1 - lz;
-			}
-			case COUNTERCLOCKWISE_90 -> {
-				dx = lz;
-				dz = sizeX - 1 - lx;
-			}
-			default -> {
-				dx = lx;
-				dz = lz;
-			}
-		}
-		return new BlockPos(boundingBox.minX() + dx, boundingBox.minY() + ground + local.getY(), boundingBox.minZ() + dz);
+	/** Le z local de {@link #local}, sans tableau. */
+	static int localZ(Rotation rotation, int sx, int sz, int dx, int dz) {
+		return switch (rotation) {
+			case NONE -> dz;
+			case CLOCKWISE_90 -> sz - 1 - dx;
+			case CLOCKWISE_180 -> sz - 1 - dz;
+			case COUNTERCLOCKWISE_90 -> dx;
+		};
+	}
+
+	/** L'inverse de {@link #local} : la position relative au coin de la boîte d'une position locale. */
+	static int[] offset(Rotation rotation, int sx, int sz, int lx, int lz) {
+		return switch (rotation) {
+			case NONE -> new int[]{lx, lz};
+			case CLOCKWISE_90 -> new int[]{sz - 1 - lz, lx};
+			case CLOCKWISE_180 -> new int[]{sx - 1 - lx, sz - 1 - lz};
+			case COUNTERCLOCKWISE_90 -> new int[]{lz, sx - 1 - lx};
+		};
 	}
 }

@@ -1,5 +1,6 @@
 package com.ajustor.fmab.item;
 
+import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.registry.FmabComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -24,6 +25,11 @@ public class TransmutedWeaponItem extends Item {
 		super(properties);
 	}
 
+	/** À cette distance d'un examinateur, l'arme ne s'effrite pas. */
+	private static final double EXAMINER_REACH = 16;
+	/** Le sursis, renouvelé tant qu'on reste près de lui. */
+	private static final int EXAMINER_GRACE = 20 * 10;
+
 	public static ItemStack create(Item item, ServerLevel level, ItemStack remains) {
 		ItemStack stack = new ItemStack(item);
 		stack.set(FmabComponents.EXPIRES, level.getGameTime() + LIFETIME_TICKS);
@@ -35,6 +41,12 @@ public class TransmutedWeaponItem extends Item {
 	public void inventoryTick(ItemStack stack, ServerLevel level, Entity owner, @Nullable EquipmentSlot slot) {
 		Long expires = stack.get(FmabComponents.EXPIRES);
 		if (expires == null || level.getGameTime() < expires) {
+			return;
+		}
+		// Sous les yeux d'un examinateur d'État, l'arme tient : on la lui remet sans course contre la
+		// montre. Elle reprend son effritement une fois qu'on s'éloigne.
+		if (!level.getEntitiesOfClass(StateExaminerEntity.class, owner.getBoundingBox().inflate(EXAMINER_REACH)).isEmpty()) {
+			stack.set(FmabComponents.EXPIRES, level.getGameTime() + EXAMINER_GRACE);
 			return;
 		}
 		ItemStack remains = stack.getOrDefault(FmabComponents.REMAINS, ItemStack.EMPTY).copy();

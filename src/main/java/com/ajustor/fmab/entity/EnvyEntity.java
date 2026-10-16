@@ -153,6 +153,12 @@ public class EnvyEntity extends HomunculusEntity {
 		});
 	}
 
+	/** Démasqué, il se bat : il ne disparaît plus. */
+	@Override
+	protected boolean mayVanish() {
+		return form().disguised();
+	}
+
 	@Override
 	protected boolean showBossBar() {
 		return !form().disguised();
@@ -204,7 +210,7 @@ public class EnvyEntity extends HomunculusEntity {
 	private void setForm(Form form) {
 		entityData.set(FORM, form.ordinal());
 		switch (form) {
-			case GIANT -> attributes(150, 0.26, 14, 2.8);
+			case GIANT -> attributes(90, 0.26, 14, 2.8);
 			case LIZARD -> attributes(8, 0.42, 0, 0.5);
 			default -> attributes(50, 0.36, 7, 1);
 		}

@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.resources.DefaultPlayerSkin;
@@ -32,7 +31,7 @@ public class EnvyRenderer extends HumanoidMobRenderer<EnvyEntity, EnvyRenderer.S
 	private static final Identifier GIANT = Fmab.id("textures/entity/envy_giant.png");
 	private static final Identifier LIZARD = Fmab.id("textures/entity/envy_lizard.png");
 
-	public static class State extends HumanoidRenderState {
+	public static class State extends FigureRenderer.State {
 		EnvyEntity.Form form = EnvyEntity.Form.HUMAN;
 		Identifier texture = HUMAN;
 	}
@@ -50,6 +49,7 @@ public class EnvyRenderer extends HumanoidMobRenderer<EnvyEntity, EnvyRenderer.S
 		@Override
 		public void setupAnim(State state) {
 			super.setupAnim(state);
+			Temper.ENVY.apply(this, state, state.aggressive);
 			boolean human = state.form != EnvyEntity.Form.LIZARD;
 			// Sa touffe en palmier n'appartient qu'à sa vraie forme : déguisé, il a la tête d'un autre.
 			if (spikes != null) {
@@ -93,6 +93,7 @@ public class EnvyRenderer extends HumanoidMobRenderer<EnvyEntity, EnvyRenderer.S
 	@Override
 	public void extractRenderState(EnvyEntity entity, State state, float partialTicks) {
 		super.extractRenderState(entity, state, partialTicks);
+		state.aggressive = entity.isAggressive();
 		state.form = entity.form();
 		state.texture = switch (entity.form()) {
 			case DISGUISED_PLAYER -> entity.copiedPlayer().map(EnvyRenderer::skinOf).orElse(HUMAN);

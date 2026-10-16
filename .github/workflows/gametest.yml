@@ -1,0 +1,59 @@
+# Les gametests client : le jeu tourne pour de vrai (sous un écran virtuel), chaque scène joue ses
+# vérifications et prend ses captures. Lancés sur les pull requests qui touchent au rendu ou aux
+# scènes, ou à la demande (en choisissant au besoin les scènes, comme -PfmabGametest). Les captures
+# sont publiées en artefact, même quand une scène échoue.
+name: gametest
+on:
+  pull_request:
+    paths:
+      - 'src/client/**'
+      - 'src/gametest/**'
+      - '.github/workflows/gametest.yml'
+  workflow_dispatch:
+    inputs:
+      scenes:
+        description: "Scènes à jouer, séparées par des virgules (vide : toutes)"
+        required: false
+        default: ''
+
+concurrency:
+  group: gametest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gametest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      # Un écran virtuel et le rendu OpenGL logiciel de Mesa : pas de carte graphique sur le runner.
+      - name: install a virtual display
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri
+      - name: run client gametests
+        env:
+          SCENES: ${{ inputs.scenes }}
+        run: |
+          args=""
+          if [ -n "$SCENES" ]; then args="-PfmabGametest=$SCENES"; fi
+          xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientGameTest $args
+      - name: upload the screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gametest-screenshots-${{ github.sha }}
+          path: build/run/clientGameTest/screenshots
+          if-no-files-found: warn

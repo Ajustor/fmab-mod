@@ -1,5 +1,6 @@
 package com.ajustor.fmab.item;
 
+import com.ajustor.fmab.util.PlayerMaps;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -34,7 +35,7 @@ public class XingSwordItem extends Item {
 	private record Combo(long last, int count) {
 	}
 
-	private static final Map<UUID, Combo> COMBOS = new HashMap<>();
+	private static final Map<UUID, Combo> COMBOS = PlayerMaps.track(new HashMap<>());
 
 	public XingSwordItem(Properties properties) {
 		super(properties);
@@ -43,12 +44,12 @@ public class XingSwordItem extends Item {
 	@Override
 	public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		super.postHurtEnemy(stack, target, attacker);
-		if (!(attacker.level() instanceof ServerLevel level)) {
+		if (!(attacker.level() instanceof ServerLevel level) || !(attacker instanceof Player)) {
 			return;
 		}
 		long now = level.getGameTime();
 		Combo combo = COMBOS.get(attacker.getUUID());
-		int count = combo != null && now - combo.last() <= CHAIN ? Math.min(MAX_COMBO, combo.count() + 1) : 0;
+		int count = combo != null && now >= combo.last() && now - combo.last() <= CHAIN ? Math.min(MAX_COMBO, combo.count() + 1) : 0;
 		COMBOS.put(attacker.getUUID(), new Combo(now, count));
 		if (count > 0 && target.isAlive()) {
 			target.invulnerableTime = 0;

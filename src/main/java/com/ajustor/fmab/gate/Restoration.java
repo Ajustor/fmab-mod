@@ -14,6 +14,8 @@ import java.util.Set;
 public final class Restoration {
 	/** Les âmes d'une Pierre neuve. */
 	public static final int STONE_SOULS = 100;
+	/** Noyaux de Pierre fondus autour de sang cristallisé pour une Pierre (recette philosopher_stone). */
+	public static final int CORES_PER_STONE = 4;
 
 	private Restoration() {
 	}

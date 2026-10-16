@@ -5,18 +5,23 @@ import com.ajustor.fmab.data.Automail;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.util.Modifiers;
+import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -29,17 +34,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * Les règles de l'automail : on ne le pose que sur un membre perdu ; il s'use (un coup ou un bloc
  * cassé pour un bras, la marche pour une jambe) ; usé jusqu'au bout, il ne répond plus jusqu'à ce
- * que Winry le répare.
+ * que Winry le répare. Un alchimiste peut transmuter son bras en lame, et l'en défaire.
  */
 public final class Automails {
 	private static final List<BodyPart> LIMBS = List.of(BodyPart.RIGHT_ARM, BodyPart.LEFT_ARM, BodyPart.RIGHT_LEG,
 			BodyPart.LEFT_LEG);
 	private static final Identifier RUSH_LEG_SPEED = Fmab.id("automail_rush_valley_speed");
 	private static final Identifier RUSH_ARM_SPEED = Fmab.id("automail_rush_valley_attack");
+	private static final Identifier BLADE_DAMAGE = Fmab.id("automail_blade");
+	/** Ce qu'ajoute la lame du bras, main nue : de quoi trancher mieux qu'une épée de fer. */
+	private static final double BLADE_ATTACK = 6;
 	private static final double RUSH_SPEED = 0.08;
 	private static final double RUSH_ATTACK = 0.15;
 	/** Une jambe s'use d'un point tous les ce nombre de blocs parcourus. */
@@ -47,8 +56,8 @@ public final class Automails {
 	/** Le prix de la réparation : un lingot de fer par quart de l'usure. */
 	public static final int REPAIR_STEPS = 4;
 
-	private static final Map<UUID, Vec3> LAST_POSITIONS = new HashMap<>();
-	private static final Map<UUID, Double> WALKED = new HashMap<>();
+	private static final Map<UUID, Vec3> LAST_POSITIONS = PlayerMaps.track(new HashMap<>());
+	private static final Map<UUID, Double> WALKED = PlayerMaps.track(new HashMap<>());
 
 	private Automails() {
 	}
@@ -74,7 +83,12 @@ public final class Automails {
 
 	/** Usé jusqu'au bout : on garde la pièce, mais elle ne répond plus. */
 	public static boolean broken(ItemStack stack) {
-		return stack.isDamageableItem() && stack.getDamageValue() >= stack.getMaxDamage() - 1;
+		return stack.isDamageableItem() && broken(stack.getDamageValue(), stack.getMaxDamage());
+	}
+
+	/** Une pièce lâche à son dernier point d'usure. */
+	public static boolean broken(int damage, int maxDamage) {
+		return damage >= maxDamage - 1;
 	}
 
 	/** Un automail en état remplace-t-il ce membre ? */
@@ -141,13 +155,55 @@ public final class Automails {
 				&& gate.lost(part) && (automail == null || automail.get(part).isEmpty());
 	}
 
-	/** Retire la pièce d'un membre ; elle revient dans l'inventaire. */
+	/** Ce bras d'automail porte-t-il une lame transmutée ? */
+	public static boolean bladed(ItemStack stack) {
+		return Boolean.TRUE.equals(stack.get(FmabComponents.AUTOMAIL_BLADE));
+	}
+
+	/** Le bras d'automail en état qu'on transmute : celui du côté de la main principale d'abord. */
+	public static Optional<BodyPart> armToTransmute(Player player) {
+		BodyPart main = player.getMainArm() == HumanoidArm.RIGHT ? BodyPart.RIGHT_ARM : BodyPart.LEFT_ARM;
+		BodyPart off = main == BodyPart.RIGHT_ARM ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM;
+		return Stream.of(main, off).filter(arm -> working(player, arm)).findFirst();
+	}
+
+	/**
+	 * Transmute le bras d'automail : une lame sort de l'avant-bras, comme chez Ed ; s'il en porte déjà
+	 * une, elle rentre et le bras reprend sa forme. Le métal vient du bras lui-même. Renvoie faux si
+	 * le joueur n'a pas de bras d'automail en état.
+	 */
+	public static boolean transmuteArm(ServerPlayer player) {
+		Optional<BodyPart> arm = armToTransmute(player);
+		if (arm.isEmpty()) {
+			return false;
+		}
+		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
+		ItemStack stack = automail.get(arm.get()).copy();
+		boolean blade = !bladed(stack);
+		if (blade) {
+			stack.set(FmabComponents.AUTOMAIL_BLADE, true);
+		} else {
+			stack.remove(FmabComponents.AUTOMAIL_BLADE);
+		}
+		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(arm.get(), stack));
+		ServerLevel level = player.level();
+		Vec3 hand = player.getEyePosition().add(player.getLookAngle().scale(0.6)).add(0, -0.5, 0);
+		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, hand.x, hand.y, hand.z, 30, 0.25, 0.3, 0.25, 0.15);
+		level.sendParticles(ParticleTypes.CRIT, hand.x, hand.y, hand.z, 12, 0.2, 0.2, 0.2, 0.2);
+		level.playSound(null, player.blockPosition(), blade ? SoundEvents.ANVIL_USE : SoundEvents.CHAIN_PLACE,
+				SoundSource.PLAYERS, 0.8f, blade ? 1.4f : 1.0f);
+		player.sendOverlayMessage(Component.translatable(blade ? "automail.fmab.blade_out" : "automail.fmab.blade_in"));
+		return true;
+	}
+
+	/** Retire la pièce d'un membre ; elle revient dans l'inventaire, sa lame rentrée. */
 	public static void remove(ServerPlayer player, BodyPart part) {
 		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
-		ItemStack stack = automail.get(part);
+		ItemStack stack = automail.get(part).copy();
 		if (stack.isEmpty()) {
 			return;
 		}
+		stack.remove(FmabComponents.AUTOMAIL_BLADE);
 		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(part, ItemStack.EMPTY));
 		if (!player.getInventory().add(stack.copy())) {
 			player.drop(stack.copy(), false);
@@ -156,10 +212,12 @@ public final class Automails {
 
 	/** Lingots de fer que demande la réparation d'une pièce. */
 	public static int repairCost(ItemStack stack) {
-		if (!stack.isDamaged()) {
-			return 0;
-		}
-		return (int) Math.ceil((double) stack.getDamageValue() * REPAIR_STEPS / stack.getMaxDamage());
+		return stack.isDamaged() ? repairCost(stack.getDamageValue(), stack.getMaxDamage()) : 0;
+	}
+
+	/** Un lingot par quart de l'usure, arrondi au-dessus : la moindre éraflure coûte un lingot. */
+	public static int repairCost(int damage, int maxDamage) {
+		return damage <= 0 ? 0 : (int) Math.ceil((double) damage * REPAIR_STEPS / maxDamage);
 	}
 
 	/** Winry répare une pièce contre des lingots de fer pris dans l'inventaire. */
@@ -205,8 +263,7 @@ public final class Automails {
 			return;
 		}
 		ItemStack worn = stack.copy();
-		int damage = Math.min(worn.getMaxDamage() - 1, worn.getDamageValue() + amount);
-		worn.setDamageValue(damage);
+		worn.setDamageValue(worn(worn.getDamageValue(), worn.getMaxDamage(), amount));
 		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(part, worn));
 		if (broken(worn)) {
 			player.level().playSound(null, player.blockPosition(), SoundEvents.ITEM_BREAK.value(), SoundSource.PLAYERS, 1, 0.8f);
@@ -215,13 +272,36 @@ public final class Automails {
 		}
 	}
 
+	/** L'usure après un coup : elle s'arrête au dernier point, la pièce lâche sans disparaître. */
+	public static int worn(int damage, int maxDamage, int amount) {
+		return Math.min(maxDamage - 1, damage + amount);
+	}
+
+	/**
+	 * Ce que s'use une jambe tous les {@link #BLOCKS_PER_WEAR} blocs : deux points pour Rush Valley,
+	 * légère mais fragile ; un pour le fer ; pour Briggs, une fois sur deux (selon {@code coin}).
+	 */
+	public static int legWear(AutomailItem.Model model, boolean coin) {
+		return switch (model) {
+			case RUSH_VALLEY -> 2;
+			case BRIGGS -> coin ? 1 : 0;
+			default -> 1;
+		};
+	}
+
 	private static void tick(ServerPlayer player) {
 		Automail automail = player.getAttached(FmabAttachments.AUTOMAIL);
 		if (automail == null || automail.limbs().isEmpty()) {
 			modifier(player, Attributes.MOVEMENT_SPEED, RUSH_LEG_SPEED, 0);
 			modifier(player, Attributes.ATTACK_SPEED, RUSH_ARM_SPEED, 0);
+			modifier(player, Attributes.ATTACK_DAMAGE, BLADE_DAMAGE, 0);
 			return;
 		}
+		// La lame du bras tranche quand on frappe de cette main, à mains nues.
+		BodyPart main = player.getMainArm() == HumanoidArm.RIGHT ? BodyPart.RIGHT_ARM : BodyPart.LEFT_ARM;
+		boolean blade = working(player, main) && bladed(automail.get(main)) && player.getMainHandItem().isEmpty();
+		modifier(player, Attributes.ATTACK_DAMAGE, BLADE_DAMAGE, blade ? BLADE_ATTACK : 0,
+				AttributeModifier.Operation.ADD_VALUE);
 		int rushLegs = 0;
 		boolean rushArm = false;
 		boolean briggs = false;
@@ -268,11 +348,7 @@ public final class Automails {
 		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
 		for (BodyPart leg : new BodyPart[]{BodyPart.LEFT_LEG, BodyPart.RIGHT_LEG}) {
 			if (automail.get(leg).getItem() instanceof AutomailItem item) {
-				int wear = switch (item.model()) {
-					case RUSH_VALLEY -> 2;
-					case BRIGGS -> player.getRandom().nextBoolean() ? 1 : 0;
-					default -> 1;
-				};
+				int wear = legWear(item.model(), player.getRandom().nextBoolean());
 				if (wear > 0) {
 					wear(player, leg, wear);
 				}
@@ -281,17 +357,11 @@ public final class Automails {
 	}
 
 	private static void modifier(ServerPlayer player, Holder<Attribute> attribute, Identifier id, double amount) {
-		AttributeInstance instance = player.getAttribute(attribute);
-		if (instance == null) {
-			return;
-		}
-		if (amount == 0) {
-			if (instance.getModifier(id) != null) {
-				instance.removeModifier(id);
-			}
-		} else {
-			instance.addOrUpdateTransientModifier(new AttributeModifier(id, amount,
-					AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
-		}
+		modifier(player, attribute, id, amount, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+	}
+
+	private static void modifier(ServerPlayer player, Holder<Attribute> attribute, Identifier id, double amount,
+			AttributeModifier.Operation operation) {
+		Modifiers.set(player, attribute, id, amount, operation);
 	}
 }

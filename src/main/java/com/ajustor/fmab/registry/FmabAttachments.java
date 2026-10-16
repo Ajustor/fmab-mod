@@ -7,6 +7,7 @@ import com.ajustor.fmab.data.ExamProgress;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.NotebookContents;
+import com.ajustor.fmab.data.Shell;
 import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.data.TransmutationPose;
@@ -15,10 +16,12 @@ import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public final class FmabAttachments {
 	/** Rang, savoir et concentration du joueur ; gardés à la mort, visibles de lui seul. */
@@ -80,6 +83,15 @@ public final class FmabAttachments {
 			.syncWith(GateState.STREAM_CODEC, AttachmentSyncPredicate.all())
 			.buildAndRegister(Fmab.id("gate"));
 
+	/**
+	 * L'heure de jeu à laquelle l'âme s'est mise à errer devant sa Porte : sa place dans la file des
+	 * âmes errantes, gardée à la déconnexion, au redémarrage du serveur et à la mort.
+	 */
+	public static final AttachmentType<Long> ADRIFT_SINCE = AttachmentRegistry.<Long>builder()
+			.persistent(Codec.LONG)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("adrift_since"));
+
 	/** Les automails posés sur les membres perdus, visibles de tous sur le corps du joueur. */
 	public static final AttachmentType<Automail> AUTOMAIL = AttachmentRegistry.<Automail>builder()
 			.persistent(Automail.CODEC)
@@ -92,6 +104,16 @@ public final class FmabAttachments {
 	public static final AttachmentType<Belly.Swallowed> SWALLOWED = AttachmentRegistry.<Belly.Swallowed>builder()
 			.persistent(Belly.Swallowed.CODEC)
 			.buildAndRegister(Fmab.id("swallowed"));
+
+	/**
+	 * La concentration, à part du reste de l'alchimiste : elle se recharge chaque seconde, et seul ce
+	 * nombre part vers le client. Absente : pleine. Gardée à la mort, visible du joueur.
+	 */
+	public static final AttachmentType<Float> CONCENTRATION = AttachmentRegistry.<Float>builder()
+			.persistent(Codec.FLOAT)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.FLOAT, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(Fmab.id("concentration"));
 
 	/** Le karma, de −100 à +100 : gardé à la mort, visible du joueur. */
 	public static final AttachmentType<Integer> KARMA = AttachmentRegistry.<Integer>builder()
@@ -113,6 +135,21 @@ public final class FmabAttachments {
 			.persistent(Codec.BOOL)
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("alkahestry"));
+
+	/** Allié de Greed, par un pacte scellé d'or : gardé à la mort, même si le pacte est rompu depuis. */
+	public static final AttachmentType<Boolean> GREED_PACT = AttachmentRegistry.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("greed_pact"));
+
+	/**
+	 * La réponse à l'offre de Père ({@link com.ajustor.fmab.stone.Recruitment}) : acceptée ou refusée,
+	 * une fois pour toutes. Gardée à la mort.
+	 */
+	public static final AttachmentType<String> RECRUITMENT = AttachmentRegistry.<String>builder()
+			.persistent(Codec.STRING)
+			.copyOnDeath()
+			.buildAndRegister(Fmab.id("recruitment"));
 
 	/** Reconnu allié de Briggs par Olivier Armstrong : gardé à la mort. */
 	public static final AttachmentType<Boolean> BRIGGS_ALLY = AttachmentRegistry.<Boolean>builder()
@@ -157,11 +194,32 @@ public final class FmabAttachments {
 			.syncWith(TransmutationPose.STREAM_CODEC, AttachmentSyncPredicate.all())
 			.buildAndRegister(Fmab.id("pose"));
 
+	/**
+	 * Le fauteuil roulant dont le joueur tient les poignées (son identifiant d'entité) : posé et retiré
+	 * par le fauteuil, éphémère, visible de tous pour l'animer sans chercher le fauteuil autour de lui.
+	 */
+	public static final AttachmentType<Integer> PUSHING = AttachmentRegistry.<Integer>builder()
+			.syncWith(ByteBufCodecs.VAR_INT, AttachmentSyncPredicate.all())
+			.buildAndRegister(Fmab.id("pushing"));
+
 	/** Le joueur a reçu son matériel de départ. */
 	public static final AttachmentType<Boolean> EQUIPPED = AttachmentRegistry.<Boolean>builder()
 			.persistent(Codec.BOOL)
 			.copyOnDeath()
 			.buildAndRegister(Fmab.id("equipped"));
+
+	/**
+	 * L'armure d'une âme comme coquille : figée ou non, et qui est dedans. Éphémère (on ne se
+	 * reconnecte pas prisonnier), visible de tous pour savoir qui cacher et quelle armure ne bouge plus.
+	 */
+	public static final AttachmentType<Shell> SHELL = AttachmentRegistry.<Shell>builder()
+			.syncWith(Shell.STREAM_CODEC, AttachmentSyncPredicate.all())
+			.buildAndRegister(Fmab.id("shell"));
+
+	/** Le joueur est dans l'armure de cette âme : on ne le dessine plus, il ne se vise plus. */
+	public static final AttachmentType<UUID> INSIDE = AttachmentRegistry.<UUID>builder()
+			.syncWith(UUIDUtil.STREAM_CODEC, AttachmentSyncPredicate.all())
+			.buildAndRegister(Fmab.id("inside"));
 
 	private FmabAttachments() {
 	}

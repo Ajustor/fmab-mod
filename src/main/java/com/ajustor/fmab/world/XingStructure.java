@@ -16,7 +16,7 @@ import java.util.Optional;
  */
 public class XingStructure extends Structure {
 	public static final MapCodec<XingStructure> CODEC = simpleCodec(XingStructure::new);
-	private static final int SIZE = 23;
+	static final int SIZE = 23;
 
 	public XingStructure(StructureSettings settings) {
 		super(settings);

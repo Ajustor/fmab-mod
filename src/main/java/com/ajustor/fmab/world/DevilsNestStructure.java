@@ -12,8 +12,8 @@ import java.util.Optional;
 /** Le Devil's Nest : le bar où Greed tient sa cour, quelque part du côté de Dublith. */
 public class DevilsNestStructure extends Structure {
 	public static final MapCodec<DevilsNestStructure> CODEC = simpleCodec(DevilsNestStructure::new);
-	private static final int SIZE_X = 13;
-	private static final int SIZE_Z = 9;
+	static final int SIZE_X = 13;
+	static final int SIZE_Z = 9;
 
 	public DevilsNestStructure(StructureSettings settings) {
 		super(settings);

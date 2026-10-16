@@ -33,7 +33,7 @@ import java.util.EnumSet;
  * avalé et se retrouve dans son Ventre (voir {@link Belly}).
  */
 public class GluttonyEntity extends HomunculusEntity {
-	private static final int SOULS = 8;
+	private static final int SOULS = 7;
 	private static final double INHALE_RANGE = 12;
 
 	public GluttonyEntity(EntityType<? extends Monster> type, Level level) {
@@ -42,7 +42,7 @@ public class GluttonyEntity extends HomunculusEntity {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 120)
+				.add(Attributes.MAX_HEALTH, 70)
 				.add(Attributes.MOVEMENT_SPEED, 0.18)
 				.add(Attributes.ATTACK_DAMAGE, 8)
 				.add(Attributes.FOLLOW_RANGE, 24)

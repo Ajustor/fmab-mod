@@ -54,7 +54,7 @@ public class WrathEntity extends HomunculusEntity {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 120)
+				.add(Attributes.MAX_HEALTH, 550)
 				.add(Attributes.MOVEMENT_SPEED, 0.38)
 				.add(Attributes.ATTACK_DAMAGE, 12)
 				.add(Attributes.ATTACK_SPEED, 2)

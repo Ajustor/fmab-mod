@@ -16,17 +16,23 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.EnumSet;
 
 /**
  * Pride (Orgueil) : Selim Bradley, un enfant en apparence. Sa vraie arme, ce sont ses ombres :
@@ -54,7 +60,7 @@ public class PrideEntity extends HomunculusEntity {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 40)
+				.add(Attributes.MAX_HEALTH, 120)
 				.add(Attributes.MOVEMENT_SPEED, 0.25)
 				.add(Attributes.ATTACK_DAMAGE, 3)
 				.add(Attributes.FOLLOW_RANGE, 24)
@@ -74,6 +80,9 @@ public class PrideEntity extends HomunculusEntity {
 	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
+		// Démasqué : sans ses ombres, il fuit vers la pénombre où elles revivent ; avec, il traque.
+		goalSelector.addGoal(2, new SeekDuskGoal());
+		goalSelector.addGoal(3, new ChaseGoal());
 		goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.5) {
 			@Override
 			public boolean canUse() {
@@ -146,7 +155,7 @@ public class PrideEntity extends HomunculusEntity {
 			}
 		}
 		if (!shadowsAlive()) {
-			// Sans ombres, il fuit vers la pénombre en titubant.
+			// Sans ombres, il titube vers la pénombre (SeekDuskGoal).
 			addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 20, 1, false, false));
 			return;
 		}
@@ -155,7 +164,8 @@ public class PrideEntity extends HomunculusEntity {
 			return;
 		}
 		LivingEntity target = getTarget();
-		if (target != null && target.isAlive() && distanceTo(target) <= REACH) {
+		// Ses ombres filent au sol : un mur plein les arrête.
+		if (target != null && target.isAlive() && distanceTo(target) <= REACH && hasLineOfSight(target)) {
 			lash(level, target);
 			shadowCooldown = 30;
 		}
@@ -177,13 +187,91 @@ public class PrideEntity extends HomunculusEntity {
 		level.playSound(null, target.blockPosition(), SoundEvents.PHANTOM_BITE, SoundSource.HOSTILE, 1, 0.5f);
 	}
 
+	/**
+	 * Ce que ses ombres peuvent dévorer : une bête sans attache. Pas un homonculus, ni un être lié à un
+	 * joueur (chimère, animal apprivoisé, bête tenue en laisse ou baptisée), ni un villageois.
+	 */
+	static boolean devourable(Mob mob) {
+		return mob.isAlive() && !(mob instanceof HomunculusEntity) && !(mob instanceof AbstractVillager)
+				&& !(mob instanceof ChimeraBeastEntity chimera && chimera.master().isPresent())
+				&& !(mob instanceof OwnableEntity owned && owned.getOwnerReference() != null)
+				&& !mob.isLeashed() && !mob.hasCustomName();
+	}
+
+	/** Une case où ses ombres vivent : ni le noir complet, ni la pleine lumière. */
+	private boolean dusky(Vec3 at) {
+		int light = level().getMaxLocalRawBrightness(BlockPos.containing(at));
+		return light > DARKNESS && light < BRIGHTNESS;
+	}
+
+	/** Démasqué et sans ombres : il fuit vers la pénombre la plus proche qu'il trouve. */
+	private final class SeekDuskGoal extends Goal {
+		private Vec3 refuge;
+
+		SeekDuskGoal() {
+			setFlags(EnumSet.of(Flag.MOVE));
+		}
+
+		@Override
+		public boolean canUse() {
+			if (!revealed() || shadowsAlive() || regenerating()) {
+				return false;
+			}
+			for (int i = 0; i < 16; i++) {
+				Vec3 at = DefaultRandomPos.getPos(PrideEntity.this, 12, 4);
+				if (at != null && dusky(at)) {
+					refuge = at;
+					return true;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public void start() {
+			getNavigation().moveTo(refuge.x, refuge.y, refuge.z, 1.1);
+		}
+
+		@Override
+		public boolean canContinueToUse() {
+			return !shadowsAlive() && !getNavigation().isDone();
+		}
+	}
+
+	/** Démasqué, ses ombres vivantes : il marche sur sa cible, jusqu'à portée d'ombre en vue. */
+	private final class ChaseGoal extends Goal {
+		ChaseGoal() {
+			setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		}
+
+		@Override
+		public boolean canUse() {
+			LivingEntity target = getTarget();
+			return revealed() && shadowsAlive() && !regenerating() && target != null && target.isAlive()
+					&& (distanceTo(target) > REACH * 0.5 || !hasLineOfSight(target));
+		}
+
+		@Override
+		public void tick() {
+			LivingEntity target = getTarget();
+			if (target != null) {
+				getLookControl().setLookAt(target, 30, 30);
+				getNavigation().moveTo(target, 0.9);
+			}
+		}
+
+		@Override
+		public void stop() {
+			getNavigation().stop();
+		}
+	}
+
 	/** Ses ombres dévorent les bêtes qui passent à leur portée, et il s'en nourrit. */
 	private void devour(ServerLevel level) {
 		if (random.nextInt(40) != 0) {
 			return;
 		}
-		for (Mob mob : level.getEntitiesOfClass(Mob.class, getBoundingBox().inflate(8),
-				m -> !(m instanceof HomunculusEntity) && m.isAlive())) {
+		for (Mob mob : level.getEntitiesOfClass(Mob.class, getBoundingBox().inflate(8), PrideEntity::devourable)) {
 			BlockPos at = mob.blockPosition();
 			level.sendParticles(SHADOW, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, 30, 0.4, 0.6, 0.4, 0);
 			mob.kill(level);

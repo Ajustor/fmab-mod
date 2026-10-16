@@ -1,5 +1,82 @@
 # Changelog
 
+## 1.5.0 — 2026-10-13
+
+### New features
+
+- The mod has an icon, settings in Mod Menu, and its language can differ from the game's (for example the game in English and the mod in French).
+## 1.4.0 — 2026-10-12
+
+### New features
+
+- A soul in armour can stand still (V key): another player can then put the armour on and walk it around; if the soul moves again, they are locked inside until it releases them, safe from blows.
+## 1.3.0 — 2026-10-12
+
+### New features
+
+- New outfits: Edward's red alchemist coat (with trousers and boots), Alphonse's steel armour, the Amestrian officer's uniform and the long officer's greatcoat, with hood, coat tails, pauldrons, plume and cap visor.
+## 1.2.0 — 2026-10-11
+
+### New features
+
+- Redrawn HUD: the soul counter shows the Stone's icon, concentration a framed gauge, lost sight a soft veil
+- Tucker's chimeras get bodies of their own: lion, wolf and snake for the beast, six stitched limbs for the crawler.
+- Liore becomes a real desert town: walls, temple avenue, fountain square, covered market and some twenty houses with roof terraces.
+- Transmutation gestures now show in first person too: hands clap in front of you, plunge onto the circle or reach for a soul.
+- Paths now link the houses of Resembool, Dublith and Rush Valley to their square, lined with lamp posts.
+- Making Greed an ally is enough for "The Seven Sins", and new advancements reward the pact with Greed, the Ishvalan tattoo, exposing Cornello, Marcoh's notes, Hohenheim and Marcoh's clinic.
+- The State watch, the Stone core, crystallized blood, thread, ink and cartridges have a tooltip explaining what they are for.
+- With very low karma, Lust first comes to make you Father's offer: accepting ends the hunts, refusing starts them.
+- Barry the Chopper has his own mechanics: a telegraphed cleaver sweep, a charge once wounded, and a seal that holds the first time he falls.
+- Test commands /fmab karma [value] and /fmab offer (operators).
+
+### Fixes
+
+- After switching worlds in single player, Scar's arm and the Stone's bargain no longer get stuck; per-player state no longer piles up on a server
+- The Treatise contents no longer cut chapter titles; Winry shows each automail's wear as a bar; the gloves screen is easier to read
+- Worn circles (embroidery, tattoos) no longer stack the same effect beyond three, and fall silent in Father's zone.
+- Envy no longer haunts those who defeated him, wandering homunculi leave when nobody comes near, and only the first of each kind leaves a Stone core.
+- Boss difficulty now follows the progression order: Gluttony and Sloth get easier, Pride, Wrath and above all Father become the toughest.
+- Circles no longer vanish during the Gate cinematic, and many circles on screen no longer make the game stutter.
+- The pistol fires slower, its bullets weaken with distance and barely slow homunculi down.
+- Unmasked Pride hunts you and flees to the dusk when his shadows die; his shadows no longer pass through walls and spare your chimeras, your animals and villagers.
+- The State exam's transmuted weapon no longer crumbles near the examiner, and casting a weapon without the required knowledge names it and how to get it.
+- A soul that opens the Gate again comes back in its own armor, battered, instead of losing it and having to leave a defenseless armor waiting.
+
+### Performance
+
+- Less network traffic for players with lost limbs, automail or worn passives: their attributes are no longer resent every tick
+- Player rendering is lighter: no more per-frame search for the pushed wheelchair or rebuilding of the body.
+- Recharging concentration no longer sends all the alchemist data to the client every second.
+## 1.1.0 — 2026-10-11
+
+### New features
+
+- Wheelchair: without legs you crawl or roll, both arms to move, ramps to climb, and a player or a villager can push you
+- Craft objects through alchemy: break an object down to understand it, then recompose it from a model with the matter it holds
+- Design page (J key): think of the object to create, no model needed; the Philosopher's Stone creates without matter; extra matter makes the object sturdier
+- Wood and Fiber glyphs: recompose chests, boats, beds, bows… ("On Wood and Fiber" tome from librarians)
+- 14 new glyphs (Carbon, Crystal, Sulfur, Mercury, Lime, Plant, Flesh, Silver, Tin, Lead, Zinc, Nickel, Aluminium, Netherite): everything can be transmuted, other mods' materials included
+- New human transmutation circle with six satellites (State Alchemist); the chimera needs Human + Flesh, detonation Fire + Sulfur
+- Rank no longer blocks a circle: beyond it, the circle loses stability and may rebound (a Philosopher's Stone holds it)
+- Human transmutation with a Philosopher's Stone: open the Gate and buy your parts back with the Stone's souls, or create a being by giving it a soul; a Gate initiate can clap with a Stone in hand
+- The form of a being created with a Stone can be chosen (human, dog, cat, horse, parrot); the Stone only gives back lost parts before the Gate
+- New textures for every creature (characters, homunculi, chimeras, golem, automail), portrait spawn eggs and redrawn weapons
+- The Gate teaches every glyph; it opens and closes as two doors, its arms undulate and have real hands; new cinematic (shadow arms, eye, tunnel of circles and glyphs) with the Truth's lines as subtitles
+- The mod's blocks are redrawn (bricks, Gluttony's flesh, crystallized blood, red stone, Father's lair, seals, alchemist table, automail bench, Gate stone)
+- Towns are denser and livelier: houses with eaves, shutters, window boxes and chimneys, trees, markets, a sheep pasture in Resembool, palms and awnings in Liore and Rush Valley
+- The State Alchemist watch, leather gloves and red stone shard are redrawn
+- Alchemist table, automail bench and Father's pipes modelled in 3D; seals and red stone glow in the dark, the Gate's eyes blink
+- Characters have recognisable silhouettes: Lust's bust and hips, Izumi's, Winry's and Olivier's bust, ponytails, May Chang's buns and braids, soldiers' visors
+- Cornello wears his medallion and priest's robe, Marcoh his satchel, Olivier her long hair down her back; Briggs soldiers have their fur collar and pack, Drachma soldiers their ushanka and greatcoat
+- Scar has a wrestler's shoulders; Pride has a child's head and, once revealed, a shadow mask and more blades
+- Redrawn icons (inks, books, chalk, gloves, crimson seals, Philosopher's Stone); the soul chestplate looks like Alphonse's armour, the stone lance has its own look; stone golem spawn egg
+- An automail arm can be transmuted into a blade (Arm blade) like Ed's, then restored; a broad blade springs from a riveted cuff, is visible and cuts bare-handed
+- Characters breathe, walk their own way and strike poses (crossed arms, hands behind their back, fists on hips), then a guard in combat; Lust points and shoots out her finger blades, Gluttony's belly wobbles
+- The mod's creatures have a voice (idle, hurt, death), and some their own footsteps
+- Drachma soldiers, immortals, chimeras, empty armours, Barry and the stone golem now drop loot
+- Fort Briggs (buttresses, loopholes, banner, portcullis gate, lit barracks) and Laboratory 5 (abandoned compound, barbed wall, brick building) are rebuilt
+- The player's transmutation gestures (clap, palms on the circle, soul reach) are animated with wind-up and follow-through
 ## 1.0.1 — 2026-10-09
 
 ### New features

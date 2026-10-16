@@ -15,6 +15,7 @@ import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyMenu;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Rebirth;
+import com.ajustor.fmab.gate.Shells;
 import com.ajustor.fmab.gate.SoulBinding;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.state.StateExam;
@@ -24,6 +25,7 @@ import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Recomposition;
+import com.ajustor.fmab.util.Throttle;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
@@ -31,6 +33,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
 public final class FmabNetwork {
+	/** La page de conception parcourt tout ce que le joueur a compris : une par seconde suffit. */
+	private static final Throttle DESIGNS = new Throttle(20);
+
 	private FmabNetwork() {
 	}
 
@@ -40,6 +45,7 @@ public final class FmabNetwork {
 				1 << 20);
 		PayloadTypeRegistry.serverboundPlay().register(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(ShellKeyPayload.TYPE, ShellKeyPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(WinryActionPayload.TYPE, WinryActionPayload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(TruthChoicePayload.TYPE, TruthChoicePayload.CODEC);
@@ -63,7 +69,7 @@ public final class FmabNetwork {
 		PayloadTypeRegistry.clientboundPlay().registerLarge(OpenDesignsPayload.TYPE, OpenDesignsPayload.CODEC, 1 << 20);
 
 		ServerPlayNetworking.registerGlobalReceiver(RequestDesignsPayload.TYPE,
-				(payload, context) -> ServerPlayNetworking.send(context.player(), Recomposition.designs(context.player())));
+				(payload, context) -> designs(context.player()));
 		ServerPlayNetworking.registerGlobalReceiver(ChooseDesignPayload.TYPE,
 				(payload, context) -> Recomposition.choose(context.player(), payload.item()));
 		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
@@ -76,6 +82,8 @@ public final class FmabNetwork {
 				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
 		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,
 				(payload, context) -> removeGlove(context.player(), payload.left()));
+		ServerPlayNetworking.registerGlobalReceiver(ShellKeyPayload.TYPE,
+				(payload, context) -> Shells.press(context.player()));
 		ServerPlayNetworking.registerGlobalReceiver(StoneChosenPayload.TYPE,
 				(payload, context) -> StoneChoice.answer(context.player(), payload.choice()));
 		ServerPlayNetworking.registerGlobalReceiver(BargainAnswerPayload.TYPE,
@@ -191,6 +199,12 @@ public final class FmabNetwork {
 			case ALREADY_THERE -> "notebook.fmab.already";
 			case FULL -> "notebook.fmab.full";
 		}));
+	}
+
+	private static void designs(ServerPlayer player) {
+		if (DESIGNS.pass(player.getUUID(), player.level().getGameTime())) {
+			ServerPlayNetworking.send(player, Recomposition.designs(player));
+		}
 	}
 
 	/** La roue des cercles : une page devient la sélection, et l'Initié peut joindre aussitôt les mains. */

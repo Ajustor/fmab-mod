@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_ishval_ruins",
+  "criteria": {
+    "scar_tattoo": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "scar_tattoo"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:ishval_tattoo"
+    },
+    "title": {
+      "translate": "advancements.fmab.scar_tattoo.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.scar_tattoo.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "scar_tattoo"
+    ]
+  ]
+}

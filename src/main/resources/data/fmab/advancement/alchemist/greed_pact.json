@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_devils_nest",
+  "criteria": {
+    "greed_pact": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "greed_pact"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:gold_ingot"
+    },
+    "title": {
+      "translate": "advancements.fmab.greed_pact.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.greed_pact.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "greed_pact"
+    ]
+  ]
+}

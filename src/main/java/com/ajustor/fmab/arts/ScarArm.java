@@ -5,7 +5,9 @@ import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
+import com.ajustor.fmab.util.Throttle;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.core.BlockPos;
@@ -22,10 +24,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 /**
  * Le bras droit de Scar : un tatouage qui unit l'alchimie d'Amestris et l'alkahestry de Xing, mais
  * dont on n'a gardé que la décomposition. Main nue, frapper un bloc le réduit en poussière (il
@@ -38,8 +36,7 @@ public final class ScarArm {
 	private static final float BLOCK_COST = 1;
 	private static final float ENTITY_COST = 2;
 	private static final float ENTITY_DAMAGE = 7;
-	private static final int COOLDOWN = 8;
-	private static final Map<UUID, Long> LAST = new HashMap<>();
+	private static final Throttle READY = new Throttle(8);
 
 	private ScarArm() {
 	}
@@ -99,13 +96,7 @@ public final class ScarArm {
 	}
 
 	private static boolean ready(ServerPlayer player, ServerLevel level) {
-		long now = level.getGameTime();
-		Long last = LAST.get(player.getUUID());
-		if (last != null && now - last < COOLDOWN) {
-			return false;
-		}
-		LAST.put(player.getUUID(), now);
-		return true;
+		return READY.pass(player.getUUID(), level.getGameTime());
 	}
 
 	/**
@@ -117,12 +108,13 @@ public final class ScarArm {
 		Knowledge knowledge = AlchemyRules.of(player.level().registryAccess()).knowledge(data);
 		cost = (float) Math.max(0.5, cost - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
 		if (!player.isCreative()) {
-			if (data.concentration() < cost) {
+			float concentration = Concentration.of(player);
+			if (concentration < cost) {
 				player.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) Math.ceil(cost),
-						(int) data.concentration()));
+						(int) concentration));
 				return false;
 			}
-			data = data.withConcentration(data.concentration() - cost);
+			Concentration.set(player, concentration - cost);
 		}
 		player.setAttached(FmabAttachments.ALCHEMIST, data.addMastery(SCHOOL, 1));
 		return true;

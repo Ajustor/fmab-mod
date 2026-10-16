@@ -50,6 +50,14 @@ public final class Milestones {
 		});
 	}
 
+	/**
+	 * Les sept péchés sont soumis : chacun vu tomber, sauf Greed, qu'un pacte suffit à soumettre (on
+	 * n'a pas à trahir son allié pour ce progrès).
+	 */
+	public static boolean sevenSins(Set<String> slain, boolean greedPact) {
+		return SINS.stream().allMatch(sin -> slain.contains(sin) || sin.equals("greed") && greedPact);
+	}
+
 	/** Les étapes qui se lisent dans l'état du joueur. */
 	private static void check(ServerPlayer p) {
 		AlchemistData alchemist = p.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
@@ -89,11 +97,18 @@ public final class Milestones {
 		if (Boolean.TRUE.equals(p.getAttached(FmabAttachments.BRIGGS_ALLY))) {
 			reach(p, "briggs_ally");
 		}
+		boolean greedPact = Boolean.TRUE.equals(p.getAttached(FmabAttachments.GREED_PACT));
+		if (greedPact) {
+			reach(p, "greed_pact");
+		}
+		if (Boolean.TRUE.equals(p.getAttached(FmabAttachments.SCAR_ARM))) {
+			reach(p, "scar_tattoo");
+		}
 		Set<String> slain = p.getAttachedOrCreate(FmabAttachments.SLAIN);
 		for (String sin : slain) {
 			reach(p, "slain_" + sin);
 		}
-		if (slain.containsAll(SINS)) {
+		if (sevenSins(slain, greedPact)) {
 			reach(p, "seven_sins");
 		}
 		if (NationalCircle.get(p.level().getServer()).broken()) {

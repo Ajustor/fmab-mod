@@ -1,13 +1,25 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.stone.Karma;
+import com.ajustor.fmab.stone.Recruitment;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
@@ -24,15 +36,21 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.EnumSet;
+import java.util.UUID;
 
 /**
  * Lust (Luxure) : ses doigts s'allongent en lames et transpercent tout en ligne droite, boucliers
- * compris. Elle frappe de loin, après un bref temps d'arrêt. Le feu la brûle deux fois plus.
+ * compris. Elle frappe de loin, après un bref temps d'arrêt. Le feu la brûle deux fois plus. Chez une
+ * âme noire qui n'a pas encore répondu, elle vient d'abord porter l'offre de Père ({@link Recruitment}).
  */
 public class LustEntity extends HomunculusEntity {
 	/** Les lames de Lust : des dégâts que le bouclier n'arrête pas. */
@@ -41,6 +59,19 @@ public class LustEntity extends HomunculusEntity {
 	private static final int SOULS = 6;
 	private static final double LANCE_RANGE = 16;
 	private static final float LANCE_DAMAGE = 9;
+	/** Le geste des doigts-lames, pour le rendu : rien, la main qui vise, les lames lancées. */
+	public enum Lance {
+		NONE, AIMING, STRIKING
+	}
+
+	private static final EntityDataAccessor<Integer> LANCE_STATE = SynchedEntityData.defineId(LustEntity.class,
+			EntityDataSerializers.INT);
+	/** Les lames restent tendues un instant après le coup. */
+	private static final int STRIKE_SHOWN = 8;
+	private int striking;
+	/** Le joueur à qui elle porte l'offre de Père : tant qu'il n'a pas répondu, elle ne l'attaque pas. */
+	private @Nullable UUID envoyTo;
+	private int waited;
 
 	public LustEntity(EntityType<? extends Monster> type, Level level) {
 		super(type, level, SOULS);
@@ -56,6 +87,47 @@ public class LustEntity extends HomunculusEntity {
 	}
 
 	@Override
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(LANCE_STATE, Lance.NONE.ordinal());
+	}
+
+	public Lance lance() {
+		return Lance.values()[entityData.get(LANCE_STATE)];
+	}
+
+	private void lance(Lance lance) {
+		entityData.set(LANCE_STATE, lance.ordinal());
+	}
+
+	@Override
+	public void aiStep() {
+		super.aiStep();
+		if (striking > 0 && --striking == 0 && lance() == Lance.STRIKING) {
+			lance(Lance.NONE);
+		}
+		if (envoyTo != null && level() instanceof ServerLevel level) {
+			await(level);
+		}
+	}
+
+	@Override
+	protected void addAdditionalSaveData(ValueOutput output) {
+		super.addAdditionalSaveData(output);
+		if (envoyTo != null) {
+			output.putString("envoy", envoyTo.toString());
+			output.putInt("waited", waited);
+		}
+	}
+
+	@Override
+	protected void readAdditionalSaveData(ValueInput input) {
+		super.readAdditionalSaveData(input);
+		envoyTo = input.getString("envoy").map(UUID::fromString).orElse(null);
+		waited = input.getIntOr("waited", 0);
+	}
+
+	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(2, new LanceGoal());
@@ -64,7 +136,92 @@ public class LustEntity extends HomunculusEntity {
 		goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 16));
 		goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 		targetSelector.addGoal(1, new HurtByTargetGoal(this));
-		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true) {
+			@Override
+			public boolean canUse() {
+				return envoyTo == null && super.canUse();
+			}
+		});
+	}
+
+	/** Elle vient porter l'offre de Père à ce joueur, sans l'attaquer. */
+	public void bringOffer(ServerPlayer player) {
+		envoyTo = player.getUUID();
+		waited = 0;
+		setTarget(null);
+		player.sendSystemMessage(Component.translatable("stone.fmab.offer"));
+	}
+
+	/** Attend-elle encore la réponse d'un joueur ? */
+	public boolean envoy() {
+		return envoyTo != null;
+	}
+
+	/**
+	 * La réponse du joueur. Oui : un noyau de Pierre en acompte, et elle s'en va. Non : elle attaque,
+	 * et les traques commencent.
+	 */
+	private void answer(ServerPlayer player, boolean accepted) {
+		envoyTo = null;
+		player.setAttached(FmabAttachments.RECRUITMENT, accepted ? Recruitment.ACCEPTED : Recruitment.REFUSED);
+		Karma.add(player, accepted ? Recruitment.ACCEPT_KARMA : Recruitment.REFUSE_KARMA);
+		ServerLevel level = player.level();
+		if (accepted) {
+			ItemStack advance = new ItemStack(FmabItems.PHILOSOPHER_STONE_CORE);
+			if (!player.getInventory().add(advance)) {
+				player.drop(advance, false);
+			}
+			player.sendSystemMessage(Component.translatable("stone.fmab.offer_accepted"));
+			level.playSound(null, blockPosition(), SoundEvents.EVOKER_PREPARE_WOLOLO, SoundSource.HOSTILE, 1, 0.7f);
+			level.sendParticles(ParticleTypes.LARGE_SMOKE, getX(), getY(0.5), getZ(), 30, 0.3, 0.6, 0.3, 0.02);
+			discard();
+		} else {
+			player.sendSystemMessage(Component.translatable("stone.fmab.offer_refused"));
+			level.playSound(null, blockPosition(), SoundEvents.TRIDENT_RIPTIDE_1.value(), SoundSource.HOSTILE, 1, 0.8f);
+			setTarget(player);
+		}
+	}
+
+	@Override
+	protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+		if (envoyTo == null || !player.getUUID().equals(envoyTo)) {
+			return super.mobInteract(player, hand);
+		}
+		if (player instanceof ServerPlayer p) {
+			answer(p, true);
+		}
+		return InteractionResult.SUCCESS;
+	}
+
+	@Override
+	public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+		// La frapper, c'est répondre non.
+		if (envoyTo != null && source.getEntity() instanceof ServerPlayer p && p.getUUID().equals(envoyTo)) {
+			answer(p, false);
+		}
+		return super.hurtServer(level, source, damage);
+	}
+
+	/** Elle s'approche et attend ; partir loin, ou la faire trop attendre, c'est répondre non. */
+	private void await(ServerLevel level) {
+		Player player = level.getPlayerByUUID(envoyTo);
+		double distance = player == null ? Double.MAX_VALUE : distanceTo(player);
+		if (!Recruitment.stillWaiting(++waited, distance)) {
+			if (player instanceof ServerPlayer p) {
+				answer(p, false);
+			} else {
+				envoyTo = null;
+			}
+			return;
+		}
+		if (distance > 4) {
+			if (waited % 20 == 1) {
+				getNavigation().moveTo(player, 0.9);
+			}
+		} else {
+			getNavigation().stop();
+			getLookControl().setLookAt(player, 30, 30);
+		}
 	}
 
 	@Override
@@ -105,6 +262,7 @@ public class LustEntity extends HomunculusEntity {
 		@Override
 		public void start() {
 			windup = WINDUP;
+			lance(Lance.AIMING);
 			getNavigation().stop();
 			if (level() instanceof ServerLevel level) {
 				level.playSound(null, blockPosition(), SoundEvents.TRIDENT_RIPTIDE_1.value(), SoundSource.HOSTILE, 1, 1.6f);
@@ -121,6 +279,15 @@ public class LustEntity extends HomunculusEntity {
 			if (--windup == 0 && aim != null && level() instanceof ServerLevel level) {
 				strike(level, aim);
 				cooldown = COOLDOWN;
+				lance(Lance.STRIKING);
+				striking = STRIKE_SHOWN;
+			}
+		}
+
+		@Override
+		public void stop() {
+			if (lance() == Lance.AIMING) {
+				lance(Lance.NONE);
 			}
 		}
 

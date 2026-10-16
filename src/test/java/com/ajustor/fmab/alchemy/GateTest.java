@@ -64,16 +64,26 @@ class GateTest {
 	}
 
 	@Test
-	void aSoulLosesItsArmorAndDriftsBeforeTheGate() {
+	void aSoulThatGivesItsSealComesBackInItsArmor() {
 		GateState gate = GateState.NONE.pay(BodyPart.ORGANS).pay(BodyPart.BODY);
 		assertEquals(2, gate.openings());
 		assertTrue(gate.soulBound());
 		assertTrue(gate.inArmor());
-		GateState adrift = gate.payWithSeal();
-		assertEquals(3, adrift.openings());
-		assertTrue(adrift.adrift());
+		// La Vérité arrache le sceau, mais l'âme le retrace en revenant : elle n'erre pas, et n'a pas
+		// besoin d'une armure laissée en attente.
+		GateState paid = gate.payWithSeal();
+		assertEquals(3, paid.openings());
+		assertFalse(paid.adrift());
+		assertTrue(paid.inArmor());
+		assertTrue(paid.lost(BodyPart.ORGANS));
+	}
+
+	@Test
+	void aSoulWhoseSealWasErasedStillDrifts() {
+		// Le plastron qui cède efface le sceau : là, l'âme erre jusqu'à ce qu'un cercle l'appelle.
+		GateState adrift = GateState.NONE.pay(BodyPart.BODY).withAdrift(true);
 		assertFalse(adrift.inArmor());
-		assertTrue(adrift.lost(BodyPart.ORGANS));
+		assertTrue(adrift.payWithSeal().adrift(), "rouvrir la Porte ne rend pas une armure qu'on n'a plus");
 		assertTrue(adrift.withAdrift(false).inArmor());
 	}
 

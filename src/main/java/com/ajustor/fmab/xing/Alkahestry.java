@@ -8,6 +8,7 @@ import com.ajustor.fmab.entity.KunaiEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -96,12 +97,13 @@ public final class Alkahestry {
 		Knowledge knowledge = AlchemyRules.of(level.registryAccess()).knowledge(alchemist);
 		float cost = (float) Math.max(1, COST - knowledge.perk(SCHOOL, "concentration_discount"));
 		if (!thrower.isCreative()) {
-			if (alchemist.concentration() < cost) {
+			float concentration = Concentration.of(thrower);
+			if (concentration < cost) {
 				thrower.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) cost,
-						(int) alchemist.concentration()));
+						(int) concentration));
 				return;
 			}
-			alchemist = alchemist.withConcentration(alchemist.concentration() - cost);
+			Concentration.set(thrower, concentration - cost);
 		}
 		thrower.setAttached(FmabAttachments.ALCHEMIST, alchemist.addMastery(SCHOOL, MASTERY));
 		ring.forEach(KunaiEntity::spend);

@@ -2,23 +2,23 @@ package com.ajustor.fmab.client.render;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.GreedEntity;
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.Identifier;
 
-/** Greed : manteau à col de fourrure, lunettes noires ; bouclier levé, une peau de carbone noir. */
-public class GreedRenderer extends HumanoidMobRenderer<GreedEntity, GreedRenderer.State, HumanoidModel<GreedRenderer.State>> {
+/**
+ * Greed : manteau à col de fourrure, lunettes noires, les mains dans les poches ; bouclier levé, une
+ * peau de carbone noir.
+ */
+public class GreedRenderer extends FigureRenderer<GreedEntity, GreedRenderer.State, FigureRenderer.Model<GreedRenderer.State>> {
 	private static final Identifier TEXTURE = Fmab.id("textures/entity/greed.png");
 	private static final Identifier SHIELD = Fmab.id("textures/entity/greed_shield.png");
 
-	public static class State extends HumanoidRenderState {
+	public static class State extends FigureRenderer.State {
 		boolean shielded;
 	}
 
 	public GreedRenderer(EntityRendererProvider.Context context) {
-		super(context, new HumanoidModel<>(BossModels.greed()), 0.5f);
+		super(context, new FigureRenderer.Model<>(BossModels.greed(), Temper.GREED));
 	}
 
 	@Override

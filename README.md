@@ -17,6 +17,12 @@ Minecraft 26.2, [Fabric Loader](https://fabricmc.net/) ≥ 0.19.3, [Fabric API](
 [Releases](https://github.com/Ajustor/fmab-mod/releases) ; chaque build de `master` en produit un
 aussi, dans les artefacts de l'onglet Actions.
 
+Avec [Mod Menu](https://modrinth.com/mod/modmenu) (facultatif), le bouton de réglages du mod permet de
+choisir la **langue du mod**, indépendamment de celle du jeu (le jeu en anglais, le mod en français, ou
+l'inverse), d'afficher ou non le cercle sélectionné et les infobulles des objets, et de régler les mondes
+solo. Sans Mod Menu, ces réglages sont dans `config/fmab-client.json` (`language` : `""` pour suivre le
+jeu, `"fr_fr"`, `"en_us"`…).
+
 ### Touches
 
 Toutes réglables dans Options → Commandes → Touches, catégorie « Alchimie ».
@@ -28,6 +34,7 @@ Toutes réglables dans Options → Commandes → Touches, catégorie « Alchimie
 | G / Maj+G | Lancer le cercle des gants / joindre les mains (les deux gants, ou sans cercle pour un Initié) |
 | H | Écran des gants |
 | J | Page de conception : l'objet auquel penser en recomposant |
+| V | Âme en armure : se figer (une armure qu'un autre joueur revêt d'un clic main nue), s'éveiller, ou relâcher celui qui est dedans |
 | — | Cercle suivant / précédent (sans touche par défaut) |
 
 Dans l'inventaire de survie, l'onglet **Corps** montre les membres, les automails et les gants.
@@ -67,11 +74,13 @@ d'État à Central, la Porte, les homonculus, puis Père.
   vêtements brodés, tatouages par rituel, aux passifs permanents.
 - **La Porte** : la transmutation humaine échoue toujours et happe l'alchimiste dans l'Espace blanc,
   où la Vérité prend son péage (un bras, une jambe, les organes, la vue... ou le corps entier : l'âme
-  vit alors dans une armure scellée de son sang). En échange, l'Initié transmute sans cercle. Le cercle
+  vit alors dans une armure scellée de son sang). En échange, l'Initié comprend tous les glyphes et transmute sans cercle. Le cercle
   n'est dans aucun traité : on le recompose soi-même, ou on trouve de très rares **Notes sur la
   transmutation humaine**.
 - **Automail** (fer, Rush Valley, Briggs) sur les membres perdus : à l'établi ou dans l'onglet Corps,
-  usure, réparation et retrait chez **Winry**.
+  usure, réparation et retrait chez **Winry**. Un alchimiste qui connaît la Lame-bras peut transmuter
+  son bras d'automail (Fer et Recomposer) : une lame en sort, qui tranche à mains nues, et la même
+  transmutation la fait rentrer.
 - **Fauteuil roulant** (craft, ou chez un forgeron d'outils) : sans jambes, on rampe, ou l'on s'y assied.
   Il ne saute pas et ne franchit qu'une demi-hauteur (dalles, escaliers : il faut des rampes) ; il faut
   deux bras pour faire tourner ses roues, qui prennent alors les mains. Un autre joueur peut le pousser
@@ -86,7 +95,9 @@ d'État à Central, la Porte, les homonculus, puis Père.
 - **Autres arts et armes** : alkahestry de Xing (kunaï, May Chang), bras de Scar, mines de Kimblee,
   pistolet et fusil, couteaux, sabre de Briggs, épée de Xing.
 - **Villes habitées** : villageois (leur métier vient du poste de travail de leur maison), maisons
-  meublées, gardes aux portes de Central ; les cartographes vendent les cartes des lieux du mod.
+  meublées aux abords soignés (avant-toits, volets, jardinières, cheminées), arbres, marchés, pré à
+  moutons à Resembool, gardes aux portes de Central ; les cartographes vendent les cartes des lieux
+  du mod.
 - **Finition** : cinématiques (la Porte, le Jour promis, la chute de Père), éclipse dans le ciel,
   sons propres (CC0), modèles des boss, textes en français et en anglais.
 
@@ -123,16 +134,23 @@ Configuration du serveur : `config/fmab.json`, créé au premier lancement.
 toute sa progression d'alchimiste ; à `false`, elle ne retrouve que son corps.
 
 Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab forget_all`,
-`/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`.
+`/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`, `/fmab karma [valeur]` (lire ou régler
+le karma, de −100 à 100), `/fmab offer` (oublier la réponse à l'offre de Père et faire venir les
+homonculus tout de suite).
 
 ### Développement
 
 JDK 25 ou plus récent :
 
 ```sh
-./gradlew build        # jar dans build/libs/, tests compris
-./gradlew runClient    # lancer le jeu de développement
+./gradlew build                # jar dans build/libs/, tests compris
+./gradlew runClient            # lancer le jeu de développement
+./gradlew runClientGameTest    # scènes en jeu : vérifications et captures
+python tools/skins/all.py      # régénérer les textures, dessinées en code
 ```
+
+Le détail (tests, gametests, générateurs de textures, conventions de commit) est dans
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 L'**éditeur de cercles** (`web/`) porte le même parseur en TypeScript, vérifié contre le Java sur
 des cercles de test communs (`testdata/circles`) : `cd web && npm install && npm run dev`. Ces
@@ -170,6 +188,12 @@ Minecraft 26.2, Fabric Loader ≥ 0.19.3, Fabric API ≥ 0.161.0 and Java 25. Dr
 `mods/`. Jars are on the [Releases](https://github.com/Ajustor/fmab-mod/releases) page; every
 `master` build also produces one in the Actions artifacts.
 
+With [Mod Menu](https://modrinth.com/mod/modmenu) (optional), the mod's settings button lets you pick the
+**mod language**, separately from the game's (game in English, mod in French, or the other way round),
+show or hide the selected circle and the item hints, and set single-player worlds. Without Mod Menu,
+these settings are in `config/fmab-client.json` (`language`: `""` to follow the game, `"fr_fr"`,
+`"en_us"`…).
+
 ### Controls
 
 All rebindable under Options → Controls → Key Binds, "Alchemy" category.
@@ -181,6 +205,7 @@ All rebindable under Options → Controls → Key Binds, "Alchemy" category.
 | G / Shift+G | Cast the gloves' circle / join hands (both gloves, or no circle for an initiate) |
 | H | Gloves screen |
 | J | Design page: the object to think of while recomposing |
+| V | Soul in armour: stand still (an armour another player puts on with an empty-hand click), wake up, or release whoever is inside |
 | — | Next / previous circle (unbound by default) |
 
 In the survival inventory, the **Body** tab shows limbs, automail and gloves.
@@ -222,7 +247,9 @@ Central, the Gate, the homunculi, then Father.
   a blood-sealed armor). In exchange, initiates transmute without a circle. The circle is in no
   treatise: work it out yourself, or find very rare **Notes on Human Transmutation**.
 - **Automail** (iron, Rush Valley, Briggs) on lost limbs: fitted at the bench or in the Body tab,
-  wears out, repaired and removed by **Winry**.
+  wears out, repaired and removed by **Winry**. An alchemist who knows the Arm blade can transmute
+  their automail arm (Iron and Recompose): a blade springs out and cuts bare-handed, and the same
+  transmutation draws it back in.
 - **Wheelchair** (crafted, or bought from a toolsmith): without legs you crawl, or sit in one. It
   cannot jump and only climbs half a block (slabs, stairs: you need ramps); turning its wheels takes
   both arms, and keeps your hands busy. Another player can push it (right-click it, sneak to let go),
@@ -235,8 +262,9 @@ Central, the Gate, the homunculi, then Father.
   a fight has begun.
 - **Other arts and weapons**: Xing alkahestry (kunai, May Chang), Scar's arm, Kimblee's mines,
   pistol and rifle, throwing knives, Briggs sabre, Xing sword.
-- **Lived-in towns**: villagers whose trade comes from their house's workstation, furnished houses,
-  guards at Central's gates; cartographers sell maps to the mod's places.
+- **Lived-in towns**: villagers whose trade comes from their house's workstation, furnished houses
+  with dressed surroundings (eaves, shutters, window boxes, chimneys), trees, markets, a sheep
+  pasture in Resembool, guards at Central's gates; cartographers sell maps to the mod's places.
 - **Polish**: cinematics (the Gate, the Promised Day, Father's fall), an eclipse in the sky, the mod's
   own sounds (CC0), boss models, texts in French and English.
 
@@ -248,7 +276,10 @@ Use `/locate structure fmab:<id>`: `central`, `resembool`, `dublith`, `rush_vall
 
 ### Development and releases
 
-Build with JDK 25+ (`./gradlew build`, jar in `build/libs/`; `./gradlew runClient` to play). The web
+Build with JDK 25+ (`./gradlew build`, jar in `build/libs/`; `./gradlew runClient` to play;
+`./gradlew runClientGameTest` for the in-game scenes and their screenshots). Textures are drawn in
+code by `tools/skins` (`pip install -r tools/skins/requirements.txt && python tools/skins/all.py`);
+see [CONTRIBUTING.md](CONTRIBUTING.md), in French. The web
 circle editor (`web/`) ports the parser to TypeScript and is checked against the Java one on shared
 test circles. Every pull request and push on `master` builds the mod and the editor; the jar is in
 the build artifacts. Pushing a `vX.Y.Z` tag (`vX.Y.Z-beta` for a pre-release) publishes a GitHub

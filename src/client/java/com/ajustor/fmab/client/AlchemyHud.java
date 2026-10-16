@@ -1,5 +1,6 @@
 package com.ajustor.fmab.client;
 
+import com.ajustor.fmab.FmabClientConfig;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.data.AlchemistData;
@@ -35,7 +36,7 @@ final class AlchemyHud {
 	static void draw(GuiGraphicsExtractor graphics) {
 		Minecraft mc = Minecraft.getInstance();
 		LocalPlayer player = mc.player;
-		if (player == null || !usable(player)) {
+		if (player == null || !FmabClientConfig.get().circleHud() || !usable(player)) {
 			return;
 		}
 		NotebookContents notebook = Notebooks.of(player);

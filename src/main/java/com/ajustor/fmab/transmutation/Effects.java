@@ -1,6 +1,7 @@
 package com.ajustor.fmab.transmutation;
 
 import com.ajustor.fmab.alchemy.exchange.Family;
+import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
@@ -427,6 +428,20 @@ public final class Effects {
 	}
 
 	/**
+	 * L'arme n'est pas encore dans le savoir du joueur : on nomme ce qui lui manque et comment l'avoir
+	 * (la maîtrise de l'école, ou le combat d'entraînement contre Izumi), plutôt que de le laisser
+	 * chercher un modèle à copier.
+	 */
+	private static void lacking(EffectContext ctx, String school, String node) {
+		ctx.caster().sendSystemMessage(Component.translatable("transmutation.fmab.weapon.locked",
+				Component.translatable("knowledge.fmab." + school + "." + node),
+				Component.translatable("knowledge.fmab.school." + school), WEAPON_MASTERY));
+	}
+
+	/** La maîtrise de l'école qui ouvre la lance de pierre et la lame-bras (voir leurs nœuds de savoir). */
+	private static final int WEAPON_MASTERY = 45;
+
+	/**
 	 * Terre + Recomposer : une lance tirée du sol, faite de deux blocs de terre ou de pierre. Elle se
 	 * défait au bout d'une minute et rend ces deux blocs.
 	 */
@@ -436,7 +451,7 @@ public final class Effects {
 			return copied.get();
 		}
 		if (!ctx.knowledge().has(STONE_LANCE_KNOWLEDGE)) {
-			ctx.caster().sendSystemMessage(Component.translatable("transmutation.fmab.copy.no_model"));
+			lacking(ctx, "earth", "stone_lance");
 			return Result.NO_TARGET;
 		}
 		ServerLevel level = ctx.level();
@@ -475,7 +490,11 @@ public final class Effects {
 		return Result.DONE;
 	}
 
-	/** Fer + Recomposer : une lame-bras, d'un lingot de fer, qu'elle rend en se défaisant. */
+	/**
+	 * Fer + Recomposer : une lame-bras, d'un lingot de fer, qu'elle rend en se défaisant. Qui porte un
+	 * bras d'automail le transmute lui-même : une lame sort de l'avant-bras, ou y rentre si elle y est
+	 * déjà.
+	 */
 	private static Result armBlade(EffectContext ctx) {
 		// Un modèle posé sur le cercle : on le copie au lieu de forger la lame.
 		Optional<Result> copied = Recomposition.copy(ctx);
@@ -483,8 +502,11 @@ public final class Effects {
 			return copied.get();
 		}
 		if (!ctx.knowledge().has(ARM_BLADE_KNOWLEDGE)) {
-			ctx.caster().sendSystemMessage(Component.translatable("transmutation.fmab.copy.no_model"));
+			lacking(ctx, "metal", "arm_blade");
 			return Result.NO_TARGET;
+		}
+		if (Automails.transmuteArm(ctx.caster())) {
+			return Result.DONE;
 		}
 		MaterialPool pool = MaterialPool.collect(ctx, "iron", Family.METAL);
 		if (!pool.consume(INGOT_MASS)) {

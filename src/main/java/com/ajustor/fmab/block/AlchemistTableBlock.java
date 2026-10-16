@@ -25,7 +25,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -37,7 +36,7 @@ import java.util.UUID;
  * sélectionné dans le carnet. Clic droit sur la table avec le gant en main, le carnet dans l'autre
  * main ou dans l'inventaire.
  */
-public class AlchemistTableBlock extends Block {
+public class AlchemistTableBlock extends FurnitureBlock {
 	/** Graver un gantelet use le burin plus qu'une inscription au sol. */
 	private static final int CHISEL_WEAR = 4;
 	/** Un vêtement ne porte qu'un cercle à un étage. */

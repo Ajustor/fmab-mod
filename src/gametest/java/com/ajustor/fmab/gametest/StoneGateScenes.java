@@ -42,6 +42,8 @@ import net.minecraft.world.phys.AABB;
 
 import java.util.Map;
 
+import static com.ajustor.fmab.gametest.GametestAsserts.check;
+
 /**
  * La transmutation humaine, Pierre philosophale en main : l'alchimiste choisit. D'abord créer un
  * être (un chien : une âme de la Pierre, et le corps vit), puis ouvrir la Porte et racheter à la Vérité ce
@@ -148,12 +150,6 @@ public class StoneGateScenes implements FabricClientGameTest {
 			ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
 			return action.run(player.level(), player);
 		});
-	}
-
-	private static void check(boolean condition, String message) {
-		if (!condition) {
-			throw new AssertionError(message);
-		}
 	}
 
 	private static int souls(ClientGameTestContext context, TestSingleplayerContext sp) {

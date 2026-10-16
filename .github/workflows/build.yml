@@ -1,7 +1,7 @@
 # Build du mod à chaque pull request et à chaque push sur master (ou à la demande) : compilation,
 # tests (parseur de cercles, règles, clés fr_fr/en_us, exemples du Traité), puis le jar du mod en
-# artefact téléchargeable, nommé d'après sa version et son commit. La release au tag est dans
-# release.yml.
+# artefact téléchargeable, nommé d'après sa version et son commit. Les textures sont vérifiées :
+# les régénérer ne doit rien changer. La release au tag est dans release.yml.
 name: build
 on:
   pull_request:
@@ -55,6 +55,26 @@ jobs:
           name: ${{ steps.jar.outputs.name }}
           path: ${{ steps.jar.outputs.path }}
           if-no-files-found: error
+
+  # Les textures sont dessinées en code (tools/skins) : les PNG commités doivent être ceux que donnent
+  # les générateurs, sinon quelqu'un a retouché une image à la main ou oublié de régénérer.
+  textures:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: tools/skins/requirements.txt
+      - name: install
+        run: pip install -r tools/skins/requirements.txt
+      # Régénère tout, puis compare les images pixel à pixel : la compression des PNG varie d'une
+      # machine à l'autre sans rien changer aux textures.
+      - name: regenerate and compare
+        run: python tools/skins/check.py
 
   # L'éditeur web rejoue les mêmes cercles de test (testdata/circles) avec son portage TypeScript.
   editor:

@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "fmab:officer"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "fmab:officer"
+      }
+    ]
+  }
+}

@@ -13,6 +13,7 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
+import com.ajustor.fmab.util.PlayerMaps;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
@@ -61,7 +62,7 @@ public final class LivingStone {
 	private record Grip(UUID target, long last, int streak) {
 	}
 
-	private static final Map<UUID, Grip> GRIPS = new HashMap<>();
+	private static final Map<UUID, Grip> GRIPS = PlayerMaps.track(new HashMap<>());
 	/** Une mort coûte cher ; une grande transmutation (deux étages ou plus), une âme. */
 	private static final int DEATH = 20;
 	private static final DustParticleOptions RED = new DustParticleOptions(0xD01020, 1.2f);
@@ -171,9 +172,8 @@ public final class LivingStone {
 				return;
 			}
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				boolean wanted = souls(player) > 0 || Karma.of(player) <= Karma.RECRUITABLE;
-				if (wanted && player.level().getRandom().nextInt(3) == 0) {
-					hunt(player);
+				if (player.level().getRandom().nextInt(3) == 0) {
+					visit(player);
 				}
 			}
 		});
@@ -239,16 +239,25 @@ public final class LivingStone {
 	 * Les homonculus viennent chercher une Pierre vivante (et recruter les alchimistes sans
 	 * scrupules) : Lust, ou Envy démasqué, non loin du joueur.
 	 */
-	private static void hunt(ServerPlayer player) {
+	/**
+	 * La visite des homonculus ({@link Recruitment#visit}) : rien pour une recrue, l'offre de Père
+	 * portée par Lust pour une âme noire qui n'a pas répondu, sinon un traqueur hostile.
+	 */
+	public static void visit(ServerPlayer player) {
+		Recruitment.Visit visit = Recruitment.visit(Karma.of(player), souls(player),
+				player.getAttached(FmabAttachments.RECRUITMENT));
 		ServerLevel level = player.level();
-		if (!level.getEntitiesOfClass(HomunculusEntity.class, player.getBoundingBox().inflate(64)).isEmpty()) {
+		if (visit == Recruitment.Visit.NONE
+				|| !level.getEntitiesOfClass(HomunculusEntity.class, player.getBoundingBox().inflate(64)).isEmpty()) {
 			return;
 		}
+		boolean offer = visit == Recruitment.Visit.OFFER;
 		double angle = level.getRandom().nextDouble() * Math.PI * 2;
-		int x = player.getBlockX() + (int) (Math.cos(angle) * 28);
-		int z = player.getBlockZ() + (int) (Math.sin(angle) * 28);
+		int reach = offer ? 12 : 28;
+		int x = player.getBlockX() + (int) (Math.cos(angle) * reach);
+		int z = player.getBlockZ() + (int) (Math.sin(angle) * reach);
 		BlockPos at = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, new BlockPos(x, 0, z));
-		HomunculusEntity hunter = level.getRandom().nextBoolean()
+		HomunculusEntity hunter = offer || level.getRandom().nextBoolean()
 				? FmabEntities.LUST.create(level, EntitySpawnReason.EVENT)
 				: FmabEntities.ENVY.create(level, EntitySpawnReason.EVENT);
 		if (hunter == null) {
@@ -258,7 +267,12 @@ public final class LivingStone {
 		if (hunter instanceof EnvyEntity envy) {
 			envy.disguiseAs(player);
 		}
+		hunter.markWanderer();
 		level.addFreshEntity(hunter);
+		if (offer && hunter instanceof LustEntity lust) {
+			lust.bringOffer(player);
+			return;
+		}
 		hunter.setTarget(player);
 		player.sendSystemMessage(Component.translatable(hunter instanceof LustEntity
 				? "stone.fmab.hunted_lust" : "stone.fmab.hunted_envy"));

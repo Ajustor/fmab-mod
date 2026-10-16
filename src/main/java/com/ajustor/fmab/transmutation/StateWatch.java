@@ -14,7 +14,7 @@ public final class StateWatch {
 	/** Portée ajoutée à chaque effet. */
 	public static final int RANGE_BONUS = 1;
 	/** Part de la concentration épargnée. */
-	private static final double SAVING = 0.2;
+	public static final double SAVING = 0.2;
 
 	private StateWatch() {
 	}

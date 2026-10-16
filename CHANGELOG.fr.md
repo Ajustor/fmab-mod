@@ -1,5 +1,82 @@
 # Journal des modifications
 
+## 1.5.0 — 2026-10-13
+
+### Nouveautés
+
+- Le mod a une icône, des réglages dans Mod Menu, et sa langue peut différer de celle du jeu (par exemple le jeu en anglais et le mod en français).
+## 1.4.0 — 2026-10-12
+
+### Nouveautés
+
+- Une âme en armure peut se figer (touche V) : un autre joueur revêt alors l'armure et la fait marcher ; si l'âme se remet à bouger, il est enfermé dedans jusqu'à ce qu'elle le relâche, à l'abri des coups.
+## 1.3.0 — 2026-10-12
+
+### Nouveautés
+
+- Nouvelles tenues : le manteau rouge d'alchimiste d'Edward (avec pantalon et bottes), l'armure d'acier d'Alphonse, l'uniforme d'officier d'Amestris et le long manteau d'officier, avec capuche, pans, épaulières, plumet et visière.
+## 1.2.0 — 2026-10-11
+
+### Nouveautés
+
+- HUD redessiné : le compteur d'âmes a l'icône de la Pierre, la concentration une jauge encadrée, la vue perdue un voile doux
+- Les chimères de Tucker ont leurs propres corps : lion, loup et serpent pour la grande, six membres cousus pour la rampante.
+- Liore devient une vraie ville du désert : enceinte, allée du temple, place à fontaine, marché couvert et une vingtaine de maisons à terrasse.
+- Les gestes de transmutation se voient aussi à la première personne : les mains claquent devant soi, plongent sur le cercle ou se tendent vers une âme.
+- Des chemins relient les maisons de Resembool, Dublith et Rush Valley à leur place, bordés de réverbères.
+- Faire de Greed un allié suffit pour « Les sept péchés », et de nouveaux progrès récompensent le pacte avec Greed, le tatouage d'Ishval, Cornello démasqué, les notes de Marcoh, Hohenheim et le dispensaire de Marcoh.
+- La montre d'État, le noyau de Pierre, le sang cristallisé, le fil, l'encre et la cartouche ont une infobulle qui dit à quoi ils servent.
+- Avec un karma très bas, Lust vient d'abord vous faire l'offre de Père : l'accepter met fin aux traques, la refuser les déclenche.
+- Barry le Boucher a sa propre mécanique : coup de hachoir en arc annoncé, ruée une fois blessé, et un sceau qui tient au premier effondrement.
+- Commandes de test /fmab karma [valeur] et /fmab offer (opérateurs).
+
+### Corrections
+
+- Après un changement de monde en solo, le bras de Scar et le marché de la Pierre ne restent plus bloqués ; les états par joueur ne s'accumulent plus sur un serveur
+- Le sommaire du Traité ne coupe plus les titres des chapitres ; Winry montre l'usure de chaque automail en barre ; l'écran des gants est plus lisible
+- Les cercles portés (broderies, tatouages) ne cumulent plus un même effet au-delà de trois, et se taisent dans la zone de Père.
+- Envy ne revient plus hanter qui l'a vaincu, les homonculus errants repartent quand personne ne les approche, et seul le premier de chaque sorte laisse un noyau de Pierre.
+- La difficulté des boss suit l'ordre de progression : Gluttony et Sloth s'adoucissent, Pride, Wrath et surtout Père deviennent les plus coriaces.
+- Les cercles ne disparaissent plus pendant la cinématique de la Porte, et beaucoup de cercles à l'écran ne font plus saccader le jeu.
+- Le pistolet tire moins vite, ses balles faiblissent avec la distance et ne font guère que ralentir les homonculus.
+- Pride démasqué vous traque et fuit vers la pénombre quand ses ombres meurent ; ses ombres ne traversent plus les murs et épargnent vos chimères, vos bêtes et les villageois.
+- L'arme transmutée de l'examen d'État ne s'effrite plus près de l'examinateur, et lancer une arme sans le savoir requis dit lequel manque et comment l'obtenir.
+- Une âme qui rouvre la Porte revient dans sa propre armure, cabossée, au lieu de la perdre et d'avoir à laisser une armure sans défense en attente.
+
+### Performances
+
+- Moins de trafic réseau pour les joueurs amputés, appareillés ou portant des passifs : leurs attributs ne sont plus renvoyés à chaque tick
+- Le rendu des joueurs est plus léger : plus de recherche du fauteuil poussé ni de reconstruction du corps à chaque image.
+- La recharge de la concentration n'envoie plus toutes les données d'alchimiste au client chaque seconde.
+## 1.1.0 — 2026-10-11
+
+### Nouveautés
+
+- Fauteuil roulant : sans jambes on rampe ou l'on roule, deux bras pour avancer, des rampes pour monter, et l'on peut se faire pousser par un joueur ou un villageois
+- Fabriquer des objets par alchimie : décomposez un objet pour le comprendre, puis recomposez-le d'après modèle avec la matière qu'il contient
+- Page de conception (touche J) : pensez à l'objet à créer, sans modèle ; la Pierre philosophale crée sans matière ; un surplus de matière rend l'objet plus solide
+- Glyphes Bois et Fibre : recomposez coffres, bateaux, lits, arcs… (tome « Du bois et de la fibre » chez les bibliothécaires)
+- 14 nouveaux glyphes (Carbone, Cristal, Soufre, Mercure, Chaux, Plante, Chair, Argent, Étain, Plomb, Zinc, Nickel, Aluminium, Nethérite) : tout se transmute, y compris les matières des autres mods
+- Nouveau cercle de transmutation humaine, à six satellites (Alchimiste d'État) ; la chimère demande Humain + Chair, la détonation Feu + Soufre
+- Le rang ne bloque plus un cercle : au-delà, il perd en stabilité et risque de rebondir (une Pierre philosophale le tient)
+- Transmutation humaine avec une Pierre philosophale : ouvrir la Porte et racheter ses parties avec les âmes de la Pierre, ou créer un être en lui donnant une âme ; un Initié de la Porte peut joindre les mains une Pierre en main
+- La forme de l'être créé avec une Pierre se choisit (humain, chien, chat, cheval, perroquet) ; la Pierre ne rend plus les parties perdues que devant la Porte
+- Nouvelles textures pour toutes les créatures (personnages, homoncules, chimères, golem, automails), œufs d'apparition en portraits et armes redessinées
+- La Porte enseigne tous les glyphes ; elle s'ouvre et se referme en deux battants, ses bras ondulent et ont de vraies mains ; nouvelle cinématique (bras d'ombre, œil, tunnel de cercles et de glyphes) avec les répliques de la Vérité en sous-titres
+- Les blocs du mod sont redessinés (briques, chair de Gluttony, sang cristallisé, pierre rouge, antre de Père, sceaux, table d'alchimiste, établi d'automail, pierre de la Porte)
+- Les villes sont plus denses et vivantes : maisons avec avant-toits, volets, jardinières et cheminées, arbres, marchés, pré à moutons à Resembool, palmiers et auvents à Liore et Rush Valley
+- La montre d'Alchimiste d'État, les gants de cuir et l'éclat de pierre rouge sont redessinés
+- Table d'alchimiste, établi d'automail et tuyaux de Père modelés en 3D ; les sceaux et la pierre rouge luisent dans le noir, les yeux de la Porte clignent
+- Les personnages ont des silhouettes reconnaissables : poitrine et hanches de Lust, poitrine d'Izumi, de Winry et d'Olivier, queues de cheval, chignons et nattes de May Chang, visières des soldats
+- Cornello porte son médaillon et sa robe de prêtre, Marcoh sa sacoche, Olivier sa chevelure dans le dos ; les soldats de Briggs ont leur col de fourrure et leur sac, ceux de Drachma leur chapka et leur capote
+- Scar a des épaules de lutteur ; Pride a une tête d'enfant et, révélé, un masque d'ombre et plus de lames
+- Icônes redessinées (encres, livres, craie, gants, cercles écarlates, Pierre philosophale) ; le plastron d'âme ressemble à l'armure d'Alphonse, la lance de pierre a sa propre apparence ; œuf d'apparition du golem de pierre
+- Un bras d'automail peut être transmuté en lame (Lame-bras) comme celui d'Ed, puis retrouver sa forme ; une lame large sort d'un manchon riveté, se voit et tranche à mains nues
+- Les personnages respirent, marchent à leur manière et prennent des poses (bras croisés, mains dans le dos, poings sur les hanches) puis une garde au combat ; Lust tend la main et lance ses doigts-lames, le ventre de Gluttony ballotte
+- Les créatures du mod ont une voix (au repos, touchées, à la mort) et certaines un bruit de pas propre
+- Les soldats de Drachma, les immortels, les chimères, les armures vides, Barry et le golem de pierre laissent un butin
+- Fort Briggs (contreforts, meurtrières, bannière, porte à herse, caserne éclairée) et le Laboratoire 5 (complexe abandonné, enceinte à barbelés, bâtiment de briques) sont reconstruits
+- Les gestes de transmutation du joueur (mains jointes, paumes sur le cercle, âme arrachée) s'animent avec élan et retombée
 ## 1.0.1 — 2026-10-09
 
 ### Nouveautés

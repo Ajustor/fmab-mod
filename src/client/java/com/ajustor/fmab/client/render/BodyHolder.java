@@ -20,6 +20,11 @@ public interface BodyHolder {
 
 	void fmab$setBody(Set<BodyPart> lostLimbs, Map<BodyPart, AutomailItem.Model> automails);
 
+	/** Les bras d'automail transmutés en lame. */
+	Set<BodyPart> fmab$blades();
+
+	void fmab$setBlades(Set<BodyPart> blades);
+
 	/**
 	 * La pose des membres du vrai modèle du joueur, relevée au moment où ses calques sont soumis : les
 	 * automails la recopient os par os au lieu de rejouer l'animation.
