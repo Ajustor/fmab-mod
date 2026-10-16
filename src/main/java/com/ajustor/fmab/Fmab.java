@@ -35,6 +35,7 @@ import com.ajustor.fmab.transmutation.ChimeraTransmutation;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.GoldTransmutation;
+import com.ajustor.fmab.transmutation.ItemCompositions;
 import com.ajustor.fmab.transmutation.Passives;
 import com.ajustor.fmab.transmutation.Transmutation;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
@@ -79,6 +80,7 @@ public class Fmab implements ModInitializer {
 		HumanTransmutation.register();
 		GoldTransmutation.register();
 		Transmutation.register();
+		ItemCompositions.register();
 		ChimeraTransmutation.register();
 		GateOfTruth.register();
 		Tolls.register();

@@ -6,6 +6,7 @@ import com.ajustor.fmab.alchemy.exchange.ExchangeValue;
 import com.ajustor.fmab.data.AlloyGroup;
 import com.ajustor.fmab.registry.FmabRegistries;
 import com.ajustor.fmab.registry.FmabTags;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -74,6 +75,38 @@ public final class ItemCompositions {
 	private static Map<String, List<Item>> units = Map.of();
 
 	private ItemCompositions() {
+	}
+
+	/**
+	 * Le calcul parcourt tous les objets et toutes les recettes : on le fait au démarrage du serveur et
+	 * après un /reload, plutôt qu'à la première transmutation d'un joueur.
+	 */
+	public static void register() {
+		ServerLifecycleEvents.SERVER_STARTED.register(ItemCompositions::precompute);
+		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> {
+			if (success) {
+				precompute(server);
+			}
+		});
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> forget());
+	}
+
+	/** Une recette qui fait échouer le calcul n'empêche pas le serveur de démarrer : la transmutation la retrouvera. */
+	private static void precompute(MinecraftServer server) {
+		try {
+			all(server.overworld());
+		} catch (RuntimeException e) {
+			Fmab.LOGGER.error("Compositions des objets non calculées d'avance", e);
+		}
+	}
+
+	/** Le monde fermé, on ne garde rien de ses recettes ni de ses tags. */
+	private static synchronized void forget() {
+		cachedFor = null;
+		cache = Map.of();
+		base = Map.of();
+		units = Map.of();
+		MaterialPool.forget();
 	}
 
 	/** La composition d'un objet, s'il en a une. */
