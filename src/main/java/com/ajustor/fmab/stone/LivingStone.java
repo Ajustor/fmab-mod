@@ -77,6 +77,11 @@ public final class LivingStone {
 		return souls == null ? 0 : souls;
 	}
 
+	/** Le joueur est-il lui-même une Pierre philosophale, comme Hohenheim ? */
+	public static boolean is(ServerPlayer player) {
+		return souls(player) > 0;
+	}
+
 	/**
 	 * Le rituel : sur un cercle de transmutation humaine, pendant l'éclipse, un Initié de la Porte qui
 	 * tient une Pierre pleine dans chaque main devient une Pierre vivante.
