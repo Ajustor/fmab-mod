@@ -290,7 +290,15 @@ public final class Transmutation {
 	/** Le jeu répète le geste toutes les quatre ticks tant qu'on maintient le clic. */
 	private static final int CHANNEL_GAP = 8;
 	/** Au-delà, l'ouvrage ne grandit plus. */
-	private static final int MAX_GROWTH = 12;
+	static final int MAX_GROWTH = 12;
+
+	/**
+	 * Ce qu'a grandi l'ouvrage à cette prolongation : un cran par geste. Une Pierre vivante n'attend
+	 * pas : dès le premier, il a toute sa taille.
+	 */
+	static int growth(int prolonged, boolean living) {
+		return living ? MAX_GROWTH : prolonged;
+	}
 
 	/**
 	 * L'alchimiste garde la main sur le cercle qu'il vient d'activer : l'énergie continue de couler.
@@ -317,7 +325,8 @@ public final class Transmutation {
 		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Analysis analysis = rules.analyze(drawing, alchemist);
-		boolean amplified = PhilosopherStones.held(caster).isPresent() || LivingStone.souls(caster) > 0;
+		boolean living = LivingStone.is(caster);
+		boolean amplified = PhilosopherStones.held(caster).isPresent() || living;
 		if (!amplified) {
 			float concentration = Concentration.of(caster);
 			if (concentration < 1) {
@@ -327,7 +336,7 @@ public final class Transmutation {
 			}
 			Concentration.set(caster, concentration - 1);
 		}
-		int growth = channel.growth() + 1;
+		int prolonged = channel.growth() + 1;
 		CircleFrame frame = CircleFrame.of(state);
 		Knowledge knowledge = rules.knowledge(alchemist);
 		boolean watch = StateWatch.empowers(caster);
@@ -340,7 +349,7 @@ public final class Transmutation {
 			EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, new ArrayList<>(), knowledge,
 					watch ? StateWatch.RANGE_BONUS : 0,
 					size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1),
-					mode == Effects.Channel.GROW ? growth : 0);
+					mode == Effects.Channel.GROW ? growth(prolonged, living) : 0);
 			Effects.Result result = Effects.get(effect.combination().effect())
 					.map(e -> e.apply(ctx))
 					.orElse(Effects.Result.NO_TARGET);
@@ -353,7 +362,7 @@ public final class Transmutation {
 			CHANNELS.remove(caster.getUUID());
 			return true;
 		}
-		CHANNELS.put(caster.getUUID(), new Channel(circle, now, growth));
+		CHANNELS.put(caster.getUUID(), new Channel(circle, now, prolonged));
 		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.4);
 		return true;
 	}

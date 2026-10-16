@@ -30,6 +30,7 @@ import com.ajustor.fmab.stone.Eclipse;
 import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
+import com.ajustor.fmab.stone.ProjectileTransmutation;
 import com.ajustor.fmab.training.IslandTrial;
 import com.ajustor.fmab.transmutation.ChimeraTransmutation;
 import com.ajustor.fmab.transmutation.Concentration;
@@ -94,6 +95,7 @@ public class Fmab implements ModInitializer {
 		Eclipse.register();
 		PhilosopherStones.register();
 		LivingStone.register();
+		ProjectileTransmutation.register();
 		Alkahestry.register();
 		Milestones.register();
 		AlchemistTableBlock.registerSealing();
