@@ -4,6 +4,7 @@ import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
+import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
@@ -95,19 +96,20 @@ public final class ScarArm {
 		level.destroyBlock(pos, !player.isCreative(), player);
 	}
 
+	/** Une Pierre vivante n'attend pas. */
 	private static boolean ready(ServerPlayer player, ServerLevel level) {
-		return READY.pass(player.getUUID(), level.getGameTime());
+		return LivingStone.is(player) || READY.pass(player.getUUID(), level.getGameTime());
 	}
 
 	/**
-	 * Le bras puise dans la concentration, comme toute transmutation, et fait progresser l'école de la
-	 * Destruction, qui le rend moins coûteux.
+	 * Le bras puise dans la concentration, comme toute transmutation (une Pierre vivante n'en a plus
+	 * besoin), et fait progresser l'école de la Destruction, qui le rend moins coûteux.
 	 */
 	private static boolean pay(ServerPlayer player, float cost) {
 		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
 		Knowledge knowledge = AlchemyRules.of(player.level().registryAccess()).knowledge(data);
 		cost = (float) Math.max(0.5, cost - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
-		if (!player.isCreative()) {
+		if (!player.isCreative() && !LivingStone.is(player)) {
 			float concentration = Concentration.of(player);
 			if (concentration < cost) {
 				player.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) Math.ceil(cost),

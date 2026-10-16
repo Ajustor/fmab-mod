@@ -3,6 +3,7 @@ package com.ajustor.fmab.item;
 import com.ajustor.fmab.entity.AlchemicalMineEntity;
 import com.ajustor.fmab.homunculus.AntiAlchemy;
 import com.ajustor.fmab.registry.FmabSounds;
+import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.transmutation.Concentration;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -89,8 +90,9 @@ public class CrimsonSealsItem extends Item {
 				m -> m.owner().map(owner.getUUID()::equals).orElse(false));
 	}
 
+	/** Une mine coûte de la concentration, sauf à une Pierre vivante, qui n'en a plus besoin. */
 	private static boolean pay(ServerPlayer player) {
-		if (player.isCreative()) {
+		if (player.isCreative() || LivingStone.is(player)) {
 			return true;
 		}
 		float concentration = Concentration.of(player);

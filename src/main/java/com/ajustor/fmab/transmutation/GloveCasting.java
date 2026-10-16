@@ -13,6 +13,7 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabSounds;
+import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.util.Throttle;
 import net.minecraft.core.BlockPos;
@@ -39,7 +40,10 @@ public final class GloveCasting {
 	private static final int REBOUND_WEAR = 8;
 	/** Délai entre deux frappes de gantelet, en ticks. */
 	private static final int STRIKE_COOLDOWN = 20;
-	/** Un lancer de gants ou un claquement de mains par demi-seconde : le serveur ne suit pas un client plus pressé. */
+	/**
+	 * Un lancer de gants ou un claquement de mains par demi-seconde : le serveur ne suit pas un client
+	 * plus pressé. Une Pierre vivante, elle, n'attend pas.
+	 */
 	private static final Throttle CASTS = new Throttle(10);
 
 	private GloveCasting() {
@@ -50,7 +54,7 @@ public final class GloveCasting {
 	 */
 	public static void cast(ServerPlayer player, boolean combine) {
 		if (!player.isAlive() || player.isSpectator()
-				|| !CASTS.pass(player.getUUID(), player.level().getGameTime())) {
+				|| !LivingStone.is(player) && !CASTS.pass(player.getUUID(), player.level().getGameTime())) {
 			return;
 		}
 		if (Wheelchairs.handsBusy(player)) {
@@ -161,7 +165,10 @@ public final class GloveCasting {
 		return strikingHand(player) != null;
 	}
 
-	/** Un gantelet frappe un bloc : son cercle s'applique sur la face frappée. */
+	/**
+	 * Un gantelet frappe un bloc : son cercle s'applique sur la face frappée. Une Pierre vivante frappe
+	 * sans délai.
+	 */
 	public static void strike(ServerPlayer player, BlockPos pos, Direction face) {
 		Boolean left = strikingHand(player);
 		if (left == null) {
@@ -169,10 +176,12 @@ public final class GloveCasting {
 		}
 		Gloves gloves = player.getAttachedOrCreate(FmabAttachments.GLOVES);
 		ItemStack glove = gloves.get(left);
-		if (player.getCooldowns().isOnCooldown(glove)) {
-			return;
+		if (!LivingStone.is(player)) {
+			if (player.getCooldowns().isOnCooldown(glove)) {
+				return;
+			}
+			player.getCooldowns().addCooldown(glove, STRIKE_COOLDOWN);
 		}
-		player.getCooldowns().addCooldown(glove, STRIKE_COOLDOWN);
 		castWith(player, gloves, left, pos, face);
 	}
 

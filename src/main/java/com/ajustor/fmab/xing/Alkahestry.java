@@ -7,6 +7,7 @@ import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.KunaiEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabSounds;
+import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -49,15 +50,16 @@ public final class Alkahestry {
 	/** Rayon dans lequel on cherche les kunaï d'un même cercle autour du dernier planté. */
 	private static final double GATHER = 10;
 	private static final int DURATION = 200;
-	private static final int PULSE = 20;
+	static final int PULSE = 20;
 	private static final float COST = 3;
 	private static final float HEAL = 3;
 	private static final float HARM = 4;
 	private static final DustParticleOptions JADE = new DustParticleOptions(0x3CCB8C, 1.0f);
 	private static final DustParticleOptions VIOLET = new DustParticleOptions(0x8A3CCB, 1.0f);
 
-	/** Un cercle d'alkahestry en action. */
-	private record Circle(ServerLevel level, Vec3 center, double radius, boolean trap, UUID caster, long until) {
+	/** Un cercle d'alkahestry en action, tracé à {@code drawn}, par une Pierre vivante ou non. */
+	private record Circle(ServerLevel level, Vec3 center, double radius, boolean trap, UUID caster, long drawn,
+			boolean living, long until) {
 	}
 
 	private static final List<Circle> CIRCLES = new ArrayList<>();
@@ -96,7 +98,9 @@ public final class Alkahestry {
 		// L'école de la Médecine : moins cher, plus large, plus long à mesure qu'on la pratique.
 		Knowledge knowledge = AlchemyRules.of(level.registryAccess()).knowledge(alchemist);
 		float cost = (float) Math.max(1, COST - knowledge.perk(SCHOOL, "concentration_discount"));
-		if (!thrower.isCreative()) {
+		// Une Pierre vivante n'a plus de concentration à dépenser.
+		boolean living = LivingStone.is(thrower);
+		if (!thrower.isCreative() && !living) {
 			float concentration = Concentration.of(thrower);
 			if (concentration < cost) {
 				thrower.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) cost,
@@ -110,7 +114,8 @@ public final class Alkahestry {
 		boolean trap = kunai.trap();
 		double reach = radius + 0.5 + knowledge.perk(SCHOOL, "range_bonus");
 		long duration = DURATION + (long) (knowledge.perk(SCHOOL, "duration_bonus") * 100);
-		CIRCLES.add(new Circle(level, center, reach, trap, thrower.getUUID(), level.getGameTime() + duration));
+		long now = level.getGameTime();
+		CIRCLES.add(new Circle(level, center, reach, trap, thrower.getUUID(), now, living, now + duration));
 		level.playSound(null, kunai.blockPosition(), FmabSounds.ALKAHESTRY, SoundSource.PLAYERS, 1.5f,
 				trap ? 0.6f : 1.4f);
 		thrower.sendOverlayMessage(Component.translatable(trap ? "alkahestry.fmab.trap" : "alkahestry.fmab.heal"));
@@ -120,6 +125,14 @@ public final class Alkahestry {
 			line(level, ring.get(i).position(), ring.get((i + 1) % ring.size()).position(), trap);
 			line(level, ring.get(i).position(), center, trap);
 		}
+	}
+
+	/**
+	 * Le cercle bat-il à cet instant ? Toutes les secondes, sur l'horloge du monde ; celui d'une Pierre
+	 * vivante bat dès son tracé, puis à son propre rythme.
+	 */
+	static boolean pulseDue(long now, long drawn, boolean living) {
+		return (living ? now - drawn : now) % PULSE == 0;
 	}
 
 	private static Vec3 centerOf(List<KunaiEntity> points) {
@@ -162,7 +175,7 @@ public final class Alkahestry {
 					continue;
 				}
 				ring(c, now);
-				if (now % PULSE == 0) {
+				if (pulseDue(now, c.drawn(), c.living())) {
 					pulse(c);
 				}
 			}
