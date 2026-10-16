@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.6.0 — 2026-10-16
+
+### New features
+
+- A living Philosopher's Stone transmutes without waiting: gloves, gauntlets and Scar's arm have no delay, its alkahestry acts as soon as it is drawn, a channelled work reaches full size at once, and Scar's arm, alkahestry and Kimblee's seals no longer cost it concentration
+- A living Philosopher's Stone breaks down projectiles aimed at it before they hit (firearm bullets included) and receives their matter through equivalent exchange
+
+### Fixes
+
+- Treatise, web editor, README and site updated: tomes, detonation, suggested rank, detailed incomplete formula
+- The server rate-limits glove casts (two per second) and design page requests; dead players and spectators can no longer cast with their gloves
+- The Truth's bargain no longer floods the chat, can actually be left, closes after two minutes and resumes when reconnecting mid-visit
+- The Philosopher's Stone choice no longer goes through if the alchemist died or their circle was erased in the meantime
+- A drifting soul keeps its place in the queue across disconnects and server restarts
+- With the daylight cycle frozen, the eclipse and the Promised Day are no longer announced every tick
+- In single player, switching worlds no longer carries over transmutation lightning or passives computed for the previous world; simultaneous lightning is capped
+
+### Performance
+
+- Item compositions are computed at server start and after /reload instead of on the first transmutation; exchange values are cached
 ## 1.5.0 — 2026-10-13
 
 ### New features

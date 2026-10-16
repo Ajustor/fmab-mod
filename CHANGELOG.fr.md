@@ -1,5 +1,25 @@
 # Journal des modifications
 
+## 1.6.0 — 2026-10-16
+
+### Nouveautés
+
+- Une Pierre vivante transmute sans attendre : gants, gantelets et bras de Scar n'ont plus de délai, son alkahestry agit dès le tracé, un ouvrage prolongé atteint d'emblée sa pleine taille, et le bras de Scar, l'alkahestry et les sceaux de Kimblee ne lui coûtent plus de concentration
+- Une Pierre vivante défait les projectiles qui la visent avant qu'ils la touchent (balles de fusil comprises) et en reçoit la matière, à l'échange équivalent
+
+### Corrections
+
+- Traité, éditeur web, README et site à jour : tomes, détonation, rang conseillé, formule incomplète détaillée
+- Le serveur limite les lancers de gants (deux par seconde) et les demandes de la page de conception ; un mort ou un spectateur ne transmute plus avec ses gants
+- Le marché de la Vérité n'inonde plus le chat, se quitte vraiment, se referme au bout de deux minutes et reprend quand on se reconnecte en pleine visite
+- Le choix de la Pierre philosophale n'aboutit plus si l'alchimiste est mort ou si son cercle a été effacé entre-temps
+- Une âme errante garde sa place dans la file quand elle se déconnecte ou que le serveur redémarre
+- Avec le cycle jour/nuit figé, l'éclipse et le Jour promis ne sont plus annoncés à chaque tick
+- En solo, changer de monde n'emporte plus les éclairs de transmutation ni les passifs calculés pour l'ancien ; les éclairs simultanés sont plafonnés
+
+### Performances
+
+- Les compositions des objets sont calculées au démarrage du serveur et après /reload, plus à la première transmutation ; les valeurs d'échange sont gardées en cache
 ## 1.5.0 — 2026-10-13
 
 ### Nouveautés
