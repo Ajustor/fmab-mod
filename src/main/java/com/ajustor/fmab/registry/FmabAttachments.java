@@ -244,6 +244,16 @@ public final class FmabAttachments {
 			.syncWith(ByteBufCodecs.STRING_UTF8, DataSlot.Sync.OWNER)
 			.register(Fmab.id("design"));
 
+	/**
+	 * L'alchimiste a donné sa Porte pour rendre son corps à un autre (voir SoulGifts) : il ne
+	 * transmutera plus jamais. Gardé à la mort, visible de lui.
+	 */
+	public static final DataSlot<Boolean> GATELESS = DataSlot.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.BOOL, DataSlot.Sync.OWNER)
+			.register(Fmab.id("gateless"));
+
 	public static void register() {
 	}
 }

@@ -106,6 +106,11 @@ public final class Transmutation {
 		Milestones.reach(caster, "fused");
 	}
 
+	/** L'alchimiste a donné sa Porte (voir SoulGifts) : plus aucune transmutation ne lui répond. */
+	public static boolean gateless(ServerPlayer player) {
+		return Boolean.TRUE.equals(FmabAttachments.GATELESS.get(player));
+	}
+
 	/** Un cercle armé qui part tout seul, au compte de son auteur, sans que celui-ci bouge. */
 	public static Result activateRemotely(ServerLevel level, BlockPos circle, BlockState state, Drawing drawing,
 			ServerPlayer author, CircleSize size) {
@@ -149,6 +154,12 @@ public final class Transmutation {
 			ServerPlayer caster, boolean inscribed, int maxStages, CircleSize size) {
 		// Père capte l'énergie tectonique : autour de lui, rien ne s'allume.
 		if (AntiAlchemy.blocks(level, circle, caster)) {
+			return Result.INERT;
+		}
+		// Qui a donné sa Porte n'a plus d'alchimie : ni cercle, ni gantelet, ni mains jointes.
+		if (gateless(caster)) {
+			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.gateless"));
+			level.playSound(null, circle, SoundEvents.SAND_STEP, SoundSource.BLOCKS, 0.6f, 0.6f);
 			return Result.INERT;
 		}
 		AlchemistData alchemist = FmabAttachments.ALCHEMIST.getOrCreate(caster);

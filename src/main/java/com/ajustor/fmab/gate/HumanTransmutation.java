@@ -44,6 +44,10 @@ import java.util.function.Predicate;
  * sang de l'alchimiste. Elle échoue toujours. Ce qui naît du cercle n'est pas humain, et
  * l'alchimiste est happé vers sa Porte, où la Vérité prend son péage.
  *
+ * <p>Sous une armure, un alchimiste qui a déjà vu sa Porte peut y payer d'un membre pour lier l'âme
+ * d'un autre (voir {@link SoulOffering}) ; un allié debout dans le cercle, il peut payer d'une âme (la
+ * sienne, ou celles de sa Pierre) pour lui rendre ce que la Porte lui a pris (voir {@link SoulGifts}).
+ *
  * <p>Une Pierre philosophale en main change la donne : l'alchimiste choisit d'ouvrir sa Porte (et
  * d'y racheter ce qu'il a perdu avec les âmes de la Pierre, voir {@link StoneBargain}), ou de donner
  * une âme de la Pierre à l'être qui naît du cercle (voir {@link StoneChoice}).
@@ -92,6 +96,14 @@ public final class HumanTransmutation {
 			return Effects.Result.NO_TARGET;
 		}
 		if (LivingStone.tryRitual(caster, circle)) {
+			return Effects.Result.DONE;
+		}
+		// Une armure sur le cercle, et la Porte déjà vue : on offre un morceau de soi pour y fixer une âme.
+		if (SoulOffering.tryRitual(caster, circle)) {
+			return Effects.Result.DONE;
+		}
+		// Un allié dans le cercle, et la Porte déjà vue : on offre une âme pour lui rendre ce qu'il a perdu.
+		if (SoulGifts.tryRitual(caster, circle)) {
 			return Effects.Result.DONE;
 		}
 		AABB area = new AABB(circle).inflate(REACH, 1, REACH);

@@ -1,6 +1,7 @@
 package com.ajustor.fmab.gate;
 
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Ce que la Vérité peut prendre. Le poids de base rend les péages légers plus fréquents ; la gravité
@@ -38,6 +39,20 @@ public enum BodyPart {
 
 	public boolean leg() {
 		return this == LEFT_LEG || this == RIGHT_LEG;
+	}
+
+	/** Son nom dans les paquets et les clés de traduction : {@code right_arm}, {@code body}… */
+	public String id() {
+		return name().toLowerCase(Locale.ROOT);
+	}
+
+	public static Optional<BodyPart> byId(String id) {
+		for (BodyPart part : values()) {
+			if (part.id().equals(id)) {
+				return Optional.of(part);
+			}
+		}
+		return Optional.empty();
 	}
 
 	/** Un membre que l'automail peut remplacer. */

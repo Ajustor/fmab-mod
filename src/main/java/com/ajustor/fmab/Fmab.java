@@ -9,6 +9,8 @@ import com.ajustor.fmab.gate.GateOfTruth;
 import com.ajustor.fmab.gate.HumanTransmutation;
 import com.ajustor.fmab.gate.Shells;
 import com.ajustor.fmab.gate.SoulBinding;
+import com.ajustor.fmab.gate.SoulGifts;
+import com.ajustor.fmab.gate.SoulOffering;
 import com.ajustor.fmab.gate.Tolls;
 import com.ajustor.fmab.gate.Wheelchairs;
 import com.ajustor.fmab.homunculus.Belly;
@@ -91,6 +93,8 @@ public final class Fmab {
 		Automails.register();
 		Wheelchairs.register();
 		SoulBinding.register();
+		SoulOffering.register();
+		SoulGifts.register();
 		Shells.register();
 		Belly.register();
 		EnvySpawner.register();
