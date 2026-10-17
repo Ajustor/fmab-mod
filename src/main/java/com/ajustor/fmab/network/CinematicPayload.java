@@ -22,6 +22,12 @@ public record CinematicPayload(String kind, int ticks) implements CustomPacketPa
 	public static final String PROMISED_DAY = "promised_day";
 	/** Père tombe : les bras de la Vérité l'emportent, éclair blanc. */
 	public static final String FATHER_FALL = "father_fall";
+	/** L'épilogue : ce que deviennent les personnages, une fois Père tombé et Hohenheim parti. */
+	public static final String EPILOGUE = "epilogue";
+	/** Ses pages, de {@code cinematic.fmab.epilogue.1} à la dernière, puis « Fin ». */
+	public static final int EPILOGUE_PAGES = 6;
+	public static final int EPILOGUE_PAGE_TICKS = 100;
+	public static final int EPILOGUE_TICKS = (EPILOGUE_PAGES + 1) * EPILOGUE_PAGE_TICKS;
 
 	public static final Type<CinematicPayload> TYPE = new Type<>(Fmab.id("cinematic"));
 

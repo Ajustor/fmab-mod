@@ -1,5 +1,6 @@
 package com.ajustor.fmab;
 
+import com.ajustor.fmab.promised.PromisedDay;
 import com.ajustor.fmab.arts.ScarArm;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
@@ -87,6 +88,7 @@ public final class Fmab {
 		TransmutationLightning.register();
 		HumanTransmutation.register();
 		GoldTransmutation.register();
+		PromisedDay.register();
 		Transmutation.register();
 		ItemCompositions.register();
 		ChimeraTransmutation.register();

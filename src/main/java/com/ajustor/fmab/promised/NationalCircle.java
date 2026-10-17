@@ -63,6 +63,11 @@ public final class NationalCircle extends SavedData {
 		return server.overworld().getDataStorage().computeIfAbsent(TYPE);
 	}
 
+	/** Les points de sang scellés. */
+	public java.util.Set<BlockPos> sealed() {
+		return java.util.Set.copyOf(sealed);
+	}
+
 	public int sealedCount() {
 		return Math.min(POINTS, sealed.size());
 	}

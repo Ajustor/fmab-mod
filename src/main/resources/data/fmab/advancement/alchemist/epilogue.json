@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/slain_father",
+  "criteria": {
+    "epilogue": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "epilogue"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:engraved_watch"
+    },
+    "title": {
+      "translate": "advancements.fmab.epilogue.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.epilogue.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "epilogue"
+    ]
+  ]
+}

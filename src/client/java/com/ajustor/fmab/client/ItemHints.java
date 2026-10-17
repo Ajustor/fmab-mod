@@ -32,6 +32,10 @@ public final class ItemHints {
 				lines.add(Component.translatable("item.fmab.glove.unstable_above", stable).withStyle(ChatFormatting.RED));
 			}
 		}
+		if (stack.is(FmabItems.ENGRAVED_WATCH)) {
+			lines.add(Component.translatable("item.fmab.engraved_watch.engraving")
+					.withStyle(ChatFormatting.ITALIC, ChatFormatting.GOLD));
+		}
 		if (!FmabClientConfig.get().itemHints()) {
 			return;
 		}

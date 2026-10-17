@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.promised.PromisedDay;
 import com.ajustor.fmab.alchemy.circle.CircleIssue;
 import com.ajustor.fmab.alchemy.circle.LinkKind;
 import com.ajustor.fmab.alchemy.circle.Stage;
@@ -190,6 +191,12 @@ public final class Transmutation {
 		Optional<UUID> partner = inscribed && !remote ? fusionPartner(level, circle, caster) : Optional.empty();
 		boolean fused = partner.isPresent();
 		double fusion = fused ? FUSION_POWER : 1;
+		// Le Jour promis : loin des points de sang scellés, l'alchimie ne donne que la moitié de sa force.
+		double promised = PromisedDay.alchemy(level, circle);
+		if (promised < 1) {
+			caster.sendOverlayMessage(Component.translatable("promised.fmab.weakened"));
+			fusion *= promised;
+		}
 		int cost = amplified ? 0 : (int) Math.ceil(StateWatch.cost(analysis.concentration(), watch) * size.cost()
 				* (fused ? 0.5 : 1));
 		float concentration = Concentration.of(caster);

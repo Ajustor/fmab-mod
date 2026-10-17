@@ -173,6 +173,7 @@ public final class Cinematics {
 					title(graphics, w, h, t, Component.translatable("cinematic.fmab.promised_day"),
 							Component.translatable("cinematic.fmab.promised_day.sub"), 0xFFE02030);
 				}
+				case CinematicPayload.EPILOGUE -> epilogue(graphics, w, h, t);
 				case CinematicPayload.FATHER_FALL -> {
 					fade(graphics, w, h, 0xFFFFFFFF, Mth.clamp(1 - Math.abs(t - 20) / 20, 0, 1));
 					title(graphics, w, h, t, Component.translatable("cinematic.fmab.father_fall"),
@@ -456,6 +457,38 @@ public final class Cinematics {
 			graphics.pose().scale(scale, scale);
 			graphics.text(font, String.valueOf(c), -3, -4, alpha << 24 | color, false);
 			graphics.pose().popMatrix();
+		}
+	}
+
+	/**
+	 * L'épilogue : un fond qui fonce, puis une page de texte après l'autre (ce que deviennent les
+	 * personnages), et « Fin ».
+	 */
+	private static void epilogue(GuiGraphicsExtractor graphics, int w, int h, float t) {
+		fade(graphics, w, h, 0xF0100808, Mth.clamp(t / 30, 0, 1) * Mth.clamp((length - t) / 30, 0, 1));
+		int span = CinematicPayload.EPILOGUE_PAGE_TICKS;
+		int page = (int) (t / span);
+		float local = t - page * span;
+		float alpha = Mth.clamp(local / 15, 0, 1) * Mth.clamp((span - local) / 15, 0, 1);
+		if (alpha <= 0.02f || page > CinematicPayload.EPILOGUE_PAGES) {
+			return;
+		}
+		Font font = Minecraft.getInstance().font;
+		int a = (int) (alpha * 255) << 24;
+		if (page == CinematicPayload.EPILOGUE_PAGES) {
+			graphics.pose().pushMatrix();
+			graphics.pose().translate(w / 2f, h / 2f - 10);
+			graphics.pose().scale(3, 3);
+			graphics.centeredText(font, Component.translatable("cinematic.fmab.epilogue.end"), 0, -4, a | 0xF0E0B0);
+			graphics.pose().popMatrix();
+			return;
+		}
+		List<FormattedCharSequence> lines = font.split(
+				Component.translatable("cinematic.fmab.epilogue." + (page + 1)), (int) (w * 0.6f));
+		int y = h / 2 - lines.size() * (font.lineHeight + 2) / 2;
+		for (FormattedCharSequence line : lines) {
+			graphics.text(font, line, (w - font.width(line)) / 2, y, a | 0xECE8DE, false);
+			y += font.lineHeight + 2;
 		}
 	}
 

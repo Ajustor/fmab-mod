@@ -1,5 +1,8 @@
 package com.ajustor.fmab.entity;
 
+import net.minecraft.core.particles.ParticleTypes;
+import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.data.Gifts;
 import com.ajustor.fmab.item.Tomes;
@@ -70,6 +73,10 @@ public class HohenheimEntity extends PathfinderMob {
 			return InteractionResult.SUCCESS;
 		}
 		Milestones.reach(p, "hohenheim_met");
+		if (NationalCircle.get(level.getServer()).fatherFallen()) {
+			rest(level, p);
+			return InteractionResult.SUCCESS;
+		}
 		if (LivingStone.souls(p) > 0) {
 			p.sendSystemMessage(Component.translatable("npc.fmab.hohenheim.kin"));
 		} else {
@@ -93,6 +100,29 @@ public class HohenheimEntity extends PathfinderMob {
 		}
 		level.sendParticles(RED, getX(), getY(0.6), getZ(), 8, 0.3, 0.4, 0.3, 0);
 		return InteractionResult.SUCCESS;
+	}
+
+	/**
+	 * Père est tombé : Hohenheim a tenu sa promesse. Il dit adieu, s'assied et s'éteint, comme dans
+	 * l'anime ; les joueurs voient l'épilogue et reçoivent sa montre.
+	 */
+	private void rest(ServerLevel level, ServerPlayer by) {
+		for (ServerPlayer p : level.getServer().getPlayerList().getPlayers()) {
+			p.sendSystemMessage(Component.translatable("npc.fmab.hohenheim.farewell", by.getDisplayName()));
+			ending(p);
+		}
+		level.sendParticles(RED, getX(), getY(0.6), getZ(), 60, 0.4, 0.6, 0.4, 0);
+		level.sendParticles(ParticleTypes.SOUL, getX(), getY(0.8), getZ(), 30, 0.3, 0.6, 0.3, 0.02);
+		discard();
+	}
+
+	/** L'épilogue, le progrès « Fin » et la montre gravée : une fois par joueur. */
+	public static void ending(ServerPlayer p) {
+		CinematicPayload.play(p, CinematicPayload.EPILOGUE, CinematicPayload.EPILOGUE_TICKS);
+		Milestones.reach(p, "epilogue");
+		if (Gifts.give(p, "engraved_watch", new ItemStack(FmabItems.ENGRAVED_WATCH))) {
+			p.sendSystemMessage(Component.translatable("npc.fmab.hohenheim.watch"));
+		}
 	}
 
 	@Override
