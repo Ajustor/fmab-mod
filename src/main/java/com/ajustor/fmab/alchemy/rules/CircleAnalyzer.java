@@ -140,8 +140,14 @@ public final class CircleAnalyzer {
 		concentration *= Math.max(1, parsed.stages().size());
 		if (knowledge != null) {
 			double discount = 0;
+			double practice = 0;
 			for (Analysis.StageEffect e : effects) {
 				discount += knowledge.perk(e.combination().school(), "concentration_discount");
+				practice += knowledge.practice(e.combination().school());
+			}
+			// La pratique des écoles du cercle allège tout le cercle (en moyenne sur ses effets).
+			if (!effects.isEmpty()) {
+				concentration = (int) Math.round(concentration * practice / effects.size());
 			}
 			concentration = Math.max(1, concentration - (int) discount);
 		}

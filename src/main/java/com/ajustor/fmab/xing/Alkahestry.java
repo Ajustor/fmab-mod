@@ -97,7 +97,7 @@ public final class Alkahestry {
 		AlchemistData alchemist = FmabAttachments.ALCHEMIST.getOrCreate(thrower);
 		// L'école de la Médecine : moins cher, plus large, plus long à mesure qu'on la pratique.
 		Knowledge knowledge = AlchemyRules.of(level.registryAccess()).knowledge(alchemist);
-		float cost = (float) Math.max(1, COST - knowledge.perk(SCHOOL, "concentration_discount"));
+		float cost = (float) Math.max(1, COST * knowledge.practice(SCHOOL) - knowledge.perk(SCHOOL, "concentration_discount"));
 		// Une Pierre vivante n'a plus de concentration à dépenser.
 		boolean living = LivingStone.is(thrower);
 		if (!thrower.isCreative() && !living) {

@@ -107,7 +107,7 @@ public final class ScarArm {
 	private static boolean pay(ServerPlayer player, float cost) {
 		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		Knowledge knowledge = AlchemyRules.of(player.level().registryAccess()).knowledge(data);
-		cost = (float) Math.max(0.5, cost - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
+		cost = (float) Math.max(0.5, cost * knowledge.practice(SCHOOL) - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
 		if (!player.isCreative() && !LivingStone.is(player)) {
 			float concentration = Concentration.of(player);
 			if (concentration < cost) {

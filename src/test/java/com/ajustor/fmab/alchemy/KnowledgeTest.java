@@ -78,8 +78,39 @@ class KnowledgeTest {
 		Analysis novice = analyzer.analyze(parser.parse(wall), Rank.APPRENTICE, null, Knowledge.NONE);
 		Analysis master = analyzer.analyze(parser.parse(wall), Rank.APPRENTICE, null,
 				new Knowledge(nodes, Map.of("earth", 70), Set.of()));
-		assertEquals(novice.concentration() - 1, master.concentration());
+		// La main exercée (70 points de Terre), puis le nœud qui retire un point.
+		assertEquals(Math.round(novice.concentration() * (1 - 70 * Knowledge.SAVING_PER_MASTERY)) - 1,
+				master.concentration());
 		assertEquals(novice.effects().getFirst().range() + 1, master.effects().getFirst().range(), 1e-9);
+	}
+
+	@Test
+	void everyUseMakesTheNextOneLessTiring() {
+		Knowledge fresh = new Knowledge(List.of(), Map.of(), Set.of());
+		assertEquals(1, fresh.practice("earth"), 1e-9);
+		double previous = 1;
+		for (int uses = 1; uses <= 100; uses++) {
+			double now = new Knowledge(List.of(), Map.of("earth", uses * Knowledge.MASTERY_PER_EFFECT), Set.of())
+					.practice("earth");
+			assertTrue(now < previous, "le " + uses + "e usage devrait coûter moins que le précédent");
+			previous = now;
+		}
+		assertEquals(0.5, previous, 1e-9, "cent transmutations : moitié prix");
+		assertEquals(0.5, new Knowledge(List.of(), Map.of("earth", 10_000), Set.of()).practice("earth"), 1e-9,
+				"jamais moins de la moitié");
+		assertEquals(1, new Knowledge(List.of(), Map.of("earth", 300), Set.of()).practice("fire"), 1e-9,
+				"chaque école s'apprend pour elle-même");
+	}
+
+	@Test
+	void aPractisedHandHalvesTheCostOfACircle() {
+		Drawing wall = square("terre", "fixer");
+		Analysis novice = analyzer.analyze(parser.parse(wall), Rank.APPRENTICE, null,
+				new Knowledge(List.of(), Map.of(), Set.of()));
+		Analysis master = analyzer.analyze(parser.parse(wall), Rank.APPRENTICE, null,
+				new Knowledge(List.of(), Map.of("earth", 300), Set.of()));
+		assertEquals(Math.max(1, Math.round(novice.concentration() * 0.5)), master.concentration());
+		assertTrue(master.concentration() < novice.concentration());
 	}
 
 	@Test
