@@ -8,13 +8,19 @@ passent par les fichiers de langue (`fr_fr.json` et `en_us.json`), jamais en dur
 Il faut un **JDK 25** (ou plus récent).
 
 ```sh
-./gradlew build        # compile, lance les tests unitaires, produit le jar dans build/libs/
-./gradlew runClient    # lance le jeu de développement
+./gradlew build                     # toutes les versions : compile, tests unitaires, jars dans build/libs/
+./gradlew :fabric:26.2:runClient    # le jeu de développement, Fabric, Minecraft 26.2
+./gradlew :26.2:test                # les tests unitaires du cœur, pour une version
 ```
+
+Le mod est découpé en un cœur sans loader (`src/`) et un adaptateur par loader (`fabric/`), construits
+pour chaque version de Minecraft prise en charge : voir [ARCHITECTURE.md](ARCHITECTURE.md). Le code du
+jeu va dans le cœur ; il ne parle au loader que par ses ports (`com.ajustor.fmab.platform`).
 
 ## Les tests
 
-- **Tests unitaires** (`src/test`, JUnit 5), lancés par `./gradlew build` ou `./gradlew test` :
+- **Tests unitaires** (`src/test`, JUnit 5), lancés par `./gradlew build` ou `./gradlew :26.2:test`, sur
+  une plateforme de test sans loader (`TestPlatform`) :
   parseur et reconnaissance des cercles, savoir et apprentissage, règles du jeu (fauteuil roulant,
   karma, usure des automails), rotations des structures, balayage de tous les plans de bâtiments,
   disposition des données, clés de langue fr/en, exemples du Traité. Une règle de jeu testable
@@ -23,13 +29,13 @@ Il faut un **JDK 25** (ou plus récent).
   piles d'objets restent hors de portée (leurs composants ne sont liés qu'au chargement des données).
 - **Cercles de test** (`testdata/circles`) : partagés avec l'éditeur web ; le Java fait référence,
   `./gradlew test -PwriteFixtures=true` les régénère.
-- **Gametests client** (`src/gametest`) : le vrai jeu tourne, chaque scène vérifie un état et prend
-  des captures dans `build/run/clientGameTest/screenshots`.
+- **Gametests client** (`fabric/src/gametest`) : le vrai jeu tourne, chaque scène vérifie un état et
+  prend des captures dans `fabric/versions/<minecraft>/build/run/clientGameTest/screenshots`.
 
   ```sh
-  ./gradlew runClientGameTest                                   # toutes les scènes
-  ./gradlew runClientGameTest -PfmabGametest=gestures,figures   # quelques-unes
-  ./gradlew runClientGameTest -PfmabGametest=towns -PfmabTowns=liore,dublith
+  ./gradlew runClientGameTest                                               # toutes les scènes, toutes les versions
+  ./gradlew :fabric:26.2:runClientGameTest -PfmabGametest=gestures,figures  # quelques-unes, une version
+  ./gradlew :fabric:26.2:runClientGameTest -PfmabGametest=towns -PfmabTowns=liore,dublith
   ```
 
   Scènes : `showcase`, `blocks`, `towns`, `figures`, `items`, `automail_blade`, `animations`,

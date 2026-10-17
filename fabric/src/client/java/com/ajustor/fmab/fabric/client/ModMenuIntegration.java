@@ -1,4 +1,6 @@
-package com.ajustor.fmab.client.config;
+package com.ajustor.fmab.fabric.client;
+
+import com.ajustor.fmab.client.config.ConfigScreen;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;

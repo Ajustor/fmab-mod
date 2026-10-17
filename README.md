@@ -144,11 +144,14 @@ homonculus tout de suite).
 JDK 25 ou plus récent :
 
 ```sh
-./gradlew build                # jar dans build/libs/, tests compris
-./gradlew runClient            # lancer le jeu de développement
-./gradlew runClientGameTest    # scènes en jeu : vérifications et captures
-python tools/skins/all.py      # régénérer les textures, dessinées en code
+./gradlew build                            # un jar par version de Minecraft dans build/libs/, tests compris
+./gradlew :fabric:26.2:runClient           # lancer le jeu de développement
+./gradlew :fabric:26.2:runClientGameTest   # scènes en jeu : vérifications et captures
+python tools/skins/all.py                  # régénérer les textures, dessinées en code
 ```
+
+Un cœur sans loader et un adaptateur par loader, pour chaque version de Minecraft :
+voir [ARCHITECTURE.md](ARCHITECTURE.md).
 
 Le détail (tests, gametests, générateurs de textures, conventions de commit) est dans
 [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -280,8 +283,10 @@ Use `/locate structure fmab:<id>`: `central`, `resembool`, `dublith`, `rush_vall
 
 ### Development and releases
 
-Build with JDK 25+ (`./gradlew build`, jar in `build/libs/`; `./gradlew runClient` to play;
-`./gradlew runClientGameTest` for the in-game scenes and their screenshots). Textures are drawn in
+Build with JDK 25+ (`./gradlew build`, one jar per Minecraft version in `build/libs/`;
+`./gradlew :fabric:26.2:runClient` to play; `./gradlew :fabric:26.2:runClientGameTest` for the in-game
+scenes and their screenshots). The mod is a loader-free core plus one adapter per loader, built for
+each Minecraft version: see [ARCHITECTURE.md](ARCHITECTURE.md), in French. Textures are drawn in
 code by `tools/skins` (`pip install -r tools/skins/requirements.txt && python tools/skins/all.py`);
 see [CONTRIBUTING.md](CONTRIBUTING.md), in French. The web
 circle editor (`web/`) ports the parser to TypeScript and is checked against the Java one on shared
