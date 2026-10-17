@@ -1,5 +1,7 @@
 package com.ajustor.fmab.entity.character;
 
+import org.jspecify.annotations.Nullable;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -18,8 +20,19 @@ import java.util.function.Supplier;
  * @param id     l'identifiant de l'entité ({@code fmab:<id>}), de sa peau et de ses textes
  * @param lines  le nombre de répliques
  * @param trades ce qu'il vend ; vide s'il ne fait que parler
+ * @param ending ce qui arrive après sa dernière réplique, s'il y a lieu
  */
-public record StoryCharacter(String id, int lines, List<Trade> trades) {
+public record StoryCharacter(String id, int lines, List<Trade> trades, @Nullable Ending ending) {
+	/** Ce qui arrive après sa dernière réplique (Tucker, démasqué). */
+	@FunctionalInterface
+	public interface Ending {
+		void play(StoryCharacterEntity character, ServerPlayer player);
+	}
+
+	public StoryCharacter(String id, int lines, List<Trade> trades) {
+		this(id, lines, trades, null);
+	}
+
 	/** Combien de fois chaque article se vend avant de manquer (il revient chaque jour). */
 	static final int STOCK = 12;
 

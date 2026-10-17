@@ -1,5 +1,8 @@
 package com.ajustor.fmab.client;
 
+import com.ajustor.fmab.client.render.Temper;
+import com.ajustor.fmab.client.render.FigureModels;
+import com.ajustor.fmab.client.render.FigureRenderer;
 import com.ajustor.fmab.client.render.StoryCharacterRenderer;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.FmabClientConfig;
@@ -183,6 +186,9 @@ public final class FmabClient {
 		ClientPlatform.get().entityRenderer(FmabEntities.IMMORTAL_SOLDIER, ImmortalSoldierRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.HAUNTED_ARMOR, c -> new HauntedArmorRenderer<>(c, "haunted_armor"));
 		ClientPlatform.get().entityRenderer(FmabEntities.BARRY, c -> new HauntedArmorRenderer<>(c, "barry", BossModels.barry()));
+		ClientPlatform.get().entityRenderer(FmabEntities.SLICER, c -> new HauntedArmorRenderer<>(c, "slicer"));
+		ClientPlatform.get().entityRenderer(FmabEntities.KIMBLEE, c -> new FigureRenderer.Simple<>(c, FigureModels.plain(false),
+				Fmab.id("textures/entity/kimblee.png"), Temper.SCAR));
 		ClientPlatform.get().entityRenderer(FmabEntities.CHIMERA_BEAST, ChimeraBeastRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.CHIMERA_CRAWLER, ChimeraCrawlerRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.ALCHEMICAL_MINE, NoopRenderer::new);

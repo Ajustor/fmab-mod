@@ -56,7 +56,7 @@ public final class StoryCharacters {
 			sells(() -> new ItemStack(FmabItems.ALCHEMICAL_INK), () -> Items.EMERALD, 3),
 			sells(() -> new ItemStack(FmabItems.ALCHEMICAL_THREAD), () -> Items.EMERALD, 2),
 			sells(() -> new ItemStack(FmabItems.ALCHEMICAL_PAINT), () -> Items.EMERALD, 2)));
-	public static final StoryCharacter TUCKER = new StoryCharacter("tucker", 3, List.of());
+	public static final StoryCharacter TUCKER = new StoryCharacter("tucker", 3, List.of(), Tucker::unmasked);
 
 	public static final List<StoryCharacter> ALL = List.of(MUSTANG, HAWKEYE, ARMSTRONG, HUGHES, LING, LAN_FAN,
 			ALPHONSE, PINAKO, BASQUE_GRAND, MCDOUGAL, TATTOOIST, TUCKER);

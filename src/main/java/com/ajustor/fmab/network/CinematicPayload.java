@@ -28,6 +28,10 @@ public record CinematicPayload(String kind, int ticks) implements CustomPacketPa
 	public static final int EPILOGUE_PAGES = 6;
 	public static final int EPILOGUE_PAGE_TICKS = 100;
 	public static final int EPILOGUE_TICKS = (EPILOGUE_PAGES + 1) * EPILOGUE_PAGE_TICKS;
+	/** Nina : ce que Tucker a fait de sa fille, en quelques pages ({@code cinematic.fmab.nina.N}). */
+	public static final String NINA = "nina";
+	public static final int NINA_PAGES = 4;
+	public static final int NINA_TICKS = (NINA_PAGES + 1) * EPILOGUE_PAGE_TICKS;
 
 	public static final Type<CinematicPayload> TYPE = new Type<>(Fmab.id("cinematic"));
 

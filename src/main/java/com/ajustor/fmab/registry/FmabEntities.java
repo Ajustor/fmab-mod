@@ -1,5 +1,7 @@
 package com.ajustor.fmab.registry;
 
+import com.ajustor.fmab.entity.KimbleeEntity;
+import com.ajustor.fmab.entity.SlicerEntity;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import com.ajustor.fmab.entity.character.StoryCharacters;
@@ -267,6 +269,26 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(BARRY_KEY));
 
+	private static final ResourceKey<EntityType<?>> SLICER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("slicer"));
+
+	/** Les frères Slicer, deux âmes dans une armure, au Laboratoire 5. */
+	public static final EntityType<SlicerEntity> SLICER = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, SLICER_KEY,
+			EntityType.Builder.<SlicerEntity>of(SlicerEntity::new, MobCategory.MONSTER)
+					.sized(0.7F, 2.0F)
+					.eyeHeight(1.8F)
+					.clientTrackingRange(10)
+					.build(SLICER_KEY));
+
+	private static final ResourceKey<EntityType<?>> KIMBLEE_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("kimblee"));
+
+	/** Kimblee, l'Alchimiste Écarlate, dans les ruines d'Ishval. */
+	public static final EntityType<KimbleeEntity> KIMBLEE = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, KIMBLEE_KEY,
+			EntityType.Builder.<KimbleeEntity>of(KimbleeEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.8F)
+					.eyeHeight(1.62F)
+					.clientTrackingRange(10)
+					.build(KIMBLEE_KEY));
+
 	private static final ResourceKey<EntityType<?>> CHIMERA_BEAST_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("chimera_beast"));
 
 	/** Une chimère massive, lion, serpent et bouc. */
@@ -444,6 +466,8 @@ public final class FmabEntities {
 		content.attributes(IMMORTAL_SOLDIER, ImmortalSoldierEntity.createAttributes());
 		content.attributes(HAUNTED_ARMOR, HauntedArmorEntity.createAttributes());
 		content.attributes(BARRY, BarryEntity.createAttributes());
+		content.attributes(SLICER, SlicerEntity.createAttributes());
+		content.attributes(KIMBLEE, KimbleeEntity.createAttributes());
 		content.attributes(CHIMERA_BEAST, ChimeraBeastEntity.createAttributes());
 		content.attributes(CHIMERA_CRAWLER, ChimeraCrawlerEntity.createAttributes());
 		content.attributes(CORNELLO, CornelloEntity.createAttributes());

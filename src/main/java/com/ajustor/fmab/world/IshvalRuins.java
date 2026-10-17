@@ -61,6 +61,8 @@ final class IshvalRuins implements Blueprint {
 		// Les Alchimistes d'État de la guerre d'extermination y montent encore la garde.
 		return List.of(new Spawn(FmabEntities.SCAR, new BlockPos(c - 2, 1, c + 2)),
 				new Spawn(FmabEntities.character(StoryCharacters.BASQUE_GRAND), new BlockPos(c + 2, 1, c + 2)),
-				new Spawn(FmabEntities.character(StoryCharacters.MCDOUGAL), new BlockPos(c + 2, 1, c + 3)));
+				new Spawn(FmabEntities.character(StoryCharacters.MCDOUGAL), new BlockPos(c + 2, 1, c + 3)),
+				// Kimblee revient là où il a fait la guerre.
+				new Spawn(FmabEntities.KIMBLEE, new BlockPos(c, 1, c - 4)));
 	}
 }
