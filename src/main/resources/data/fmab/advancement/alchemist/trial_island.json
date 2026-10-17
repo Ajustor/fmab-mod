@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/izumi_met",
+  "criteria": {
+    "trial_island": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "trial_island"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:mutton"
+    },
+    "title": {
+      "translate": "trial.fmab.island"
+    },
+    "description": {
+      "translate": "advancements.fmab.trial.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "trial_island"
+    ]
+  ]
+}

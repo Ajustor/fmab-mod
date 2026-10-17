@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/root",
+  "criteria": {
+    "tome_read": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "tome_read"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:alchemy_tome"
+    },
+    "title": {
+      "translate": "advancements.fmab.tome_read.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.tome_read.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "tome_read"
+    ]
+  ]
+}

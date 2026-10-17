@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/transmuted",
+  "criteria": {
+    "gloves_worn": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "gloves_worn"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:cloth_gloves"
+    },
+    "title": {
+      "translate": "advancements.fmab.gloves_worn.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.gloves_worn.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "gloves_worn"
+    ]
+  ]
+}

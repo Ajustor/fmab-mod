@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/transmuted",
+  "criteria": {
+    "first_node": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "first_node"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:enchanted_book"
+    },
+    "title": {
+      "translate": "advancements.fmab.first_node.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.first_node.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "first_node"
+    ]
+  ]
+}

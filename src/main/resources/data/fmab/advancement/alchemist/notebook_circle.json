@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/root",
+  "criteria": {
+    "notebook_circle": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "notebook_circle"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:chalk"
+    },
+    "title": {
+      "translate": "advancements.fmab.notebook_circle.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.notebook_circle.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "notebook_circle"
+    ]
+  ]
+}

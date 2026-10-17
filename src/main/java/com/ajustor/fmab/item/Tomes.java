@@ -6,6 +6,7 @@ import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Les tomes d'alchimie du mod. Chacun enseigne un groupe de glyphes ; on les trouve dans le kit de
@@ -48,7 +49,15 @@ public final class Tomes {
 	public static final List<Tome> ALL = List.of(RUDIMENTS, STONE_AND_METAL, WOOD_AND_FIBER, LIVING_MATTER,
 			CARBON_AND_CRYSTAL, SULFUR_AND_LIME, PLANETARY_METALS, DEEP_METALS, FORMS, FLAME, HOHENHEIM, GOLD);
 
+	/** Les tomes qui ne se vendent pas : où les chercher. */
+	public static final List<Tome> HIDDEN = List.of(HOHENHEIM, GOLD);
+
 	private Tomes() {
+	}
+
+	/** Le tome qui enseigne ce glyphe, s'il y en a un. */
+	public static Optional<Tome> teaching(String glyph) {
+		return ALL.stream().filter(tome -> tome.glyphs().contains(glyph)).findFirst();
 	}
 
 	private static Tome tome(String name, String... glyphs) {

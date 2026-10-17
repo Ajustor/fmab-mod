@@ -9,6 +9,7 @@ import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.CircleFrame;
+import com.ajustor.fmab.transmutation.Transmutation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -79,7 +80,7 @@ public final class Trainings {
 					.ifPresent(key -> player.sendSystemMessage(Component.translatable("knowledge.fmab.unlocked",
 							Component.translatable(key))));
 		}
-		FmabAttachments.ALCHEMIST.set(player, data);
+		FmabAttachments.ALCHEMIST.set(player, Transmutation.promote(player, data));
 		trial.tome().ifPresent(t -> {
 			ItemStack tome = Tomes.stack(t);
 			if (!player.getInventory().add(tome)) {

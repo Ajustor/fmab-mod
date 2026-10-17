@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/rank_alchemist",
+  "criteria": {
+    "tattoo": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "tattoo"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:alchemical_ink"
+    },
+    "title": {
+      "translate": "advancements.fmab.tattoo.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.tattoo.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "tattoo"
+    ]
+  ]
+}

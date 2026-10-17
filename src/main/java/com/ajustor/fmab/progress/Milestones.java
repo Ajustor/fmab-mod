@@ -4,9 +4,12 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.promised.NationalCircle;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.xing.Alkahestry;
@@ -78,6 +81,19 @@ public final class Milestones {
 		Training training = FmabAttachments.TRAINING.getOrCreate(p);
 		if (training.met()) {
 			reach(p, "izumi_met");
+		}
+		for (String trial : training.rewarded()) {
+			reach(p, "trial_" + trial);
+		}
+		if (!AlchemyRules.of(p.level().registryAccess()).knowledge(alchemist).unlocked().isEmpty()) {
+			reach(p, "first_node");
+		}
+		Gloves gloves = FmabAttachments.GLOVES.getOrCreate(p);
+		if (gloves.left().has(FmabComponents.GLOVE_CIRCLE) || gloves.right().has(FmabComponents.GLOVE_CIRCLE)) {
+			reach(p, "gloves_worn");
+		}
+		if (!FmabAttachments.TATTOOS.getOrCreate(p).slots().isEmpty()) {
+			reach(p, "tattoo");
 		}
 		if (training.rewarded().size() >= Trial.values().length) {
 			reach(p, "izumi_done");

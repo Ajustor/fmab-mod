@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/first_node",
+  "criteria": {
+    "chimera": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "chimera"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:chimera_beast_spawn_egg"
+    },
+    "title": {
+      "translate": "advancements.fmab.chimera.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.chimera.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "chimera"
+    ]
+  ]
+}

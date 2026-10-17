@@ -24,7 +24,9 @@ class AdvancementTest {
 			"izumi_met", "izumi_done", "soul_armor", "automail", "living_stone", "alkahestry", "briggs_ally",
 			"seven_sins", "seal_opened", "crest_sealed", "circle_broken", "slain_lust", "slain_gluttony",
 			"slain_envy", "slain_greed", "slain_sloth", "slain_wrath", "slain_pride", "slain_father", "fused",
-			"greed_pact", "scar_tattoo", "cornello_exposed", "marcoh_notes", "hohenheim_met");
+			"greed_pact", "scar_tattoo", "cornello_exposed", "marcoh_notes", "hohenheim_met", "notebook_circle",
+			"tome_read", "first_node", "gloves_worn", "tattoo", "chimera", "gold", "trial_first_wall",
+			"trial_surface", "trial_two_stages", "trial_gloves", "trial_spar", "trial_island");
 
 	private static Map<String, JsonObject> load() throws IOException {
 		Path dir = TestGlyphs.resources().resolve("data/fmab/advancement/alchemist");

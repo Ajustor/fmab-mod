@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/visit_xerxes_ruins",
+  "criteria": {
+    "gold": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "gold"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:gold_ingot"
+    },
+    "title": {
+      "translate": "advancements.fmab.gold.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.gold.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "gold"
+    ]
+  ]
+}

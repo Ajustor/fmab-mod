@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/izumi_met",
+  "criteria": {
+    "trial_two_stages": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "trial_two_stages"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:mutton"
+    },
+    "title": {
+      "translate": "trial.fmab.two_stages"
+    },
+    "description": {
+      "translate": "advancements.fmab.trial.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "trial_two_stages"
+    ]
+  ]
+}

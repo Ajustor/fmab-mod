@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.entity.AmestrianSoldierEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.stone.Karma;
@@ -64,6 +65,9 @@ public final class GoldTransmutation {
 		BlockPos c = ctx.circle();
 		level.sendParticles(ParticleTypes.WAX_ON, c.getX() + 0.5, c.getY() + 0.3, c.getZ() + 0.5, 30, 0.6, 0.2, 0.6, 0.1);
 		ServerPlayer caster = ctx.caster();
+		if (caster != null) {
+			Milestones.reach(caster, "gold");
+		}
 		if (caster != null && !caster.isCreative()) {
 			punish(level, caster);
 		}
