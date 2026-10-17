@@ -51,7 +51,7 @@ public class BodyScreen extends AbstractContainerScreen<BodyMenu> {
 	}
 
 	private GateState gate() {
-		GateState gate = minecraft.player == null ? null : minecraft.player.getAttached(FmabAttachments.GATE);
+		GateState gate = minecraft.player == null ? null : FmabAttachments.GATE.get(minecraft.player);
 		return gate == null ? GateState.NONE : gate;
 	}
 

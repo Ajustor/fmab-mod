@@ -2,12 +2,6 @@ package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.entity.WheelchairEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -16,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jspecify.annotations.Nullable;
+import com.ajustor.fmab.platform.event.InteractionEvents;
 
 /**
  * Les règles du fauteuil roulant côté joueur : il faut ses deux bras pour faire tourner les roues (ou
@@ -30,14 +25,14 @@ public final class Wheelchairs {
 	}
 
 	public static void register() {
-		UseItemCallback.EVENT.register((player, level, hand) -> busy(player) ? InteractionResult.FAIL : InteractionResult.PASS);
-		UseBlockCallback.EVENT.register((player, level, hand, hit) -> busy(player) ? InteractionResult.FAIL : InteractionResult.PASS);
-		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) ->
+		InteractionEvents.USE_ITEM.register((player, level, hand) -> busy(player) ? InteractionResult.FAIL : InteractionResult.PASS);
+		InteractionEvents.USE_BLOCK.register((player, level, hand, hit) -> busy(player) ? InteractionResult.FAIL : InteractionResult.PASS);
+		InteractionEvents.ATTACK_BLOCK.register((player, level, hand, pos, direction) ->
 				busy(player) ? InteractionResult.FAIL : InteractionResult.PASS);
-		AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) ->
+		InteractionEvents.ATTACK_ENTITY.register((player, level, hand, entity, hit) ->
 				busy(player) ? InteractionResult.FAIL : InteractionResult.PASS);
-		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> !busy(player));
-		UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+		InteractionEvents.BEFORE_BREAK.register((level, player, pos, state, blockEntity) -> !busy(player));
+		InteractionEvents.USE_ENTITY.register((player, level, hand, entity, hit) -> {
 			if (entity instanceof WheelchairEntity) {
 				// Prendre ou lâcher les poignées, s'asseoir : le fauteuil s'en occupe.
 				return InteractionResult.PASS;
@@ -95,7 +90,7 @@ public final class Wheelchairs {
 	 * FmabAttachments#PUSHING}), s'il est toujours là et le reconnaît pour pousseur.
 	 */
 	public static @Nullable WheelchairEntity pushing(Player player) {
-		Integer id = player.getAttached(FmabAttachments.PUSHING);
+		Integer id = FmabAttachments.PUSHING.get(player);
 		if (id == null) {
 			return null;
 		}

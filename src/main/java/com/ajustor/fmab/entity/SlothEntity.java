@@ -31,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Sloth (Paresse) : le plus fort et le plus rapide des homonculus, et le plus paresseux. Il creuse
@@ -201,7 +202,7 @@ public class SlothEntity extends HomunculusEntity {
 				if (hit.add(e)) {
 					e.hurtServer(level, damageSources().mobAttack(SlothEntity.this), CHARGE_DAMAGE);
 					e.push(direction.x * 2.5, 0.8, direction.z * 2.5);
-					e.hurtMarked = true;
+					EntityCompat.syncVelocity(e);
 				}
 			}
 		}

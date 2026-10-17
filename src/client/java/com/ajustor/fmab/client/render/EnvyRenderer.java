@@ -21,6 +21,7 @@ import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.Identifier;
 
 import java.util.UUID;
+import com.ajustor.fmab.client.compat.RenderCompat;
 
 /**
  * Envy sous toutes ses formes : les traits d'un joueur ou d'un habitant, sa vraie apparence, le
@@ -129,8 +130,8 @@ public class EnvyRenderer extends HumanoidMobRenderer<EnvyEntity, EnvyRenderer.S
 			if (state.form != EnvyEntity.Form.LIZARD) {
 				return;
 			}
-			collector.order(1).submitModel(model, state, poseStack, RenderTypes.entityCutout(LIZARD), light,
-					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor, null);
+			RenderCompat.submitModel(collector.order(1), model, state, poseStack, RenderTypes.entityCutout(LIZARD), light,
+					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor);
 		}
 	}
 }

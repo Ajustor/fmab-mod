@@ -26,11 +26,13 @@ import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Recomposition;
 import com.ajustor.fmab.util.Throttle;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import com.ajustor.fmab.platform.Platform;
+import com.ajustor.fmab.platform.network.Network;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import com.ajustor.fmab.compat.EntityCompat;
 
 public final class FmabNetwork {
 	/** La page de conception parcourt tout ce que le joueur a compris : une par seconde suffit. */
@@ -39,71 +41,77 @@ public final class FmabNetwork {
 	private FmabNetwork() {
 	}
 
-	public static void register() {
-		// Le carnet entier (seize pages) dépasse vite la taille d'un paquet ordinaire.
-		PayloadTypeRegistry.serverboundPlay().registerLarge(SaveNotebookPayload.TYPE, SaveNotebookPayload.CODEC,
-				1 << 20);
-		PayloadTypeRegistry.serverboundPlay().register(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(ShellKeyPayload.TYPE, ShellKeyPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(WinryActionPayload.TYPE, WinryActionPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(TruthChoicePayload.TYPE, TruthChoicePayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(OpenTruthPayload.TYPE, OpenTruthPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(StoneChoicePayload.TYPE, StoneChoicePayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(StoneChosenPayload.TYPE, StoneChosenPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(BargainPayload.TYPE, BargainPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(BargainAnswerPayload.TYPE, BargainAnswerPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(CinematicPayload.TYPE, CinematicPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(OpenWinryPayload.TYPE, OpenWinryPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(OpenIzumiPayload.TYPE, OpenIzumiPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(ExamActionPayload.TYPE, ExamActionPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(OpenExamPayload.TYPE, OpenExamPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(TattooPayload.TYPE, TattooPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(AddToNotebookPayload.TYPE, AddToNotebookPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(SelectCirclePayload.TYPE, SelectCirclePayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(OpenBodyPayload.TYPE, OpenBodyPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(OpenTattooPayload.TYPE, OpenTattooPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(RequestDesignsPayload.TYPE, RequestDesignsPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(ChooseDesignPayload.TYPE, ChooseDesignPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().registerLarge(OpenDesignsPayload.TYPE, OpenDesignsPayload.CODEC, 1 << 20);
+	/** Envoie un paquet du mod à un joueur. */
+	public static void send(ServerPlayer player, CustomPacketPayload payload) {
+		Platform.get().network().send(player, payload);
+	}
 
-		ServerPlayNetworking.registerGlobalReceiver(RequestDesignsPayload.TYPE,
-				(payload, context) -> designs(context.player()));
-		ServerPlayNetworking.registerGlobalReceiver(ChooseDesignPayload.TYPE,
-				(payload, context) -> Recomposition.choose(context.player(), payload.item()));
-		ServerPlayNetworking.registerGlobalReceiver(SaveNotebookPayload.TYPE,
-				(payload, context) -> Notebooks.set(context.player(), payload.contents()));
-		ServerPlayNetworking.registerGlobalReceiver(SelectCirclePayload.TYPE,
-				(payload, context) -> selectCircle(context.player(), payload));
-		ServerPlayNetworking.registerGlobalReceiver(OpenBodyPayload.TYPE,
-				(payload, context) -> BodyMenu.open(context.player()));
-		ServerPlayNetworking.registerGlobalReceiver(CastGlovesPayload.TYPE,
-				(payload, context) -> GloveCasting.cast(context.player(), payload.combine()));
-		ServerPlayNetworking.registerGlobalReceiver(RemoveGlovePayload.TYPE,
-				(payload, context) -> removeGlove(context.player(), payload.left()));
-		ServerPlayNetworking.registerGlobalReceiver(ShellKeyPayload.TYPE,
-				(payload, context) -> Shells.press(context.player()));
-		ServerPlayNetworking.registerGlobalReceiver(StoneChosenPayload.TYPE,
-				(payload, context) -> StoneChoice.answer(context.player(), payload.choice()));
-		ServerPlayNetworking.registerGlobalReceiver(BargainAnswerPayload.TYPE,
-				(payload, context) -> StoneBargain.answer(context.player(), payload.part()));
-		ServerPlayNetworking.registerGlobalReceiver(TruthChoicePayload.TYPE,
-				(payload, context) -> truth(context.player(), payload));
-		ServerPlayNetworking.registerGlobalReceiver(WinryActionPayload.TYPE,
-				(payload, context) -> winry(context.player(), payload));
-		ServerPlayNetworking.registerGlobalReceiver(IzumiActionPayload.TYPE,
-				(payload, context) -> izumi(context.player(), payload.entityId(), payload.action()));
-		ServerPlayNetworking.registerGlobalReceiver(ExamActionPayload.TYPE,
-				(payload, context) -> exam(context.player(), payload.entityId(), payload.action()));
-		ServerPlayNetworking.registerGlobalReceiver(AddToNotebookPayload.TYPE,
-				(payload, context) -> addToNotebook(context.player(), payload.name(), payload.drawing()));
-		ServerPlayNetworking.registerGlobalReceiver(TattooPayload.TYPE, (payload, context) ->
+	public static void register() {
+		Network network = Platform.get().network();
+		// Le carnet entier (seize pages) dépasse vite la taille d'un paquet ordinaire.
+		network.serverbound(SaveNotebookPayload.TYPE, SaveNotebookPayload.CODEC,
+				1 << 20);
+		network.serverbound(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
+		network.serverbound(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
+		network.serverbound(ShellKeyPayload.TYPE, ShellKeyPayload.CODEC);
+		network.serverbound(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
+		network.serverbound(WinryActionPayload.TYPE, WinryActionPayload.CODEC);
+		network.serverbound(TruthChoicePayload.TYPE, TruthChoicePayload.CODEC);
+		network.clientbound(OpenTruthPayload.TYPE, OpenTruthPayload.CODEC);
+		network.clientbound(StoneChoicePayload.TYPE, StoneChoicePayload.CODEC);
+		network.serverbound(StoneChosenPayload.TYPE, StoneChosenPayload.CODEC);
+		network.clientbound(BargainPayload.TYPE, BargainPayload.CODEC);
+		network.serverbound(BargainAnswerPayload.TYPE, BargainAnswerPayload.CODEC);
+		network.clientbound(CinematicPayload.TYPE, CinematicPayload.CODEC);
+		network.clientbound(OpenWinryPayload.TYPE, OpenWinryPayload.CODEC);
+		network.clientbound(OpenIzumiPayload.TYPE, OpenIzumiPayload.CODEC);
+		network.serverbound(ExamActionPayload.TYPE, ExamActionPayload.CODEC);
+		network.clientbound(OpenExamPayload.TYPE, OpenExamPayload.CODEC);
+		network.serverbound(TattooPayload.TYPE, TattooPayload.CODEC);
+		network.serverbound(AddToNotebookPayload.TYPE, AddToNotebookPayload.CODEC);
+		network.serverbound(SelectCirclePayload.TYPE, SelectCirclePayload.CODEC);
+		network.serverbound(OpenBodyPayload.TYPE, OpenBodyPayload.CODEC);
+		network.clientbound(OpenTattooPayload.TYPE, OpenTattooPayload.CODEC);
+		network.serverbound(RequestDesignsPayload.TYPE, RequestDesignsPayload.CODEC);
+		network.serverbound(ChooseDesignPayload.TYPE, ChooseDesignPayload.CODEC);
+		network.clientbound(OpenDesignsPayload.TYPE, OpenDesignsPayload.CODEC, 1 << 20);
+
+		network.receive(RequestDesignsPayload.TYPE,
+				(payload, player) -> designs(player));
+		network.receive(ChooseDesignPayload.TYPE,
+				(payload, player) -> Recomposition.choose(player, payload.item()));
+		network.receive(SaveNotebookPayload.TYPE,
+				(payload, player) -> Notebooks.set(player, payload.contents()));
+		network.receive(SelectCirclePayload.TYPE,
+				(payload, player) -> selectCircle(player, payload));
+		network.receive(OpenBodyPayload.TYPE,
+				(payload, player) -> BodyMenu.open(player));
+		network.receive(CastGlovesPayload.TYPE,
+				(payload, player) -> GloveCasting.cast(player, payload.combine()));
+		network.receive(RemoveGlovePayload.TYPE,
+				(payload, player) -> removeGlove(player, payload.left()));
+		network.receive(ShellKeyPayload.TYPE,
+				(payload, player) -> Shells.press(player));
+		network.receive(StoneChosenPayload.TYPE,
+				(payload, player) -> StoneChoice.answer(player, payload.choice()));
+		network.receive(BargainAnswerPayload.TYPE,
+				(payload, player) -> StoneBargain.answer(player, payload.part()));
+		network.receive(TruthChoicePayload.TYPE,
+				(payload, player) -> truth(player, payload));
+		network.receive(WinryActionPayload.TYPE,
+				(payload, player) -> winry(player, payload));
+		network.receive(IzumiActionPayload.TYPE,
+				(payload, player) -> izumi(player, payload.entityId(), payload.action()));
+		network.receive(ExamActionPayload.TYPE,
+				(payload, player) -> exam(player, payload.entityId(), payload.action()));
+		network.receive(AddToNotebookPayload.TYPE,
+				(payload, player) -> addToNotebook(player, payload.name(), payload.drawing()));
+		network.receive(TattooPayload.TYPE, (payload, player) ->
 				TattooSlot.byId(payload.slot()).ifPresent(slot -> {
 					if (payload.erase()) {
-						TattooRitual.erase(context.player(), slot);
+						TattooRitual.erase(player, slot);
 					} else {
-						TattooRitual.tattoo(context.player(), payload.circle(), slot);
+						TattooRitual.tattoo(player, payload.circle(), slot);
 					}
 				}));
 	}
@@ -117,7 +125,7 @@ public final class FmabNetwork {
 		switch (action) {
 			case ExamActionPayload.GIVE -> {
 				if (StateExam.giveItems(player)) {
-					ServerPlayNetworking.send(player, OpenExamPayload.of(examiner, player));
+					FmabNetwork.send(player, OpenExamPayload.of(examiner, player));
 				}
 			}
 			case ExamActionPayload.FIGHT -> StateExam.startFight(examiner, player);
@@ -130,7 +138,7 @@ public final class FmabNetwork {
 	private static void truth(ServerPlayer player, TruthChoicePayload payload) {
 		if (!(player.level().getEntity(payload.entityId()) instanceof TruthEntity truth)
 				|| truth.owner().filter(player.getUUID()::equals).isEmpty() || player.distanceToSqr(truth) > 100
-				|| !player.getAttachedOrCreate(FmabAttachments.GATE).adrift()) {
+				|| !FmabAttachments.GATE.getOrCreate(player).adrift()) {
 			return;
 		}
 		if (payload.restart()) {
@@ -173,7 +181,7 @@ public final class FmabNetwork {
 		}
 		try {
 			if (Trainings.claim(player, Trial.byId(action))) {
-				ServerPlayNetworking.send(player, OpenIzumiPayload.of(izumi, player));
+				FmabNetwork.send(player, OpenIzumiPayload.of(izumi, player));
 			}
 		} catch (IllegalArgumentException unknownTrial) {
 			// Rien à rendre : action inconnue.
@@ -181,14 +189,14 @@ public final class FmabNetwork {
 	}
 
 	private static void removeGlove(ServerPlayer player, boolean left) {
-		Gloves gloves = player.getAttachedOrCreate(FmabAttachments.GLOVES);
+		Gloves gloves = FmabAttachments.GLOVES.getOrCreate(player);
 		ItemStack glove = gloves.get(left);
 		if (glove.isEmpty()) {
 			return;
 		}
-		player.setAttached(FmabAttachments.GLOVES, gloves.with(left, ItemStack.EMPTY));
+		FmabAttachments.GLOVES.set(player, gloves.with(left, ItemStack.EMPTY));
 		if (!player.getInventory().add(glove)) {
-			player.drop(glove, false);
+			EntityCompat.drop(player, glove);
 		}
 	}
 
@@ -203,7 +211,7 @@ public final class FmabNetwork {
 
 	private static void designs(ServerPlayer player) {
 		if (DESIGNS.pass(player.getUUID(), player.level().getGameTime())) {
-			ServerPlayNetworking.send(player, Recomposition.designs(player));
+			FmabNetwork.send(player, Recomposition.designs(player));
 		}
 	}
 
@@ -215,7 +223,7 @@ public final class FmabNetwork {
 		NotebookContents contents = Notebooks.of(player);
 		player.sendOverlayMessage(Component.translatable("circle.fmab.selected",
 				Notebooks.pageName(contents.pages().get(contents.selected()))));
-		if (payload.clap() && player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.GATE)) {
+		if (payload.clap() && FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.GATE)) {
 			GloveCasting.cast(player, true);
 		}
 	}

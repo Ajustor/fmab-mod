@@ -7,13 +7,13 @@ import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.network.TattooPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.tattoo.TattooSlot;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Le rituel du tatouage : choisir où le cercle du sol passera dans la peau, ou effacer un
@@ -48,7 +48,7 @@ public class TattooScreen extends Screen {
 			boolean taken = state.occupied().contains(slot.id());
 			Button b = addRenderableWidget(Button.builder(
 					Component.translatable(taken ? "tattoo.fmab.erase" : "tattoo.fmab.here"), btn -> {
-						ClientPlayNetworking.send(new TattooPayload(state.circle(), slot.id(), taken));
+						ClientPlatform.get().send(new TattooPayload(state.circle(), slot.id(), taken));
 						onClose();
 					}).bounds(left + WIDTH - 96, y + 4, 86, 18).build());
 			b.active = true;
@@ -67,7 +67,7 @@ public class TattooScreen extends Screen {
 			y += 10;
 		}
 		Tattoos tattoos = minecraft == null || minecraft.player == null ? null
-				: minecraft.player.getAttached(FmabAttachments.TATTOOS);
+				: FmabAttachments.TATTOOS.get(minecraft.player);
 		y = top + 44;
 		for (TattooSlot slot : TattooSlot.values()) {
 			Drawing drawing = tattoos == null ? null : tattoos.get(slot).orElse(null);

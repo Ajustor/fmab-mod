@@ -11,9 +11,6 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.util.Modifiers;
 import com.ajustor.fmab.util.PlayerMaps;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,6 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.LivingEvents;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Cercles portés : brodés sur les vêtements ou tatoués hors des paumes. Un cercle porté qui
@@ -79,8 +78,8 @@ public final class Passives {
 
 	public static void register() {
 		// Les analyses valent pour les glyphes d'un monde : un autre monde (en solo) peut en avoir d'autres.
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> CACHE.clear());
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.STOPPED.register(server -> CACHE.clear());
+		ServerEvents.END_TICK.register(server -> {
 			if (server.getTickCount() % PERIOD != 0) {
 				return;
 			}
@@ -90,7 +89,7 @@ public final class Passives {
 				apply(player, silenced ? Map.of() : capped(count(player)));
 			}
 		});
-		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damage, blocked) -> {
+		LivingEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damage, blocked) -> {
 			if (entity instanceof ServerPlayer player && source.getEntity() instanceof LivingEntity attacker
 					&& attacker != player) {
 				int thorns = ACTIVE.getOrDefault(player.getUUID(), Map.of()).getOrDefault("fmab:thorns", 0);
@@ -111,7 +110,7 @@ public final class Passives {
 				worn.add(d);
 			}
 		}
-		Tattoos tattoos = player.getAttachedOrCreate(FmabAttachments.TATTOOS);
+		Tattoos tattoos = FmabAttachments.TATTOOS.getOrCreate(player);
 		for (TattooSlot slot : TattooSlot.values()) {
 			if (!slot.active()) {
 				tattoos.get(slot).ifPresent(worn::add);
@@ -121,7 +120,7 @@ public final class Passives {
 		if (worn.isEmpty()) {
 			return out;
 		}
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		AlchemyRules rules = AlchemyRules.of(player.level().registryAccess());
 		for (Drawing d : worn) {
 			Analysis a = CACHE.computeIfAbsent(new CacheKey(d, me), k -> rules.analyze(k.drawing(), k.alchemist()));

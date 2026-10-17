@@ -5,7 +5,6 @@ import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.registry.FmabItems;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -17,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Ce que fait la Pierre philosophale dans les mains d'un alchimiste : elle amplifie ses
@@ -81,7 +81,7 @@ public final class PhilosopherStones {
 	}
 
 	public static void register() {
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			if (server.getTickCount() % 20 != 0) {
 				return;
 			}

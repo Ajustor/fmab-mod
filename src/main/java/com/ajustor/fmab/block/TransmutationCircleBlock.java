@@ -54,7 +54,9 @@ import org.jspecify.annotations.Nullable;
  * face (le haut de la page est alors le ciel).
  */
 public class TransmutationCircleBlock extends BaseEntityBlock {
+	//? if <26.3 {
 	public static final MapCodec<TransmutationCircleBlock> CODEC = simpleCodec(TransmutationCircleBlock::new);
+	//?}
 	public static final EnumProperty<AttachFace> FACE = BlockStateProperties.ATTACH_FACE;
 	public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 	public static final EnumProperty<CircleMedium> MEDIUM = EnumProperty.create("medium", CircleMedium.class);
@@ -77,10 +79,12 @@ public class TransmutationCircleBlock extends BaseEntityBlock {
 				.setValue(MEDIUM, CircleMedium.CHALK));
 	}
 
+	//? if <26.3 {
 	@Override
 	protected MapCodec<? extends BaseEntityBlock> codec() {
 		return CODEC;
 	}
+	//?}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -207,7 +211,7 @@ public class TransmutationCircleBlock extends BaseEntityBlock {
 
 	/** Relever un cercle dans son carnet, sous le nom de l'effet qu'on y lit (s'il y en a un). */
 	private static void learn(ServerPlayer player, Drawing drawing) {
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		Analysis analysis = AlchemyRules.of(player.level().registryAccess()).analyze(drawing, me);
 		String key = analysis.effects().isEmpty() ? "circle.fmab.learned_name"
 				: "effect." + analysis.effects().getFirst().combination().effect().replace(':', '.');

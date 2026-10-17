@@ -2,7 +2,6 @@ package com.ajustor.fmab.network;
 
 import com.ajustor.fmab.Fmab;
 import io.netty.buffer.ByteBuf;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -33,7 +32,7 @@ public record CinematicPayload(String kind, int ticks) implements CustomPacketPa
 
 	/** Joue la cinématique chez ce joueur. */
 	public static void play(ServerPlayer player, String kind, int ticks) {
-		ServerPlayNetworking.send(player, new CinematicPayload(kind, ticks));
+		FmabNetwork.send(player, new CinematicPayload(kind, ticks));
 	}
 
 	@Override

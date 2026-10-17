@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import com.ajustor.fmab.client.compat.RenderCompat;
 
 /**
  * Un bras noir de la Porte : une longue coulée d'ombre qui s'effile, faite de segments qui ondulent
@@ -170,8 +171,8 @@ public class GateHandRenderer extends EntityRenderer<GateHandEntity, GateHandRen
 			orient(poseStack, d);
 			// Un peu plus long que l'écart : les segments se chevauchent et le bras ne se fend pas aux coudes.
 			poseStack.scale(thickness, thickness, length + 0.04f);
-			collector.submitModel(segment, state, poseStack, TEXTURE, 0xF000F0, OverlayTexture.NO_OVERLAY,
-					state.outlineColor, null);
+			RenderCompat.submitModel(collector, segment, state, poseStack, TEXTURE, 0xF000F0, OverlayTexture.NO_OVERLAY,
+					state.outlineColor);
 			poseStack.popPose();
 		}
 		Vec3 tip = points[n];
@@ -179,8 +180,8 @@ public class GateHandRenderer extends EntityRenderer<GateHandEntity, GateHandRen
 		poseStack.translate(tip.x, tip.y, tip.z);
 		orient(poseStack, points[n].subtract(points[n - 1]));
 		poseStack.translate(0, 0, -0.05);
-		collector.submitModel(hand, state, poseStack, TEXTURE, 0xF000F0, OverlayTexture.NO_OVERLAY, state.outlineColor,
-				null);
+		RenderCompat.submitModel(collector, hand, state, poseStack, TEXTURE, 0xF000F0, OverlayTexture.NO_OVERLAY,
+				state.outlineColor);
 		poseStack.popPose();
 		super.submit(state, poseStack, collector, camera);
 	}
@@ -189,7 +190,7 @@ public class GateHandRenderer extends EntityRenderer<GateHandEntity, GateHandRen
 	private static void orient(PoseStack poseStack, Vec3 d) {
 		float yaw = (float) Mth.atan2(d.x, d.z);
 		float pitch = (float) Mth.atan2(d.y, Math.hypot(d.x, d.z));
-		poseStack.mulPose(Axis.YP.rotation(yaw));
-		poseStack.mulPose(Axis.XP.rotation(-pitch));
+		RenderCompat.rotate(poseStack, Axis.YP.rotation(yaw));
+		RenderCompat.rotate(poseStack, Axis.XP.rotation(-pitch));
 	}
 }

@@ -1,15 +1,14 @@
 package com.ajustor.fmab.registry;
 
-import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.Map;
+import com.ajustor.fmab.platform.event.ContentEvents;
 
 /**
  * Ce que le mod glisse dans les coffres du jeu de base. Les Notes sur la transmutation humaine
@@ -26,13 +25,12 @@ public final class FmabLoot {
 	}
 
 	public static void register() {
-		LootTableEvents.MODIFY.register((key, table, source, registries) -> {
+		ContentEvents.MODIFY_LOOT.register((key, table, builtin, registries) -> {
 			Float chance = HUMAN_TRANSMUTATION_NOTES.get(key);
-			if (chance == null || !source.isBuiltin()) {
+			if (chance == null || !builtin) {
 				return;
 			}
 			table.withPool(LootPool.lootPool()
-					.setRolls(ConstantValue.exactly(1))
 					.when(LootItemRandomChanceCondition.randomChance(chance))
 					.add(LootItem.lootTableItem(FmabItems.HUMAN_TRANSMUTATION_NOTES)));
 		});

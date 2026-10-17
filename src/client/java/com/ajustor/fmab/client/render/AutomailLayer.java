@@ -26,6 +26,7 @@ import net.minecraft.resources.Identifier;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
+import com.ajustor.fmab.client.compat.RenderCompat;
 
 /**
  * Les automails sur le corps du joueur : à la place du membre perdu, le bras ou la jambe de métal.
@@ -119,12 +120,12 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		holder.fmab$setSkeleton(pose);
 		for (AutomailItem.Model kind : EnumSet.copyOf(automails.values())) {
 			Model model = models.get(kind);
-			collector.order(1).submitModel(model, state, poseStack, RenderTypes.entityCutout(model.texture), light,
-					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor, null);
+			RenderCompat.submitModel(collector.order(1), model, state, poseStack, RenderTypes.entityCutout(model.texture), light,
+					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor);
 		}
 		if (!holder.fmab$blades().isEmpty()) {
-			collector.order(1).submitModel(bladeModel, state, poseStack, RenderTypes.entityCutout(BLADE_TEXTURE), light,
-					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor, null);
+			RenderCompat.submitModel(collector.order(1), bladeModel, state, poseStack, RenderTypes.entityCutout(BLADE_TEXTURE), light,
+					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor);
 		}
 	}
 

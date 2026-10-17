@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * L'armure où vit l'âme d'un joueur qui a perdu son corps à la Porte, comme Alphonse. Seul le
@@ -107,7 +108,7 @@ public final class SoulArmor {
 			ItemStack worn = player.getItemBySlot(slot);
 			if (!worn.isEmpty()) {
 				if (!player.getInventory().add(worn.copy())) {
-					player.drop(worn.copy(), false);
+					EntityCompat.drop(player, worn.copy());
 				}
 				player.setItemSlot(slot, ItemStack.EMPTY);
 			}

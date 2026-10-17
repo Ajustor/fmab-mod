@@ -82,7 +82,7 @@ public class AmestrianSoldierEntity extends PathfinderMob {
 		if (player.isCreative() || player.isSpectator()) {
 			return false;
 		}
-		Long until = player.getAttached(FmabAttachments.WANTED);
+		Long until = FmabAttachments.WANTED.get(player);
 		return Karma.of(player) < OUTLAW || until != null && until > player.level().getGameTime();
 	}
 
@@ -90,7 +90,7 @@ public class AmestrianSoldierEntity extends PathfinderMob {
 	public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
 		if (source.getEntity() instanceof ServerPlayer p && !p.isCreative()) {
 			// Lever la main sur l'armée : recherché, pour un temps.
-			p.setAttached(FmabAttachments.WANTED, level.getGameTime() + WANTED);
+			FmabAttachments.WANTED.set(p, level.getGameTime() + WANTED);
 		}
 		return super.hurtServer(level, source, damage);
 	}

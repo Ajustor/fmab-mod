@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.HashSet;
 import java.util.Set;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /** Les cadeaux qu'un PNJ ne fait qu'une fois à chaque joueur. */
 public final class Gifts {
@@ -13,7 +14,7 @@ public final class Gifts {
 	}
 
 	public static boolean received(ServerPlayer player, String gift) {
-		return player.getAttachedOrCreate(FmabAttachments.GIFTS).contains(gift);
+		return FmabAttachments.GIFTS.getOrCreate(player).contains(gift);
 	}
 
 	/**
@@ -25,11 +26,11 @@ public final class Gifts {
 		if (received(player, gift)) {
 			return false;
 		}
-		Set<String> gifts = new HashSet<>(player.getAttachedOrCreate(FmabAttachments.GIFTS));
+		Set<String> gifts = new HashSet<>(FmabAttachments.GIFTS.getOrCreate(player));
 		gifts.add(gift);
-		player.setAttached(FmabAttachments.GIFTS, Set.copyOf(gifts));
+		FmabAttachments.GIFTS.set(player, Set.copyOf(gifts));
 		if (!player.getInventory().add(stack)) {
-			player.drop(stack, false);
+			EntityCompat.drop(player, stack);
 		}
 		return true;
 	}

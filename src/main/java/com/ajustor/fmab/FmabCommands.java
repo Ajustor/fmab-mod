@@ -10,12 +10,12 @@ import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Arrays;
+import com.ajustor.fmab.platform.event.ContentEvents;
 
 /**
  * {@code /fmab} : réglages de test réservés aux opérateurs (rang, glyphes, maîtrise, nœuds de savoir,
@@ -26,7 +26,7 @@ public final class FmabCommands {
 	}
 
 	public static void register() {
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
+		ContentEvents.COMMANDS.register((dispatcher, registryAccess, environment) -> dispatcher.register(
 				Commands.literal("fmab")
 						.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 						.then(Commands.literal("rank")
@@ -95,7 +95,7 @@ public final class FmabCommands {
 						// Oublie la réponse à l'offre de Père et fait venir les homonculus tout de suite.
 						.then(Commands.literal("offer").executes(c -> {
 							ServerPlayer p = c.getSource().getPlayerOrException();
-							p.removeAttached(FmabAttachments.RECRUITMENT);
+							FmabAttachments.RECRUITMENT.remove(p);
 							LivingStone.visit(p);
 							c.getSource().sendSuccess(() -> Component.translatable("command.fmab.offer"), false);
 							return 1;
@@ -103,10 +103,10 @@ public final class FmabCommands {
 	}
 
 	private static AlchemistData data(ServerPlayer player) {
-		return player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		return FmabAttachments.ALCHEMIST.getOrCreate(player);
 	}
 
 	private static void update(ServerPlayer player, AlchemistData data) {
-		player.setAttached(FmabAttachments.ALCHEMIST, data);
+		FmabAttachments.ALCHEMIST.set(player, data);
 	}
 }

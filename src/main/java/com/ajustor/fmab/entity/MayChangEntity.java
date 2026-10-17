@@ -34,6 +34,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * May Chang, alkahestriste du clan Chang, dans son pavillon de Xing. Elle se méfie de qui sent le
@@ -80,7 +81,7 @@ public class MayChangEntity extends PathfinderMob {
 			return InteractionResult.SUCCESS;
 		}
 		if (!Alkahestry.knows(p)) {
-			p.setAttached(FmabAttachments.ALKAHESTRY, true);
+			FmabAttachments.ALKAHESTRY.set(p, true);
 			give(p, new ItemStack(FmabItems.KUNAI, TEACHING_KUNAI));
 			p.sendSystemMessage(Component.translatable("npc.fmab.may.teaches"));
 			// Elle parle aussi du Nord, de Briggs, où l'alchimie d'Amestris tient bon.
@@ -114,7 +115,7 @@ public class MayChangEntity extends PathfinderMob {
 
 	private static void give(ServerPlayer player, ItemStack stack) {
 		if (!player.getInventory().add(stack)) {
-			player.drop(stack, false);
+			EntityCompat.drop(player, stack);
 		}
 	}
 

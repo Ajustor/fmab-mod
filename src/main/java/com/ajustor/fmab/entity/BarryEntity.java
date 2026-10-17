@@ -21,6 +21,8 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import com.ajustor.fmab.compat.EntityCompat;
+import com.ajustor.fmab.compat.SoundCompat;
 
 /**
  * Barry le Boucher : un tueur en série dont l'âme a été scellée dans une armure, gardien du poste
@@ -156,7 +158,7 @@ public class BarryEntity extends HauntedArmorEntity {
 				windup = Butcher.SWEEP_WINDUP;
 				sweepYaw = (float) Math.toDegrees(Math.atan2(-(target.getX() - getX()), target.getZ() - getZ()));
 				face(sweepYaw);
-				level.playSound(null, blockPosition(), SoundEvents.AXE_SCRAPE, SoundSource.HOSTILE, 1.5f, 0.5f);
+				level.playSound(null, blockPosition(), SoundCompat.AXE_SCRAPE, SoundSource.HOSTILE, 1.5f, 0.5f);
 				tell(level, true, "entity.fmab.barry.windup");
 			}
 		}
@@ -170,7 +172,7 @@ public class BarryEntity extends HauntedArmorEntity {
 
 	/** Le hachoir balaie l'arc : tout ce qui s'y trouve encore est frappé et renversé. */
 	private void sweep(ServerLevel level) {
-		swing(InteractionHand.MAIN_HAND, true);
+		EntityCompat.swing(this, InteractionHand.MAIN_HAND, true);
 		level.playSound(null, blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.HOSTILE, 1.5f, 0.6f);
 		markArc(level, ParticleTypes.SWEEP_ATTACK);
 		float rad = sweepYaw * Mth.DEG_TO_RAD;
@@ -188,7 +190,7 @@ public class BarryEntity extends HauntedArmorEntity {
 	private static void throwBack(LivingEntity hit, double x, double z, double strength) {
 		double resist = 1 - hit.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
 		hit.push(x * strength * 0.5 * resist, 0.35 * resist, z * strength * 0.5 * resist);
-		hit.hurtMarked = true;
+		EntityCompat.syncVelocity(hit);
 	}
 
 	/** Une rangée de particules sur l'arc du hachoir. */

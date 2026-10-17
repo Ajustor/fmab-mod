@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "fmab-gametest",
+	"version": "1.0.0",
+	"name": "FMAB render showcase",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"com.ajustor.fmab.gametest.RenderShowcase",
+			"com.ajustor.fmab.gametest.WheelchairScenes",
+			"com.ajustor.fmab.gametest.RecompositionScenes",
+			"com.ajustor.fmab.gametest.StoneGateScenes",
+			"com.ajustor.fmab.gametest.GateScenes",
+			"com.ajustor.fmab.gametest.BlockScenes",
+			"com.ajustor.fmab.gametest.TownScenes",
+			"com.ajustor.fmab.gametest.FigureScenes",
+			"com.ajustor.fmab.gametest.ItemScenes",
+			"com.ajustor.fmab.gametest.AutomailBladeScenes",
+			"com.ajustor.fmab.gametest.AnimationScenes",
+			"com.ajustor.fmab.gametest.GestureScenes",
+			"com.ajustor.fmab.gametest.FoeScenes",
+			"com.ajustor.fmab.gametest.ShellScenes",
+			"com.ajustor.fmab.gametest.OutfitScenes",
+			"com.ajustor.fmab.gametest.ConfigScenes",
+			"com.ajustor.fmab.gametest.DataScenes"
+		]
+	},
+	"depends": {
+		"fmab": "*"
+	}
+}

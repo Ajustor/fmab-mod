@@ -14,6 +14,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Un bras noir de la Porte : il jaillit d'un point (la Porte ouverte, ou le sol du cercle), s'allonge
@@ -128,7 +129,7 @@ public class GateHandEntity extends Entity {
 			// Il tient sa proie, et la tire vers lui.
 			Vec3 toward = position().subtract(target.position()).normalize().scale(pull);
 			target.setDeltaMovement(target.getDeltaMovement().scale(0.6).add(toward));
-			target.hurtMarked = true;
+			EntityCompat.syncVelocity(target);
 			// Tenu, il ne tombe pas : pas de chute à payer quand le bras le lâche.
 			target.resetFallDistance();
 		}

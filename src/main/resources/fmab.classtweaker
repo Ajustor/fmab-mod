@@ -1,0 +1,18 @@
+accessWidener v2 official
+# Ce que le cœur du mod ouvre dans Minecraft. Fabric l'applique tel quel (classTweaker de
+# fabric.mod.json) ; un autre loader le traduit dans son format (access transformer de NeoForge).
+
+# Les types de dégâts du mod (lance de Lust, balles, alkahestry)
+accessible	field	net/minecraft/world/damagesource/DamageSources	damageTypes	Lnet/minecraft/core/Registry;
+# Les blocs du mod, inscrits comme ceux du jeu
+accessible	method	net/minecraft/world/level/block/Blocks	register	(Lnet/minecraft/resources/ResourceKey;Ljava/util/function/Function;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;
+# Où apparaissent les créatures du mod
+accessible	method	net/minecraft/world/entity/SpawnPlacements	register	(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacementType;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V
+# Le contenu de l'onglet créatif
+accessible	class	net/minecraft/world/item/CreativeModeTab$Output
+# La page du corps (un menu du mod)
+accessible	class	net/minecraft/world/inventory/MenuType$MenuSupplier
+accessible	method	net/minecraft/world/inventory/MenuType	<init>	(Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+# L'écran de la page du corps (client)
+accessible	class	net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
+accessible	method	net/minecraft/client/gui/screens/MenuScreens	register	(Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V

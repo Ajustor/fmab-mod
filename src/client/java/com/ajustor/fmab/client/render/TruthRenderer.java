@@ -23,6 +23,7 @@ import net.minecraft.resources.Identifier;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
+import com.ajustor.fmab.client.compat.RenderCompat;
 
 /**
  * La Vérité : la silhouette de l'alchimiste qu'elle reçoit, toute blanche, avec son sourire. Ce
@@ -111,8 +112,8 @@ public class TruthRenderer extends HumanoidMobRenderer<TruthEntity, TruthRendere
 			if (state.stolen.isEmpty() || state.isInvisible) {
 				return;
 			}
-			collector.order(1).submitModel(model, state, poseStack, RenderTypes.entityTranslucent(state.skin), light,
-					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor, null);
+			RenderCompat.submitModel(collector.order(1), model, state, poseStack, RenderTypes.entityTranslucent(state.skin), light,
+					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor);
 		}
 	}
 }

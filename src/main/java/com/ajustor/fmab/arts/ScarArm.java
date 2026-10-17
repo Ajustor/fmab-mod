@@ -9,8 +9,6 @@ import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.util.Throttle;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,6 +22,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
+import com.ajustor.fmab.platform.event.InteractionEvents;
 
 /**
  * Le bras droit de Scar : un tatouage qui unit l'alchimie d'Amestris et l'alkahestry de Xing, mais
@@ -44,11 +43,11 @@ public final class ScarArm {
 
 	/** Le joueur porte-t-il le bras de Scar, main droite nue ? Valable des deux côtés. */
 	public static boolean armed(Player player) {
-		return Boolean.TRUE.equals(player.getAttached(FmabAttachments.SCAR_ARM)) && player.getMainHandItem().isEmpty();
+		return Boolean.TRUE.equals(FmabAttachments.SCAR_ARM.get(player)) && player.getMainHandItem().isEmpty();
 	}
 
 	public static void register() {
-		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
+		InteractionEvents.ATTACK_BLOCK.register((player, level, hand, pos, direction) -> {
 			// Un gantelet gravé frappe avec son propre cercle : il passe avant le bras.
 			if (hand != InteractionHand.MAIN_HAND || !armed(player) || player.isSpectator()
 					|| GloveCasting.canStrike(player)) {
@@ -59,7 +58,7 @@ public final class ScarArm {
 			}
 			return InteractionResult.SUCCESS;
 		});
-		AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+		InteractionEvents.ATTACK_ENTITY.register((player, level, hand, entity, hit) -> {
 			if (hand != InteractionHand.MAIN_HAND || !armed(player) || !(entity instanceof LivingEntity target)
 					|| !(player instanceof ServerPlayer p) || !(level instanceof ServerLevel server)) {
 				return InteractionResult.PASS;
@@ -106,7 +105,7 @@ public final class ScarArm {
 	 * besoin), et fait progresser l'école de la Destruction, qui le rend moins coûteux.
 	 */
 	private static boolean pay(ServerPlayer player, float cost) {
-		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		Knowledge knowledge = AlchemyRules.of(player.level().registryAccess()).knowledge(data);
 		cost = (float) Math.max(0.5, cost - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
 		if (!player.isCreative() && !LivingStone.is(player)) {
@@ -118,7 +117,7 @@ public final class ScarArm {
 			}
 			Concentration.set(player, concentration - cost);
 		}
-		player.setAttached(FmabAttachments.ALCHEMIST, data.addMastery(SCHOOL, 1));
+		FmabAttachments.ALCHEMIST.set(player, data.addMastery(SCHOOL, 1));
 		return true;
 	}
 }

@@ -26,7 +26,6 @@ import com.ajustor.fmab.item.TransmutedWeaponItem;
 import com.ajustor.fmab.item.WheelchairItem;
 import com.ajustor.fmab.item.XerxesMuralItem;
 import com.ajustor.fmab.item.XingSwordItem;
-import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -42,6 +41,7 @@ import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 
 import java.util.function.Function;
+import com.ajustor.fmab.platform.Platform;
 
 public final class FmabItems {
 	public static final Item CHALK = register("chalk", p -> new InscriptionItem(CircleMedium.CHALK, p),
@@ -265,11 +265,11 @@ public final class FmabItems {
 
 	private static Item register(String name, Function<Item.Properties, Item> factory, Item.Properties properties) {
 		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Fmab.id(name));
-		return Registry.register(BuiltInRegistries.ITEM, key, factory.apply(properties.setId(key)));
+		return Platform.get().content().register(BuiltInRegistries.ITEM, key, factory.apply(properties.setId(key)));
 	}
 
 	public static void register() {
-		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TAB, FabricCreativeModeTab.builder()
+		Platform.get().content().register(BuiltInRegistries.CREATIVE_MODE_TAB, TAB, Platform.get().content().creativeTab()
 				.title(Component.translatable("itemGroup.fmab.alchemy"))
 				.icon(() -> new ItemStack(ALCHEMY_TREATISE))
 				.displayItems((parameters, output) -> {

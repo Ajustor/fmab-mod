@@ -46,6 +46,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.UUID;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Lust (Luxure) : ses doigts s'allongent en lames et transpercent tout en ligne droite, boucliers
@@ -163,13 +164,13 @@ public class LustEntity extends HomunculusEntity {
 	 */
 	private void answer(ServerPlayer player, boolean accepted) {
 		envoyTo = null;
-		player.setAttached(FmabAttachments.RECRUITMENT, accepted ? Recruitment.ACCEPTED : Recruitment.REFUSED);
+		FmabAttachments.RECRUITMENT.set(player, accepted ? Recruitment.ACCEPTED : Recruitment.REFUSED);
 		Karma.add(player, accepted ? Recruitment.ACCEPT_KARMA : Recruitment.REFUSE_KARMA);
 		ServerLevel level = player.level();
 		if (accepted) {
 			ItemStack advance = new ItemStack(FmabItems.PHILOSOPHER_STONE_CORE);
 			if (!player.getInventory().add(advance)) {
-				player.drop(advance, false);
+				EntityCompat.drop(player, advance);
 			}
 			player.sendSystemMessage(Component.translatable("stone.fmab.offer_accepted"));
 			level.playSound(null, blockPosition(), SoundEvents.EVOKER_PREPARE_WOLOLO, SoundSource.HOSTILE, 1, 0.7f);

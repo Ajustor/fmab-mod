@@ -3,12 +3,12 @@ package com.ajustor.fmab.client.screen;
 import com.ajustor.fmab.gate.BeingKind;
 import com.ajustor.fmab.network.StoneChoicePayload;
 import com.ajustor.fmab.network.StoneChosenPayload;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Une transmutation humaine, Pierre philosophale en main : ouvrir sa Porte, ou donner une âme de la
@@ -71,14 +71,14 @@ public class StoneChoiceScreen extends Screen {
 
 	private void answer(String choice) {
 		answered = true;
-		ClientPlayNetworking.send(new StoneChosenPayload(choice));
+		ClientPlatform.get().send(new StoneChosenPayload(choice));
 		onClose();
 	}
 
 	@Override
 	public void removed() {
 		if (!answered) {
-			ClientPlayNetworking.send(new StoneChosenPayload(""));
+			ClientPlatform.get().send(new StoneChosenPayload(""));
 		}
 		super.removed();
 	}

@@ -34,15 +34,15 @@ public class IshvalTattooItem extends Item {
 		if (!(player instanceof ServerPlayer p)) {
 			return InteractionResult.SUCCESS;
 		}
-		if (Boolean.TRUE.equals(p.getAttached(FmabAttachments.SCAR_ARM))) {
+		if (Boolean.TRUE.equals(FmabAttachments.SCAR_ARM.get(p))) {
 			p.sendOverlayMessage(Component.translatable("item.fmab.ishval_tattoo.already"));
 			return InteractionResult.SUCCESS;
 		}
-		if (!p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.ALCHEMIST) && !p.isCreative()) {
+		if (!FmabAttachments.ALCHEMIST.getOrCreate(p).rank().atLeast(Rank.ALCHEMIST) && !p.isCreative()) {
 			p.sendOverlayMessage(Component.translatable("item.fmab.ishval_tattoo.too_soon"));
 			return InteractionResult.SUCCESS;
 		}
-		p.setAttached(FmabAttachments.SCAR_ARM, true);
+		FmabAttachments.SCAR_ARM.set(p, true);
 		Milestones.reach(p, "scar_tattoo");
 		p.getItemInHand(hand).consume(1, p);
 		p.hurtServer(p.level(), p.level().damageSources().magic(), 4);

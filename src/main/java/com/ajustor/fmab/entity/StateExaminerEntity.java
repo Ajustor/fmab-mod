@@ -1,7 +1,6 @@
 package com.ajustor.fmab.entity;
 
 import com.ajustor.fmab.network.OpenExamPayload;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -17,6 +16,7 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import com.ajustor.fmab.network.FmabNetwork;
 
 /**
  * Examinateur de l'armée d'Amestris : il fait passer l'examen d'Alchimiste d'État. Il ne bouge pas
@@ -44,7 +44,7 @@ public class StateExaminerEntity extends PathfinderMob {
 	@Override
 	protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 		if (player instanceof ServerPlayer serverPlayer) {
-			ServerPlayNetworking.send(serverPlayer, OpenExamPayload.of(this, serverPlayer));
+			FmabNetwork.send(serverPlayer, OpenExamPayload.of(this, serverPlayer));
 		}
 		return InteractionResult.SUCCESS;
 	}

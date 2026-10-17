@@ -3,7 +3,6 @@ package com.ajustor.fmab.entity;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.network.OpenWinryPayload;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -22,6 +21,7 @@ import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import com.ajustor.fmab.network.FmabNetwork;
 
 /**
  * Winry Rockbell, mécanicienne d'automail : elle pose la pièce qu'on lui tend, répare (contre du
@@ -60,7 +60,7 @@ public class WinryEntity extends PathfinderMob {
 			if (held.getItem() instanceof AutomailItem) {
 				Automails.fit(serverPlayer, held);
 			} else {
-				ServerPlayNetworking.send(serverPlayer, new OpenWinryPayload(getId()));
+				FmabNetwork.send(serverPlayer, new OpenWinryPayload(getId()));
 			}
 		}
 		return InteractionResult.SUCCESS;

@@ -26,6 +26,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Gluttony (Gourmandise) : lent, peu malin, toujours affamé. Il aspire tout ce qui traîne autour de
@@ -144,7 +145,7 @@ public class GluttonyEntity extends HomunculusEntity {
 			}
 			double pull = e instanceof Player ? 0.09 : 0.18;
 			e.push(toward.normalize().scale(pull));
-			e.hurtMarked = true;
+			EntityCompat.syncVelocity(e);
 		}
 		for (int i = 0; i < 6; i++) {
 			double a = random.nextDouble() * Math.PI * 2;

@@ -62,7 +62,7 @@ public class BloodCrestBlock extends Block {
 			p.sendOverlayMessage(Component.translatable("alkahestry.fmab.unknown"));
 			return InteractionResult.SUCCESS;
 		}
-		if (chisel && !p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.STATE) && !p.isCreative()) {
+		if (chisel && !FmabAttachments.ALCHEMIST.getOrCreate(p).rank().atLeast(Rank.STATE) && !p.isCreative()) {
 			p.sendOverlayMessage(Component.translatable("block.fmab.blood_crest.needs_state"));
 			return InteractionResult.SUCCESS;
 		}

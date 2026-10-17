@@ -6,7 +6,6 @@ import com.ajustor.fmab.network.StoneChoicePayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.stone.PhilosopherStones;
 import com.ajustor.fmab.util.PlayerMaps;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -19,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import com.ajustor.fmab.network.FmabNetwork;
 
 /**
  * Une transmutation humaine, Pierre philosophale en main : le cercle attend que l'alchimiste
@@ -49,7 +49,7 @@ public final class StoneChoice {
 		PENDING.put(caster.getUUID(), new Pending(level.dimension(), circle.immutable(), level.getGameTime(),
 				level.getBlockEntity(circle) instanceof TransmutationCircleBlockEntity));
 		int souls = PhilosopherStones.held(caster).map(PhilosopherStoneItem::souls).orElse(0);
-		ServerPlayNetworking.send(caster, new StoneChoicePayload(souls));
+		FmabNetwork.send(caster, new StoneChoicePayload(souls));
 	}
 
 	/** Ce que l'alchimiste a choisi ; tout autre réponse (l'écran fermé) laisse le cercle s'éteindre. */
@@ -60,7 +60,7 @@ public final class StoneChoice {
 				|| pending.inscribed() && !(level.getBlockEntity(pending.circle()) instanceof TransmutationCircleBlockEntity)
 				|| level.getGameTime() - pending.since() > PATIENCE
 				|| player.position().distanceTo(Vec3.atCenterOf(pending.circle())) > REACH
-				|| player.getAttachedOrCreate(FmabAttachments.GATE).visit().isPresent()) {
+				|| FmabAttachments.GATE.getOrCreate(player).visit().isPresent()) {
 			if (GATE.equals(choice) || choice.startsWith(BEING)) {
 				player.sendOverlayMessage(Component.translatable("gate.fmab.choice.too_late"));
 			}

@@ -5,13 +5,6 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.util.Modifiers;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -30,6 +23,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import com.ajustor.fmab.platform.event.InteractionEvents;
+import com.ajustor.fmab.platform.event.LivingEvents;
+import com.ajustor.fmab.platform.event.PlayerEvents;
+import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Ce que coûte au quotidien ce que la Vérité a pris :
@@ -70,16 +68,16 @@ public final class Tolls {
 	}
 
 	public static void register() {
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				tick(player);
 			}
 		});
-		AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) ->
+		InteractionEvents.ATTACK_ENTITY.register((player, level, hand, entity, hit) ->
 				disabled(player, BodyPart.RIGHT_ARM) ? InteractionResult.FAIL : InteractionResult.PASS);
-		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) ->
+		InteractionEvents.ATTACK_BLOCK.register((player, level, hand, pos, direction) ->
 				disabled(player, BodyPart.RIGHT_ARM) ? InteractionResult.FAIL : InteractionResult.PASS);
-		UseItemCallback.EVENT.register((player, level, hand) -> {
+		InteractionEvents.USE_ITEM.register((player, level, hand) -> {
 			if (disabled(player, armOf(hand))) {
 				return InteractionResult.FAIL;
 			}
@@ -97,14 +95,14 @@ public final class Tolls {
 		});
 		// Sans bras droit, on ouvre un coffre ou une porte de la main gauche : seul celui qui n'a plus
 		// aucun bras ne peut plus rien manier.
-		UseBlockCallback.EVENT.register((player, level, hand, hit) ->
+		InteractionEvents.USE_BLOCK.register((player, level, hand, hit) ->
 				noHands(player) || hand == InteractionHand.OFF_HAND && disabled(player, BodyPart.LEFT_ARM)
 						? InteractionResult.FAIL : InteractionResult.PASS);
-		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+		LivingEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
 			if (!(entity instanceof ServerPlayer player) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 				return true;
 			}
-			GateState gate = player.getAttached(FmabAttachments.GATE);
+			GateState gate = FmabAttachments.GATE.get(player);
 			if (gate == null) {
 				return true;
 			}
@@ -119,8 +117,8 @@ public final class Tolls {
 			return true;
 		});
 		// Une âme ne meurt pas : quand son armure tombe, elle retourne devant la Porte.
-		ServerPlayerEvents.ALLOW_DEATH.register((player, source, amount) -> {
-			GateState gate = player.getAttached(FmabAttachments.GATE);
+		PlayerEvents.ALLOW_DEATH.register((player, source, amount) -> {
+			GateState gate = FmabAttachments.GATE.get(player);
 			if (gate == null || !gate.soulBound()) {
 				return true;
 			}
@@ -143,7 +141,7 @@ public final class Tolls {
 	}
 
 	private static boolean soulBound(Player player) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.get(player);
 		return gate != null && gate.soulBound();
 	}
 
@@ -152,7 +150,7 @@ public final class Tolls {
 	 * a des bras et des jambes d'acier.
 	 */
 	public static boolean disabled(Player player, BodyPart part) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.get(player);
 		if (gate == null || gate.soulBound() || !gate.lost(part)) {
 			return false;
 		}
@@ -160,7 +158,7 @@ public final class Tolls {
 	}
 
 	private static void tick(ServerPlayer player) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.get(player);
 		if (gate == null) {
 			return;
 		}
@@ -197,7 +195,7 @@ public final class Tolls {
 				return;
 			}
 		}
-		player.drop(stack, false);
+		EntityCompat.drop(player, stack);
 	}
 
 	private static void legs(ServerPlayer player) {
@@ -271,7 +269,7 @@ public final class Tolls {
 	 * @return vrai si une pièce a été réparée
 	 */
 	public static boolean mendWith(ServerPlayer player, ItemStack material) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.get(player);
 		if (gate == null || !gate.inArmor() || material.isEmpty()) {
 			return false;
 		}
@@ -336,15 +334,15 @@ public final class Tolls {
 	 * la Porte jusqu'à ce qu'un cercle d'âme l'appelle.
 	 */
 	private static void sealErased(ServerPlayer player) {
-		GateState gate = player.getAttachedOrCreate(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.getOrCreate(player);
 		for (EquipmentSlot slot : SoulArmor.SLOTS) {
 			ItemStack piece = player.getItemBySlot(slot);
 			if (!piece.isEmpty() && slot != EquipmentSlot.CHEST) {
-				player.drop(piece.copy(), false);
+				EntityCompat.drop(player, piece.copy());
 			}
 			player.setItemSlot(slot, ItemStack.EMPTY);
 		}
-		player.setAttached(FmabAttachments.GATE, gate.withAdrift(true));
+		FmabAttachments.GATE.set(player, gate.withAdrift(true));
 		player.sendSystemMessage(Component.translatable("gate.fmab.seal_erased").withStyle(s -> s.withColor(0xB0201A)));
 	}
 

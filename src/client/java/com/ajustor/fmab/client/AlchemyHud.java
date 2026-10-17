@@ -50,7 +50,7 @@ final class AlchemyHud {
 		String name = mc.font.plainSubstrByWidth(Notebooks.pageName(page).getString(), NAME_WIDTH);
 		graphics.text(mc.font, name, MARGIN + THUMB + 6, MARGIN + (THUMB - 8) / 2, INK, true);
 		// L'objet auquel l'alchimiste pense : ce qu'un cercle Recomposer créera sans modèle.
-		String design = player.getAttached(FmabAttachments.DESIGN);
+		String design = FmabAttachments.DESIGN.get(player);
 		if (design != null && !design.isEmpty()) {
 			BuiltInRegistries.ITEM.getOptional(Identifier.tryParse(design)).ifPresent(item -> {
 				int y = MARGIN + THUMB + 4;
@@ -62,7 +62,7 @@ final class AlchemyHud {
 
 	/** Le cercle sélectionné sert-il en ce moment ? */
 	private static boolean usable(LocalPlayer player) {
-		AlchemistData data = player.getAttached(FmabAttachments.ALCHEMIST);
+		AlchemistData data = FmabAttachments.ALCHEMIST.get(player);
 		return data != null && data.rank().atLeast(Rank.GATE) || inscribes(player.getMainHandItem())
 				|| inscribes(player.getOffhandItem());
 	}

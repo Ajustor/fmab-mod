@@ -6,7 +6,6 @@ import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.network.WinryActionPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,6 +14,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * L'atelier de Winry : l'état de chaque membre (intact, perdu, automail et son usure), la réparation
@@ -59,11 +59,11 @@ public class WinryScreen extends Screen {
 				Button repair = addRenderableWidget(Button.builder(cost == 0
 								? Component.translatable("entity.fmab.winry.repaired")
 								: Component.translatable("entity.fmab.winry.repair", cost),
-						b -> ClientPlayNetworking.send(new WinryActionPayload(entityId, part.serializedName(), true)))
+						b -> ClientPlatform.get().send(new WinryActionPayload(entityId, part.serializedName(), true)))
 						.bounds(left + WIDTH - 156, y - 4, 86, 18).build());
 				repair.active = cost > 0;
 				addRenderableWidget(Button.builder(Component.translatable("entity.fmab.winry.remove"),
-						b -> ClientPlayNetworking.send(new WinryActionPayload(entityId, part.serializedName(), false)))
+						b -> ClientPlatform.get().send(new WinryActionPayload(entityId, part.serializedName(), false)))
 						.bounds(left + WIDTH - 66, y - 4, 58, 18).build());
 			}
 			y += ROW;
@@ -90,13 +90,13 @@ public class WinryScreen extends Screen {
 
 	private Automail automail() {
 		Automail a = minecraft == null || minecraft.player == null ? null
-				: minecraft.player.getAttached(FmabAttachments.AUTOMAIL);
+				: FmabAttachments.AUTOMAIL.get(minecraft.player);
 		return a == null ? Automail.NONE : a;
 	}
 
 	private GateState gate() {
 		GateState g = minecraft == null || minecraft.player == null ? null
-				: minecraft.player.getAttached(FmabAttachments.GATE);
+				: FmabAttachments.GATE.get(minecraft.player);
 		return g == null ? GateState.NONE : g;
 	}
 

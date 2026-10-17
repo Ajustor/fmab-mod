@@ -1,11 +1,9 @@
 package com.ajustor.fmab.client.screen;
 
 import com.ajustor.fmab.client.mixin.AbstractContainerScreenAccessor;
+import com.ajustor.fmab.client.mixin.ScreenInvoker;
 import com.ajustor.fmab.network.OpenBodyPayload;
 import com.ajustor.fmab.registry.FmabItems;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -19,10 +17,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Les onglets au-dessus de l'inventaire, à la manière de ceux du mode créatif : l'inventaire, puis
- * la page du corps. Ils suivent l'inventaire quand le livre de recettes le décale.
+ * la page du corps. Ils suivent l'inventaire quand le livre de recettes le décale. Sur l'inventaire du
+ * joueur, c'est {@code InventoryScreenMixin} qui les pose.
  */
 public final class InventoryTabs {
 	private static final int WIDTH = 26;
@@ -31,15 +31,6 @@ public final class InventoryTabs {
 	private static final int RISE = 28;
 
 	private InventoryTabs() {
-	}
-
-	public static void register() {
-		ScreenEvents.AFTER_INIT.register((minecraft, screen, width, height) -> {
-			if (screen instanceof InventoryScreen inventory) {
-				Tab[] tabs = add(inventory, true);
-				ScreenEvents.beforeExtract(screen).register((s, graphics, mouseX, mouseY, a) -> place(inventory, tabs));
-			}
-		});
 	}
 
 	/**
@@ -51,16 +42,17 @@ public final class InventoryTabs {
 		Tab inventory = new Tab(0, new ItemStack(Items.CHEST), Component.translatable("body_page.fmab.tab.inventory"),
 				inventoryOpen, InventoryTabs::openInventory);
 		Tab body = new Tab(1, new ItemStack(FmabItems.IRON_AUTOMAIL_ARM), Component.translatable("body_page.fmab.tab.body"),
-				!inventoryOpen, () -> ClientPlayNetworking.send(OpenBodyPayload.INSTANCE));
+				!inventoryOpen, () -> ClientPlatform.get().send(OpenBodyPayload.INSTANCE));
 		Tab[] tabs = {inventory, body};
 		for (Tab tab : tabs) {
-			Screens.getWidgets(screen).add(tab);
+			((ScreenInvoker) screen).fmab$addRenderableWidget(tab);
 		}
 		place(screen, tabs);
 		return tabs;
 	}
 
-	private static void place(AbstractContainerScreen<?> screen, Tab[] tabs) {
+	/** Replace les onglets contre la fenêtre (posés par {@code InventoryScreenMixin} sur l'inventaire). */
+	public static void place(AbstractContainerScreen<?> screen, Tab[] tabs) {
 		AbstractContainerScreenAccessor at = (AbstractContainerScreenAccessor) screen;
 		for (Tab tab : tabs) {
 			tab.setPosition(at.fmab$leftPos() + tab.column * (WIDTH + 1), at.fmab$topPos() - RISE);

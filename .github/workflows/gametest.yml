@@ -1,13 +1,13 @@
 # Les gametests client : le jeu tourne pour de vrai (sous un écran virtuel), chaque scène joue ses
-# vérifications et prend ses captures. Lancés sur les pull requests qui touchent au rendu ou aux
-# scènes, ou à la demande (en choisissant au besoin les scènes, comme -PfmabGametest). Les captures
-# sont publiées en artefact, même quand une scène échoue.
+# vérifications et prend ses captures, une fois par version de Minecraft. Lancés sur les pull
+# requests qui touchent au rendu ou aux scènes, ou à la demande (en choisissant au besoin les
+# scènes, comme -PfmabGametest). Les captures sont publiées en artefact, même quand une scène échoue.
 name: gametest
 on:
   pull_request:
     paths:
       - 'src/client/**'
-      - 'src/gametest/**'
+      - 'fabric/src/**'
       - '.github/workflows/gametest.yml'
   workflow_dispatch:
     inputs:
@@ -24,6 +24,11 @@ jobs:
   gametest:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # Les versions de Minecraft de settings.gradle.kts.
+        minecraft: ['26.2', '26.3']
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
@@ -42,18 +47,21 @@ jobs:
         run: chmod +x ./gradlew
       # Un écran virtuel et le rendu OpenGL logiciel de Mesa : pas de carte graphique sur le runner.
       - name: install a virtual display
-        run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libegl1 mesa-utils
       - name: run client gametests
         env:
           SCENES: ${{ inputs.scenes }}
+          # À partir de 26.3, la fenêtre du jeu passe par SDL3, qui demande un tampon d'image sRGB : les
+          # visuels GLX de Xvfb n'en ont pas, ceux d'EGL (Mesa) si. Sans effet sur les versions en GLFW.
+          SDL_VIDEO_FORCE_EGL: '1'
         run: |
           args=""
           if [ -n "$SCENES" ]; then args="-PfmabGametest=$SCENES"; fi
-          xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientGameTest $args
+          xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew ":fabric:${{ matrix.minecraft }}:runClientGameTest" $args
       - name: upload the screenshots
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: gametest-screenshots-${{ github.sha }}
-          path: build/run/clientGameTest/screenshots
+          name: gametest-screenshots-${{ matrix.minecraft }}-${{ github.sha }}
+          path: fabric/versions/${{ matrix.minecraft }}/build/run/clientGameTest/screenshots
           if-no-files-found: warn

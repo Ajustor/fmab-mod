@@ -21,7 +21,6 @@ import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
 import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.util.PlayerMaps;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -43,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Activation d'un cercle par un alchimiste : le serveur relit le tracé, vérifie le savoir, le
@@ -119,7 +120,7 @@ public final class Transmutation {
 
 	public static void register() {
 		// Un nouveau monde (ou un serveur relancé) repart sans contacts en mémoire.
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> TOUCHES.clear());
+		ServerEvents.STOPPED.register(server -> TOUCHES.clear());
 	}
 
 	/**
@@ -150,7 +151,7 @@ public final class Transmutation {
 		if (AntiAlchemy.blocks(level, circle, caster)) {
 			return Result.INERT;
 		}
-		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData alchemist = FmabAttachments.ALCHEMIST.getOrCreate(caster);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Knowledge knowledge = rules.knowledge(alchemist);
 		Analysis analysis = rules.analyze(drawing, alchemist);
@@ -246,7 +247,7 @@ public final class Transmutation {
 		dropAll(level, circle, flow);
 		// Le geste : la paume plaquée sur le cercle (les mains jointes, l'appelant les remplace).
 		if (!remote) {
-			caster.swing(InteractionHand.MAIN_HAND, true);
+			EntityCompat.swing(caster, InteractionHand.MAIN_HAND, true);
 			TransmutationPose.strike(caster, TransmutationPose.Kind.PALM, 14);
 		}
 		if (anything) {
@@ -322,7 +323,7 @@ public final class Transmutation {
 		if (channel.growth() >= MAX_GROWTH) {
 			return true;
 		}
-		AlchemistData alchemist = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData alchemist = FmabAttachments.ALCHEMIST.getOrCreate(caster);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Analysis analysis = rules.analyze(drawing, alchemist);
 		boolean living = LivingStone.is(caster);
@@ -355,7 +356,7 @@ public final class Transmutation {
 					.orElse(Effects.Result.NO_TARGET);
 			anything |= result == Effects.Result.DONE;
 		}
-		caster.swing(InteractionHand.MAIN_HAND, true);
+		EntityCompat.swing(caster, InteractionHand.MAIN_HAND, true);
 		TransmutationPose.strike(caster, TransmutationPose.Kind.HOLD, CHANNEL_GAP + 2);
 		if (!anything) {
 			// Plus de matière, ou rien qui puisse grandir : l'énergie s'arrête.
@@ -395,7 +396,7 @@ public final class Transmutation {
 	 * nœuds atteints sont annoncés, et un Apprenti assez expérimenté devient Alchimiste.
 	 */
 	private static void practice(ServerPlayer caster, AlchemyRules rules, Knowledge before, List<String> schools) {
-		AlchemistData data = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(caster);
 		for (String school : schools) {
 			data = data.addMastery(school, Knowledge.MASTERY_PER_EFFECT);
 		}
@@ -413,7 +414,7 @@ public final class Transmutation {
 			caster.level().playSound(null, caster.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS,
 					1, 1);
 		}
-		caster.setAttached(FmabAttachments.ALCHEMIST, data);
+		FmabAttachments.ALCHEMIST.set(caster, data);
 	}
 
 	/**
@@ -421,7 +422,7 @@ public final class Transmutation {
 	 * {@link AlchemistData#USES_TO_LEARN} usages, on le comprend.
 	 */
 	private static void practiceGlyphs(ServerPlayer caster, AlchemyRules rules, Analysis analysis) {
-		AlchemistData data = caster.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(caster);
 		for (CircleIssue issue : analysis.issues()) {
 			if (issue.kind() != CircleIssue.Kind.GLYPH_NOT_LEARNED) {
 				continue;
@@ -433,7 +434,7 @@ public final class Transmutation {
 						"transmutation.fmab.glyph_understood", Component.translatable(g.nameKey()))));
 			}
 		}
-		caster.setAttached(FmabAttachments.ALCHEMIST, data);
+		FmabAttachments.ALCHEMIST.set(caster, data);
 	}
 
 	/** L'étage reçoit-il l'énergie, compte tenu de sa liaison et du sort de l'étage précédent ? */

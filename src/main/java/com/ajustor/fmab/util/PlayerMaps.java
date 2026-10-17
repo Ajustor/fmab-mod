@@ -1,12 +1,12 @@
 package com.ajustor.fmab.util;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.platform.event.PlayerEvents;
 
 /**
  * Les états que les règles gardent par joueur le temps d'une session : délais de recharge, combos,
@@ -27,8 +27,8 @@ public final class PlayerMaps {
 	}
 
 	public static void register() {
-		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> forget(handler.getPlayer().getUUID()));
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> clear());
+		PlayerEvents.DISCONNECT.register((player, server) -> forget(player.getUUID()));
+		ServerEvents.STOPPED.register(server -> clear());
 	}
 
 	/** Oublie ce joueur dans toutes les maps inscrites. */

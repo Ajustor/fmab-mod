@@ -31,11 +31,11 @@ public final class Notebooks {
 	}
 
 	public static NotebookContents of(Player player) {
-		return player.getAttachedOrElse(FmabAttachments.NOTEBOOK, NotebookContents.EMPTY);
+		return FmabAttachments.NOTEBOOK.getOrElse(player, NotebookContents.EMPTY);
 	}
 
 	public static void set(Player player, NotebookContents contents) {
-		player.setAttached(FmabAttachments.NOTEBOOK, contents);
+		FmabAttachments.NOTEBOOK.set(player, contents);
 	}
 
 	/** Le cercle sélectionné, ou un tracé vide si le carnet l'est. */
@@ -94,7 +94,7 @@ public final class Notebooks {
 	 * contient déjà quelques cercles simples, prêts à tracer à la craie.
 	 */
 	public static void ensure(ServerPlayer player) {
-		if (player.hasAttached(FmabAttachments.NOTEBOOK)) {
+		if (FmabAttachments.NOTEBOOK.has(player)) {
 			return;
 		}
 		AlchemyRules rules = AlchemyRules.of(player.level().registryAccess());

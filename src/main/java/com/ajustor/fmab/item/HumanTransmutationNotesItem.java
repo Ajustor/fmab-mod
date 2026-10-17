@@ -44,10 +44,10 @@ public class HumanTransmutationNotesItem extends Item {
 
 	private static void read(ServerPlayer player) {
 		boolean news = false;
-		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		Glyph glyph = AlchemyRules.of(player.level().registryAccess()).glyph(HUMAN_GLYPH).orElse(null);
 		if (glyph != null && !data.known().contains(HUMAN_GLYPH)) {
-			player.setAttached(FmabAttachments.ALCHEMIST, data.learn(HUMAN_GLYPH));
+			FmabAttachments.ALCHEMIST.set(player, data.learn(HUMAN_GLYPH));
 			player.sendSystemMessage(Component.translatable("tome.fmab.learned", Component.translatable(glyph.nameKey())));
 			news = true;
 		}

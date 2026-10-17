@@ -43,7 +43,7 @@ public class TomeItem extends Item {
 	}
 
 	private static void read(ServerPlayer player, Tome tome) {
-		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		AlchemyRules rules = AlchemyRules.of(player.level().registryAccess());
 		int learned = 0;
 		for (String id : tome.glyphs()) {
@@ -60,7 +60,7 @@ public class TomeItem extends Item {
 			player.sendOverlayMessage(Component.translatable("tome.fmab.nothing_new"));
 			return;
 		}
-		player.setAttached(FmabAttachments.ALCHEMIST, data);
+		FmabAttachments.ALCHEMIST.set(player, data);
 		player.level().playSound(null, player.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1, 1);
 	}
 

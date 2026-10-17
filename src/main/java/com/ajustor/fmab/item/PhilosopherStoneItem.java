@@ -25,6 +25,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * La Pierre philosophale : des âmes humaines condensées en une pierre rouge (sa barre d'usure
@@ -50,7 +51,7 @@ public class PhilosopherStoneItem extends Item {
 	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		if (player instanceof ServerPlayer server) {
 			// Seule la Vérité rend ce qu'elle a pris : on le lui rachète devant sa Porte (voir StoneBargain).
-			GateState gate = server.getAttachedOrCreate(FmabAttachments.GATE);
+			GateState gate = FmabAttachments.GATE.getOrCreate(server);
 			server.sendOverlayMessage(Component.translatable(gate.lost().isEmpty()
 					? "item.fmab.philosopher_stone.pulses" : "item.fmab.philosopher_stone.only_the_truth"));
 		}
@@ -66,18 +67,18 @@ public class PhilosopherStoneItem extends Item {
 		if (plan.restored().contains(BodyPart.BODY) && gate.inArmor()) {
 			SoulBinding.leaveShell(player, false);
 		}
-		player.setAttached(FmabAttachments.GATE, gate.restore(plan.restored()));
+		FmabAttachments.GATE.set(player, gate.restore(plan.restored()));
 		GateOfTruth.returnParts(player);
-		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.getOrCreate(player);
 		for (Map.Entry<BodyPart, ItemStack> limb : automail.limbs().entrySet()) {
 			if (plan.restored().contains(limb.getKey())) {
 				if (!player.getInventory().add(limb.getValue().copy())) {
-					player.drop(limb.getValue().copy(), false);
+					EntityCompat.drop(player, limb.getValue().copy());
 				}
 				automail = automail.with(limb.getKey(), ItemStack.EMPTY);
 			}
 		}
-		player.setAttached(FmabAttachments.AUTOMAIL, automail);
+		FmabAttachments.AUTOMAIL.set(player, automail);
 		player.setHealth(player.getMaxHealth());
 		level.sendParticles(RED, player.getX(), player.getY(0.5), player.getZ(), 120, 0.5, 1, 0.5, 0);
 		level.playSound(null, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.PLAYERS, 1, 1.2f);

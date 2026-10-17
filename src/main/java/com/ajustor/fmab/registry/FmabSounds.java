@@ -5,6 +5,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
+import com.ajustor.fmab.platform.Platform;
 
 /**
  * Les sons du mod ({@code assets/fmab/sounds.json}). Tous viennent de banques libres de droits (CC0) :
@@ -33,7 +34,7 @@ public final class FmabSounds {
 
 	private static SoundEvent register(String name) {
 		Identifier id = Fmab.id(name);
-		return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
+		return Platform.get().content().register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
 	}
 
 	public static void register() {

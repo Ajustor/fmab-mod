@@ -24,6 +24,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
+import com.ajustor.fmab.client.compat.RenderCompat;
 
 /**
  * Les volumes des tenues, par-dessus l'armure peinte : la capuche et les pans du manteau d'Edward,
@@ -106,9 +107,9 @@ public class OutfitLayer<S extends HumanoidRenderState, M extends HumanoidModel<
 		Set<Outfit> outfits = EnumSet.noneOf(Outfit.class);
 		Outfit.extras(state.headEquipment.getItem(), state.chestEquipment.getItem()).forEach(e -> outfits.add(e.outfit()));
 		for (Outfit outfit : outfits) {
-			collector.order(1).submitModel(models.get(outfit), state, poseStack,
+			RenderCompat.submitModel(collector.order(1), models.get(outfit), state, poseStack,
 					RenderTypes.armorCutoutNoCull(texture(outfit)), light, LivingEntityRenderer.getOverlayCoords(state, 0.0F),
-					state.outlineColor, null);
+					state.outlineColor);
 		}
 	}
 

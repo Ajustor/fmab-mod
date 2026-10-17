@@ -47,7 +47,7 @@ public class FatherSealBlock extends Block {
 		if (!(level instanceof ServerLevel server) || !(player instanceof ServerPlayer p)) {
 			return InteractionResult.SUCCESS;
 		}
-		Set<String> slain = p.getAttachedOrCreate(FmabAttachments.SLAIN);
+		Set<String> slain = FmabAttachments.SLAIN.getOrCreate(p);
 		List<Component> missing = new ArrayList<>();
 		for (String guardian : GUARDIANS) {
 			if (!slain.contains(guardian)) {

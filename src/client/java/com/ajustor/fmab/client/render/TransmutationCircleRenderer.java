@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
+import com.ajustor.fmab.client.compat.RenderCompat;
 
 /**
  * Dessine le cercle comme une décalcomanie posée sur sa surface, de la taille choisie en le traçant
@@ -76,17 +77,17 @@ public class TransmutationCircleRenderer
 		poseStack.pushPose();
 		poseStack.translate(0.5f, 0.5f, 0.5f);
 		// Après cette rotation, −Z local pointe vers state.facing.
-		poseStack.mulPose(Axis.YP.rotationDegrees(180 - state.facing.toYRot()));
+		RenderCompat.rotate(poseStack, Axis.YP.rotationDegrees(180 - state.facing.toYRot()));
 		switch (state.face) {
 			case FLOOR -> poseStack.translate(0, -0.5f + LIFT, 0);
 			case CEILING -> {
 				poseStack.translate(0, 0.5f - LIFT, 0);
-				poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+				RenderCompat.rotate(poseStack, Axis.ZP.rotationDegrees(180));
 			}
 			case WALL -> {
 				// Le support est derrière, du côté +Z local.
 				poseStack.translate(0, 0, 0.5f - LIFT);
-				poseStack.mulPose(TO_WALL);
+				RenderCompat.rotate(poseStack, TO_WALL);
 			}
 		}
 		int light = state.lightCoords;

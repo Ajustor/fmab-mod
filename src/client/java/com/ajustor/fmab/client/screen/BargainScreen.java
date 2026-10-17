@@ -2,12 +2,12 @@ package com.ajustor.fmab.client.screen;
 
 import com.ajustor.fmab.network.BargainAnswerPayload;
 import com.ajustor.fmab.network.BargainPayload;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Marchander avec la Vérité : chaque partie qu'elle a prise, et son prix en âmes. On rachète ce que
@@ -49,7 +49,7 @@ public class BargainScreen extends Screen {
 			int cost = state.costs().get(i);
 			Button b = addRenderableWidget(Button.builder(Component.translatable("truth.fmab.bargain.part",
 							Component.translatable("body.fmab." + part), cost),
-					x -> ClientPlayNetworking.send(new BargainAnswerPayload(part)))
+					x -> ClientPlatform.get().send(new BargainAnswerPayload(part)))
 					.bounds(left + 20, y, WIDTH - 40, 20).build());
 			b.active = cost <= state.souls() || minecraft.player.isCreative();
 			y += 22;
@@ -62,7 +62,7 @@ public class BargainScreen extends Screen {
 	public void removed() {
 		if (!leaving) {
 			leaving = true;
-			ClientPlayNetworking.send(new BargainAnswerPayload(""));
+			ClientPlatform.get().send(new BargainAnswerPayload(""));
 		}
 		super.removed();
 	}

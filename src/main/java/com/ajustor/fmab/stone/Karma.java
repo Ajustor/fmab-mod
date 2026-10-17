@@ -5,8 +5,6 @@ import com.ajustor.fmab.entity.HauntedArmorEntity;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.ImmortalSoldierEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.gossip.GossipType;
@@ -14,6 +12,8 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.npc.villager.Villager;
 import org.jspecify.annotations.Nullable;
+import com.ajustor.fmab.platform.event.LivingEvents;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Le karma : une jauge morale de −100 à +100. Fabriquer des Pierres, tuer des innocents la fait
@@ -33,7 +33,7 @@ public final class Karma {
 	}
 
 	public static int of(ServerPlayer player) {
-		Integer k = player.getAttached(FmabAttachments.KARMA);
+		Integer k = FmabAttachments.KARMA.get(player);
 		return k == null ? 0 : k;
 	}
 
@@ -43,7 +43,7 @@ public final class Karma {
 		}
 		int before = of(player);
 		int after = shifted(before, delta);
-		player.setAttached(FmabAttachments.KARMA, after);
+		FmabAttachments.KARMA.set(player, after);
 		if (crossesTier(before, after)) {
 			player.sendOverlayMessage(Component.translatable(after < before ? "karma.fmab.falls" : "karma.fmab.rises"));
 		}
@@ -74,11 +74,11 @@ public final class Karma {
 	}
 
 	public static void set(ServerPlayer player, int value) {
-		player.setAttached(FmabAttachments.KARMA, Math.clamp(value, MIN, MAX));
+		FmabAttachments.KARMA.set(player, Math.clamp(value, MIN, MAX));
 	}
 
 	public static void register() {
-		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
+		LivingEvents.AFTER_DEATH.register((entity, source) -> {
 			if (!(source.getEntity() instanceof ServerPlayer killer)) {
 				return;
 			}
@@ -96,7 +96,7 @@ public final class Karma {
 				add(killer, 1);
 			}
 		});
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			if (server.getTickCount() % 100 != 0) {
 				return;
 			}

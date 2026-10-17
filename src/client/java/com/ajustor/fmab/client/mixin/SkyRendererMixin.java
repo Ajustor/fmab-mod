@@ -30,6 +30,10 @@ public abstract class SkyRendererMixin {
 		// Le soleil n'est plus qu'une lueur derrière la lune (le ciel, lui, vient de ClientLevelMixin).
 		state.rainBrightness = Math.min(state.rainBrightness, 0.06f);
 		state.starBrightness = Math.max(state.starBrightness, 0.6f);
+		//? if >=26.3 {
+		/*state.sunriseAndSunsetColor = ARGB.vector4fFromARGB32(ARGB.color(140, 160, 30, 20));
+		*///?} else {
 		state.sunriseAndSunsetColor = ARGB.color(140, 160, 30, 20);
+		//?}
 	}
 }

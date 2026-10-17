@@ -40,6 +40,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Père, l'Homonculus originel, sur son trône sous Central. Le combat final, en trois formes :
@@ -210,7 +211,7 @@ public class FatherEntity extends HomunculusEntity {
 
 	/** D'un geste, sans cercle : la pierre du sol jaillit sous la cible et la projette. */
 	private void erupt(ServerLevel level, Player target) {
-		swing(InteractionHand.MAIN_HAND);
+		EntityCompat.swing(this, InteractionHand.MAIN_HAND);
 		Vec3 at = target.position();
 		BlockParticleOption stone = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DEEPSLATE.defaultBlockState());
 		level.sendParticles(stone, at.x, at.y + 0.3, at.z, 60, 0.6, 0.6, 0.6, 0.2);
@@ -219,7 +220,7 @@ public class FatherEntity extends HomunculusEntity {
 				0.6f);
 		target.hurtServer(level, damageSources().indirectMagic(this, this), phase() == 0 ? 7 : 9);
 		target.setDeltaMovement(target.getDeltaMovement().add(0, 1.0, 0));
-		target.hurtMarked = true;
+		EntityCompat.syncVelocity(target);
 	}
 
 	/** Le petit soleil : il le forge entre ses mains, puis le jette sur sa cible. */
@@ -292,10 +293,10 @@ public class FatherEntity extends HomunculusEntity {
 			}
 			int taken = Math.min(souls, 2 + phase());
 			if (souls - taken <= 0) {
-				p.removeAttached(FmabAttachments.LIVING_STONE);
+				FmabAttachments.LIVING_STONE.remove(p);
 				p.sendSystemMessage(Component.translatable("homunculus.fmab.father_drained_dry"));
 			} else {
-				p.setAttached(FmabAttachments.LIVING_STONE, souls - taken);
+				FmabAttachments.LIVING_STONE.set(p, souls - taken);
 			}
 			heal(taken * 4);
 			draw(level, p);

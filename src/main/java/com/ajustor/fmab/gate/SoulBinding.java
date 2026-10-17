@@ -13,8 +13,6 @@ import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.util.PlayerMaps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.Registries;
@@ -49,6 +47,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.InteractionEvents;
+import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Le cercle d'âme (Humain et Fixer) : il appelle une âme qui erre devant la Porte et la fixe dans
@@ -74,7 +75,7 @@ public final class SoulBinding {
 	public static void register() {
 		Effects.register("fmab:soul_binding", SoulBinding::apply);
 		// Poser un plastron scellé sur un porte-armure prépare un sceau.
-		UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+		InteractionEvents.USE_ENTITY.register((player, level, hand, entity, hit) -> {
 			if (entity instanceof ArmorStand stand && level instanceof ServerLevel server) {
 				ItemStack held = player.getItemInHand(hand);
 				SoulArmor.sealOf(held).ifPresent(owner -> Anchors.get(server.getServer())
@@ -83,13 +84,13 @@ public final class SoulBinding {
 			}
 			return InteractionResult.PASS;
 		});
-		ServerTickEvents.END_SERVER_TICK.register(SoulBinding::tickRecalls);
+		ServerEvents.END_TICK.register(SoulBinding::tickRecalls);
 	}
 
 	/** Une âme vient de perdre son armure : elle prend son tour dans la file. */
 	public static void drift(ServerPlayer soul) {
-		if (!soul.hasAttached(FmabAttachments.ADRIFT_SINCE)) {
-			soul.setAttached(FmabAttachments.ADRIFT_SINCE, soul.level().getGameTime());
+		if (!FmabAttachments.ADRIFT_SINCE.has(soul)) {
+			FmabAttachments.ADRIFT_SINCE.set(soul, soul.level().getGameTime());
 		}
 	}
 
@@ -139,17 +140,17 @@ public final class SoulBinding {
 
 	/** Les âmes errantes passent par ordre d'arrivée devant la Porte. */
 	private static long adriftSince(ServerPlayer soul) {
-		Long since = soul.getAttached(FmabAttachments.ADRIFT_SINCE);
+		Long since = FmabAttachments.ADRIFT_SINCE.get(soul);
 		return since == null ? Long.MAX_VALUE : since;
 	}
 
 	private static boolean inArmor(ServerPlayer player) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.get(player);
 		return gate != null && gate.inArmor();
 	}
 
 	private static boolean adrift(ServerPlayer player) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.get(player);
 		return gate != null && gate.adrift();
 	}
 
@@ -181,8 +182,8 @@ public final class SoulBinding {
 		ItemStack chest = pieces.get(EquipmentSlot.CHEST);
 		pieces.put(EquipmentSlot.CHEST, SoulArmor.sealOf(chest).isPresent() ? chest
 				: SoulArmor.sealed(level.registryAccess(), soul.getUUID(), chest));
-		soul.setAttached(FmabAttachments.GATE, soul.getAttachedOrCreate(FmabAttachments.GATE).withAdrift(false));
-		soul.removeAttached(FmabAttachments.ADRIFT_SINCE);
+		FmabAttachments.GATE.set(soul, FmabAttachments.GATE.getOrCreate(soul).withAdrift(false));
+		FmabAttachments.ADRIFT_SINCE.remove(soul);
 		RECALLS.remove(soul.getUUID());
 		GateOfTruth.leaveTruth(soul);
 		soul.teleport(new TeleportTransition(level, at, Vec3.ZERO, soul.getYRot(), 0,
@@ -212,7 +213,7 @@ public final class SoulBinding {
 			if (shell != null) {
 				shell.setItemSlot(slot, piece.copy());
 			} else {
-				soul.drop(piece.copy(), false);
+				EntityCompat.drop(soul, piece.copy());
 			}
 		}
 		if (shell == null) {

@@ -9,6 +9,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 
 import java.util.function.Consumer;
+import com.ajustor.fmab.client.compat.RenderCompat;
 
 /**
  * Les gestes de transmutation vus de ses propres yeux : pendant le geste, les deux mains paraissent
@@ -59,7 +60,7 @@ public final class FirstPersonGestures {
 	 * @return vrai si le geste a pris la place des mains ordinaires
 	 */
 	public static boolean submit(LocalPlayer player, float partialTicks, PoseStack poseStack, Consumer<HumanoidArm> arm) {
-		TransmutationPose pose = player.getAttached(FmabAttachments.POSE);
+		TransmutationPose pose = FmabAttachments.POSE.get(player);
 		long now = player.level().getGameTime();
 		if (pose == null || !pose.active(now) || player.isInvisible()) {
 			return false;
@@ -92,8 +93,8 @@ public final class FirstPersonGestures {
 		float s = side == HumanoidArm.RIGHT ? 1 : -1;
 		poseStack.pushPose();
 		poseStack.translate(-s * at.in(), at.up() - hidden, -at.ahead());
-		poseStack.mulPose(Axis.YP.rotationDegrees(s * at.yaw()));
-		poseStack.mulPose(Axis.XP.rotationDegrees(at.pitch()));
+		RenderCompat.rotate(poseStack, Axis.YP.rotationDegrees(s * at.yaw()));
+		RenderCompat.rotate(poseStack, Axis.XP.rotationDegrees(at.pitch()));
 		arm.accept(side);
 		poseStack.popPose();
 	}

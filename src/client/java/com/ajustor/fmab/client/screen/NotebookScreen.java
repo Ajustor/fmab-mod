@@ -19,7 +19,6 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.IssueText;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -32,7 +31,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -40,6 +38,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.ajustor.fmab.platform.client.ClientPlatform;
+import com.mojang.blaze3d.platform.InputConstants;
 
 /**
  * Carnet de cercles (sa touche l'ouvre) : on y trace ses cercles sur une grille de 32 cases, on les
@@ -418,12 +418,12 @@ public class NotebookScreen extends Screen {
 			return false;
 		}
 		Vec2 p = toGrid(event.x(), event.y());
-		if (event.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+		if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
 			resetGesture();
 			erase(p);
 			return true;
 		}
-		if (event.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
 			return false;
 		}
 		setFocused(null);
@@ -456,7 +456,7 @@ public class NotebookScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
-		if (anchor == null || event.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (anchor == null || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
 			return super.mouseReleased(event);
 		}
 		Vec2 p = toGrid(event.x(), event.y());
@@ -510,7 +510,7 @@ public class NotebookScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (event.key() == GLFW.GLFW_KEY_Z && event.hasControlDown() && !nameBox.isFocused()) {
+		if (event.key() == InputConstants.KEY_Z && event.hasControlDown() && !nameBox.isFocused()) {
 			undo();
 			return true;
 		}
@@ -718,7 +718,7 @@ public class NotebookScreen extends Screen {
 	private void save(boolean announce) {
 		store();
 		contents = contents.select(Math.min(page, Math.max(0, contents.pages().size() - 1)));
-		ClientPlayNetworking.send(new SaveNotebookPayload(contents));
+		ClientPlatform.get().send(new SaveNotebookPayload(contents));
 		if (announce) {
 			status = Component.translatable("notebook.fmab.saved");
 		}
@@ -805,7 +805,7 @@ public class NotebookScreen extends Screen {
 
 	private AlchemistData alchemist() {
 		Player player = minecraft == null ? null : minecraft.player;
-		AlchemistData data = player == null ? null : player.getAttached(FmabAttachments.ALCHEMIST);
+		AlchemistData data = player == null ? null : FmabAttachments.ALCHEMIST.get(player);
 		return data == null ? AlchemistData.NEW : data;
 	}
 

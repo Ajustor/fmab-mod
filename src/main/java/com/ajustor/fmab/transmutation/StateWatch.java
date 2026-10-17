@@ -20,7 +20,7 @@ public final class StateWatch {
 	}
 
 	public static boolean empowers(ServerPlayer player) {
-		if (!player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.STATE)) {
+		if (!FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.STATE)) {
 			return false;
 		}
 		for (ItemStack stack : player.getInventory()) {

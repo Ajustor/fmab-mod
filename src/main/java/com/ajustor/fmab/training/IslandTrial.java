@@ -2,13 +2,13 @@ package com.ajustor.fmab.training;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.registry.FmabAttachments;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * L'épreuve de l'île de Yock : « un est tout, tout est un ». Izumi y abandonne ses élèves un mois
@@ -25,7 +25,7 @@ public final class IslandTrial {
 	}
 
 	public static void register() {
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			if (server.getTickCount() % PERIOD != 0) {
 				return;
 			}
@@ -36,19 +36,19 @@ public final class IslandTrial {
 	}
 
 	private static void check(ServerPlayer player) {
-		var training = player.getAttachedOrCreate(FmabAttachments.TRAINING);
+		var training = FmabAttachments.TRAINING.getOrCreate(player);
 		if (!training.met() || training.achieved().contains(Trial.ISLAND.id())) {
 			return;
 		}
 		ServerLevel level = player.level();
 		var structure = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getValue(YOCK);
 		boolean onIsland = structure != null
-				&& level.structureManager().getStructureWithPieceAt(player.blockPosition(), structure).isValid();
-		Integer before = player.getAttached(FmabAttachments.ISLAND_TIME);
+				&& level.structureManager().getStructureWithPieceAt(player.blockPosition(), holder -> holder.value() == structure).isValid();
+		Integer before = FmabAttachments.ISLAND_TIME.get(player);
 		int time = before == null ? 0 : before;
 		if (!onIsland) {
 			if (time > 0) {
-				player.removeAttached(FmabAttachments.ISLAND_TIME);
+				FmabAttachments.ISLAND_TIME.remove(player);
 				player.sendOverlayMessage(Component.translatable("trial.fmab.island.left"));
 			}
 			return;
@@ -57,7 +57,7 @@ public final class IslandTrial {
 			player.sendSystemMessage(Component.translatable("trial.fmab.island.arrived"));
 		}
 		time += PERIOD;
-		player.setAttached(FmabAttachments.ISLAND_TIME, time);
+		FmabAttachments.ISLAND_TIME.set(player, time);
 		if (time >= DAY) {
 			Trainings.achieve(player, Trial.ISLAND);
 		}

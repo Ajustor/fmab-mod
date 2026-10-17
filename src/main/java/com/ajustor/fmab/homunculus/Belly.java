@@ -6,7 +6,6 @@ import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.Registries;
@@ -33,6 +32,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Le Ventre de Gluttony : un vide sombre, noyé de sang, où dérivent les restes de ce qu'il a
@@ -73,9 +73,9 @@ public final class Belly {
 	}
 
 	public static void register() {
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				Swallowed s = player.getAttached(FmabAttachments.SWALLOWED);
+				Swallowed s = FmabAttachments.SWALLOWED.get(player);
 				if (s != null) {
 					tick(server, player, s);
 				} else if (player.level().dimension() == BELLY && player.tickCount % 20 == 0) {
@@ -88,7 +88,7 @@ public final class Belly {
 	}
 
 	public static boolean swallowed(ServerPlayer player) {
-		return player.getAttached(FmabAttachments.SWALLOWED) != null;
+		return FmabAttachments.SWALLOWED.get(player) != null;
 	}
 
 	/** Gluttony avale le joueur. */
@@ -96,7 +96,7 @@ public final class Belly {
 		if (swallowed(player)) {
 			return;
 		}
-		player.setAttached(FmabAttachments.SWALLOWED, new Swallowed(player.level().dimension().identifier().toString(),
+		FmabAttachments.SWALLOWED.set(player, new Swallowed(player.level().dimension().identifier().toString(),
 				gluttony.blockPosition(), -1, List.of()));
 		player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_BURP, SoundSource.HOSTILE, 1.5f, 0.5f);
 		player.sendSystemMessage(Component.translatable("homunculus.fmab.swallowed"));
@@ -117,7 +117,7 @@ public final class Belly {
 	private static void tick(MinecraftServer server, ServerPlayer player, Swallowed s) {
 		ServerLevel belly = server.getLevel(BELLY);
 		if (belly == null) {
-			player.removeAttached(FmabAttachments.SWALLOWED);
+			FmabAttachments.SWALLOWED.remove(player);
 			return;
 		}
 		if (s.ticks() < 0 || player.level() != belly) {
@@ -125,7 +125,7 @@ public final class Belly {
 			return;
 		}
 		Swallowed now = new Swallowed(s.dimension(), s.origin(), s.ticks() + 1, s.creatures());
-		player.setAttached(FmabAttachments.SWALLOWED, now);
+		FmabAttachments.SWALLOWED.set(player, now);
 		if (now.ticks() % 20 == 0 && !now.creatures().isEmpty()
 				&& now.creatures().stream().map(belly::getEntity).noneMatch(e -> e != null && e.isAlive())) {
 			player.sendSystemMessage(Component.translatable("homunculus.fmab.belly_cleared"));
@@ -157,7 +157,7 @@ public final class Belly {
 			belly.addFreshEntity(remains);
 			creatures.add(remains.getUUID());
 		}
-		player.setAttached(FmabAttachments.SWALLOWED, new Swallowed(s.dimension(), s.origin(), 0, creatures));
+		FmabAttachments.SWALLOWED.set(player, new Swallowed(s.dimension(), s.origin(), 0, creatures));
 	}
 
 	/** Les restes de ce que Gluttony a dévoré, épars autour du joueur, et des mares de sang. */
@@ -180,8 +180,8 @@ public final class Belly {
 
 	/** Recraché : retour là où Gluttony l'avait avalé, et les restes s'évanouissent. */
 	private static void release(MinecraftServer server, ServerPlayer player) {
-		Swallowed s = player.getAttached(FmabAttachments.SWALLOWED);
-		player.removeAttached(FmabAttachments.SWALLOWED);
+		Swallowed s = FmabAttachments.SWALLOWED.get(player);
+		FmabAttachments.SWALLOWED.remove(player);
 		ServerLevel belly = server.getLevel(BELLY);
 		if (s == null) {
 			return;

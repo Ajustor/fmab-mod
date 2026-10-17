@@ -6,7 +6,6 @@ import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.StoneBargain;
 import com.ajustor.fmab.network.OpenTruthPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -30,6 +29,7 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import com.ajustor.fmab.network.FmabNetwork;
 
 /**
  * La Vérité : une copie toute blanche de l'alchimiste qui lui fait face. Ce qu'elle lui prend, elle
@@ -99,14 +99,14 @@ public class TruthEntity extends PathfinderMob {
 	@Override
 	protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 		if (player instanceof ServerPlayer server && owner().filter(server.getUUID()::equals).isPresent()) {
-			GateState gate = server.getAttachedOrCreate(FmabAttachments.GATE);
+			GateState gate = FmabAttachments.GATE.getOrCreate(server);
 			if (gate.visit().isPresent() && StoneBargain.offer(server)) {
 				// Pendant la visite, une Pierre en poche : la Vérité rouvre le marché.
 				return InteractionResult.SUCCESS;
 			}
 			if (gate.adrift()) {
 				// Être rappelée dans un sceau, ou repartir de zéro : l'âme choisit.
-				ServerPlayNetworking.send(server, new OpenTruthPayload(getId(), FmabConfig.get().restartWipesProgress()));
+				FmabNetwork.send(server, new OpenTruthPayload(getId(), FmabConfig.get().restartWipesProgress()));
 			}
 		}
 		return InteractionResult.SUCCESS;
