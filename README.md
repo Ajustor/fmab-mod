@@ -134,6 +134,9 @@ Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/fmab/glyph`), com
 Configuration du serveur : `config/fmab.json`, créé au premier lancement.
 `restart_wipes_progress` (par défaut `true`) : une âme qui repart de zéro devant la Vérité perd aussi
 toute sa progression d'alchimiste ; à `false`, elle ne retrouve que son corps.
+`soul_binding_requires_sacrifice` (par défaut `true`) : lier l'âme d'un autre joueur à une armure coûte
+un membre (transmutation humaine sous l'armure, après avoir vu sa Porte) ; à `false`, le cercle d'âme
+l'appelle gratuitement.
 
 Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab forget_all`,
 `/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`, `/fmab karma [valeur]` (lire ou régler

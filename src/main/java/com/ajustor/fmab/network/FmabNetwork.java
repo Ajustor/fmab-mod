@@ -10,6 +10,7 @@ import com.ajustor.fmab.entity.StateExaminerEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.gate.StoneBargain;
+import com.ajustor.fmab.gate.SoulOffering;
 import com.ajustor.fmab.gate.StoneChoice;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyMenu;
@@ -60,6 +61,8 @@ public final class FmabNetwork {
 		network.clientbound(OpenTruthPayload.TYPE, OpenTruthPayload.CODEC);
 		network.clientbound(StoneChoicePayload.TYPE, StoneChoicePayload.CODEC);
 		network.serverbound(StoneChosenPayload.TYPE, StoneChosenPayload.CODEC);
+		network.clientbound(SoulOfferPayload.TYPE, SoulOfferPayload.CODEC);
+		network.serverbound(SoulOfferAnswerPayload.TYPE, SoulOfferAnswerPayload.CODEC);
 		network.clientbound(BargainPayload.TYPE, BargainPayload.CODEC);
 		network.serverbound(BargainAnswerPayload.TYPE, BargainAnswerPayload.CODEC);
 		network.clientbound(CinematicPayload.TYPE, CinematicPayload.CODEC);
@@ -92,6 +95,7 @@ public final class FmabNetwork {
 				(payload, player) -> removeGlove(player, payload.left()));
 		network.receive(ShellKeyPayload.TYPE,
 				(payload, player) -> Shells.press(player));
+		network.receive(SoulOfferAnswerPayload.TYPE, (payload, player) -> SoulOffering.answer(player, payload));
 		network.receive(StoneChosenPayload.TYPE,
 				(payload, player) -> StoneChoice.answer(player, payload.choice()));
 		network.receive(BargainAnswerPayload.TYPE,

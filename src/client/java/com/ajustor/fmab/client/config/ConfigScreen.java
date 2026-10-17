@@ -69,7 +69,12 @@ public class ConfigScreen extends Screen {
 		addRenderableWidget(CycleButton.onOffBuilder(world.restartWipesProgress())
 				.withTooltip(on -> Tooltip.create(Component.translatable("config.fmab.restart_wipes_progress.tooltip")))
 				.create(x, y, BUTTON_WIDTH, 20, Component.translatable("config.fmab.restart_wipes_progress"),
-						(button, on) -> world = new FmabConfig(on)));
+						(button, on) -> world = world.withRestartWipesProgress(on)));
+		y += ROW;
+		addRenderableWidget(CycleButton.onOffBuilder(world.soulBindingRequiresSacrifice())
+				.withTooltip(on -> Tooltip.create(Component.translatable("config.fmab.soul_binding_requires_sacrifice.tooltip")))
+				.create(x, y, BUTTON_WIDTH, 20, Component.translatable("config.fmab.soul_binding_requires_sacrifice"),
+						(button, on) -> world = world.withSoulBindingRequiresSacrifice(on)));
 
 		addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> onClose())
 				.bounds((width - 200) / 2, height - 28, 200, 20).build());

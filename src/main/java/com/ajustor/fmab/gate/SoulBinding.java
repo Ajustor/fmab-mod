@@ -1,6 +1,7 @@
 package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.FmabConfig;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.AlchemistData;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import com.ajustor.fmab.platform.event.InteractionEvents;
 import com.ajustor.fmab.platform.event.ServerEvents;
 import com.ajustor.fmab.compat.EntityCompat;
@@ -94,25 +96,66 @@ public final class SoulBinding {
 		}
 	}
 
-	private static Effects.Result apply(EffectContext ctx) {
-		ServerLevel level = ctx.level();
-		AABB area = new AABB(ctx.circle()).inflate(1, 1, 1);
+	/**
+	 * L'armure posée sur un cercle : un porte-armure qui porte un plastron, sinon un plastron au sol.
+	 *
+	 * @param stand le porte-armure, ou null
+	 * @param loose le plastron posé au sol, ou null
+	 */
+	public record Armor(@Nullable ArmorStand stand, @Nullable ItemEntity loose) {
+		public ItemStack chest() {
+			return stand != null ? stand.getItemBySlot(EquipmentSlot.CHEST) : loose.getItem();
+		}
+
+		/** Elle est toujours là, entière. */
+		public boolean present() {
+			return stand != null ? stand.isAlive() && stand.getItemBySlot(EquipmentSlot.CHEST).is(ItemTags.CHEST_ARMOR)
+					: loose.isAlive() && loose.getItem().is(ItemTags.CHEST_ARMOR);
+		}
+	}
+
+	public static Optional<Armor> armorOn(ServerLevel level, BlockPos circle) {
+		AABB area = new AABB(circle).inflate(1, 1, 1);
 		ArmorStand stand = level.getEntitiesOfClass(ArmorStand.class, area,
 				s -> s.getItemBySlot(EquipmentSlot.CHEST).is(ItemTags.CHEST_ARMOR)).stream()
 				.findFirst().orElse(null);
 		ItemEntity loose = stand != null ? null : level.getEntitiesOfClass(ItemEntity.class, area,
 				e -> e.getItem().is(ItemTags.CHEST_ARMOR)).stream().findFirst().orElse(null);
-		if (stand == null && loose == null) {
+		return stand == null && loose == null ? Optional.empty() : Optional.of(new Armor(stand, loose));
+	}
+
+	/** Les âmes qui errent devant la Porte, par ordre d'arrivée. */
+	public static List<ServerPlayer> waiting(MinecraftServer server) {
+		return server.getPlayerList().getPlayers().stream()
+				.filter(SoulBinding::adrift)
+				.sorted((a, b) -> Long.compare(adriftSince(a), adriftSince(b)))
+				.toList();
+	}
+
+	/** Fixe cette âme dans l'armure posée sur le cercle. */
+	public static void bind(ServerPlayer soul, ServerLevel level, BlockPos circle, Armor armor) {
+		summon(soul, level, Vec3.atBottomCenterOf(circle), armor.stand(), armor.loose());
+	}
+
+	private static Effects.Result apply(EffectContext ctx) {
+		ServerLevel level = ctx.level();
+		Optional<Armor> armor = armorOn(level, ctx.circle());
+		if (armor.isEmpty()) {
 			ctx.caster().sendOverlayMessage(Component.translatable("gate.fmab.soul.no_armor"));
 			return Effects.Result.NO_MATERIAL;
 		}
-		ItemStack chest = stand != null ? stand.getItemBySlot(EquipmentSlot.CHEST) : loose.getItem();
-		Optional<ServerPlayer> soul = soulFor(level.getServer(), chest, ctx.caster());
+		Optional<ServerPlayer> soul = soulFor(level.getServer(), armor.get().chest(), ctx.caster());
 		if (soul.isEmpty()) {
 			ctx.caster().sendOverlayMessage(Component.translatable("gate.fmab.soul.nobody"));
 			return Effects.Result.NO_TARGET;
 		}
-		summon(soul.get(), level, Vec3.atBottomCenterOf(ctx.circle()), stand, loose);
+		// L'âme d'un autre ne revient qu'au prix d'un membre (voir SoulOffering), sauf si le serveur
+		// en a décidé autrement.
+		if (soul.get() != ctx.caster() && FmabConfig.get().soulBindingRequiresSacrifice()) {
+			ctx.caster().sendOverlayMessage(Component.translatable("gate.fmab.soul.needs_sacrifice"));
+			return Effects.Result.NO_TARGET;
+		}
+		bind(soul.get(), level, ctx.circle(), armor.get());
 		if (soul.get() != ctx.caster()) {
 			ctx.caster().sendSystemMessage(Component.translatable("gate.fmab.soul.summoned_other",
 					soul.get().getDisplayName()));
@@ -133,9 +176,7 @@ public final class SoulBinding {
 		if (inArmor(caster)) {
 			return Optional.of(caster);
 		}
-		return server.getPlayerList().getPlayers().stream()
-				.filter(SoulBinding::adrift)
-				.min((a, b) -> Long.compare(adriftSince(a), adriftSince(b)));
+		return waiting(server).stream().findFirst();
 	}
 
 	/** Les âmes errantes passent par ordre d'arrivée devant la Porte. */
@@ -149,7 +190,7 @@ public final class SoulBinding {
 		return gate != null && gate.inArmor();
 	}
 
-	private static boolean adrift(ServerPlayer player) {
+	public static boolean adrift(ServerPlayer player) {
 		GateState gate = FmabAttachments.GATE.get(player);
 		return gate != null && gate.adrift();
 	}
