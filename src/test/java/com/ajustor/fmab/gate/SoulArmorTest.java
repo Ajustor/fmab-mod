@@ -5,8 +5,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** L'armure d'une âme après que la Vérité a arraché son sceau : cabossée, jamais brisée. */
+/**
+ * L'armure d'une âme : cabossée, jamais brisée, après que la Vérité a arraché son sceau ; sans
+ * jambières, sans jambes.
+ */
 class SoulArmorTest {
 	@BeforeAll
 	static void bootstrap() {
@@ -27,5 +32,16 @@ class SoulArmorTest {
 	void theTollNeverBreaksAPiece() {
 		assertEquals(239, SoulArmor.battered(239, 240));
 		assertEquals(0, SoulArmor.battered(0, 1));
+	}
+
+	@Test
+	void withoutLeggingsASoulHasNoLegs() {
+		assertTrue(SoulArmor.legsMissing(true, false));
+		assertFalse(SoulArmor.legsMissing(true, true), "des jambières valides lui rendent ses jambes");
+	}
+
+	@Test
+	void onlyAnInhabitedArmourLosesItsLegs() {
+		assertFalse(SoulArmor.legsMissing(false, false), "une âme errante, ou un joueur de chair, n'est pas concerné");
 	}
 }

@@ -49,7 +49,6 @@ public final class Tolls {
 	private static final Identifier RIGHT_LEG_JUMP = Fmab.id("toll_right_leg_jump");
 	private static final Identifier NO_LEGS_JUMP = Fmab.id("toll_no_legs_jump");
 	private static final Identifier ORGANS_HEALTH = Fmab.id("toll_organs_health");
-	private static final Identifier SOUL_NO_LEGGINGS = Fmab.id("soul_no_leggings");
 	private static final Identifier SOUL_NO_BOOTS = Fmab.id("soul_no_boots");
 	private static final double LEG_SPEED = -0.3;
 	private static final double LEG_JUMP = -0.3;
@@ -147,11 +146,18 @@ public final class Tolls {
 
 	/**
 	 * Le membre ou l'organe manque-t-il, sans rien pour le remplacer ? Une âme fixée dans une armure
-	 * a des bras et des jambes d'acier.
+	 * a des bras et des jambes d'acier : ses jambes sont ses jambières, sans lesquelles elle va comme
+	 * un joueur sans jambes (vitesse, saut, reptation).
 	 */
 	public static boolean disabled(Player player, BodyPart part) {
 		GateState gate = FmabAttachments.GATE.get(player);
-		if (gate == null || gate.soulBound() || !gate.lost(part)) {
+		if (gate == null) {
+			return false;
+		}
+		if (gate.soulBound()) {
+			return part.leg() && SoulArmor.legsMissing(player, gate);
+		}
+		if (!gate.lost(part)) {
 			return false;
 		}
 		return !part.limb() || !Automails.working(player, part);
@@ -225,16 +231,13 @@ public final class Tolls {
 		}
 	}
 
-	/** Les jambes d'une armure d'âme sont ses jambières et ses solerets : sans eux, on avance mal. */
+	/**
+	 * Les pieds d'une armure d'âme sont ses solerets : sans eux, on avance mal. (Sans jambières, elle
+	 * n'a plus de jambes du tout : voir {@link #disabled}.)
+	 */
 	private static void soulLimbs(ServerPlayer player, GateState gate) {
-		boolean armored = gate.inArmor();
-		boolean noLeggings = armored && player.getItemBySlot(EquipmentSlot.LEGS).isEmpty();
-		boolean noBoots = armored && player.getItemBySlot(EquipmentSlot.FEET).isEmpty();
-		modifier(player, Attributes.MOVEMENT_SPEED, SOUL_NO_LEGGINGS, noLeggings ? LEG_SPEED : 0);
+		boolean noBoots = gate.inArmor() && player.getItemBySlot(EquipmentSlot.FEET).isEmpty();
 		modifier(player, Attributes.MOVEMENT_SPEED, SOUL_NO_BOOTS, noBoots ? SOUL_NO_BOOTS_SPEED : 0);
-		if (noLeggings && player.isSprinting()) {
-			player.setSprinting(false);
-		}
 	}
 
 	/** Une armure n'a ni faim ni souffle ; et sans son sceau, l'âme s'en va. */
