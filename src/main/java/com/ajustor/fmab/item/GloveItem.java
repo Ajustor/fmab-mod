@@ -71,6 +71,15 @@ public class GloveItem extends Item {
 		public Rank rank() {
 			return rank;
 		}
+
+		/**
+		 * Les étages que ce gant porte sans perte de stabilité à ce rang : un gant porte parfois plus que
+		 * le rang qui l'ouvre n'en tient, pour plus tard (le cuir pour l'Alchimiste, les gants d'État
+		 * pour l'Initié de la Porte).
+		 */
+		public int stableStages(Rank holder) {
+			return Math.min(stages, holder.maxStages());
+		}
 	}
 
 	private final Kind kind;

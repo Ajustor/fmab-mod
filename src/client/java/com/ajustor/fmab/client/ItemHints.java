@@ -3,6 +3,7 @@ package com.ajustor.fmab.client;
 import com.ajustor.fmab.FmabClientConfig;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.gate.Restoration;
+import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.StateWatch;
@@ -23,12 +24,19 @@ public final class ItemHints {
 	}
 
 	public static void append(ItemStack stack, List<Component> lines) {
+		// Une règle, pas un conseil : affichée même sans les infobulles d'aide.
+		var player = Minecraft.getInstance().player;
+		if (player != null && stack.getItem() instanceof GloveItem glove) {
+			int stable = glove.kind().stableStages(FmabAttachments.ALCHEMIST.getOrCreate(player).rank());
+			if (stable < glove.kind().stages()) {
+				lines.add(Component.translatable("item.fmab.glove.unstable_above", stable).withStyle(ChatFormatting.RED));
+			}
+		}
 		if (!FmabClientConfig.get().itemHints()) {
 			return;
 		}
 		if (stack.is(FmabItems.STATE_WATCH)) {
 			lines.add(hint("item.fmab.state_watch.hint", StateWatch.RANGE_BONUS, Math.round(StateWatch.SAVING * 100)));
-			var player = Minecraft.getInstance().player;
 			if (player != null && !FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.STATE)) {
 				lines.add(Component.translatable("item.fmab.state_watch.inert").withStyle(ChatFormatting.RED));
 			}

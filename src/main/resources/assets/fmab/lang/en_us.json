@@ -35,6 +35,7 @@
   "trial.fmab.gloves": "Transmute with a glove, without drawing anything",
   "trial.fmab.spar": "Hold your ground against Izumi",
   "item.fmab.glove.stages": "Holds a circle of %s stage(s)",
+  "item.fmab.glove.unstable_above": "At your rank, past %s stage(s), the circle loses stability",
   "item.fmab.glove.inscribed": "A circle is inscribed on it",
   "item.fmab.glove.blank": "Blank: embroider it at an alchemist's table",
   "item.fmab.glove.rank_too_low": "These gloves require the rank of %s.",

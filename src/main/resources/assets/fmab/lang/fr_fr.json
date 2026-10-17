@@ -35,6 +35,7 @@
   "trial.fmab.gloves": "Transmuter avec un gant, sans rien tracer",
   "trial.fmab.spar": "Tenir tête à Izumi en combat",
   "item.fmab.glove.stages": "Porte un cercle de %s étage(s)",
+  "item.fmab.glove.unstable_above": "À votre rang, au-delà de %s étage(s), le cercle perd en stabilité",
   "item.fmab.glove.inscribed": "Un cercle y est inscrit",
   "item.fmab.glove.blank": "Vierge : brodez-le à la table d'alchimiste",
   "item.fmab.glove.rank_too_low": "Ces gants demandent le rang %s.",
