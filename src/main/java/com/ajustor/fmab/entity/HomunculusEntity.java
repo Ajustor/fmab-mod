@@ -28,6 +28,9 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.HashSet;
 import java.util.Set;
+import com.ajustor.fmab.stone.Recruitment;
+import net.minecraft.world.entity.LivingEntity;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Un homonculus : un être artificiel dont le cœur est une Pierre philosophale. Tant que la Pierre
@@ -36,6 +39,25 @@ import java.util.Set;
  * À la dernière, il meurt pour de bon et laisse son noyau de Pierre.
  */
 public abstract class HomunculusEntity extends Monster {
+	/**
+	 * Les recrues de Père sont épargnées (voir {@link Recruitment#spared}) : ni le ciblage du jeu, ni
+	 * celui de chaque homonculus ne les visent, tant qu'elles ne frappent pas.
+	 */
+	@Override
+	public boolean canAttack(LivingEntity target) {
+		if (target instanceof Player player && Recruitment.spared(FmabAttachments.RECRUITMENT.get(player),
+				player == getLastHurtByMob())) {
+			return false;
+		}
+		return super.canAttack(target);
+	}
+
+	/** Le joueur le plus proche qu'on peut attaquer (une recrue qui ne frappe pas n'en est pas un). */
+	protected @Nullable Player nearestPrey(ServerLevel level, double reach) {
+		return level.getNearestPlayer(getX(), getY(), getZ(), reach,
+				entity -> entity instanceof Player player && canAttack(player));
+	}
+
 	/** Durée d'une reconstitution, en ticks : il ne bouge ni ne craint rien pendant ce temps. */
 	private static final int REGENERATION = 60;
 	private static final DustParticleOptions FLESH = new DustParticleOptions(0xB0101A, 1.2f);

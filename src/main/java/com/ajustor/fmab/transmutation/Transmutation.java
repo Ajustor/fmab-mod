@@ -182,7 +182,7 @@ public final class Transmutation {
 		boolean watch = StateWatch.empowers(caster);
 		// Une Pierre philosophale en main (ou dans le corps) : ni concentration, ni rebond d'instabilité.
 		Optional<ItemStack> stone = PhilosopherStones.held(caster);
-		boolean living = LivingStone.souls(caster) > 0;
+		boolean living = LivingStone.fuels(caster);
 		boolean amplified = stone.isPresent() || living;
 		// Une pierre rouge impure amplifie, mais ne tient rien : le cercle rebondit comme sans elle.
 		boolean steady = living || stone.filter(PhilosopherStones::pure).isPresent();
@@ -203,6 +203,11 @@ public final class Transmutation {
 			partner.ifPresent(id -> fuse(level, circle, caster, id));
 		}
 		Concentration.set(caster, concentration - cost);
+		// La Pierre paie dès que l'énergie part : rebond ou essai à vide compris.
+		stone.ifPresent(s -> PhilosopherStones.drain(caster, s, PhilosopherStones.cost(analysis)));
+		if (living && stone.isEmpty()) {
+			LivingStone.spend(caster, analysis.parsed().stages().size());
+		}
 		// L'énergie est partie : quoi qu'il arrive, on s'est familiarisé avec les glyphes tracés.
 		practiceGlyphs(caster, rules, analysis);
 
@@ -271,10 +276,6 @@ public final class Transmutation {
 			practice(caster, rules, knowledge, practiced);
 			Trainings.onTransmutation(caster, analysis, frame, inscribed, done);
 			Belly.transmuted(caster);
-			stone.ifPresent(s -> PhilosopherStones.drain(caster, s, PhilosopherStones.cost(analysis)));
-			if (living && stone.isEmpty() && analysis.parsed().stages().size() >= 2) {
-				LivingStone.spend(caster, 1);
-			}
 			if (done.contains("fmab:repair")) {
 				// Réparer ce qui est cassé : un peu de bien en ce monde.
 				Karma.add(caster, 1);
@@ -312,10 +313,16 @@ public final class Transmutation {
 		return living ? MAX_GROWTH : prolonged;
 	}
 
+	/** Cette prolongation (comptée à partir de 1) puise-t-elle une âme dans la Pierre ? */
+	static boolean channelPaysASoul(int prolonged) {
+		return prolonged % PhilosopherStones.CHANNEL_SOUL_EVERY == 1;
+	}
+
 	/**
 	 * L'alchimiste garde la main sur le cercle qu'il vient d'activer : l'énergie continue de couler.
 	 * Les ouvrages grandissent (un mur monte, une pique s'allonge) tant qu'il reste de la matière,
-	 * les jets se répètent. Chaque prolongation coûte un peu de concentration (rien avec une Pierre).
+	 * les jets se répètent. Chaque prolongation coûte un peu de concentration ; avec une Pierre, une
+	 * âme toutes les {@link PhilosopherStones#CHANNEL_SOUL_EVERY} prolongations.
 	 *
 	 * @return vrai si le geste prolonge une transmutation (il ne faut pas en lancer une nouvelle)
 	 */
@@ -337,9 +344,18 @@ public final class Transmutation {
 		AlchemistData alchemist = FmabAttachments.ALCHEMIST.getOrCreate(caster);
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Analysis analysis = rules.analyze(drawing, alchemist);
-		boolean living = LivingStone.is(caster);
-		boolean amplified = PhilosopherStones.held(caster).isPresent() || living;
-		if (!amplified) {
+		boolean living = LivingStone.fuels(caster);
+		Optional<ItemStack> stone = PhilosopherStones.held(caster);
+		boolean amplified = stone.isPresent() || living;
+		if (amplified) {
+			if (channelPaysASoul(channel.growth() + 1)) {
+				if (stone.isPresent()) {
+					PhilosopherStones.drain(caster, stone.get(), 1);
+				} else {
+					LivingStone.spend(caster, 1);
+				}
+			}
+		} else {
 			float concentration = Concentration.of(caster);
 			if (concentration < 1) {
 				caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", 1, 0));

@@ -23,17 +23,16 @@ final class Clearance {
 	private Clearance() {
 	}
 
-	static boolean nearCentral(Structure.GenerationContext context) {
-		return near(context, CENTRAL, CENTRAL_CHUNKS);
+	static boolean nearCentral(Structure.GenerationContext context, ChunkPos here) {
+		return near(context, here, CENTRAL, CENTRAL_CHUNKS);
 	}
 
-	/** Un emplacement possible de cet ensemble est-il à moins de {@code chunks} chunks d'ici ? */
-	static boolean near(Structure.GenerationContext context, ResourceKey<StructureSet> set, int chunks) {
+	/** Un emplacement possible de cet ensemble est-il à moins de {@code chunks} chunks de ce chunk ? */
+	static boolean near(Structure.GenerationContext context, ChunkPos here, ResourceKey<StructureSet> set, int chunks) {
 		StructureSet structures = context.registryAccess().lookupOrThrow(Registries.STRUCTURE_SET).getValue(set);
 		if (structures == null || !(structures.placement() instanceof RandomSpreadStructurePlacement spread)) {
 			return false;
 		}
-		ChunkPos here = context.chunkPos();
 		int spacing = spread.spacing();
 		int gx = Math.floorDiv(here.x(), spacing), gz = Math.floorDiv(here.z(), spacing);
 		// Un emplacement par case de la grille : les cases voisines suffisent (chunks < espacement).

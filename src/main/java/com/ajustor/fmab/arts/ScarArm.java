@@ -95,9 +95,9 @@ public final class ScarArm {
 		level.destroyBlock(pos, !player.isCreative(), player);
 	}
 
-	/** Une Pierre vivante n'attend pas. */
+	/** Le bras reprend son souffle entre deux usages, Pierre vivante comprise. */
 	private static boolean ready(ServerPlayer player, ServerLevel level) {
-		return LivingStone.is(player) || READY.pass(player.getUUID(), level.getGameTime());
+		return READY.pass(player.getUUID(), level.getGameTime());
 	}
 
 	/**
@@ -107,8 +107,11 @@ public final class ScarArm {
 	private static boolean pay(ServerPlayer player, float cost) {
 		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		Knowledge knowledge = AlchemyRules.of(player.level().registryAccess()).knowledge(data);
-		cost = (float) Math.max(0.5, cost - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
-		if (!player.isCreative() && !LivingStone.is(player)) {
+		cost = (float) Math.max(0.5, cost * knowledge.practice(SCHOOL) - knowledge.perk(SCHOOL, "concentration_discount") * 0.5);
+		if (LivingStone.fuels(player)) {
+			// Une Pierre vivante ne puise pas dans sa concentration, mais dans ses âmes.
+			LivingStone.spend(player, 1);
+		} else if (!player.isCreative()) {
 			float concentration = Concentration.of(player);
 			if (concentration < cost) {
 				player.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) Math.ceil(cost),

@@ -67,4 +67,28 @@ class TreatiseTest {
 				.flatMap(c -> c.pages().stream())
 				.anyMatch(p -> p instanceof Treatise.GlyphCatalogue));
 	}
+
+	/**
+	 * Un nouveau venu sait quoi faire dès le premier chapitre : devenir Alchimiste (et à combien de
+	 * maîtrise), aller tôt chez Izumi, passer l'examen, trouver le sang cristallisé.
+	 */
+	@Test
+	void theFirstChapterShowsTheWay() throws IOException {
+		assertTrue(load().chapters().getFirst().pages().contains(new Treatise.TextPage("treatise.fmab.ch1.path")),
+				"les premiers pas doivent être au chapitre I");
+		String mastery = Integer.toString(com.ajustor.fmab.alchemy.knowledge.Knowledge.ALCHEMIST_MASTERY);
+		for (String lang : new String[]{"fr_fr", "en_us"}) {
+			var texts = JsonParser.parseString(Files.readString(
+					TestGlyphs.resources().resolve("assets/fmab/lang/" + lang + ".json"))).getAsJsonObject();
+			String path = texts.get("treatise.fmab.ch1.path").getAsString();
+			assertTrue(path.contains(mastery), lang + " : la maîtrise qui fait l'Alchimiste");
+			assertTrue(path.contains("Izumi") && path.contains("Dublith"), lang + " : Izumi, tôt");
+			assertTrue(path.contains("Central"), lang + " : l'examen");
+			assertTrue(texts.get("exam.fmab.not_eligible").getAsString().contains(mastery), lang);
+			for (String key : new String[]{"welcome.fmab.greeting", "trial.fmab.not_student",
+					"item.fmab.crystallized_blood.where"}) {
+				assertTrue(texts.has(key), lang + " : " + key);
+			}
+		}
+	}
 }

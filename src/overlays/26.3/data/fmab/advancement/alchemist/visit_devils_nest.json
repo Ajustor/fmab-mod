@@ -1,5 +1,5 @@
 {
-  "parent": "fmab:alchemist/rank_state",
+  "parent": "fmab:alchemist/root",
   "criteria": {
     "visit_devils_nest": {
       "trigger": "minecraft:location",

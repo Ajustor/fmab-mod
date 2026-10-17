@@ -90,9 +90,13 @@ public class CrimsonSealsItem extends Item {
 				m -> m.owner().map(owner.getUUID()::equals).orElse(false));
 	}
 
-	/** Une mine coûte de la concentration, sauf à une Pierre vivante, qui n'en a plus besoin. */
+	/** Une mine coûte de la concentration ; à une Pierre vivante, une âme. */
 	private static boolean pay(ServerPlayer player) {
-		if (player.isCreative() || LivingStone.is(player)) {
+		if (player.isCreative()) {
+			return true;
+		}
+		if (LivingStone.fuels(player)) {
+			LivingStone.spend(player, 1);
 			return true;
 		}
 		float concentration = Concentration.of(player);

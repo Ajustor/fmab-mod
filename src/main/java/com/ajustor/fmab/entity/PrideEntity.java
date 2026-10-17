@@ -140,7 +140,7 @@ public class PrideEntity extends HomunculusEntity {
 		}
 		if (!revealed()) {
 			// L'enfant sage se lasse vite qu'on le dévisage dans la pénombre.
-			Player near = level.getNearestPlayer(this, 5);
+			Player near = nearestPrey(level, 5);
 			closeTicks = near != null && !near.isCreative() && shadowsAlive() ? closeTicks + 1 : 0;
 			if (closeTicks > 60) {
 				reveal(level);
@@ -149,7 +149,7 @@ public class PrideEntity extends HomunculusEntity {
 			return;
 		}
 		if (getTarget() == null) {
-			Player near = level.getNearestPlayer(this, REACH);
+			Player near = nearestPrey(level, REACH);
 			if (near != null && !near.isCreative() && !near.isSpectator()) {
 				setTarget(near);
 			}

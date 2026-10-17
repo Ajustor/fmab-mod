@@ -84,6 +84,14 @@ public final class LivingStone {
 	}
 
 	/**
+	 * A-t-il des âmes à dépenser ? La dernière est la sienne : réduite à elle, la Pierre vivante
+	 * n'amplifie plus rien, et il paie de sa concentration comme tout le monde.
+	 */
+	public static boolean fuels(ServerPlayer player) {
+		return souls(player) > 1;
+	}
+
+	/**
 	 * Le rituel : sur un cercle de transmutation humaine, pendant l'éclipse, un Initié de la Porte qui
 	 * tient une Pierre pleine dans chaque main devient une Pierre vivante.
 	 *
@@ -134,7 +142,7 @@ public final class LivingStone {
 		return stack.is(FmabItems.PHILOSOPHER_STONE) && PhilosopherStoneItem.souls(stack) >= stack.getMaxDamage();
 	}
 
-	/** Une grande transmutation consume une âme. */
+	/** Chaque usage de la Pierre vivante consume des âmes (jamais la dernière, la sienne). */
 	public static void spend(ServerPlayer player, int souls) {
 		int left = souls(player);
 		if (left <= 0 || player.isCreative()) {

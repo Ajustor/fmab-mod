@@ -1,5 +1,5 @@
 {
-  "parent": "fmab:alchemist/rank_alchemist",
+  "parent": "fmab:alchemist/visit_laboratory_5",
   "criteria": {
     "slain_barry": {
       "trigger": "minecraft:player_killed_entity",

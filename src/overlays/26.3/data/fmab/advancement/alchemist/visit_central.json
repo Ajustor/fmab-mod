@@ -1,5 +1,5 @@
 {
-  "parent": "fmab:alchemist/rank_alchemist",
+  "parent": "fmab:alchemist/root",
   "criteria": {
     "visit_central": {
       "trigger": "minecraft:location",

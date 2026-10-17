@@ -18,6 +18,10 @@ public final class Knowledge {
 	public static final int ALCHEMIST_MASTERY = 60;
 	/** Maîtrise gagnée par effet réussi. */
 	public static final int MASTERY_PER_EFFECT = 3;
+	/** Ce que chaque point de maîtrise d'une école retire au coût en concentration de ses effets. */
+	public static final double SAVING_PER_MASTERY = 1 / 600.0;
+	/** La pratique ne retire jamais plus de la moitié du coût (atteinte à 300 points de maîtrise). */
+	public static final double MAX_SAVING = 0.5;
 
 	/** Personne ne sait rien : sert à l'éditeur web et aux tests. */
 	public static final Knowledge NONE = new Knowledge(List.of(), Map.of(), Set.of());
@@ -48,6 +52,14 @@ public final class Knowledge {
 
 	public int mastery(String school) {
 		return mastery.getOrDefault(school, 0);
+	}
+
+	/**
+	 * La part du coût en concentration qui reste à payer pour un effet de cette école : la main
+	 * s'habitue, chaque usage rend le suivant un peu moins éprouvant, jusqu'à la moitié du coût.
+	 */
+	public double practice(String school) {
+		return 1 - Math.min(MAX_SAVING, mastery(school) * SAVING_PER_MASTERY);
 	}
 
 	public int totalMastery() {

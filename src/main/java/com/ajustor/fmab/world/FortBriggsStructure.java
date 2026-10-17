@@ -2,6 +2,7 @@ package com.ajustor.fmab.world;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -25,8 +26,13 @@ public class FortBriggsStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		int cx = context.chunkPos().getMiddleBlockX();
-		int cz = context.chunkPos().getMiddleBlockZ();
+		return UniqueSite.only(this, context, this::at);
+	}
+
+	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
+	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+		int cx = chunk.getMiddleBlockX();
+		int cz = chunk.getMiddleBlockZ();
 		int y = context.chunkGenerator().getFirstFreeHeight(cx, cz, Heightmap.Types.WORLD_SURFACE_WG,
 				context.heightAccessor(), context.randomState());
 		if (y <= context.chunkGenerator().getSeaLevel()) {

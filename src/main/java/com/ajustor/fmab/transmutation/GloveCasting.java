@@ -55,7 +55,7 @@ public final class GloveCasting {
 	 */
 	public static void cast(ServerPlayer player, boolean combine) {
 		if (!player.isAlive() || player.isSpectator()
-				|| !LivingStone.is(player) && !CASTS.pass(player.getUUID(), player.level().getGameTime())) {
+				|| !CASTS.pass(player.getUUID(), player.level().getGameTime())) {
 			return;
 		}
 		if (Wheelchairs.handsBusy(player)) {
@@ -167,8 +167,7 @@ public final class GloveCasting {
 	}
 
 	/**
-	 * Un gantelet frappe un bloc : son cercle s'applique sur la face frappée. Une Pierre vivante frappe
-	 * sans délai.
+	 * Un gantelet frappe un bloc : son cercle s'applique sur la face frappée.
 	 */
 	public static void strike(ServerPlayer player, BlockPos pos, Direction face) {
 		Boolean left = strikingHand(player);
@@ -177,12 +176,10 @@ public final class GloveCasting {
 		}
 		Gloves gloves = FmabAttachments.GLOVES.getOrCreate(player);
 		ItemStack glove = gloves.get(left);
-		if (!LivingStone.is(player)) {
-			if (player.getCooldowns().isOnCooldown(glove)) {
-				return;
-			}
-			player.getCooldowns().addCooldown(glove, STRIKE_COOLDOWN);
+		if (player.getCooldowns().isOnCooldown(glove)) {
+			return;
 		}
+		player.getCooldowns().addCooldown(glove, STRIKE_COOLDOWN);
 		castWith(player, gloves, left, pos, face);
 	}
 

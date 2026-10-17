@@ -1,5 +1,5 @@
 {
-  "parent": "fmab:alchemist/slain_barry",
+  "parent": "fmab:alchemist/rank_state",
   "criteria": {
     "visit_laboratory_5": {
       "trigger": "minecraft:location",
