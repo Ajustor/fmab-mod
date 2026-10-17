@@ -177,6 +177,8 @@ public final class FmabItems {
 		return out;
 	}
 
+	public static final Item DRACHMA_GENERAL_SPAWN_EGG = register("drachma_general_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.DRACHMA_GENERAL));
 	public static final Item SLICER_SPAWN_EGG = register("slicer_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.SLICER));
 	public static final Item KIMBLEE_SPAWN_EGG = register("kimblee_spawn_egg", SpawnEggItem::new,
@@ -375,6 +377,7 @@ public final class FmabItems {
 					output.accept(MARCOH_SPAWN_EGG);
 					CHARACTER_EGGS.values().forEach(output::accept);
 					output.accept(SLICER_SPAWN_EGG);
+					output.accept(DRACHMA_GENERAL_SPAWN_EGG);
 					output.accept(KIMBLEE_SPAWN_EGG);
 				})
 				.build());

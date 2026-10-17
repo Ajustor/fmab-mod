@@ -1,0 +1,14 @@
+{
+  "type": "fmab:single_site",
+  "biomes": "#fmab:has_structure/drachma_fort",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "piece": "drachma_fort",
+  "size": 27,
+  "height": 12,
+  "ground": 0,
+  "avoid": [
+    "fmab:fort_briggs"
+  ]
+}
