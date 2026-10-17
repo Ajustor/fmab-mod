@@ -31,7 +31,8 @@
 			"com.ajustor.fmab.gametest.PracticeScenes",
 			"com.ajustor.fmab.gametest.WelcomeScenes",
 			"com.ajustor.fmab.gametest.StoneCostScenes",
-			"com.ajustor.fmab.gametest.GloveStageScenes"
+			"com.ajustor.fmab.gametest.GloveStageScenes",
+			"com.ajustor.fmab.gametest.TreatiseCatalogueScenes"
 		]
 	},
 	"depends": {

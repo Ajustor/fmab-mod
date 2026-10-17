@@ -2,6 +2,7 @@ package com.ajustor.fmab.client.screen;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.Treatise;
+import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.DrawingCode;
 import com.ajustor.fmab.alchemy.drawing.SoulSeal;
@@ -161,6 +162,22 @@ public class TreatiseScreen extends Screen {
 		return -1;
 	}
 
+	/** Ouvre le Traité à la page de ce glyphe, dans le catalogue. */
+	public void goToGlyph(String glyph) {
+		for (int i = 0; i < entries.size(); i++) {
+			if (entries.get(i).glyph() != null && entries.get(i).glyph().id().equals(glyph)) {
+				go(i);
+				return;
+			}
+		}
+	}
+
+	/** La page ouverte est-elle celle d'un glyphe que le lecteur voit en entier ? */
+	public boolean showsRevealedGlyph() {
+		Entry e = current();
+		return e != null && e.glyph() != null && revealed(e.glyph());
+	}
+
 	private void go(int target) {
 		index = Math.clamp(target, -1, entries.size() - 1);
 		contentsButtons.forEach(b -> b.visible = index < 0);
@@ -170,7 +187,7 @@ public class TreatiseScreen extends Screen {
 		notebookButton.active = true;
 		notebookButton.setMessage(Component.translatable("treatise.fmab.add_to_notebook"));
 		if (e != null && e.glyph() != null) {
-			notebookButton.visible = glyphExample(e.glyph()).isPresent();
+			notebookButton.visible = revealed(e.glyph()) && glyphExample(e.glyph()).isPresent();
 		} else if (e != null && (e.page() instanceof Treatise.ExamplePage || e.page() instanceof Treatise.SealPage)) {
 			actionButton.visible = true;
 			actionButton.active = true;
@@ -283,6 +300,10 @@ public class TreatiseScreen extends Screen {
 	}
 
 	private void drawGlyph(GuiGraphicsExtractor graphics, Glyph g) {
+		if (!revealed(g)) {
+			drawUnknown(graphics, g);
+			return;
+		}
 		// Le glyphe est défini dans le carré −1..1 : on le pose au centre d'une page de carnet.
 		Drawing d = new Drawing(g.primitives().stream()
 				.map(p -> p.map(v -> v.scale(12).add(new Vec2(Drawing.CENTER, Drawing.CENTER))))
@@ -303,6 +324,37 @@ public class TreatiseScreen extends Screen {
 		int y = top + 26;
 		for (Component line : lines) {
 			for (FormattedCharSequence seq : font.split(line, BOOK_WIDTH - IMAGE - 36)) {
+				graphics.text(font, seq, left + 12, y, INK, false);
+				y += 10;
+			}
+		}
+	}
+
+	private boolean revealed(Glyph g) {
+		AlchemistData me = alchemist();
+		return Treatise.revealed(g.id(), me.known(), me.uses(g.id()));
+	}
+
+	/** Un glyphe ni appris ni tracé : une page blanche, et où l'apprendre. */
+	private void drawUnknown(GuiGraphicsExtractor graphics, Glyph g) {
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.literal("???").withStyle(s -> s.withBold(true)));
+		lines.add(Component.translatable("treatise.fmab.rank", Component.translatable(g.rank().translationKey())));
+		lines.add(Component.empty());
+		lines.add(Component.translatable("treatise.fmab.unknown"));
+		Tomes.teaching(g.id()).ifPresent(tome -> {
+			lines.add(Component.empty());
+			lines.add(Component.translatable("treatise.fmab.unknown.tome", Component.translatable(tome.titleKey())));
+			lines.add(Component.translatable(Tomes.HIDDEN.contains(tome)
+					? "treatise.fmab.unknown.where." + tome.titleKey().substring("tome.fmab.".length())
+					: "treatise.fmab.unknown.where.library"));
+		});
+		int y = top + 26;
+		for (Component line : lines) {
+			if (line.getString().isEmpty()) {
+				y += 6;
+			}
+			for (FormattedCharSequence seq : font.split(line, BOOK_WIDTH - 24)) {
 				graphics.text(font, seq, left + 12, y, INK, false);
 				y += 10;
 			}

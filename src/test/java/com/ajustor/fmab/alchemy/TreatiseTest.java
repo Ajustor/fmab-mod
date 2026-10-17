@@ -68,6 +68,27 @@ class TreatiseTest {
 				.anyMatch(p -> p instanceof Treatise.GlyphCatalogue));
 	}
 
+	/** Le catalogue se complète au fil du savoir : appris ou tracé une fois, sinon une page blanche. */
+	@Test
+	void theCatalogueFillsInAsYouLearn() throws IOException {
+		assertTrue(Treatise.revealed("fmab:terre", Set.of("fmab:terre"), 0), "appris");
+		assertTrue(Treatise.revealed("fmab:humain", Set.of(), 1), "tracé une fois");
+		assertTrue(!Treatise.revealed("fmab:humain", Set.of("fmab:terre"), 0), "ni l'un ni l'autre");
+		// Chaque page blanche dit où l'apprendre : un tome, et où le trouver.
+		var fr = JsonParser.parseString(Files.readString(
+				TestGlyphs.resources().resolve("assets/fmab/lang/fr_fr.json"))).getAsJsonObject();
+		var en = JsonParser.parseString(Files.readString(
+				TestGlyphs.resources().resolve("assets/fmab/lang/en_us.json"))).getAsJsonObject();
+		for (String glyph : TestGlyphs.all().keySet()) {
+			var tome = com.ajustor.fmab.item.Tomes.teaching(glyph);
+			assertTrue(tome.isPresent(), glyph + " : aucun tome ne l'enseigne");
+			String where = com.ajustor.fmab.item.Tomes.HIDDEN.contains(tome.get())
+					? "treatise.fmab.unknown.where." + tome.get().titleKey().substring("tome.fmab.".length())
+					: "treatise.fmab.unknown.where.library";
+			assertTrue(fr.has(where) && en.has(where), glyph + " : " + where);
+		}
+	}
+
 	/**
 	 * Un nouveau venu sait quoi faire dès le premier chapitre : devenir Alchimiste (et à combien de
 	 * maîtrise), aller tôt chez Izumi, passer l'examen, trouver le sang cristallisé.

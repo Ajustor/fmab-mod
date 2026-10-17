@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Plan du Traité d'alchimie, lu depuis {@code assets/fmab/treatise/treatise.json} : des chapitres
@@ -32,6 +33,14 @@ public record Treatise(List<Chapter> chapters) {
 
 	/** Le sceau de sang du lecteur : chacun y voit le sien. */
 	public record SealPage(String textKey) implements Page {
+	}
+
+	/**
+	 * Le catalogue se complète au fil du savoir : un glyphe y paraît une fois compris, ou dès qu'on
+	 * l'a tracé ; les autres restent des pages blanches qui disent où l'apprendre.
+	 */
+	public static boolean revealed(String glyph, Set<String> known, int uses) {
+		return known.contains(glyph) || uses > 0;
 	}
 
 	public static Treatise parse(JsonObject json) {
