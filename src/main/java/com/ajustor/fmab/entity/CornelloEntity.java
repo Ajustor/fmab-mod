@@ -87,7 +87,7 @@ public class CornelloEntity extends PathfinderMob {
 			p.sendSystemMessage(Component.translatable("npc.fmab.cornello.cornered"));
 			return InteractionResult.SUCCESS;
 		}
-		if (!p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.ALCHEMIST)) {
+		if (!FmabAttachments.ALCHEMIST.getOrCreate(p).rank().atLeast(Rank.ALCHEMIST)) {
 			// Un « miracle » : une fleur de pierre, et les fidèles applaudissent.
 			level.sendParticles(RED, getX(), getY(1.1), getZ(), 20, 0.3, 0.3, 0.3, 0);
 			p.sendSystemMessage(Component.translatable("npc.fmab.cornello.miracle"));

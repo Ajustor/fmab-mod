@@ -40,12 +40,12 @@ public final class TattooRitual {
 		}
 		Drawing drawing = be.drawing();
 		int stages = AlchemyRules.of(level.registryAccess())
-				.analyze(drawing, player.getAttachedOrCreate(FmabAttachments.ALCHEMIST)).parsed().stages().size();
+				.analyze(drawing, FmabAttachments.ALCHEMIST.getOrCreate(player)).parsed().stages().size();
 		if (stages == 0 || stages > slot.stages()) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.support_too_small", slot.stages()));
 			return;
 		}
-		Tattoos tattoos = player.getAttachedOrCreate(FmabAttachments.TATTOOS);
+		Tattoos tattoos = FmabAttachments.TATTOOS.getOrCreate(player);
 		if (tattoos.get(slot).isPresent()) {
 			player.sendOverlayMessage(Component.translatable("tattoo.fmab.occupied"));
 			return;
@@ -53,7 +53,7 @@ public final class TattooRitual {
 		if (!player.isCreative()) {
 			ink.shrink(1);
 		}
-		player.setAttached(FmabAttachments.TATTOOS, tattoos.with(slot, drawing));
+		FmabAttachments.TATTOOS.set(player, tattoos.with(slot, drawing));
 		level.removeBlock(circle, false);
 		player.hurtServer(level, level.damageSources().magic(), PAIN);
 		TransmutationLightning.discharge(level, player.blockPosition(), 1.5, 1);
@@ -63,7 +63,7 @@ public final class TattooRitual {
 
 	/** Effacer un tatouage : deux encres, et une douleur plus vive encore. */
 	public static void erase(ServerPlayer player, TattooSlot slot) {
-		Tattoos tattoos = player.getAttachedOrCreate(FmabAttachments.TATTOOS);
+		Tattoos tattoos = FmabAttachments.TATTOOS.getOrCreate(player);
 		if (tattoos.get(slot).isEmpty()) {
 			return;
 		}
@@ -75,7 +75,7 @@ public final class TattooRitual {
 			}
 			ink.shrink(ERASE_INK);
 		}
-		player.setAttached(FmabAttachments.TATTOOS, tattoos.without(slot));
+		FmabAttachments.TATTOOS.set(player, tattoos.without(slot));
 		player.hurtServer(player.level(), player.level().damageSources().magic(), ERASE_PAIN);
 		player.sendSystemMessage(Component.translatable("tattoo.fmab.erased", Component.translatable(slot.translationKey())));
 	}

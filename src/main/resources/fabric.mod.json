@@ -16,10 +16,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.ajustor.fmab.Fmab"
+			"com.ajustor.fmab.fabric.FmabFabric"
 		],
 		"client": [
-			"com.ajustor.fmab.client.FmabClient"
+			"com.ajustor.fmab.fabric.client.FmabFabricClient"
 		],
 		"modmenu": [
 			"com.ajustor.fmab.client.config.ModMenuIntegration"

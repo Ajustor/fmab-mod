@@ -14,9 +14,6 @@ import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.util.PlayerMaps;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
@@ -37,6 +34,9 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.InteractionEvents;
+import com.ajustor.fmab.platform.event.PlayerEvents;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * La Pierre philosophale vivante, comme Van Hohenheim : l'alchimiste a fondu dans son corps les âmes
@@ -73,7 +73,7 @@ public final class LivingStone {
 	}
 
 	public static int souls(ServerPlayer player) {
-		Integer souls = player.getAttached(FmabAttachments.LIVING_STONE);
+		Integer souls = FmabAttachments.LIVING_STONE.get(player);
 		return souls == null ? 0 : souls;
 	}
 
@@ -104,7 +104,7 @@ public final class LivingStone {
 			player.sendSystemMessage(Component.translatable("stone.fmab.ritual_needs_eclipse"));
 			return true;
 		}
-		if (!player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank()
+		if (!FmabAttachments.ALCHEMIST.getOrCreate(player).rank()
 				.atLeast(Rank.GATE)) {
 			player.sendSystemMessage(Component.translatable("stone.fmab.ritual_needs_gate"));
 			return true;
@@ -115,9 +115,9 @@ public final class LivingStone {
 			main.shrink(1);
 			off.shrink(1);
 		}
-		player.setAttached(FmabAttachments.LIVING_STONE, souls);
-		GateState gate = player.getAttachedOrCreate(FmabAttachments.GATE);
-		player.setAttached(FmabAttachments.GATE, gate.restore(gate.lost()));
+		FmabAttachments.LIVING_STONE.set(player, souls);
+		GateState gate = FmabAttachments.GATE.getOrCreate(player);
+		FmabAttachments.GATE.set(player, gate.restore(gate.lost()));
 		GateOfTruth.returnParts(player);
 		Karma.set(player, Karma.MIN);
 		player.setHealth(player.getMaxHealth());
@@ -139,11 +139,11 @@ public final class LivingStone {
 		if (left <= 0 || player.isCreative()) {
 			return;
 		}
-		player.setAttached(FmabAttachments.LIVING_STONE, Math.max(1, left - souls));
+		FmabAttachments.LIVING_STONE.set(player, Math.max(1, left - souls));
 	}
 
 	public static void register() {
-		UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+		InteractionEvents.USE_ENTITY.register((player, level, hand, entity, hit) -> {
 			if (!(player instanceof ServerPlayer absorber) || hand != InteractionHand.MAIN_HAND
 					|| !player.getMainHandItem().isEmpty() || souls(absorber) <= 0 || !player.isShiftKeyDown()
 					|| !(entity instanceof LivingEntity target) || entity instanceof TruthEntity) {
@@ -153,18 +153,18 @@ public final class LivingStone {
 			return InteractionResult.SUCCESS;
 		});
 		// Il ressuscite sur place tant qu'il lui reste des âmes.
-		ServerPlayerEvents.ALLOW_DEATH.register((player, source, amount) -> {
+		PlayerEvents.ALLOW_DEATH.register((player, source, amount) -> {
 			int left = souls(player);
 			if (left <= 0 || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && player.getY() < -128) {
 				return true;
 			}
 			int after = left - DEATH;
 			if (after <= 0) {
-				player.removeAttached(FmabAttachments.LIVING_STONE);
+				FmabAttachments.LIVING_STONE.remove(player);
 				player.sendSystemMessage(Component.translatable("stone.fmab.living_stone_spent"));
 				return true;
 			}
-			player.setAttached(FmabAttachments.LIVING_STONE, after);
+			FmabAttachments.LIVING_STONE.set(player, after);
 			player.setHealth(player.getMaxHealth());
 			player.level().sendParticles(RED, player.getX(), player.getY(0.5), player.getZ(), 80, 0.5, 1, 0.5, 0);
 			player.level().playSound(null, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.PLAYERS,
@@ -172,7 +172,7 @@ public final class LivingStone {
 			player.sendOverlayMessage(Component.translatable("stone.fmab.resurrected", after));
 			return false;
 		});
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			if (server.getTickCount() % HUNT_PERIOD != 0) {
 				return;
 			}
@@ -205,11 +205,11 @@ public final class LivingStone {
 			int left = souls(victim);
 			gained = Math.min(rate, left);
 			if (left - gained <= 0) {
-				victim.removeAttached(FmabAttachments.LIVING_STONE);
+				FmabAttachments.LIVING_STONE.remove(victim);
 				victim.sendSystemMessage(Component.translatable("stone.fmab.drained_dry"));
 				victim.kill(level);
 			} else {
-				victim.setAttached(FmabAttachments.LIVING_STONE, left - gained);
+				FmabAttachments.LIVING_STONE.set(victim, left - gained);
 				victim.sendOverlayMessage(Component.translatable("stone.fmab.being_drained", left - gained));
 			}
 		} else if (target instanceof HomunculusEntity homunculus && homunculus.souls() > 0) {
@@ -222,7 +222,7 @@ public final class LivingStone {
 					: target instanceof Player || target instanceof AbstractVillager ? HUMAN_SOULS : BEAST_SOULS;
 		}
 		if (gained > 0) {
-			absorber.setAttached(FmabAttachments.LIVING_STONE, souls(absorber) + gained);
+			FmabAttachments.LIVING_STONE.set(absorber, souls(absorber) + gained);
 			absorber.sendOverlayMessage(Component.translatable("stone.fmab.absorbed", gained, souls(absorber)));
 			if (target instanceof Player || target instanceof AbstractVillager) {
 				Karma.add(absorber, -gained);
@@ -250,7 +250,7 @@ public final class LivingStone {
 	 */
 	public static void visit(ServerPlayer player) {
 		Recruitment.Visit visit = Recruitment.visit(Karma.of(player), souls(player),
-				player.getAttached(FmabAttachments.RECRUITMENT));
+				FmabAttachments.RECRUITMENT.get(player));
 		ServerLevel level = player.level();
 		if (visit == Recruitment.Visit.NONE
 				|| !level.getEntitiesOfClass(HomunculusEntity.class, player.getBoundingBox().inflate(64)).isEmpty()) {

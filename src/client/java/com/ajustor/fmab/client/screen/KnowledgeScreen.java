@@ -110,7 +110,7 @@ public class KnowledgeScreen extends Screen {
 
 	private AlchemistData alchemist() {
 		AlchemistData data = minecraft == null || minecraft.player == null ? null
-				: minecraft.player.getAttached(FmabAttachments.ALCHEMIST);
+				: FmabAttachments.ALCHEMIST.get(minecraft.player);
 		return data == null ? AlchemistData.NEW : data;
 	}
 
@@ -129,7 +129,7 @@ public class KnowledgeScreen extends Screen {
 	/** Le karma, en toutes lettres : il se sent plus qu'il ne se compte. */
 	private Component karmaLine() {
 		Integer karma = minecraft == null || minecraft.player == null ? null
-				: minecraft.player.getAttached(FmabAttachments.KARMA);
+				: FmabAttachments.KARMA.get(minecraft.player);
 		int k = karma == null ? 0 : karma;
 		String step = k <= -60 ? "damned" : k <= -25 ? "dark" : k < 25 ? "neutral" : k < 60 ? "good" : "noble";
 		return Component.translatable("knowledge.fmab.karma", Component.translatable("karma.fmab." + step), k);

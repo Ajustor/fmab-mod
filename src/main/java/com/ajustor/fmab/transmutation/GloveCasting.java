@@ -62,7 +62,7 @@ public final class GloveCasting {
 			player.sendOverlayMessage(Component.translatable("wheelchair.fmab.hands_busy"));
 			return;
 		}
-		if (combine && player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.GATE)) {
+		if (combine && FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.GATE)) {
 			clap(player);
 			return;
 		}
@@ -120,21 +120,21 @@ public final class GloveCasting {
 
 	/** Une main porte-t-elle un cercle : celui de son gant, ou, paume nue, celui de son tatouage ? */
 	private static boolean hasCircle(ServerPlayer player, boolean left) {
-		ItemStack glove = player.getAttachedOrCreate(FmabAttachments.GLOVES).get(left);
+		ItemStack glove = FmabAttachments.GLOVES.getOrCreate(player).get(left);
 		if (!glove.isEmpty()) {
 			return inscribed(glove);
 		}
-		return player.getAttachedOrCreate(FmabAttachments.TATTOOS).get(TattooSlot.palm(left)).isPresent();
+		return FmabAttachments.TATTOOS.getOrCreate(player).get(TattooSlot.palm(left)).isPresent();
 	}
 
 	private static boolean castHand(ServerPlayer player, boolean left, BlockPos target, Direction face) {
-		Gloves gloves = player.getAttachedOrCreate(FmabAttachments.GLOVES);
+		Gloves gloves = FmabAttachments.GLOVES.getOrCreate(player);
 		if (!gloves.get(left).isEmpty()) {
 			return castWith(player, gloves, left, target, face);
 		}
 		// Paume nue tatouée : le cercle fait partie du corps, il ne s'use pas.
 		TattooSlot palm = TattooSlot.palm(left);
-		Drawing drawing = player.getAttachedOrCreate(FmabAttachments.TATTOOS).get(palm).orElse(null);
+		Drawing drawing = FmabAttachments.TATTOOS.getOrCreate(player).get(palm).orElse(null);
 		if (drawing == null) {
 			return false;
 		}
@@ -174,7 +174,7 @@ public final class GloveCasting {
 		if (left == null) {
 			return;
 		}
-		Gloves gloves = player.getAttachedOrCreate(FmabAttachments.GLOVES);
+		Gloves gloves = FmabAttachments.GLOVES.getOrCreate(player);
 		ItemStack glove = gloves.get(left);
 		if (!LivingStone.is(player)) {
 			if (player.getCooldowns().isOnCooldown(glove)) {
@@ -190,7 +190,7 @@ public final class GloveCasting {
 		if (!player.getMainHandItem().isEmpty()) {
 			return null;
 		}
-		Gloves gloves = player.getAttached(FmabAttachments.GLOVES);
+		Gloves gloves = FmabAttachments.GLOVES.get(player);
 		if (gloves == null) {
 			return null;
 		}
@@ -250,8 +250,8 @@ public final class GloveCasting {
 			ItemStack worn = glove.copy();
 			worn.hurtAndBreak(wear, level, player, broken -> player.sendOverlayMessage(
 					Component.translatable("transmutation.fmab.glove_broken")));
-			Gloves now = player.getAttachedOrCreate(FmabAttachments.GLOVES);
-			player.setAttached(FmabAttachments.GLOVES, now.with(left, worn.isEmpty() ? ItemStack.EMPTY : worn));
+			Gloves now = FmabAttachments.GLOVES.getOrCreate(player);
+			FmabAttachments.GLOVES.set(player, now.with(left, worn.isEmpty() ? ItemStack.EMPTY : worn));
 		}
 		return result != Transmutation.Result.INERT && result != Transmutation.Result.TIRED;
 	}

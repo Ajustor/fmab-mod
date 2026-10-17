@@ -39,8 +39,8 @@ public record OpenExamPayload(int entityId, boolean eligible, boolean itemsGiven
 			OpenExamPayload::new);
 
 	public static OpenExamPayload of(Entity examiner, ServerPlayer player) {
-		ExamProgress exam = player.getAttachedOrCreate(FmabAttachments.EXAM);
-		boolean eligible = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.ALCHEMIST);
+		ExamProgress exam = FmabAttachments.EXAM.getOrCreate(player);
+		boolean eligible = FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.ALCHEMIST);
 		List<Row> rows = StateExam.requirements().stream()
 				.map(r -> new Row(r.key(), r.held(player), r.count()))
 				.toList();

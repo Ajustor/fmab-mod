@@ -101,7 +101,7 @@ public class FoeScenes implements FabricClientGameTest {
 		onPlayer(context, sp, p -> {
 			p.getInventory().clearContent();
 			p.interactOn(lust[0], InteractionHand.MAIN_HAND, Vec3.ZERO);
-			check(Recruitment.ACCEPTED.equals(p.getAttached(FmabAttachments.RECRUITMENT)), "l'offre devrait être acceptée");
+			check(Recruitment.ACCEPTED.equals(FmabAttachments.RECRUITMENT.get(p)), "l'offre devrait être acceptée");
 			check(lust[0].isRemoved(), "Lust devrait s'en aller une fois l'offre acceptée");
 			check(p.getInventory().countItem(FmabItems.PHILOSOPHER_STONE_CORE) == 1,
 					"l'acompte de Père devrait être un noyau de Pierre");
@@ -116,7 +116,7 @@ public class FoeScenes implements FabricClientGameTest {
 		LustEntity[] lust = envoy(context, sp);
 		onPlayer(context, sp, p -> {
 			p.attack(lust[0]);
-			check(Recruitment.REFUSED.equals(p.getAttached(FmabAttachments.RECRUITMENT)), "frapper Lust devrait refuser l'offre");
+			check(Recruitment.REFUSED.equals(FmabAttachments.RECRUITMENT.get(p)), "frapper Lust devrait refuser l'offre");
 			check(!lust[0].envoy() && lust[0].getTarget() == p, "Lust devrait attaquer le joueur qui a refusé");
 			check(Karma.of(p) == -80 + Recruitment.REFUSE_KARMA, "refuser devrait faire remonter le karma");
 		});

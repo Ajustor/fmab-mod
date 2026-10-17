@@ -14,9 +14,6 @@ import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.transmutation.AlchemyRules;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -41,6 +38,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
+import com.ajustor.fmab.platform.event.PlayerEvents;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * La visite de l'Espace blanc : l'alchimiste arrive devant sa Porte, face à sa Vérité (sa copie toute
@@ -113,9 +112,8 @@ public final class GateOfTruth {
 
 	public static void register() {
 		// Revenu en pleine visite : la cinématique reprend là où elle en était.
-		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			ServerPlayer player = handler.getPlayer();
-			GateState gate = player.getAttached(FmabAttachments.GATE);
+		PlayerEvents.JOIN.register((player, server) -> {
+			GateState gate = FmabAttachments.GATE.get(player);
 			if (gate == null || gate.visit().isEmpty()) {
 				return;
 			}
@@ -130,15 +128,15 @@ public final class GateOfTruth {
 			}
 		});
 		// Mort pendant qu'on l'aspirait : revenu à la vie, il est de nouveau happé.
-		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, player, alive) -> {
-			GateState gate = player.getAttached(FmabAttachments.GATE);
+		PlayerEvents.AFTER_RESPAWN.register((oldPlayer, player, alive) -> {
+			GateState gate = FmabAttachments.GATE.get(player);
 			if (gate != null && gate.visit().isPresent() && gate.visit().get().ticks() < -1) {
 				CinematicPayload.play(player, CinematicPayload.GATE_PULL, -gate.visit().get().ticks());
 			}
 		});
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				GateState gate = player.getAttached(FmabAttachments.GATE);
+				GateState gate = FmabAttachments.GATE.get(player);
 				if (gate != null && gate.visit().isPresent()) {
 					step(server, player, gate, gate.visit().get());
 				} else if (gate != null && gate.adrift()) {
@@ -168,14 +166,14 @@ public final class GateOfTruth {
 		ServerLevel space = server.getLevel(WHITE_SPACE);
 		if (space == null) {
 			Fmab.LOGGER.error("Dimension {} introuvable : la Porte ne peut pas s'ouvrir", WHITE_SPACE.identifier());
-			player.setAttached(FmabAttachments.GATE, gate.withVisit(null));
+			FmabAttachments.GATE.set(player, gate.withVisit(null));
 			return;
 		}
 		if (visit.ticks() < -1 && player.level() != space) {
 			// Les bras noirs le tiennent : il ne bouge plus, le monde s'assombrit.
 			player.setDeltaMovement(player.getDeltaMovement().multiply(0.2, 0.2, 0.2));
 			player.hurtMarked = true;
-			player.setAttached(FmabAttachments.GATE, gate.withVisit(visit.tick()));
+			FmabAttachments.GATE.set(player, gate.withVisit(visit.tick()));
 			return;
 		}
 		if (visit.ticks() < 0 || player.level() != space) {
@@ -184,7 +182,7 @@ public final class GateOfTruth {
 				visit = new GateState.Visit(visit.dimension(), visit.origin(), visit.ambition(), visit.severe(), -1);
 			}
 			if (arrive(space, player, gate)) {
-				player.setAttached(FmabAttachments.GATE, gate.withVisit(visit.tick()));
+				FmabAttachments.GATE.set(player, gate.withVisit(visit.tick()));
 			}
 			return;
 		}
@@ -242,7 +240,7 @@ public final class GateOfTruth {
 		}
 		if (t >= RETURN) {
 			close(space, player);
-			player.setAttached(FmabAttachments.GATE, gate.withVisit(null));
+			FmabAttachments.GATE.set(player, gate.withVisit(null));
 			if (gate.adrift()) {
 				SoulBinding.drift(player);
 				mock(player);
@@ -252,7 +250,7 @@ public final class GateOfTruth {
 			}
 			return;
 		}
-		player.setAttached(FmabAttachments.GATE, gate.withVisit(visit.tick()));
+		FmabAttachments.GATE.set(player, gate.withVisit(visit.tick()));
 	}
 
 	/** Une âme sans armure attend devant sa Porte, face à sa Vérité, qui ne se prive pas de s'en moquer. */
@@ -340,7 +338,7 @@ public final class GateOfTruth {
 	public static void returnParts(ServerPlayer player) {
 		ServerLevel space = player.level().getServer().getLevel(WHITE_SPACE);
 		if (space != null) {
-			truth(space, player).ifPresent(t -> t.setStolen(player.getAttachedOrCreate(FmabAttachments.GATE).lost()));
+			truth(space, player).ifPresent(t -> t.setStolen(FmabAttachments.GATE.getOrCreate(player).lost()));
 		}
 	}
 
@@ -441,13 +439,13 @@ public final class GateOfTruth {
 		say(player, "truth.fmab.knowledge");
 		// Derrière la Porte : l'œil, le torrent des symboles, puis le blanc.
 		CinematicPayload.play(player, CinematicPayload.GATE_KNOWLEDGE, TOLL - KNOWLEDGE);
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		int before = me.known().size();
 		for (Glyph glyph : AlchemyRules.of(space.registryAccess()).glyphs()) {
 			me = me.learn(glyph.id());
 		}
 		if (me.known().size() > before) {
-			player.setAttached(FmabAttachments.ALCHEMIST, me);
+			FmabAttachments.ALCHEMIST.set(player, me);
 			player.sendSystemMessage(Component.translatable("gate.fmab.knowledge_learned", me.known().size() - before)
 					.withStyle(s -> s.withColor(0xE0D8B0)));
 		}
@@ -517,13 +515,13 @@ public final class GateOfTruth {
 				SoulArmor.giveNotes(player);
 			}
 		}
-		player.setAttached(FmabAttachments.GATE, paid);
+		FmabAttachments.GATE.set(player, paid);
 		truth(space, player).ifPresent(t -> t.setStolen(paid.lost()));
 		space.playSound(null, player.blockPosition(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1, 0.5f);
 		Tolls.dropFromLostHands(player, paid);
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		if (!me.rank().atLeast(Rank.GATE)) {
-			player.setAttached(FmabAttachments.ALCHEMIST, me.withRank(Rank.GATE));
+			FmabAttachments.ALCHEMIST.set(player, me.withRank(Rank.GATE));
 			player.sendSystemMessage(Component.translatable("gate.fmab.initiated",
 					Component.translatable(Rank.GATE.translationKey())));
 		}

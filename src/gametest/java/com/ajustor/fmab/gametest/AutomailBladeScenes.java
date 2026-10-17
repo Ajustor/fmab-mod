@@ -68,8 +68,8 @@ public class AutomailBladeScenes implements FabricClientGameTest {
 				mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
 			});
 			onPlayer(context, sp, p -> {
-				p.setAttached(FmabAttachments.GATE, GateState.NONE.pay(BodyPart.RIGHT_ARM));
-				p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE
+				FmabAttachments.GATE.set(p, GateState.NONE.pay(BodyPart.RIGHT_ARM));
+				FmabAttachments.AUTOMAIL.set(p, Automail.NONE
 						.with(BodyPart.RIGHT_ARM, new ItemStack(FmabItems.IRON_AUTOMAIL_ARM)));
 			});
 			context.waitTicks(10);
@@ -82,7 +82,7 @@ public class AutomailBladeScenes implements FabricClientGameTest {
 			if (blade <= fist) {
 				String state = sp.getServer().computeOnServer(server -> {
 					ServerPlayer p = server.getPlayerList().getPlayers().getFirst();
-					ItemStack arm = p.getAttachedOrCreate(FmabAttachments.AUTOMAIL).get(BodyPart.RIGHT_ARM);
+					ItemStack arm = FmabAttachments.AUTOMAIL.getOrCreate(p).get(BodyPart.RIGHT_ARM);
 					return "lame " + Automails.bladed(arm) + ", en état " + Automails.working(p, BodyPart.RIGHT_ARM)
 							+ ", main tenue " + p.getMainHandItem();
 				});

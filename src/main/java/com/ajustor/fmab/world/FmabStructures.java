@@ -7,15 +7,16 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
+import com.ajustor.fmab.platform.Platform;
 
 /**
  * Types de structure et de pièce du mod. Leur placement (biomes, fréquence) est en JSON :
  * {@code data/fmab/worldgen/structure} et {@code structure_set}.
  */
 public final class FmabStructures {
-	public static final StructurePieceType PROCEDURAL_PIECE = Registry.register(BuiltInRegistries.STRUCTURE_PIECE,
+	public static final StructurePieceType PROCEDURAL_PIECE = Platform.get().content().register(BuiltInRegistries.STRUCTURE_PIECE,
 			Fmab.id("procedural"), (StructurePieceType.ContextlessType) ProceduralPiece::new);
-	public static final StructurePieceType PATH_PIECE = Registry.register(BuiltInRegistries.STRUCTURE_PIECE,
+	public static final StructurePieceType PATH_PIECE = Platform.get().content().register(BuiltInRegistries.STRUCTURE_PIECE,
 			Fmab.id("path"), (StructurePieceType.ContextlessType) PathPiece::new);
 
 	public static final StructureType<CentralStructure> CENTRAL = type("central", CentralStructure.CODEC);
@@ -35,7 +36,7 @@ public final class FmabStructures {
 	}
 
 	private static <S extends Structure> StructureType<S> type(String name, MapCodec<S> codec) {
-		return Registry.register(BuiltInRegistries.STRUCTURE_TYPE, Fmab.id(name), () -> codec);
+		return Platform.get().content().register(BuiltInRegistries.STRUCTURE_TYPE, Fmab.id(name), () -> codec);
 	}
 
 	public static void register() {

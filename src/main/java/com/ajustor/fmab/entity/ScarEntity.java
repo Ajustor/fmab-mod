@@ -79,7 +79,7 @@ public class ScarEntity extends PathfinderMob {
 
 	private static boolean stateAlchemist(ServerPlayer player) {
 		return !player.isCreative() && !player.isSpectator()
-				&& player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.STATE);
+				&& FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.STATE);
 	}
 
 	@Override

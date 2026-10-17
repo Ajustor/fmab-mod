@@ -11,8 +11,10 @@
 		"ClientLevelMixin",
 		"EntityRenderDispatcherMixin",
 		"HudMixin",
+		"InventoryScreenMixin",
 		"ItemInHandRendererMixin",
 		"PlayerModelMixin",
+		"ScreenInvoker",
 		"SkyRendererMixin"
 	],
 	"injectors": {

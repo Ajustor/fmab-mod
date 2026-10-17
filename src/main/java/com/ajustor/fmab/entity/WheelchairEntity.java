@@ -119,14 +119,14 @@ public class WheelchairEntity extends Mob {
 	private void grab(LivingEntity pusher) {
 		entityData.set(PUSHER, pusher.getId());
 		if (pusher instanceof Player player) {
-			player.setAttached(FmabAttachments.PUSHING, getId());
+			FmabAttachments.PUSHING.set(player, getId());
 		}
 	}
 
 	/** Le joueur qui tenait les poignées ne les tient plus. */
 	private void releasePlayer() {
-		if (pusher() instanceof Player player && Integer.valueOf(getId()).equals(player.getAttached(FmabAttachments.PUSHING))) {
-			player.removeAttached(FmabAttachments.PUSHING);
+		if (pusher() instanceof Player player && Integer.valueOf(getId()).equals(FmabAttachments.PUSHING.get(player))) {
+			FmabAttachments.PUSHING.remove(player);
 		}
 	}
 

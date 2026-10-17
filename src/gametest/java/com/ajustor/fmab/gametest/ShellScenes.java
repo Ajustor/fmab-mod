@@ -25,6 +25,8 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static com.ajustor.fmab.gametest.GametestAsserts.check;
+import com.ajustor.fmab.platform.client.ClientPlatform;
+import com.ajustor.fmab.platform.event.LivingEvents;
 
 /**
  * L'armure d'une âme comme coquille, jouée pour de vrai : le joueur est l'âme, une autre joueuse
@@ -59,12 +61,12 @@ public class ShellScenes implements FabricClientGameTest {
 				for (BodyPart part : BodyPart.values()) {
 					everything = everything.pay(part);
 				}
-				p.setAttached(FmabAttachments.GATE, everything);
+				FmabAttachments.GATE.set(p, everything);
 				SoulArmor.bindFirstTime(p);
 				return null;
 			});
 			context.waitTicks(10);
-			check(server(sp, p -> p.getAttachedOrCreate(FmabAttachments.GATE).inArmor()), "le joueur devrait être une âme en armure");
+			check(server(sp, p -> FmabAttachments.GATE.getOrCreate(p).inArmor()), "le joueur devrait être une âme en armure");
 
 			// 1. La touche fige l'âme : plus de vitesse à elle.
 			key(context, sp);
@@ -136,7 +138,7 @@ public class ShellScenes implements FabricClientGameTest {
 			int[] wear = new int[1];
 			boolean hurt = server(sp, p -> {
 				wear[0] = p.getItemBySlot(EquipmentSlot.CHEST).getDamageValue();
-				return ServerLivingEntityEvents.ALLOW_DAMAGE.invoker().allowDamage(winry,
+				return LivingEvents.ALLOW_DAMAGE.invoker().allowDamage(winry,
 						p.level().damageSources().generic(), 6);
 			});
 			check(!hurt, "Winry, dans l'armure, ne devrait pas être blessée");
@@ -155,12 +157,12 @@ public class ShellScenes implements FabricClientGameTest {
 	}
 
 	private static Shell shell(ServerPlayer p) {
-		return p.getAttachedOrElse(FmabAttachments.SHELL, Shell.NONE);
+		return FmabAttachments.SHELL.getOrElse(p, Shell.NONE);
 	}
 
 	/** La touche de l'âme, par le vrai paquet du client. */
 	private static void key(ClientGameTestContext context, TestSingleplayerContext sp) {
-		context.runOnClient(mc -> ClientPlayNetworking.send(ShellKeyPayload.INSTANCE));
+		context.runOnClient(mc -> ClientPlatform.get().send(ShellKeyPayload.INSTANCE));
 		sp.getConnection().waitForClientboundPackets();
 		context.waitTicks(3);
 	}

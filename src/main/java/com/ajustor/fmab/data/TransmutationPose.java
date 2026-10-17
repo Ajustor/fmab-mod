@@ -47,7 +47,7 @@ public record TransmutationPose(Kind kind, long start, long until) {
 	/** Le joueur prend la pose pendant {@code ticks} ticks. */
 	public static void strike(ServerPlayer player, Kind kind, int ticks) {
 		long now = player.level().getGameTime();
-		player.setAttached(FmabAttachments.POSE, new TransmutationPose(kind, now, now + ticks));
+		FmabAttachments.POSE.set(player, new TransmutationPose(kind, now, now + ticks));
 	}
 
 	public boolean active(long now) {

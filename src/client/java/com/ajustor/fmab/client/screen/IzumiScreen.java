@@ -3,12 +3,12 @@ package com.ajustor.fmab.client.screen;
 import com.ajustor.fmab.network.IzumiActionPayload;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.training.Trial;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Dialogue avec Izumi : ses épreuves (à faire, réussies, récompensées) et le combat
@@ -44,13 +44,13 @@ public class IzumiScreen extends Screen {
 			boolean rewarded = state.rewarded().contains(trial.id());
 			if (achieved && !rewarded) {
 				addRenderableWidget(Button.builder(Component.translatable("entity.fmab.izumi.report"),
-						b -> ClientPlayNetworking.send(new IzumiActionPayload(state.entityId(), trial.id())))
+						b -> ClientPlatform.get().send(new IzumiActionPayload(state.entityId(), trial.id())))
 						.bounds(left + WIDTH - 90, y - 4, 80, 16).build());
 			}
 			y += ROW;
 		}
 		addRenderableWidget(Button.builder(Component.translatable("entity.fmab.izumi.spar"), b -> {
-			ClientPlayNetworking.send(new IzumiActionPayload(state.entityId(), IzumiActionPayload.SPAR));
+			ClientPlatform.get().send(new IzumiActionPayload(state.entityId(), IzumiActionPayload.SPAR));
 			onClose();
 		}).bounds(left + WIDTH / 2 - 75, top + panelHeight - 26, 150, 18).build());
 	}

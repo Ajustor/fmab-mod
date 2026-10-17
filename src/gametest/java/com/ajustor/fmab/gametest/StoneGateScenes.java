@@ -43,6 +43,7 @@ import net.minecraft.world.phys.AABB;
 import java.util.Map;
 
 import static com.ajustor.fmab.gametest.GametestAsserts.check;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * La transmutation humaine, Pierre philosophale en main : l'alchimiste choisit. D'abord créer un
@@ -67,11 +68,11 @@ public class StoneGateScenes implements FabricClientGameTest {
 			sp.getServer().runCommand("tp @p 0.5 -60 -0.5 0 35");
 			sp.getConnection().waitForChunksRender();
 			server(context, sp, (level, p) -> {
-				AlchemistData data = p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).withRank(Rank.GATE);
+				AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(p).withRank(Rank.GATE);
 				for (Glyph g : AlchemyRules.of(level.registryAccess()).glyphs()) {
 					data = data.learn(g.id());
 				}
-				p.setAttached(FmabAttachments.ALCHEMIST, data);
+				FmabAttachments.ALCHEMIST.set(p, data);
 				p.getInventory().clearContent();
 				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FmabItems.PHILOSOPHER_STONE));
 				return null;
@@ -92,7 +93,7 @@ public class StoneGateScenes implements FabricClientGameTest {
 			context.waitTicks(2);
 			context.takeScreenshot("stonegate_00b_choose_form");
 			int before = souls(context, sp);
-			context.runOnClient(mc -> ClientPlayNetworking.send(new StoneChosenPayload("being:dog")));
+			context.runOnClient(mc -> ClientPlatform.get().send(new StoneChosenPayload("being:dog")));
 			context.setScreen(() -> null);
 			sp.getConnection().waitForServerboundPackets();
 			context.waitTicks(20);
@@ -102,7 +103,7 @@ public class StoneGateScenes implements FabricClientGameTest {
 			check(souls(context, sp) == before - 1, "la Pierre devrait avoir donné une âme");
 			check(server(context, sp, (level, p) -> level.getEntitiesOfClass(ItemEntity.class, around()).stream()
 					.noneMatch(e -> e.getItem().is(Items.COAL))), "les ingrédients devraient être consommés");
-			check(server(context, sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).visit().isEmpty()),
+			check(server(context, sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p).visit().isEmpty()),
 					"la Porte ne devrait pas s'ouvrir");
 			context.takeScreenshot("stonegate_01_being_created");
 			server(context, sp, (level, p) -> {
@@ -114,17 +115,17 @@ public class StoneGateScenes implements FabricClientGameTest {
 			body(context, sp);
 			cast(context, sp);
 			context.waitForScreen(StoneChoiceScreen.class);
-			context.runOnClient(mc -> ClientPlayNetworking.send(new StoneChosenPayload("gate")));
+			context.runOnClient(mc -> ClientPlatform.get().send(new StoneChosenPayload("gate")));
 			context.setScreen(() -> null);
 			context.waitFor(mc -> mc.gui.screen() instanceof BargainScreen, 20 * 60);
 			context.takeScreenshot("stonegate_02_bargain");
 			BodyPart lost = server(context, sp, (level, p) ->
-					p.getAttachedOrCreate(FmabAttachments.GATE).lost().iterator().next());
+					FmabAttachments.GATE.getOrCreate(p).lost().iterator().next());
 			int stoneBefore = souls(context, sp);
-			context.runOnClient(mc -> ClientPlayNetworking.send(new BargainAnswerPayload(lost.serializedName())));
+			context.runOnClient(mc -> ClientPlatform.get().send(new BargainAnswerPayload(lost.serializedName())));
 			sp.getConnection().waitForServerboundPackets();
 			context.waitTicks(10);
-			GateState gate = server(context, sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE));
+			GateState gate = server(context, sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p));
 			check(!gate.lost().contains(lost), "la partie rachetée devrait être rendue : " + lost);
 			check(souls(context, sp) <= stoneBefore - 15, "la Pierre devrait avoir payé");
 			context.takeScreenshot("stonegate_03_bought_back");
@@ -134,7 +135,7 @@ public class StoneGateScenes implements FabricClientGameTest {
 			context.waitFor(mc -> mc.player != null && mc.player.level().dimension() != GateOfTruth.WHITE_SPACE,
 					20 * 30);
 			context.waitTicks(20);
-			check(server(context, sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).visit().isEmpty()),
+			check(server(context, sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p).visit().isEmpty()),
 					"la visite devrait être terminée");
 			context.takeScreenshot("stonegate_04_back_home");
 		}

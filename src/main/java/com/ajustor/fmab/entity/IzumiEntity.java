@@ -9,7 +9,6 @@ import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.world.Maps;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -43,6 +42,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.UUID;
+import com.ajustor.fmab.network.FmabNetwork;
 
 /**
  * Izumi Curtis, maîtresse d'entraînement. Elle propose des épreuves et, à qui le demande, un combat
@@ -98,10 +98,9 @@ public class IzumiEntity extends PathfinderMob {
 	@Override
 	protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 		if (player instanceof ServerPlayer serverPlayer && student == null) {
-			serverPlayer.setAttached(FmabAttachments.TRAINING,
-					serverPlayer.getAttachedOrCreate(FmabAttachments.TRAINING).meet());
+			FmabAttachments.TRAINING.set(serverPlayer, FmabAttachments.TRAINING.getOrCreate(serverPlayer).meet());
 			giveIslandMap(serverPlayer);
-			ServerPlayNetworking.send(serverPlayer, OpenIzumiPayload.of(this, serverPlayer));
+			FmabNetwork.send(serverPlayer, OpenIzumiPayload.of(this, serverPlayer));
 		}
 		return InteractionResult.SUCCESS;
 	}

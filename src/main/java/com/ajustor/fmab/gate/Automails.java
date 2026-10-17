@@ -8,9 +8,6 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.util.Modifiers;
 import com.ajustor.fmab.util.PlayerMaps;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -35,6 +32,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+import com.ajustor.fmab.platform.event.InteractionEvents;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Les règles de l'automail : on ne le pose que sur un membre perdu ; il s'use (un coup ou un bloc
@@ -63,18 +62,18 @@ public final class Automails {
 	}
 
 	public static void register() {
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				tick(player);
 			}
 		});
-		AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+		InteractionEvents.ATTACK_ENTITY.register((player, level, hand, entity, hit) -> {
 			if (player instanceof ServerPlayer server) {
 				wear(server, BodyPart.RIGHT_ARM, 1);
 			}
 			return InteractionResult.PASS;
 		});
-		PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) -> {
+		InteractionEvents.AFTER_BREAK.register((level, player, pos, state, blockEntity) -> {
 			if (player instanceof ServerPlayer server) {
 				wear(server, BodyPart.RIGHT_ARM, 1);
 			}
@@ -93,7 +92,7 @@ public final class Automails {
 
 	/** Un automail en état remplace-t-il ce membre ? */
 	public static boolean working(Player player, BodyPart part) {
-		Automail automail = player.getAttached(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.get(player);
 		if (automail == null) {
 			return false;
 		}
@@ -103,8 +102,8 @@ public final class Automails {
 
 	/** Le membre perdu que cette pièce peut remplacer, le côté droit d'abord. */
 	public static Optional<BodyPart> slotFor(Player player, AutomailItem item) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
-		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
+		GateState gate = FmabAttachments.GATE.get(player);
+		Automail automail = FmabAttachments.AUTOMAIL.getOrCreate(player);
 		if (gate == null) {
 			return Optional.empty();
 		}
@@ -139,8 +138,8 @@ public final class Automails {
 	 * le membre est perdu et libre, et que la pièce lui va.
 	 */
 	public static void fitTo(ServerPlayer player, BodyPart part, ItemStack piece) {
-		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
-		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(part, piece));
+		Automail automail = FmabAttachments.AUTOMAIL.getOrCreate(player);
+		FmabAttachments.AUTOMAIL.set(player, automail.with(part, piece));
 		// Brancher les nerfs fait mal : Ed s'en souvient.
 		player.hurtServer(player.level(), player.level().damageSources().generic(), 2);
 		player.level().playSound(null, player.blockPosition(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.8f, 1.2f);
@@ -149,8 +148,8 @@ public final class Automails {
 
 	/** Ce membre peut-il recevoir cette pièce : perdu, libre, et la pièce est faite pour lui ? */
 	public static boolean canFit(Player player, BodyPart part, ItemStack piece) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
-		Automail automail = player.getAttached(FmabAttachments.AUTOMAIL);
+		GateState gate = FmabAttachments.GATE.get(player);
+		Automail automail = FmabAttachments.AUTOMAIL.get(player);
 		return piece.getItem() instanceof AutomailItem item && item.fits(part) && gate != null && !gate.soulBound()
 				&& gate.lost(part) && (automail == null || automail.get(part).isEmpty());
 	}
@@ -177,7 +176,7 @@ public final class Automails {
 		if (arm.isEmpty()) {
 			return false;
 		}
-		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.getOrCreate(player);
 		ItemStack stack = automail.get(arm.get()).copy();
 		boolean blade = !bladed(stack);
 		if (blade) {
@@ -185,7 +184,7 @@ public final class Automails {
 		} else {
 			stack.remove(FmabComponents.AUTOMAIL_BLADE);
 		}
-		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(arm.get(), stack));
+		FmabAttachments.AUTOMAIL.set(player, automail.with(arm.get(), stack));
 		ServerLevel level = player.level();
 		Vec3 hand = player.getEyePosition().add(player.getLookAngle().scale(0.6)).add(0, -0.5, 0);
 		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, hand.x, hand.y, hand.z, 30, 0.25, 0.3, 0.25, 0.15);
@@ -198,13 +197,13 @@ public final class Automails {
 
 	/** Retire la pièce d'un membre ; elle revient dans l'inventaire, sa lame rentrée. */
 	public static void remove(ServerPlayer player, BodyPart part) {
-		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.getOrCreate(player);
 		ItemStack stack = automail.get(part).copy();
 		if (stack.isEmpty()) {
 			return;
 		}
 		stack.remove(FmabComponents.AUTOMAIL_BLADE);
-		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(part, ItemStack.EMPTY));
+		FmabAttachments.AUTOMAIL.set(player, automail.with(part, ItemStack.EMPTY));
 		if (!player.getInventory().add(stack.copy())) {
 			player.drop(stack.copy(), false);
 		}
@@ -222,7 +221,7 @@ public final class Automails {
 
 	/** Winry répare une pièce contre des lingots de fer pris dans l'inventaire. */
 	public static boolean repair(ServerPlayer player, BodyPart part) {
-		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.getOrCreate(player);
 		ItemStack stack = automail.get(part).copy();
 		int cost = repairCost(stack);
 		if (cost == 0) {
@@ -244,7 +243,7 @@ public final class Automails {
 			}
 		}
 		stack.setDamageValue(0);
-		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(part, stack));
+		FmabAttachments.AUTOMAIL.set(player, automail.with(part, stack));
 		player.level().playSound(null, player.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.PLAYERS, 1, 1);
 		return true;
 	}
@@ -254,7 +253,7 @@ public final class Automails {
 		if (player.isCreative()) {
 			return;
 		}
-		Automail automail = player.getAttached(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.get(player);
 		if (automail == null) {
 			return;
 		}
@@ -264,7 +263,7 @@ public final class Automails {
 		}
 		ItemStack worn = stack.copy();
 		worn.setDamageValue(worn(worn.getDamageValue(), worn.getMaxDamage(), amount));
-		player.setAttached(FmabAttachments.AUTOMAIL, automail.with(part, worn));
+		FmabAttachments.AUTOMAIL.set(player, automail.with(part, worn));
 		if (broken(worn)) {
 			player.level().playSound(null, player.blockPosition(), SoundEvents.ITEM_BREAK.value(), SoundSource.PLAYERS, 1, 0.8f);
 			player.sendSystemMessage(Component.translatable("automail.fmab.broke",
@@ -290,7 +289,7 @@ public final class Automails {
 	}
 
 	private static void tick(ServerPlayer player) {
-		Automail automail = player.getAttached(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.get(player);
 		if (automail == null || automail.limbs().isEmpty()) {
 			modifier(player, Attributes.MOVEMENT_SPEED, RUSH_LEG_SPEED, 0);
 			modifier(player, Attributes.ATTACK_SPEED, RUSH_ARM_SPEED, 0);
@@ -345,7 +344,7 @@ public final class Automails {
 			return;
 		}
 		WALKED.put(id, 0.0);
-		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.getOrCreate(player);
 		for (BodyPart leg : new BodyPart[]{BodyPart.LEFT_LEG, BodyPart.RIGHT_LEG}) {
 			if (automail.get(leg).getItem() instanceof AutomailItem item) {
 				int wear = legWear(item.model(), player.getRandom().nextBoolean());

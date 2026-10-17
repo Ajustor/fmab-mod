@@ -76,9 +76,9 @@ public class OlivierEntity extends PathfinderMob {
 			p.sendSystemMessage(Component.translatable("npc.fmab.olivier.contempt"));
 			return InteractionResult.SUCCESS;
 		}
-		boolean ally = Boolean.TRUE.equals(p.getAttached(FmabAttachments.BRIGGS_ALLY));
+		boolean ally = Boolean.TRUE.equals(FmabAttachments.BRIGGS_ALLY.get(p));
 		if (!ally && (karma >= ALLY || p.isCreative())) {
-			p.setAttached(FmabAttachments.BRIGGS_ALLY, true);
+			FmabAttachments.BRIGGS_ALLY.set(p, true);
 			ItemStack sabre = new ItemStack(FmabItems.BRIGGS_SABRE);
 			if (!p.getInventory().add(sabre)) {
 				p.drop(sabre, false);

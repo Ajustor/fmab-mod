@@ -41,9 +41,9 @@ public final class BodyContainer implements Container {
 	public ItemStack getItem(int index) {
 		BodyPart limb = BodyMenu.limb(index);
 		if (limb != null) {
-			return player.getAttachedOrCreate(FmabAttachments.AUTOMAIL).get(limb);
+			return FmabAttachments.AUTOMAIL.getOrCreate(player).get(limb);
 		}
-		return player.getAttachedOrCreate(FmabAttachments.GLOVES).get(BodyMenu.leftGlove(index));
+		return FmabAttachments.GLOVES.getOrCreate(player).get(BodyMenu.leftGlove(index));
 	}
 
 	@Override
@@ -71,16 +71,16 @@ public final class BodyContainer implements Container {
 			setGlove(index, stack);
 			return;
 		}
-		Automail automail = player.getAttachedOrCreate(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.getOrCreate(player);
 		if (!stack.isEmpty() && automail.get(limb).isEmpty()) {
 			Automails.fitTo(player, limb, stack.copyWithCount(1));
 		}
 	}
 
 	private void setGlove(int index, ItemStack stack) {
-		Gloves gloves = player.getAttachedOrCreate(FmabAttachments.GLOVES);
+		Gloves gloves = FmabAttachments.GLOVES.getOrCreate(player);
 		boolean left = BodyMenu.leftGlove(index);
-		player.setAttached(FmabAttachments.GLOVES, gloves.with(left, stack.isEmpty() ? ItemStack.EMPTY : stack.copyWithCount(1)));
+		FmabAttachments.GLOVES.set(player, gloves.with(left, stack.isEmpty() ? ItemStack.EMPTY : stack.copyWithCount(1)));
 		if (!stack.isEmpty()) {
 			player.level().playSound(null, player.blockPosition(), SoundEvents.ARMOR_EQUIP_LEATHER.value(),
 					SoundSource.PLAYERS, 1, 1);

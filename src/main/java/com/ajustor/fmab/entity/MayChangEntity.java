@@ -80,7 +80,7 @@ public class MayChangEntity extends PathfinderMob {
 			return InteractionResult.SUCCESS;
 		}
 		if (!Alkahestry.knows(p)) {
-			p.setAttached(FmabAttachments.ALKAHESTRY, true);
+			FmabAttachments.ALKAHESTRY.set(p, true);
 			give(p, new ItemStack(FmabItems.KUNAI, TEACHING_KUNAI));
 			p.sendSystemMessage(Component.translatable("npc.fmab.may.teaches"));
 			// Elle parle aussi du Nord, de Briggs, où l'alchimie d'Amestris tient bon.

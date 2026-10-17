@@ -2,13 +2,12 @@ package com.ajustor.fmab.stone;
 
 import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.promised.NationalCircle;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * L'éclipse, rappel du Jour promis : tous les huit jours, vers midi, la lune passe devant le soleil.
@@ -80,8 +79,8 @@ public final class Eclipse {
 	}
 
 	public static void register() {
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> announced = Long.MIN_VALUE);
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.STOPPED.register(server -> announced = Long.MIN_VALUE);
+		ServerEvents.END_TICK.register(server -> {
 			ServerLevel overworld = server.overworld();
 			long clock = overworld.getOverworldClockTime();
 			Announcement announcement = announcement(clock, announced);

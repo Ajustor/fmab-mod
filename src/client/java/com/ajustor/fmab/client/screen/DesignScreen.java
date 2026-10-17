@@ -2,7 +2,6 @@ package com.ajustor.fmab.client.screen;
 
 import com.ajustor.fmab.network.ChooseDesignPayload;
 import com.ajustor.fmab.network.OpenDesignsPayload;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * La page de conception : l'alchimiste choisit l'objet auquel il pense en recomposant, parmi ceux
@@ -88,7 +88,7 @@ public class DesignScreen extends Screen {
 
 	private void choose(String id) {
 		current = id;
-		ClientPlayNetworking.send(new ChooseDesignPayload(id));
+		ClientPlatform.get().send(new ChooseDesignPayload(id));
 	}
 
 	private int gridX() {

@@ -7,9 +7,10 @@ import com.ajustor.fmab.alchemy.rules.Combination;
 import com.ajustor.fmab.data.AlloyGroup;
 import com.ajustor.fmab.data.ExchangeGroup;
 import com.ajustor.fmab.data.FmabCodecs;
-import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import com.ajustor.fmab.platform.Platform;
+import com.ajustor.fmab.platform.registry.Content;
 
 /**
  * Registres de données : tout ce qu'un pack peut étendre sans recompiler le mod. Les glyphes, les
@@ -34,10 +35,11 @@ public final class FmabRegistries {
 	}
 
 	public static void register() {
-		DynamicRegistries.registerSynced(GLYPH, FmabCodecs.GLYPH);
-		DynamicRegistries.registerSynced(COMBINATION, FmabCodecs.COMBINATION);
-		DynamicRegistries.registerSynced(KNOWLEDGE, FmabCodecs.KNOWLEDGE_NODE);
-		DynamicRegistries.register(EXCHANGE, ExchangeGroup.CODEC);
-		DynamicRegistries.register(ALLOY, AlloyGroup.CODEC);
+		Content content = Platform.get().content();
+		content.dataRegistry(GLYPH, FmabCodecs.GLYPH, true);
+		content.dataRegistry(COMBINATION, FmabCodecs.COMBINATION, true);
+		content.dataRegistry(KNOWLEDGE, FmabCodecs.KNOWLEDGE_NODE, true);
+		content.dataRegistry(EXCHANGE, ExchangeGroup.CODEC, false);
+		content.dataRegistry(ALLOY, AlloyGroup.CODEC, false);
 	}
 }

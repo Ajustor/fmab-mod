@@ -29,7 +29,7 @@ public final class ItemHints {
 		if (stack.is(FmabItems.STATE_WATCH)) {
 			lines.add(hint("item.fmab.state_watch.hint", StateWatch.RANGE_BONUS, Math.round(StateWatch.SAVING * 100)));
 			var player = Minecraft.getInstance().player;
-			if (player != null && !player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.STATE)) {
+			if (player != null && !FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.STATE)) {
 				lines.add(Component.translatable("item.fmab.state_watch.inert").withStyle(ChatFormatting.RED));
 			}
 		} else if (stack.is(FmabItems.PHILOSOPHER_STONE_CORE)) {

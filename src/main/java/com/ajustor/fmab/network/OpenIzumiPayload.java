@@ -24,7 +24,7 @@ public record OpenIzumiPayload(int entityId, List<String> achieved, List<String>
 			OpenIzumiPayload::new);
 
 	public static OpenIzumiPayload of(Entity izumi, ServerPlayer player) {
-		Training training = player.getAttachedOrCreate(FmabAttachments.TRAINING);
+		Training training = FmabAttachments.TRAINING.getOrCreate(player);
 		return new OpenIzumiPayload(izumi.getId(), List.copyOf(training.achieved()), List.copyOf(training.rewarded()));
 	}
 

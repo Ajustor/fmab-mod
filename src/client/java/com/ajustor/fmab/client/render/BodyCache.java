@@ -41,11 +41,11 @@ public final class BodyCache {
 	}
 
 	public static Body of(Entity entity) {
-		GateState gate = entity instanceof Player ? entity.getAttached(FmabAttachments.GATE) : null;
+		GateState gate = entity instanceof Player ? FmabAttachments.GATE.get(entity) : null;
 		if (gate == null || gate.lost().isEmpty()) {
 			return Body.WHOLE;
 		}
-		Automail automail = entity.getAttached(FmabAttachments.AUTOMAIL);
+		Automail automail = FmabAttachments.AUTOMAIL.get(entity);
 		Entry entry = CACHE.get(entity.getId());
 		if (entry != null && entry.gate() == gate && entry.automail() == automail) {
 			return entry.body();

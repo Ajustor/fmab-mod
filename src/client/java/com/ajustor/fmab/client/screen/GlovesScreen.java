@@ -6,7 +6,6 @@ import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.network.RemoveGlovePayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -14,6 +13,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Les deux emplacements de gants : ce qu'on porte à chaque main, le cercle qui y est brodé ou gravé,
@@ -42,7 +42,7 @@ public class GlovesScreen extends Screen {
 		for (boolean leftHand : new boolean[]{true, false}) {
 			int x = column(leftHand);
 			addRenderableWidget(Button.builder(Component.translatable("gloves.fmab.remove"),
-					b -> ClientPlayNetworking.send(new RemoveGlovePayload(leftHand)))
+					b -> ClientPlatform.get().send(new RemoveGlovePayload(leftHand)))
 					.bounds(x, top + PANEL_HEIGHT - 26, IMAGE + 20, 18).build());
 		}
 	}
@@ -57,7 +57,7 @@ public class GlovesScreen extends Screen {
 		graphics.fill(left, top, left + PANEL_WIDTH, top + PANEL_HEIGHT, PAPER);
 		graphics.centeredText(font, title, left + PANEL_WIDTH / 2, top + 6, INK);
 		Gloves gloves = minecraft == null || minecraft.player == null ? null
-				: minecraft.player.getAttached(FmabAttachments.GLOVES);
+				: FmabAttachments.GLOVES.get(minecraft.player);
 		if (gloves == null) {
 			gloves = Gloves.NONE;
 		}

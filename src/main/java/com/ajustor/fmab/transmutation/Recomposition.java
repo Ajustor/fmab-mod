@@ -93,19 +93,19 @@ public final class Recomposition {
 	/** L'alchimiste retient comment cet objet est fait. */
 	private static void understand(ServerPlayer caster, ItemStack stack) {
 		String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
-		Set<String> known = caster.getAttachedOrCreate(FmabAttachments.UNDERSTOOD);
+		Set<String> known = FmabAttachments.UNDERSTOOD.getOrCreate(caster);
 		if (known.contains(id)) {
 			return;
 		}
 		Set<String> more = new HashSet<>(known);
 		more.add(id);
-		caster.setAttached(FmabAttachments.UNDERSTOOD, Set.copyOf(more));
+		FmabAttachments.UNDERSTOOD.set(caster, Set.copyOf(more));
 		caster.sendSystemMessage(Component.translatable("transmutation.fmab.understood", stack.getHoverName())
 				.withStyle(ChatFormatting.DARK_AQUA));
 	}
 
 	public static boolean understands(ServerPlayer caster, Item item) {
-		return caster.getAttachedOrCreate(FmabAttachments.UNDERSTOOD)
+		return FmabAttachments.UNDERSTOOD.getOrCreate(caster)
 				.contains(BuiltInRegistries.ITEM.getKey(item).toString());
 	}
 
@@ -220,7 +220,7 @@ public final class Recomposition {
 
 	/** L'objet auquel l'alchimiste pense, s'il en a choisi un. */
 	private static Optional<Item> design(ServerPlayer caster) {
-		String id = caster.getAttached(FmabAttachments.DESIGN);
+		String id = FmabAttachments.DESIGN.get(caster);
 		if (id == null || id.isEmpty()) {
 			return Optional.empty();
 		}
@@ -233,19 +233,19 @@ public final class Recomposition {
 	public static OpenDesignsPayload designs(ServerPlayer player) {
 		ServerLevel level = player.level();
 		List<OpenDesignsPayload.Entry> entries = new ArrayList<>();
-		for (String id : new TreeSet<>(player.getAttachedOrCreate(FmabAttachments.UNDERSTOOD))) {
+		for (String id : new TreeSet<>(FmabAttachments.UNDERSTOOD.getOrCreate(player))) {
 			BuiltInRegistries.ITEM.getOptional(Identifier.parse(id))
 					.flatMap(item -> composition(level, item))
 					.ifPresent(c -> entries.add(new OpenDesignsPayload.Entry(id, c.cost())));
 		}
-		String current = player.getAttached(FmabAttachments.DESIGN);
+		String current = FmabAttachments.DESIGN.get(player);
 		return new OpenDesignsPayload(entries, current == null ? "" : current);
 	}
 
 	/** L'alchimiste pense désormais à cet objet (ou à rien, si l'identifiant est vide). */
 	public static void choose(ServerPlayer player, String id) {
 		if (id.isEmpty()) {
-			player.removeAttached(FmabAttachments.DESIGN);
+			FmabAttachments.DESIGN.remove(player);
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.design.cleared"));
 			return;
 		}
@@ -253,7 +253,7 @@ public final class Recomposition {
 		if (item.isEmpty() || !understands(player, item.get()) || composition(player.level(), item.get()).isEmpty()) {
 			return;
 		}
-		player.setAttached(FmabAttachments.DESIGN, id);
+		FmabAttachments.DESIGN.set(player, id);
 		player.sendOverlayMessage(Component.translatable("transmutation.fmab.design.chosen",
 				new ItemStack(item.get()).getHoverName()));
 	}

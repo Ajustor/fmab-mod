@@ -78,8 +78,8 @@ public final class StateExam {
 
 	/** Le candidat remet les objets : tous d'un coup, ou rien. */
 	public static boolean giveItems(ServerPlayer player) {
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-		ExamProgress exam = player.getAttachedOrCreate(FmabAttachments.EXAM);
+		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
+		ExamProgress exam = FmabAttachments.EXAM.getOrCreate(player);
 		if (!me.rank().atLeast(Rank.ALCHEMIST) || exam.itemsGiven()) {
 			return false;
 		}
@@ -99,7 +99,7 @@ public final class StateExam {
 				}
 			}
 		}
-		player.setAttached(FmabAttachments.EXAM, new ExamProgress(true, false));
+		FmabAttachments.EXAM.set(player, new ExamProgress(true, false));
 		player.sendSystemMessage(Component.translatable("exam.fmab.items_accepted"));
 		return true;
 	}
@@ -110,7 +110,7 @@ public final class StateExam {
 	 */
 	public static void startFight(Entity examiner, ServerPlayer player) {
 		ServerLevel level = player.level();
-		ExamProgress exam = player.getAttachedOrCreate(FmabAttachments.EXAM);
+		ExamProgress exam = FmabAttachments.EXAM.getOrCreate(player);
 		if (!exam.itemsGiven() || exam.passed()) {
 			return;
 		}
@@ -155,14 +155,14 @@ public final class StateExam {
 	 * sur la combustion des archives de l'armée.
 	 */
 	public static void pass(ServerPlayer player) {
-		ExamProgress exam = player.getAttachedOrCreate(FmabAttachments.EXAM);
+		ExamProgress exam = FmabAttachments.EXAM.getOrCreate(player);
 		if (exam.passed() || !exam.itemsGiven()) {
 			return;
 		}
-		player.setAttached(FmabAttachments.EXAM, new ExamProgress(true, true));
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		FmabAttachments.EXAM.set(player, new ExamProgress(true, true));
+		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		if (!me.rank().atLeast(Rank.STATE)) {
-			player.setAttached(FmabAttachments.ALCHEMIST, me.withRank(Rank.STATE));
+			FmabAttachments.ALCHEMIST.set(player, me.withRank(Rank.STATE));
 		}
 		for (ItemStack reward : new ItemStack[]{new ItemStack(FmabItems.STATE_WATCH), Tomes.stack(Tomes.FLAME)}) {
 			if (!player.getInventory().add(reward)) {

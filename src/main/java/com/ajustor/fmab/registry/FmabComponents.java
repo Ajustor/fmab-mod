@@ -10,10 +10,11 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.item.ItemStack;
+import com.ajustor.fmab.platform.Platform;
 
 public final class FmabComponents {
 	/** Cercle brodé ou gravé sur un gant. */
-	public static final DataComponentType<Drawing> GLOVE_CIRCLE = Registry.register(
+	public static final DataComponentType<Drawing> GLOVE_CIRCLE = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("glove_circle"),
 			DataComponentType.<Drawing>builder()
@@ -22,7 +23,7 @@ public final class FmabComponents {
 					.build());
 
 	/** Cercle brodé sur un vêtement : il agit tant qu'on le porte. */
-	public static final DataComponentType<Drawing> EMBROIDERY = Registry.register(
+	public static final DataComponentType<Drawing> EMBROIDERY = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("embroidery"),
 			DataComponentType.<Drawing>builder()
@@ -31,7 +32,7 @@ public final class FmabComponents {
 					.build());
 
 	/** Ce que dessinent les kunaï d'alkahestry : vrai pour un piège, faux pour un soin. */
-	public static final DataComponentType<Boolean> KUNAI_TRAP = Registry.register(
+	public static final DataComponentType<Boolean> KUNAI_TRAP = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("kunai_trap"),
 			DataComponentType.<Boolean>builder()
@@ -40,7 +41,7 @@ public final class FmabComponents {
 					.build());
 
 	/** Un bras d'automail transmuté en lame, comme celui d'Ed : la lame sort de l'avant-bras. */
-	public static final DataComponentType<Boolean> AUTOMAIL_BLADE = Registry.register(
+	public static final DataComponentType<Boolean> AUTOMAIL_BLADE = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("automail_blade"),
 			DataComponentType.<Boolean>builder()
@@ -49,7 +50,7 @@ public final class FmabComponents {
 					.build());
 
 	/** Le tome que cachent des notes chiffrées de Marcoh. */
-	public static final DataComponentType<Integer> CIPHER = Registry.register(
+	public static final DataComponentType<Integer> CIPHER = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("cipher"),
 			DataComponentType.<Integer>builder()
@@ -58,7 +59,7 @@ public final class FmabComponents {
 					.build());
 
 	/** Le numéro d'un fragment de fresque de Xerxès. */
-	public static final DataComponentType<Integer> MURAL = Registry.register(
+	public static final DataComponentType<Integer> MURAL = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("mural"),
 			DataComponentType.<Integer>builder()
@@ -67,7 +68,7 @@ public final class FmabComponents {
 					.build());
 
 	/** Heure de jeu (ticks) à laquelle une arme transmutée se défait. */
-	public static final DataComponentType<Long> EXPIRES = Registry.register(
+	public static final DataComponentType<Long> EXPIRES = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("expires"),
 			DataComponentType.<Long>builder()
@@ -76,7 +77,7 @@ public final class FmabComponents {
 					.build());
 
 	/** La matière qui revient quand l'arme se défait : rien ne se perd. */
-	public static final DataComponentType<ItemStack> REMAINS = Registry.register(
+	public static final DataComponentType<ItemStack> REMAINS = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("remains"),
 			DataComponentType.<ItemStack>builder()
@@ -85,7 +86,7 @@ public final class FmabComponents {
 					.build());
 
 	/** Les glyphes qu'enseigne un tome d'alchimie. */
-	public static final DataComponentType<Tome> TOME = Registry.register(
+	public static final DataComponentType<Tome> TOME = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("tome"),
 			DataComponentType.<Tome>builder()
@@ -94,7 +95,7 @@ public final class FmabComponents {
 					.build());
 
 	/** Le sceau de sang tracé dans le plastron d'une armure d'âme : l'UUID de l'âme qui l'habite. */
-	public static final DataComponentType<String> BLOOD_SEAL = Registry.register(
+	public static final DataComponentType<String> BLOOD_SEAL = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("blood_seal"),
 			DataComponentType.<String>builder()
@@ -103,7 +104,7 @@ public final class FmabComponents {
 					.build());
 
 	/** La taille (en blocs) des cercles que trace une craie, une peinture ou un burin. */
-	public static final DataComponentType<Integer> CIRCLE_SIZE = Registry.register(
+	public static final DataComponentType<Integer> CIRCLE_SIZE = Platform.get().content().register(
 			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			Fmab.id("circle_size"),
 			DataComponentType.<Integer>builder()

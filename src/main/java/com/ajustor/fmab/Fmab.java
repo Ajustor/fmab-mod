@@ -43,24 +43,26 @@ import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.util.PlayerMaps;
 import com.ajustor.fmab.world.FmabStructures;
 import com.ajustor.fmab.xing.Alkahestry;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ajustor.fmab.platform.event.InteractionEvents;
+import com.ajustor.fmab.platform.event.PlayerEvents;
 
-public class Fmab implements ModInitializer {
+public final class Fmab {
 	public static final String MOD_ID = "fmab";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	private static ClientHooks clientHooks = ClientHooks.NONE;
 
-	@Override
-	public void onInitialize() {
+	private Fmab() {
+	}
+
+	/** Lance le mod : appelé par le point d'entrée du loader, une fois ses événements branchés. */
+	public static void init() {
 		FmabConfig.load();
 		FmabRegistries.register();
 		FmabComponents.register();
@@ -102,12 +104,12 @@ public class Fmab implements ModInitializer {
 		ScarArm.register();
 		PlayerMaps.register();
 		IslandTrial.register();
-		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			equip(handler.getPlayer());
-			Notebooks.ensure(handler.getPlayer());
+		PlayerEvents.JOIN.register((player, server) -> {
+			equip(player);
+			Notebooks.ensure(player);
 		});
 		// Gantelets : frapper un bloc, main libre, y lance leur cercle au lieu de commencer à le casser.
-		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
+		InteractionEvents.ATTACK_BLOCK.register((player, level, hand, pos, direction) -> {
 			if (!GloveCasting.canStrike(player)) {
 				return InteractionResult.PASS;
 			}
@@ -124,16 +126,16 @@ public class Fmab implements ModInitializer {
 	 * l'alchimiste le garde en tête ({@link Notebooks#ensure}). Une seule fois par joueur.
 	 */
 	private static void equip(ServerPlayer player) {
-		if (Boolean.TRUE.equals(player.getAttached(FmabAttachments.EQUIPPED))) {
+		if (Boolean.TRUE.equals(FmabAttachments.EQUIPPED.get(player))) {
 			return;
 		}
-		player.setAttached(FmabAttachments.EQUIPPED, true);
+		FmabAttachments.EQUIPPED.set(player, true);
 		// Les rudiments sont acquis : les cercles du carnet de départ ne rebondissent pas pour un rien.
-		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		for (String glyph : Tomes.RUDIMENTS.glyphs()) {
 			data = data.learn(glyph);
 		}
-		player.setAttached(FmabAttachments.ALCHEMIST, data);
+		FmabAttachments.ALCHEMIST.set(player, data);
 		for (ItemStack stack : new ItemStack[]{new ItemStack(FmabItems.ALCHEMY_TREATISE),
 				Tomes.stack(Tomes.RUDIMENTS), new ItemStack(FmabItems.CHALK)}) {
 			if (!player.getInventory().add(stack)) {

@@ -1,8 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
 import com.ajustor.fmab.registry.FmabSounds;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -15,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Les éclairs bleus de la transmutation : des arcs en zigzag qui jaillissent du cercle et crépitent
@@ -52,8 +51,8 @@ public final class TransmutationLightning {
 
 	public static void register() {
 		// Un monde fermé (en solo) ne garde pas ses décharges pour le suivant.
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> ACTIVE.clear());
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.STOPPED.register(server -> ACTIVE.clear());
+		ServerEvents.END_TICK.register(server -> {
 			for (Iterator<Discharge> it = ACTIVE.iterator(); it.hasNext(); ) {
 				Discharge d = it.next();
 				for (int i = 0; i < d.boltsPerTick; i++) {

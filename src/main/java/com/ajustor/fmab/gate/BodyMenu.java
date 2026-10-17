@@ -148,7 +148,7 @@ public class BodyMenu extends AbstractContainerMenu {
 			if (!(stack.getItem() instanceof GloveItem glove)) {
 				return false;
 			}
-			AlchemistData me = player.getAttached(FmabAttachments.ALCHEMIST);
+			AlchemistData me = FmabAttachments.ALCHEMIST.get(player);
 			return me != null && me.rank().atLeast(glove.kind().rank());
 		}
 

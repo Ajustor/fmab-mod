@@ -5,7 +5,6 @@ import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.gate.GateOfTruth;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabEntities;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -15,6 +14,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.List;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Envy erre dans le monde : de temps à autre, il apparaît non loin d'un joueur, sous les traits de
@@ -35,7 +35,7 @@ public final class EnvySpawner {
 	}
 
 	public static void register() {
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			if (server.getTickCount() % PERIOD != 0) {
 				return;
 			}
@@ -48,10 +48,10 @@ public final class EnvySpawner {
 	private static void tryNear(MinecraftServer server, ServerPlayer player) {
 		ServerLevel level = player.level();
 		RandomSource random = level.getRandom();
-		if (!player.getAttachedOrCreate(FmabAttachments.ALCHEMIST).rank().atLeast(Rank.ALCHEMIST)
+		if (!FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.ALCHEMIST)
 				|| player.isCreative() || player.isSpectator() || level.dimension() == GateOfTruth.WHITE_SPACE
 				|| level.dimension() == Belly.BELLY || random.nextInt(CHANCE) != 0
-				|| !HomunculusRules.envyHaunts(player.getAttachedOrCreate(FmabAttachments.SLAIN))) {
+				|| !HomunculusRules.envyHaunts(FmabAttachments.SLAIN.getOrCreate(player))) {
 			return;
 		}
 		if (!level.getEntitiesOfClass(EnvyEntity.class, player.getBoundingBox().inflate(ALONE)).isEmpty()) {

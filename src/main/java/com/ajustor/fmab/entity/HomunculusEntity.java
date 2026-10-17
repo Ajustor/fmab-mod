@@ -178,7 +178,7 @@ public abstract class HomunculusEntity extends Monster {
 		// Le noyau ne tombe que du premier homonculus de cette sorte que le joueur abat : pas de Pierres
 		// à la chaîne avec les rôdeurs et les traqueurs.
 		Set<String> slain = getLastHurtByPlayer() instanceof ServerPlayer killer
-				? killer.getAttachedOrCreate(FmabAttachments.SLAIN) : Set.of();
+				? FmabAttachments.SLAIN.getOrCreate(killer) : Set.of();
 		if (HomunculusRules.dropsCore(slain, BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath())) {
 			spawnAtLocation(level, new ItemStack(FmabItems.PHILOSOPHER_STONE_CORE));
 		}
@@ -202,9 +202,9 @@ public abstract class HomunculusEntity extends Monster {
 			}
 			for (ServerPlayer p : witnesses) {
 				p.sendSystemMessage(Component.translatable("homunculus.fmab.destroyed", name));
-				Set<String> seen = new HashSet<>(p.getAttachedOrCreate(FmabAttachments.SLAIN));
+				Set<String> seen = new HashSet<>(FmabAttachments.SLAIN.getOrCreate(p));
 				seen.add(slain);
-				p.setAttached(FmabAttachments.SLAIN, Set.copyOf(seen));
+				FmabAttachments.SLAIN.set(p, Set.copyOf(seen));
 			}
 		}
 	}

@@ -10,13 +10,14 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.xing.Alkahestry;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
 import java.util.Set;
+import com.ajustor.fmab.platform.Platform;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Les étapes du chemin de l'alchimiste, qui débloquent les progrès ({@code data/fmab/advancement}).
@@ -25,7 +26,7 @@ import java.util.Set;
  * par {@link #reach}.
  */
 public final class Milestones {
-	public static final MilestoneTrigger TRIGGER = Registry.register(BuiltInRegistries.TRIGGER_TYPES,
+	public static final MilestoneTrigger TRIGGER = Platform.get().content().register(BuiltInRegistries.TRIGGER_TYPES,
 			Fmab.id("milestone"), new MilestoneTrigger());
 	/** Les sept homonculus, par identifiant de type d'entité. */
 	public static final List<String> SINS = List.of("lust", "gluttony", "envy", "greed", "sloth", "wrath", "pride");
@@ -40,7 +41,7 @@ public final class Milestones {
 	}
 
 	public static void register() {
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			if (server.getTickCount() % PERIOD != 0) {
 				return;
 			}
@@ -60,7 +61,7 @@ public final class Milestones {
 
 	/** Les étapes qui se lisent dans l'état du joueur. */
 	private static void check(ServerPlayer p) {
-		AlchemistData alchemist = p.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData alchemist = FmabAttachments.ALCHEMIST.getOrCreate(p);
 		if (alchemist.mastery().values().stream().mapToInt(Integer::intValue).sum() > 0) {
 			reach(p, "transmuted");
 		}
@@ -74,18 +75,18 @@ public final class Milestones {
 		if (rank.atLeast(Rank.GATE)) {
 			reach(p, "rank_gate");
 		}
-		Training training = p.getAttachedOrCreate(FmabAttachments.TRAINING);
+		Training training = FmabAttachments.TRAINING.getOrCreate(p);
 		if (training.met()) {
 			reach(p, "izumi_met");
 		}
 		if (training.rewarded().size() >= Trial.values().length) {
 			reach(p, "izumi_done");
 		}
-		GateState gate = p.getAttachedOrCreate(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.getOrCreate(p);
 		if (gate.inArmor()) {
 			reach(p, "soul_armor");
 		}
-		if (!p.getAttachedOrCreate(FmabAttachments.AUTOMAIL).limbs().isEmpty()) {
+		if (!FmabAttachments.AUTOMAIL.getOrCreate(p).limbs().isEmpty()) {
 			reach(p, "automail");
 		}
 		if (LivingStone.souls(p) > 0) {
@@ -94,17 +95,17 @@ public final class Milestones {
 		if (Alkahestry.knows(p)) {
 			reach(p, "alkahestry");
 		}
-		if (Boolean.TRUE.equals(p.getAttached(FmabAttachments.BRIGGS_ALLY))) {
+		if (Boolean.TRUE.equals(FmabAttachments.BRIGGS_ALLY.get(p))) {
 			reach(p, "briggs_ally");
 		}
-		boolean greedPact = Boolean.TRUE.equals(p.getAttached(FmabAttachments.GREED_PACT));
+		boolean greedPact = Boolean.TRUE.equals(FmabAttachments.GREED_PACT.get(p));
 		if (greedPact) {
 			reach(p, "greed_pact");
 		}
-		if (Boolean.TRUE.equals(p.getAttached(FmabAttachments.SCAR_ARM))) {
+		if (Boolean.TRUE.equals(FmabAttachments.SCAR_ARM.get(p))) {
 			reach(p, "scar_tattoo");
 		}
-		Set<String> slain = p.getAttachedOrCreate(FmabAttachments.SLAIN);
+		Set<String> slain = FmabAttachments.SLAIN.getOrCreate(p);
 		for (String sin : slain) {
 			reach(p, "slain_" + sin);
 		}

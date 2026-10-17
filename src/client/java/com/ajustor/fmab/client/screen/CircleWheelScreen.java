@@ -7,7 +7,6 @@ import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.network.SelectCirclePayload;
 import com.ajustor.fmab.registry.FmabAttachments;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -17,6 +16,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * La roue des cercles : les pages du carnet en couronne autour du viseur, dans l'ordre du carnet. On
@@ -59,7 +59,7 @@ public class CircleWheelScreen extends Screen {
 			mc.player.sendOverlayMessage(Component.translatable("wheel.fmab.empty", Component.keybind("key.fmab.notebook")));
 			return;
 		}
-		AlchemistData data = mc.player.getAttached(FmabAttachments.ALCHEMIST);
+		AlchemistData data = FmabAttachments.ALCHEMIST.get(mc.player);
 		mc.gui.setScreen(new CircleWheelScreen(key, contents, data != null && data.rank().atLeast(Rank.GATE)));
 	}
 
@@ -182,7 +182,7 @@ public class CircleWheelScreen extends Screen {
 	private void choose(int index, boolean clap) {
 		onClose();
 		if (index >= 0 && index < count()) {
-			ClientPlayNetworking.send(new SelectCirclePayload(index, clap));
+			ClientPlatform.get().send(new SelectCirclePayload(index, clap));
 		}
 	}
 

@@ -31,6 +31,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static com.ajustor.fmab.gametest.GametestAsserts.check;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Une visite guidée des rendus du mod, en captures d'écran : le corps du joueur (membres perdus,
@@ -126,23 +127,22 @@ public class RenderShowcase implements FabricClientGameTest {
 		context.waitTicks(5);
 		context.takeScreenshot("body_00_intact");
 
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GATE,
-				GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_LEG)));
-		check(context.computeOnClient(mc -> mc.player.getAttachedOrElse(FmabAttachments.GATE, GateState.NONE)
+		onPlayer(context, sp, p -> FmabAttachments.GATE.set(p, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_LEG)));
+		check(context.computeOnClient(mc -> FmabAttachments.GATE.getOrElse(mc.player, GateState.NONE)
 				.lost(BodyPart.RIGHT_ARM)), "le client devrait savoir que le bras droit est perdu");
 		context.takeScreenshot("body_01_lost_right_arm_left_leg");
 
 		onPlayer(context, sp, p -> {
-			p.setAttached(FmabAttachments.GATE, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_ARM)
+			FmabAttachments.GATE.set(p, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_ARM)
 					.pay(BodyPart.RIGHT_LEG).pay(BodyPart.LEFT_LEG));
-			p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE
+			FmabAttachments.AUTOMAIL.set(p, Automail.NONE
 					.with(BodyPart.RIGHT_ARM, new ItemStack(FmabItems.IRON_AUTOMAIL_ARM))
 					.with(BodyPart.LEFT_ARM, new ItemStack(FmabItems.RUSH_VALLEY_AUTOMAIL_ARM))
 					.with(BodyPart.RIGHT_LEG, new ItemStack(FmabItems.BRIGGS_AUTOMAIL_LEG)));
 		});
 		context.takeScreenshot("body_02_automail_iron_rush_briggs_leftleg_lost");
 
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE
+		onPlayer(context, sp, p -> FmabAttachments.AUTOMAIL.set(p, Automail.NONE
 				.with(BodyPart.RIGHT_ARM, new ItemStack(FmabItems.IRON_AUTOMAIL_ARM))
 				.with(BodyPart.LEFT_ARM, new ItemStack(FmabItems.IRON_AUTOMAIL_ARM))
 				.with(BodyPart.RIGHT_LEG, new ItemStack(FmabItems.IRON_AUTOMAIL_LEG))
@@ -170,14 +170,14 @@ public class RenderShowcase implements FabricClientGameTest {
 		context.getInput().releaseKey(options -> options.keyShift);
 		context.waitTicks(5);
 		onPlayer(context, sp, p -> {
-			p.setAttached(FmabAttachments.GATE, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_LEG));
-			p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE);
+			FmabAttachments.GATE.set(p, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_LEG));
+			FmabAttachments.AUTOMAIL.set(p, Automail.NONE);
 		});
 		context.takeScreenshot("body_04_lost_side");
 		onPlayer(context, sp, p -> {
-			p.setAttached(FmabAttachments.GATE, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_ARM)
+			FmabAttachments.GATE.set(p, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_ARM)
 					.pay(BodyPart.RIGHT_LEG).pay(BodyPart.LEFT_LEG));
-			p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE
+			FmabAttachments.AUTOMAIL.set(p, Automail.NONE
 					.with(BodyPart.RIGHT_ARM, new ItemStack(FmabItems.IRON_AUTOMAIL_ARM))
 					.with(BodyPart.LEFT_ARM, new ItemStack(FmabItems.IRON_AUTOMAIL_ARM))
 					.with(BodyPart.RIGHT_LEG, new ItemStack(FmabItems.IRON_AUTOMAIL_LEG))
@@ -196,12 +196,12 @@ public class RenderShowcase implements FabricClientGameTest {
 		});
 		context.waitTicks(5);
 		context.takeScreenshot("body_06_first_person_iron");
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE));
+		onPlayer(context, sp, p -> FmabAttachments.AUTOMAIL.set(p, Automail.NONE));
 		context.takeScreenshot("body_07_first_person_lost");
 		context.runOnClient(mc -> hideGui(mc, true));
 		onPlayer(context, sp, p -> {
-			p.setAttached(FmabAttachments.GATE, GateState.NONE);
-			p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE);
+			FmabAttachments.GATE.set(p, GateState.NONE);
+			FmabAttachments.AUTOMAIL.set(p, Automail.NONE);
 		});
 	}
 
@@ -238,13 +238,13 @@ public class RenderShowcase implements FabricClientGameTest {
 	private static void screens(ClientGameTestContext context, TestSingleplayerContext sp) {
 		command(sp, "tp @p 0 -60 0 0 0");
 		onPlayer(context, sp, p -> {
-			p.setAttached(FmabAttachments.GATE, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_LEG));
-			p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE
+			FmabAttachments.GATE.set(p, GateState.NONE.pay(BodyPart.RIGHT_ARM).pay(BodyPart.LEFT_LEG));
+			FmabAttachments.AUTOMAIL.set(p, Automail.NONE
 					.with(BodyPart.RIGHT_ARM, new ItemStack(FmabItems.IRON_AUTOMAIL_ARM)));
 		});
 		context.runOnClient(mc -> {
 			mc.gui.hud.getChat().clearMessages(false);
-			ClientPlayNetworking.send(OpenBodyPayload.INSTANCE);
+			ClientPlatform.get().send(OpenBodyPayload.INSTANCE);
 		});
 		context.waitForScreen(BodyScreen.class);
 		context.takeScreenshot("screen_body");
@@ -253,7 +253,7 @@ public class RenderShowcase implements FabricClientGameTest {
 		context.setScreen(NotebookScreen::new);
 		context.takeScreenshot("screen_notebook");
 		// Un gant à une main, l'autre vide : on voit les deux états de l'écran.
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GLOVES, com.ajustor.fmab.data.Gloves.NONE
+		onPlayer(context, sp, p -> FmabAttachments.GLOVES.set(p, com.ajustor.fmab.data.Gloves.NONE
 				.with(false, new ItemStack(FmabItems.SPARK_GLOVES))));
 		context.setScreen(GlovesScreen::new);
 		context.takeScreenshot("screen_gloves");
@@ -284,12 +284,11 @@ public class RenderShowcase implements FabricClientGameTest {
 		context.waitTicks(5);
 		context.takeScreenshot("hud_00_alchemist_panel");
 		onPlayer(context, sp, p -> Concentration.set(p, 5));
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.LIVING_STONE, 42));
+		onPlayer(context, sp, p -> FmabAttachments.LIVING_STONE.set(p, 42));
 		context.takeScreenshot("hud_01_concentration_living_stone");
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GATE,
-				p.getAttachedOrCreate(FmabAttachments.GATE).pay(BodyPart.SIGHT)));
+		onPlayer(context, sp, p -> FmabAttachments.GATE.set(p, FmabAttachments.GATE.getOrCreate(p).pay(BodyPart.SIGHT)));
 		context.takeScreenshot("hud_02_lost_sight");
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GATE, GateState.NONE));
+		onPlayer(context, sp, p -> FmabAttachments.GATE.set(p, GateState.NONE));
 		command(sp, "time set " + (7 * 24000 + 6000));
 		context.waitTicks(20);
 		context.runOnClient(mc -> mc.gui.hud.getChat().clearMessages(false));

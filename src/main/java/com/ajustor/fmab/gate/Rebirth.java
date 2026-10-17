@@ -26,16 +26,16 @@ public final class Rebirth {
 
 	public static void restart(ServerPlayer player) {
 		boolean wipe = FmabConfig.get().restartWipesProgress();
-		player.setAttached(FmabAttachments.GATE, GateState.NONE);
-		player.removeAttached(FmabAttachments.ADRIFT_SINCE);
-		player.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE);
-		player.removeAttached(FmabAttachments.LIVING_STONE);
+		FmabAttachments.GATE.set(player, GateState.NONE);
+		FmabAttachments.ADRIFT_SINCE.remove(player);
+		FmabAttachments.AUTOMAIL.set(player, Automail.NONE);
+		FmabAttachments.LIVING_STONE.remove(player);
 		if (wipe) {
-			player.setAttached(FmabAttachments.ALCHEMIST, AlchemistData.NEW);
-			player.setAttached(FmabAttachments.TRAINING, Training.NONE);
-			player.setAttached(FmabAttachments.EXAM, ExamProgress.NONE);
-			player.setAttached(FmabAttachments.TATTOOS, Tattoos.NONE);
-			player.setAttached(FmabAttachments.KARMA, 0);
+			FmabAttachments.ALCHEMIST.set(player, AlchemistData.NEW);
+			FmabAttachments.TRAINING.set(player, Training.NONE);
+			FmabAttachments.EXAM.set(player, ExamProgress.NONE);
+			FmabAttachments.TATTOOS.set(player, Tattoos.NONE);
+			FmabAttachments.KARMA.set(player, 0);
 		}
 		GateOfTruth.leaveTruth(player);
 		ServerLevel home = player.level().getServer().overworld();

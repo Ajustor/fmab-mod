@@ -6,7 +6,6 @@ import com.ajustor.fmab.network.BargainPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.util.PlayerMaps;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import com.ajustor.fmab.network.FmabNetwork;
 
 /**
  * Marchander avec la Vérité : devant sa Porte, l'alchimiste qui porte une Pierre philosophale
@@ -45,7 +45,7 @@ public final class StoneBargain {
 	 * @return vrai si le marché est ouvert
 	 */
 	public static boolean offer(ServerPlayer player) {
-		GateState gate = player.getAttachedOrCreate(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.getOrCreate(player);
 		if (gate.lost().isEmpty() || souls(player) <= 0) {
 			return false;
 		}
@@ -62,7 +62,7 @@ public final class StoneBargain {
 		}
 		if (player.level().getGameTime() - bargain.since() > PATIENCE) {
 			settle(player);
-			ServerPlayNetworking.send(player, BargainPayload.CLOSE);
+			FmabNetwork.send(player, BargainPayload.CLOSE);
 			return false;
 		}
 		return true;
@@ -89,7 +89,7 @@ public final class StoneBargain {
 			return;
 		}
 		Optional<BodyPart> part = part(partName);
-		GateState gate = player.getAttachedOrCreate(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.getOrCreate(player);
 		if (part.isEmpty() || !gate.lost().contains(part.get())) {
 			settle(player);
 			return;
@@ -104,12 +104,12 @@ public final class StoneBargain {
 			pay(player, cost);
 		}
 		PhilosopherStoneItem.restore(player, gate, new Restoration.Plan(EnumSet.of(part.get()), cost));
-		GateState after = player.getAttachedOrCreate(FmabAttachments.GATE);
+		GateState after = FmabAttachments.GATE.getOrCreate(player);
 		if (after.lost().isEmpty() || souls(player) <= 0) {
 			settle(player);
 			player.sendSystemMessage(Component.translatable("truth.fmab.bargain.done")
 					.withStyle(s -> s.withItalic(true).withColor(0x9A9A9A)));
-			ServerPlayNetworking.send(player, BargainPayload.CLOSE);
+			FmabNetwork.send(player, BargainPayload.CLOSE);
 		} else {
 			send(player, after);
 		}
@@ -131,7 +131,7 @@ public final class StoneBargain {
 					parts.add(p.serializedName());
 					costs.add(Restoration.cost(p));
 				});
-		ServerPlayNetworking.send(player, new BargainPayload(parts, costs, souls(player)));
+		FmabNetwork.send(player, new BargainPayload(parts, costs, souls(player)));
 	}
 
 	/** Les âmes de toutes les Pierres que l'alchimiste porte. */

@@ -59,7 +59,7 @@ public final class FirstPersonGestures {
 	 * @return vrai si le geste a pris la place des mains ordinaires
 	 */
 	public static boolean submit(LocalPlayer player, float partialTicks, PoseStack poseStack, Consumer<HumanoidArm> arm) {
-		TransmutationPose pose = player.getAttached(FmabAttachments.POSE);
+		TransmutationPose pose = FmabAttachments.POSE.get(player);
 		long now = player.level().getGameTime();
 		if (pose == null || !pose.active(now) || player.isInvisible()) {
 			return false;

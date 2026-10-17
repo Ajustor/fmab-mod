@@ -25,7 +25,7 @@ public record OpenTattooPayload(BlockPos circle, List<String> occupied) implemen
 
 	public static OpenTattooPayload of(ServerPlayer player, BlockPos circle) {
 		return new OpenTattooPayload(circle,
-				List.copyOf(player.getAttachedOrCreate(FmabAttachments.TATTOOS).slots().keySet()));
+				List.copyOf(FmabAttachments.TATTOOS.getOrCreate(player).slots().keySet()));
 	}
 
 	@Override

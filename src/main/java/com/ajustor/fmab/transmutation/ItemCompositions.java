@@ -6,7 +6,6 @@ import com.ajustor.fmab.alchemy.exchange.ExchangeValue;
 import com.ajustor.fmab.data.AlloyGroup;
 import com.ajustor.fmab.registry.FmabRegistries;
 import com.ajustor.fmab.registry.FmabTags;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * La composition de chaque objet du jeu, tirée des tables d'échange (pour les matières de base),
@@ -82,13 +82,13 @@ public final class ItemCompositions {
 	 * après un /reload, plutôt qu'à la première transmutation d'un joueur.
 	 */
 	public static void register() {
-		ServerLifecycleEvents.SERVER_STARTED.register(ItemCompositions::precompute);
-		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> {
+		ServerEvents.STARTED.register(ItemCompositions::precompute);
+		ServerEvents.DATA_RELOADED.register((server, success) -> {
 			if (success) {
 				precompute(server);
 			}
 		});
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> forget());
+		ServerEvents.STOPPED.register(server -> forget());
 	}
 
 	/** Une recette qui fait échouer le calcul n'empêche pas le serveur de démarrer : la transmutation la retrouvera. */

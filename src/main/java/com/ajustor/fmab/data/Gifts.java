@@ -13,7 +13,7 @@ public final class Gifts {
 	}
 
 	public static boolean received(ServerPlayer player, String gift) {
-		return player.getAttachedOrCreate(FmabAttachments.GIFTS).contains(gift);
+		return FmabAttachments.GIFTS.getOrCreate(player).contains(gift);
 	}
 
 	/**
@@ -25,9 +25,9 @@ public final class Gifts {
 		if (received(player, gift)) {
 			return false;
 		}
-		Set<String> gifts = new HashSet<>(player.getAttachedOrCreate(FmabAttachments.GIFTS));
+		Set<String> gifts = new HashSet<>(FmabAttachments.GIFTS.getOrCreate(player));
 		gifts.add(gift);
-		player.setAttached(FmabAttachments.GIFTS, Set.copyOf(gifts));
+		FmabAttachments.GIFTS.set(player, Set.copyOf(gifts));
 		if (!player.getInventory().add(stack)) {
 			player.drop(stack, false);
 		}

@@ -10,7 +10,6 @@ import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -34,6 +33,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * L'alkahestry de Xing. Elle puise au flux du dragon, l'énergie qui court dans la terre, et non à
@@ -68,7 +68,7 @@ public final class Alkahestry {
 	}
 
 	public static boolean knows(ServerPlayer player) {
-		return Boolean.TRUE.equals(player.getAttached(FmabAttachments.ALKAHESTRY));
+		return Boolean.TRUE.equals(FmabAttachments.ALKAHESTRY.get(player));
 	}
 
 	/** Un kunaï vient de se planter : referme-t-il un cercle ? */
@@ -94,7 +94,7 @@ public final class Alkahestry {
 			thrower.sendOverlayMessage(Component.translatable("alkahestry.fmab.unknown"));
 			return;
 		}
-		AlchemistData alchemist = thrower.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData alchemist = FmabAttachments.ALCHEMIST.getOrCreate(thrower);
 		// L'école de la Médecine : moins cher, plus large, plus long à mesure qu'on la pratique.
 		Knowledge knowledge = AlchemyRules.of(level.registryAccess()).knowledge(alchemist);
 		float cost = (float) Math.max(1, COST - knowledge.perk(SCHOOL, "concentration_discount"));
@@ -109,7 +109,7 @@ public final class Alkahestry {
 			}
 			Concentration.set(thrower, concentration - cost);
 		}
-		thrower.setAttached(FmabAttachments.ALCHEMIST, alchemist.addMastery(SCHOOL, MASTERY));
+		FmabAttachments.ALCHEMIST.set(thrower, alchemist.addMastery(SCHOOL, MASTERY));
 		ring.forEach(KunaiEntity::spend);
 		boolean trap = kunai.trap();
 		double reach = radius + 0.5 + knowledge.perk(SCHOOL, "range_bonus");
@@ -166,7 +166,7 @@ public final class Alkahestry {
 	}
 
 	public static void register() {
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			for (Iterator<Circle> it = CIRCLES.iterator(); it.hasNext(); ) {
 				Circle c = it.next();
 				long now = c.level().getGameTime();

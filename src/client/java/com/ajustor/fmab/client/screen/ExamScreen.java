@@ -2,12 +2,12 @@ package com.ajustor.fmab.client.screen;
 
 import com.ajustor.fmab.network.ExamActionPayload;
 import com.ajustor.fmab.network.OpenExamPayload;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * L'examen d'Alchimiste d'État : les objets demandés (ce que le candidat porte déjà), la remise,
@@ -42,12 +42,12 @@ public class ExamScreen extends Screen {
 		if (!state.itemsGiven()) {
 			boolean ready = state.rows().stream().allMatch(r -> r.held() >= r.count());
 			Button give = addRenderableWidget(Button.builder(Component.translatable("exam.fmab.give"),
-					b -> ClientPlayNetworking.send(new ExamActionPayload(state.entityId(), ExamActionPayload.GIVE)))
+					b -> ClientPlatform.get().send(new ExamActionPayload(state.entityId(), ExamActionPayload.GIVE)))
 					.bounds(left + WIDTH / 2 - 75, top + HEIGHT - 26, 150, 18).build());
 			give.active = ready;
 		} else {
 			addRenderableWidget(Button.builder(Component.translatable("exam.fmab.fight"), b -> {
-				ClientPlayNetworking.send(new ExamActionPayload(state.entityId(), ExamActionPayload.FIGHT));
+				ClientPlatform.get().send(new ExamActionPayload(state.entityId(), ExamActionPayload.FIGHT));
 				onClose();
 			}).bounds(left + WIDTH / 2 - 75, top + HEIGHT - 26, 150, 18).build());
 		}

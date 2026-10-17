@@ -2,12 +2,12 @@ package com.ajustor.fmab.client.screen;
 
 import com.ajustor.fmab.network.OpenTruthPayload;
 import com.ajustor.fmab.network.TruthChoicePayload;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * La Vérité face à une âme sans corps : elle s'en moque, puis propose deux issues. Être rappelée
@@ -40,7 +40,7 @@ public class TruthScreen extends Screen {
 		int y = top + HEIGHT - 28;
 		if (!confirming) {
 			addRenderableWidget(Button.builder(Component.translatable("truth.fmab.choice.recall"), b -> {
-				ClientPlayNetworking.send(new TruthChoicePayload(state.entityId(), false));
+				ClientPlatform.get().send(new TruthChoicePayload(state.entityId(), false));
 				onClose();
 			}).bounds(left + 10, y, 135, 20).build());
 			addRenderableWidget(Button.builder(Component.translatable("truth.fmab.choice.restart"), b -> {
@@ -49,7 +49,7 @@ public class TruthScreen extends Screen {
 			}).bounds(left + WIDTH - 145, y, 135, 20).build());
 		} else {
 			addRenderableWidget(Button.builder(Component.translatable("truth.fmab.choice.confirm"), b -> {
-				ClientPlayNetworking.send(new TruthChoicePayload(state.entityId(), true));
+				ClientPlatform.get().send(new TruthChoicePayload(state.entityId(), true));
 				onClose();
 			}).bounds(left + 10, y, 135, 20).build());
 			addRenderableWidget(Button.builder(Component.translatable("truth.fmab.choice.back"), b -> {

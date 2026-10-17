@@ -292,10 +292,10 @@ public class FatherEntity extends HomunculusEntity {
 			}
 			int taken = Math.min(souls, 2 + phase());
 			if (souls - taken <= 0) {
-				p.removeAttached(FmabAttachments.LIVING_STONE);
+				FmabAttachments.LIVING_STONE.remove(p);
 				p.sendSystemMessage(Component.translatable("homunculus.fmab.father_drained_dry"));
 			} else {
-				p.setAttached(FmabAttachments.LIVING_STONE, souls - taken);
+				FmabAttachments.LIVING_STONE.set(p, souls - taken);
 			}
 			heal(taken * 4);
 			draw(level, p);

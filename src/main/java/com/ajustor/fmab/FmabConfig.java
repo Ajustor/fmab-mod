@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import com.ajustor.fmab.platform.Platform;
 
 /**
  * Les réglages du serveur, dans {@code config/fmab.json}. Le fichier est créé avec les valeurs par
@@ -60,6 +60,6 @@ public record FmabConfig(boolean restartWipesProgress) {
 	}
 
 	private static Path file() {
-		return FabricLoader.getInstance().getConfigDir().resolve("fmab.json");
+		return Platform.get().configDir().resolve("fmab.json");
 	}
 }

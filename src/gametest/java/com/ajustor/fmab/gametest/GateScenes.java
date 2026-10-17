@@ -67,11 +67,11 @@ public class GateScenes implements FabricClientGameTest {
 			sp.getConnection().waitForChunksRender();
 			// Le cercle doit être compris pour réagir : on connaît tout, le temps de l'activer.
 			server(sp, (level, p) -> {
-				AlchemistData data = p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).withRank(Rank.GATE);
+				AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(p).withRank(Rank.GATE);
 				for (Glyph g : AlchemyRules.of(level.registryAccess()).glyphs()) {
 					data = data.learn(g.id());
 				}
-				p.setAttached(FmabAttachments.ALCHEMIST, data);
+				FmabAttachments.ALCHEMIST.set(p, data);
 				Concentration.set(p, Concentration.max(p));
 				p.getInventory().clearContent();
 				return null;
@@ -85,14 +85,14 @@ public class GateScenes implements FabricClientGameTest {
 			body(context, sp);
 			cast(context, sp);
 			for (int i = 0; i < 100 && !server(sp, (level, p) ->
-					p.getAttachedOrCreate(FmabAttachments.GATE).visit().isPresent()); i++) {
+					FmabAttachments.GATE.getOrCreate(p).visit().isPresent()); i++) {
 				context.waitTick();
 			}
-			check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).visit().isPresent()),
+			check(server(sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p).visit().isPresent()),
 					"le cercle devrait happer l'alchimiste");
 			// Pendant l'aspiration, il oublie tout : c'est la Porte qui doit tout lui apprendre.
 			server(sp, (level, p) -> {
-				p.setAttached(FmabAttachments.ALCHEMIST, p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).forgetAll());
+				FmabAttachments.ALCHEMIST.set(p, FmabAttachments.ALCHEMIST.getOrCreate(p).forgetAll());
 				return null;
 			});
 			context.waitTicks(15);
@@ -134,7 +134,7 @@ public class GateScenes implements FabricClientGameTest {
 				}
 				if (name.equals("08_knowledge_flood")) {
 					int total = server(sp, (level, p) -> AlchemyRules.of(level.registryAccess()).glyphs().size());
-					int known = server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).known().size());
+					int known = server(sp, (level, p) -> FmabAttachments.ALCHEMIST.getOrCreate(p).known().size());
 					check(known == total, "le savoir de la Porte devrait apprendre tous les glyphes : " + known + "/" + total);
 				}
 			}
@@ -143,7 +143,7 @@ public class GateScenes implements FabricClientGameTest {
 			context.waitFor(mc -> mc.player != null && mc.player.level().dimension() != GateOfTruth.WHITE_SPACE,
 					20 * 30);
 			context.waitTicks(20);
-			check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).visit().isEmpty()),
+			check(server(sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p).visit().isEmpty()),
 					"la visite devrait être terminée");
 			context.takeScreenshot("gate_10_back_home");
 
@@ -160,23 +160,23 @@ public class GateScenes implements FabricClientGameTest {
 			for (BodyPart part : BodyPart.values()) {
 				everything = everything.pay(part);
 			}
-			p.setAttached(FmabAttachments.GATE, everything);
+			FmabAttachments.GATE.set(p, everything);
 			SoulArmor.bindFirstTime(p);
 			Concentration.set(p, Concentration.max(p));
 			return null;
 		});
-		check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).inArmor()),
+		check(server(sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p).inArmor()),
 				"l'alchimiste devrait être une âme dans son armure");
 		body(context, sp);
 		cast(context, sp);
 		context.waitFor(mc -> mc.player != null && mc.player.level().dimension() == GateOfTruth.WHITE_SPACE, 20 * 15);
 		context.waitFor(mc -> mc.player != null && mc.player.level().dimension() != GateOfTruth.WHITE_SPACE, 20 * 40);
 		context.waitTicks(20);
-		check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).visit().isEmpty()),
+		check(server(sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p).visit().isEmpty()),
 				"la seconde visite devrait être terminée");
-		check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).openings() == BodyPart.values().length + 1),
+		check(server(sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p).openings() == BodyPart.values().length + 1),
 				"la Vérité devrait avoir pris le sceau (une ouverture de plus)");
-		check(server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).inArmor()),
+		check(server(sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p).inArmor()),
 				"l'âme devrait revenir dans son armure, sans errer devant la Porte");
 		check(server(sp, (level, p) -> SoulArmor.sealIntact(p)), "le sceau devrait être retracé dans le plastron");
 		check(server(sp, (level, p) -> {
@@ -190,7 +190,7 @@ public class GateScenes implements FabricClientGameTest {
 
 	/** Où en est la visite : -1 tant qu'il n'est pas devant sa Porte. */
 	private static int visitTicks(TestSingleplayerContext sp) {
-		return server(sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.GATE).visit()
+		return server(sp, (level, p) -> FmabAttachments.GATE.getOrCreate(p).visit()
 				.map(GateState.Visit::ticks).orElse(Integer.MAX_VALUE));
 	}
 

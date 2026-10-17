@@ -12,7 +12,6 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabTags;
 import com.ajustor.fmab.transmutation.AlchemyRules;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -30,6 +29,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.Optional;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.InteractionEvents;
 
 /**
  * Table d'alchimiste : on y brode (au fil alchimique) ou grave (au burin) sur un gant le cercle
@@ -68,7 +68,7 @@ public class AlchemistTableBlock extends FurnitureBlock {
 			player.sendOverlayMessage(Notebooks.noCircle());
 			return InteractionResult.FAIL;
 		}
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		int stages = AlchemyRules.of(level.registryAccess()).analyze(drawing, me).parsed().stages().size();
 		if (stages > glove.kind().stages()) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.support_too_small",
@@ -97,7 +97,7 @@ public class AlchemistTableBlock extends FurnitureBlock {
 			player.sendOverlayMessage(Notebooks.noCircle());
 			return InteractionResult.FAIL;
 		}
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		if (AlchemyRules.of(level.registryAccess()).analyze(drawing, me).parsed().stages().size() > CLOTHES_STAGES) {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.support_too_small", CLOTHES_STAGES));
 			return InteractionResult.FAIL;
@@ -123,7 +123,7 @@ public class AlchemistTableBlock extends FurnitureBlock {
 	 * on est accroupi avec un objet ; on passe donc par l'événement d'utilisation, qui vient avant.
 	 */
 	public static void registerSealing() {
-		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+		InteractionEvents.USE_BLOCK.register((player, level, hand, hit) -> {
 			ItemStack stack = player.getItemInHand(hand);
 			if (!player.isShiftKeyDown() || !stack.is(ItemTags.CHEST_ARMOR) || stack.is(FmabItems.SOUL_CHESTPLATE)
 					|| !level.getBlockState(hit.getBlockPos()).is(FmabBlocks.ALCHEMIST_TABLE)) {
@@ -153,7 +153,7 @@ public class AlchemistTableBlock extends FurnitureBlock {
 				break;
 			}
 		}
-		boolean soul = player.getAttachedOrCreate(FmabAttachments.GATE).soulBound();
+		boolean soul = FmabAttachments.GATE.getOrCreate(player).soulBound();
 		if (player.isCreative()) {
 			// Rien à payer.
 		} else if (!ink.isEmpty()) {

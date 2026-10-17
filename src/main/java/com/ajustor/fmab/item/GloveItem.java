@@ -89,17 +89,17 @@ public class GloveItem extends Item {
 		if (level.isClientSide()) {
 			return InteractionResult.SUCCESS;
 		}
-		AlchemistData me = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		if (!me.rank().atLeast(kind.rank)) {
 			player.sendOverlayMessage(Component.translatable("item.fmab.glove.rank_too_low",
 					Component.translatable(kind.rank.translationKey())));
 			return InteractionResult.FAIL;
 		}
-		Gloves gloves = player.getAttachedOrCreate(FmabAttachments.GLOVES);
+		Gloves gloves = FmabAttachments.GLOVES.getOrCreate(player);
 		// Main droite d'abord, puis la gauche ; si les deux sont prises, on échange la droite.
 		boolean left = !gloves.right().isEmpty() && gloves.left().isEmpty();
 		ItemStack previous = gloves.get(left);
-		player.setAttached(FmabAttachments.GLOVES, gloves.with(left, stack.copyWithCount(1)));
+		FmabAttachments.GLOVES.set(player, gloves.with(left, stack.copyWithCount(1)));
 		stack.shrink(1);
 		if (!previous.isEmpty() && !player.getInventory().add(previous)) {
 			player.drop(previous, false);

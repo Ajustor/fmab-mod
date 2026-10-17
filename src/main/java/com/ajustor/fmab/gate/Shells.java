@@ -5,14 +5,6 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Shell;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.util.PlayerMaps;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -39,6 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.InteractionEvents;
+import com.ajustor.fmab.platform.event.LivingEvents;
+import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.platform.event.PlayerEvents;
 
 /**
  * L'armure d'une âme comme coquille (voir {@link Shell}). L'âme se fige avec sa touche : elle n'est
@@ -70,7 +66,7 @@ public final class Shells {
 	}
 
 	public static void register() {
-		UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+		InteractionEvents.USE_ENTITY.register((player, level, hand, entity, hit) -> {
 			if (hand != InteractionHand.MAIN_HAND || !(entity instanceof Player soul) || !canEnter(player, soul)) {
 				return inside(player) ? InteractionResult.FAIL : InteractionResult.PASS;
 			}
@@ -80,16 +76,16 @@ public final class Shells {
 			return InteractionResult.SUCCESS;
 		});
 		// Dedans, on ne fait rien : on est porté, ou on porte l'armure qui, elle, ne tient rien.
-		UseItemCallback.EVENT.register((player, level, hand) -> busy(player));
-		UseBlockCallback.EVENT.register((player, level, hand, hit) -> busy(player));
-		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> busy(player));
-		AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> busy(player));
+		InteractionEvents.USE_ITEM.register((player, level, hand) -> busy(player));
+		InteractionEvents.USE_BLOCK.register((player, level, hand, hit) -> busy(player));
+		InteractionEvents.ATTACK_BLOCK.register((player, level, hand, pos, direction) -> busy(player));
+		InteractionEvents.ATTACK_ENTITY.register((player, level, hand, entity, hit) -> busy(player));
 		// Les coups qui visent celui qui est dedans frappent l'armure.
-		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+		LivingEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
 			if (!(entity instanceof ServerPlayer player) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 				return true;
 			}
-			UUID soulId = player.getAttached(FmabAttachments.INSIDE);
+			UUID soulId = FmabAttachments.INSIDE.get(player);
 			Pair pair = soulId == null ? null : SHELLS.get(soulId);
 			if (pair == null || pair.occupant != player) {
 				return true;
@@ -99,14 +95,13 @@ public final class Shells {
 			}
 			return false;
 		});
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			for (Pair pair : new ArrayList<>(SHELLS.values())) {
 				tick(pair);
 			}
 		});
 		// Qui part (déconnexion) libère la coquille : l'âme s'éveille, l'occupant ressort.
-		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-			ServerPlayer player = handler.getPlayer();
+		PlayerEvents.DISCONNECT.register((player, server) -> {
 			for (Pair pair : new ArrayList<>(SHELLS.values())) {
 				if (pair.soul == player || pair.occupant == player) {
 					release(pair);
@@ -118,27 +113,27 @@ public final class Shells {
 	// ---------------------------------------------------------------- règles
 
 	private static Shell shell(Player soul) {
-		return soul.getAttachedOrElse(FmabAttachments.SHELL, Shell.NONE);
+		return FmabAttachments.SHELL.getOrElse(soul, Shell.NONE);
 	}
 
 	private static boolean inArmor(Player player) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.get(player);
 		return gate != null && gate.inArmor();
 	}
 
 	public static boolean inside(Player player) {
-		return player.hasAttached(FmabAttachments.INSIDE);
+		return FmabAttachments.INSIDE.has(player);
 	}
 
 	/** Une âme habitée, ou celui qui l'habite : tous deux à la même place. */
 	public static boolean paired(net.minecraft.world.entity.LivingEntity entity) {
 		return entity instanceof Player player && (inside(player)
-				|| player.getAttachedOrElse(FmabAttachments.SHELL, Shell.NONE).occupant().isPresent());
+				|| FmabAttachments.SHELL.getOrElse(player, Shell.NONE).occupant().isPresent());
 	}
 
 	/** Un joueur de chair, main vide, devant une âme figée et vide. */
 	public static boolean canEnter(Player player, Player soul) {
-		GateState gate = player.getAttached(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.get(player);
 		return player != soul && inArmor(soul) && shell(soul).canEnter() && !inside(player)
 				&& (gate == null || !gate.soulBound()) && player.getMainHandItem().isEmpty() && !player.isSpectator();
 	}
@@ -187,7 +182,7 @@ public final class Shells {
 		Pair pair = SHELLS.computeIfAbsent(soul.getUUID(), id -> new Pair(soul));
 		pair.occupant = occupant;
 		set(soul, shell(soul).enter(occupant.getUUID()));
-		occupant.setAttached(FmabAttachments.INSIDE, soul.getUUID());
+		FmabAttachments.INSIDE.set(occupant, soul.getUUID());
 		occupant.stopRiding();
 		follow(occupant, soul, false);
 		soul.level().playSound(null, soul.blockPosition(), SoundEvents.ARMOR_EQUIP_IRON.value(), SoundSource.PLAYERS,
@@ -198,7 +193,7 @@ public final class Shells {
 
 	private static void set(ServerPlayer soul, Shell value) {
 		if (value.equals(Shell.NONE)) {
-			soul.removeAttached(FmabAttachments.SHELL);
+			FmabAttachments.SHELL.remove(soul);
 			Pair pair = SHELLS.remove(soul.getUUID());
 			if (pair != null && pair.occupant != null) {
 				free(pair.occupant);
@@ -206,7 +201,7 @@ public final class Shells {
 			lock(soul, false);
 			return;
 		}
-		soul.setAttached(FmabAttachments.SHELL, value);
+		FmabAttachments.SHELL.set(soul, value);
 		SHELLS.computeIfAbsent(soul.getUUID(), id -> new Pair(soul));
 	}
 
@@ -233,7 +228,7 @@ public final class Shells {
 
 	/** Le joueur n'est plus dans aucune armure : il se revoit, se meut et agit. */
 	private static void free(ServerPlayer occupant) {
-		occupant.removeAttached(FmabAttachments.INSIDE);
+		FmabAttachments.INSIDE.remove(occupant);
 		lock(occupant, false);
 	}
 

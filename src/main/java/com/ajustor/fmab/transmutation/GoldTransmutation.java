@@ -73,7 +73,7 @@ public final class GoldTransmutation {
 	/** La loi d'État ne pardonne pas : karma, avis de recherche, et la garde qui accourt. */
 	private static void punish(ServerLevel level, ServerPlayer caster) {
 		Karma.add(caster, KARMA);
-		caster.setAttached(FmabAttachments.WANTED, level.getGameTime() + WANTED);
+		FmabAttachments.WANTED.set(caster, level.getGameTime() + WANTED);
 		caster.sendSystemMessage(Component.translatable("transmutation.fmab.gold_forbidden").withStyle(ChatFormatting.RED));
 		for (AmestrianSoldierEntity soldier : level.getEntitiesOfClass(AmestrianSoldierEntity.class,
 				caster.getBoundingBox().inflate(ALERT))) {

@@ -163,7 +163,7 @@ public class LustEntity extends HomunculusEntity {
 	 */
 	private void answer(ServerPlayer player, boolean accepted) {
 		envoyTo = null;
-		player.setAttached(FmabAttachments.RECRUITMENT, accepted ? Recruitment.ACCEPTED : Recruitment.REFUSED);
+		FmabAttachments.RECRUITMENT.set(player, accepted ? Recruitment.ACCEPTED : Recruitment.REFUSED);
 		Karma.add(player, accepted ? Recruitment.ACCEPT_KARMA : Recruitment.REFUSE_KARMA);
 		ServerLevel level = player.level();
 		if (accepted) {

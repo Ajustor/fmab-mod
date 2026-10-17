@@ -33,9 +33,6 @@ import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.entity.WheelchairEntity;
 import com.ajustor.fmab.entity.WinryEntity;
 import com.ajustor.fmab.entity.WrathEntity;
-import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -50,11 +47,14 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
+import com.ajustor.fmab.platform.Platform;
+import com.ajustor.fmab.platform.registry.Content;
+import java.util.Set;
 
 public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> IZUMI_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("izumi"));
 
-	public static final EntityType<IzumiEntity> IZUMI = Registry.register(BuiltInRegistries.ENTITY_TYPE, IZUMI_KEY,
+	public static final EntityType<IzumiEntity> IZUMI = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, IZUMI_KEY,
 			EntityType.Builder.<IzumiEntity>of(IzumiEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.8F)
 					.eyeHeight(1.62F)
@@ -66,7 +66,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> GOLEM_KEY =
 			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("stone_golem"));
 
-	public static final EntityType<StateExaminerEntity> STATE_EXAMINER = Registry.register(
+	public static final EntityType<StateExaminerEntity> STATE_EXAMINER = Platform.get().content().register(
 			BuiltInRegistries.ENTITY_TYPE, EXAMINER_KEY,
 			EntityType.Builder.<StateExaminerEntity>of(StateExaminerEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.8F)
@@ -74,7 +74,7 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(EXAMINER_KEY));
 
-	public static final EntityType<StoneGolemEntity> STONE_GOLEM = Registry.register(
+	public static final EntityType<StoneGolemEntity> STONE_GOLEM = Platform.get().content().register(
 			BuiltInRegistries.ENTITY_TYPE, GOLEM_KEY,
 			EntityType.Builder.<StoneGolemEntity>of(StoneGolemEntity::new, MobCategory.MISC)
 					.sized(1.4F, 2.7F)
@@ -84,7 +84,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> TRUTH_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("truth"));
 
 	/** La Vérité, devant la Porte. */
-	public static final EntityType<TruthEntity> TRUTH = Registry.register(BuiltInRegistries.ENTITY_TYPE, TRUTH_KEY,
+	public static final EntityType<TruthEntity> TRUTH = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, TRUTH_KEY,
 			EntityType.Builder.<TruthEntity>of(TruthEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.8F)
 					.eyeHeight(1.62F)
@@ -94,7 +94,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> WINRY_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("winry"));
 
 	/** Winry Rockbell, mécanicienne d'automail à Rush Valley. */
-	public static final EntityType<WinryEntity> WINRY = Registry.register(BuiltInRegistries.ENTITY_TYPE, WINRY_KEY,
+	public static final EntityType<WinryEntity> WINRY = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, WINRY_KEY,
 			EntityType.Builder.<WinryEntity>of(WinryEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.8F)
 					.eyeHeight(1.62F)
@@ -106,7 +106,7 @@ public final class FmabEntities {
 			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("gluttony"));
 
 	/** Lust (Luxure), gardienne du Laboratoire 5. */
-	public static final EntityType<LustEntity> LUST = Registry.register(BuiltInRegistries.ENTITY_TYPE, LUST_KEY,
+	public static final EntityType<LustEntity> LUST = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, LUST_KEY,
 			EntityType.Builder.<LustEntity>of(LustEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -114,7 +114,7 @@ public final class FmabEntities {
 					.build(LUST_KEY));
 
 	/** Gluttony (Gourmandise), gardien du Laboratoire 5 ; sa taille vient de son attribut d'échelle. */
-	public static final EntityType<GluttonyEntity> GLUTTONY = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+	public static final EntityType<GluttonyEntity> GLUTTONY = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE,
 			GLUTTONY_KEY,
 			EntityType.Builder.<GluttonyEntity>of(GluttonyEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.8F)
@@ -125,7 +125,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> ENVY_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("envy"));
 
 	/** Envy (Envie) : erre déguisé ; sa taille change avec sa forme (attribut d'échelle). */
-	public static final EntityType<EnvyEntity> ENVY = Registry.register(BuiltInRegistries.ENTITY_TYPE, ENVY_KEY,
+	public static final EntityType<EnvyEntity> ENVY = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, ENVY_KEY,
 			EntityType.Builder.<EnvyEntity>of(EnvyEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.8F)
 					.eyeHeight(1.62F)
@@ -135,7 +135,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> GREED_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("greed"));
 
 	/** Greed (Avarice), dans son bar du Devil's Nest. */
-	public static final EntityType<GreedEntity> GREED = Registry.register(BuiltInRegistries.ENTITY_TYPE, GREED_KEY,
+	public static final EntityType<GreedEntity> GREED = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, GREED_KEY,
 			EntityType.Builder.<GreedEntity>of(GreedEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -145,7 +145,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> SLOTH_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("sloth"));
 
 	/** Sloth (Paresse), dans le grand tunnel sous Central ; sa taille vient de son échelle. */
-	public static final EntityType<SlothEntity> SLOTH = Registry.register(BuiltInRegistries.ENTITY_TYPE, SLOTH_KEY,
+	public static final EntityType<SlothEntity> SLOTH = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, SLOTH_KEY,
 			EntityType.Builder.<SlothEntity>of(SlothEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.8F)
 					.eyeHeight(1.62F)
@@ -155,7 +155,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> WRATH_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("wrath"));
 
 	/** Wrath (Colère), King Bradley, dans sa résidence de Central. */
-	public static final EntityType<WrathEntity> WRATH = Registry.register(BuiltInRegistries.ENTITY_TYPE, WRATH_KEY,
+	public static final EntityType<WrathEntity> WRATH = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, WRATH_KEY,
 			EntityType.Builder.<WrathEntity>of(WrathEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -165,7 +165,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> PRIDE_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("pride"));
 
 	/** Pride (Orgueil), Selim Bradley : un enfant, à son échelle. */
-	public static final EntityType<PrideEntity> PRIDE = Registry.register(BuiltInRegistries.ENTITY_TYPE, PRIDE_KEY,
+	public static final EntityType<PrideEntity> PRIDE = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, PRIDE_KEY,
 			EntityType.Builder.<PrideEntity>of(PrideEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.8F)
 					.eyeHeight(1.62F)
@@ -175,7 +175,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> FATHER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("father"));
 
 	/** Père, l'Homonculus originel, sur son trône sous Central ; sa forme divine grandit (échelle). */
-	public static final EntityType<FatherEntity> FATHER = Registry.register(BuiltInRegistries.ENTITY_TYPE, FATHER_KEY,
+	public static final EntityType<FatherEntity> FATHER = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, FATHER_KEY,
 			EntityType.Builder.<FatherEntity>of(FatherEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -185,7 +185,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> KUNAI_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("kunai"));
 
 	/** Un kunaï d'alkahestry lancé, qui se plante comme une flèche. */
-	public static final EntityType<KunaiEntity> KUNAI = Registry.register(BuiltInRegistries.ENTITY_TYPE, KUNAI_KEY,
+	public static final EntityType<KunaiEntity> KUNAI = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, KUNAI_KEY,
 			EntityType.Builder.<KunaiEntity>of(KunaiEntity::new, MobCategory.MISC)
 					.sized(0.4F, 0.4F)
 					.clientTrackingRange(4)
@@ -195,7 +195,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> MAY_CHANG_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("may_chang"));
 
 	/** May Chang, alkahestriste de Xing, dans son pavillon ; petite (attribut d'échelle). */
-	public static final EntityType<MayChangEntity> MAY_CHANG = Registry.register(BuiltInRegistries.ENTITY_TYPE, MAY_CHANG_KEY,
+	public static final EntityType<MayChangEntity> MAY_CHANG = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, MAY_CHANG_KEY,
 			EntityType.Builder.<MayChangEntity>of(MayChangEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.8F)
 					.eyeHeight(1.62F)
@@ -205,7 +205,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> DRACHMA_SOLDIER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("drachma_soldier"));
 
 	/** Un soldat de Drachma, la nuit au pied de Fort Briggs. */
-	public static final EntityType<DrachmaSoldierEntity> DRACHMA_SOLDIER = Registry.register(BuiltInRegistries.ENTITY_TYPE, DRACHMA_SOLDIER_KEY,
+	public static final EntityType<DrachmaSoldierEntity> DRACHMA_SOLDIER = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, DRACHMA_SOLDIER_KEY,
 			EntityType.Builder.<DrachmaSoldierEntity>of(DrachmaSoldierEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -215,7 +215,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> OLIVIER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("olivier"));
 
 	/** La générale Olivier Mira Armstrong, qui tient Fort Briggs. */
-	public static final EntityType<OlivierEntity> OLIVIER = Registry.register(BuiltInRegistries.ENTITY_TYPE, OLIVIER_KEY,
+	public static final EntityType<OlivierEntity> OLIVIER = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, OLIVIER_KEY,
 			EntityType.Builder.<OlivierEntity>of(OlivierEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -225,7 +225,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> AMESTRIAN_SOLDIER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("amestrian_soldier"));
 
 	/** Un soldat d'Amestris, en uniforme bleu. */
-	public static final EntityType<AmestrianSoldierEntity> AMESTRIAN_SOLDIER = Registry.register(BuiltInRegistries.ENTITY_TYPE, AMESTRIAN_SOLDIER_KEY,
+	public static final EntityType<AmestrianSoldierEntity> AMESTRIAN_SOLDIER = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, AMESTRIAN_SOLDIER_KEY,
 			EntityType.Builder.<AmestrianSoldierEntity>of(AmestrianSoldierEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -235,7 +235,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> IMMORTAL_SOLDIER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("immortal_soldier"));
 
 	/** Un soldat immortel, sous Central et au Laboratoire 5. */
-	public static final EntityType<ImmortalSoldierEntity> IMMORTAL_SOLDIER = Registry.register(BuiltInRegistries.ENTITY_TYPE, IMMORTAL_SOLDIER_KEY,
+	public static final EntityType<ImmortalSoldierEntity> IMMORTAL_SOLDIER = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, IMMORTAL_SOLDIER_KEY,
 			EntityType.Builder.<ImmortalSoldierEntity>of(ImmortalSoldierEntity::new, MobCategory.MONSTER)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -245,7 +245,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> HAUNTED_ARMOR_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("haunted_armor"));
 
 	/** Une armure habitée, liée par un sceau de sang. */
-	public static final EntityType<HauntedArmorEntity> HAUNTED_ARMOR = Registry.register(BuiltInRegistries.ENTITY_TYPE, HAUNTED_ARMOR_KEY,
+	public static final EntityType<HauntedArmorEntity> HAUNTED_ARMOR = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, HAUNTED_ARMOR_KEY,
 			EntityType.Builder.<HauntedArmorEntity>of(HauntedArmorEntity::new, MobCategory.MONSTER)
 					.sized(0.7F, 2.0F)
 					.eyeHeight(1.8F)
@@ -255,7 +255,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> BARRY_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("barry"));
 
 	/** Barry le Boucher, armure habitée au-dessus du Laboratoire 5. */
-	public static final EntityType<BarryEntity> BARRY = Registry.register(BuiltInRegistries.ENTITY_TYPE, BARRY_KEY,
+	public static final EntityType<BarryEntity> BARRY = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, BARRY_KEY,
 			EntityType.Builder.<BarryEntity>of(BarryEntity::new, MobCategory.MONSTER)
 					.sized(0.7F, 2.0F)
 					.eyeHeight(1.8F)
@@ -265,7 +265,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> CHIMERA_BEAST_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("chimera_beast"));
 
 	/** Une chimère massive, lion, serpent et bouc. */
-	public static final EntityType<ChimeraBeastEntity> CHIMERA_BEAST = Registry.register(BuiltInRegistries.ENTITY_TYPE, CHIMERA_BEAST_KEY,
+	public static final EntityType<ChimeraBeastEntity> CHIMERA_BEAST = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, CHIMERA_BEAST_KEY,
 			EntityType.Builder.<ChimeraBeastEntity>of(ChimeraBeastEntity::new, MobCategory.MONSTER)
 					.sized(1.4F, 1.4F)
 					.eyeHeight(1.2F)
@@ -275,7 +275,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> CHIMERA_CRAWLER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("chimera_crawler"));
 
 	/** Une chimère rampante, qui grimpe aux murs. */
-	public static final EntityType<ChimeraCrawlerEntity> CHIMERA_CRAWLER = Registry.register(BuiltInRegistries.ENTITY_TYPE, CHIMERA_CRAWLER_KEY,
+	public static final EntityType<ChimeraCrawlerEntity> CHIMERA_CRAWLER = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, CHIMERA_CRAWLER_KEY,
 			EntityType.Builder.<ChimeraCrawlerEntity>of(ChimeraCrawlerEntity::new, MobCategory.MONSTER)
 					.sized(1.2F, 0.9F)
 					.eyeHeight(0.65F)
@@ -286,7 +286,7 @@ public final class FmabEntities {
 			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("briggs_soldier"));
 
 	/** Un soldat de Briggs, en manteau d'hiver : la même classe que le soldat d'Amestris. */
-	public static final EntityType<AmestrianSoldierEntity> BRIGGS_SOLDIER = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+	public static final EntityType<AmestrianSoldierEntity> BRIGGS_SOLDIER = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE,
 			BRIGGS_SOLDIER_KEY,
 			EntityType.Builder.<AmestrianSoldierEntity>of(AmestrianSoldierEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.9F)
@@ -298,7 +298,7 @@ public final class FmabEntities {
 			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("alchemical_mine"));
 
 	/** Une mine alchimique de Kimblee, posée sur un bloc. */
-	public static final EntityType<AlchemicalMineEntity> ALCHEMICAL_MINE = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+	public static final EntityType<AlchemicalMineEntity> ALCHEMICAL_MINE = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE,
 			ALCHEMICAL_MINE_KEY,
 			EntityType.Builder.<AlchemicalMineEntity>of(AlchemicalMineEntity::new, MobCategory.MISC)
 					.sized(0.5F, 0.5F)
@@ -309,7 +309,7 @@ public final class FmabEntities {
 			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("throwing_knife"));
 
 	/** Un couteau de lancer de Hughes. */
-	public static final EntityType<ThrowingKnifeEntity> THROWING_KNIFE = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+	public static final EntityType<ThrowingKnifeEntity> THROWING_KNIFE = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE,
 			THROWING_KNIFE_KEY,
 			EntityType.Builder.<ThrowingKnifeEntity>of(ThrowingKnifeEntity::new, MobCategory.MISC)
 					.sized(0.4F, 0.4F)
@@ -320,7 +320,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> CORNELLO_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("cornello"));
 
 	/** Le père Cornello, faux prophète de Liore. */
-	public static final EntityType<CornelloEntity> CORNELLO = Registry.register(BuiltInRegistries.ENTITY_TYPE, CORNELLO_KEY,
+	public static final EntityType<CornelloEntity> CORNELLO = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, CORNELLO_KEY,
 			EntityType.Builder.<CornelloEntity>of(CornelloEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -330,7 +330,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> SCAR_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("scar"));
 
 	/** Scar, l'Ishvalien au bras tatoué, dans les ruines d'Ishval. */
-	public static final EntityType<ScarEntity> SCAR = Registry.register(BuiltInRegistries.ENTITY_TYPE, SCAR_KEY,
+	public static final EntityType<ScarEntity> SCAR = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, SCAR_KEY,
 			EntityType.Builder.<ScarEntity>of(ScarEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -340,7 +340,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> HOHENHEIM_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("hohenheim"));
 
 	/** Van Hohenheim, dans les ruines de Xerxès. */
-	public static final EntityType<HohenheimEntity> HOHENHEIM = Registry.register(BuiltInRegistries.ENTITY_TYPE, HOHENHEIM_KEY,
+	public static final EntityType<HohenheimEntity> HOHENHEIM = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, HOHENHEIM_KEY,
 			EntityType.Builder.<HohenheimEntity>of(HohenheimEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -350,7 +350,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> GATE_HAND_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("gate_hand"));
 
 	/** Un bras noir de la Porte, le temps d'une cinématique. */
-	public static final EntityType<GateHandEntity> GATE_HAND = Registry.register(BuiltInRegistries.ENTITY_TYPE, GATE_HAND_KEY,
+	public static final EntityType<GateHandEntity> GATE_HAND = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, GATE_HAND_KEY,
 			EntityType.Builder.<GateHandEntity>of(GateHandEntity::new, MobCategory.MISC)
 					.noSave()
 					.sized(0.4F, 0.4F)
@@ -361,7 +361,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> MARCOH_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("marcoh"));
 
 	/** Le docteur Marcoh, dans son dispensaire de campagne. */
-	public static final EntityType<MarcohEntity> MARCOH = Registry.register(BuiltInRegistries.ENTITY_TYPE, MARCOH_KEY,
+	public static final EntityType<MarcohEntity> MARCOH = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, MARCOH_KEY,
 			EntityType.Builder.<MarcohEntity>of(MarcohEntity::new, MobCategory.MISC)
 					.sized(0.6F, 1.9F)
 					.eyeHeight(1.7F)
@@ -371,7 +371,7 @@ public final class FmabEntities {
 	private static final ResourceKey<EntityType<?>> FATHER_SUN_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("father_sun"));
 
 	/** Le petit soleil de Père, qu'on esquive ou qu'on renvoie d'un coup. */
-	public static final EntityType<FatherSunEntity> FATHER_SUN = Registry.register(BuiltInRegistries.ENTITY_TYPE, FATHER_SUN_KEY,
+	public static final EntityType<FatherSunEntity> FATHER_SUN = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, FATHER_SUN_KEY,
 			EntityType.Builder.<FatherSunEntity>of(FatherSunEntity::new, MobCategory.MISC)
 					.sized(1.0F, 1.0F)
 					.clientTrackingRange(6)
@@ -382,7 +382,7 @@ public final class FmabEntities {
 			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("wheelchair"));
 
 	/** Le fauteuil roulant : une monture, assise à mi-hauteur. */
-	public static final EntityType<WheelchairEntity> WHEELCHAIR = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+	public static final EntityType<WheelchairEntity> WHEELCHAIR = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE,
 			WHEELCHAIR_KEY,
 			EntityType.Builder.<WheelchairEntity>of(WheelchairEntity::new, MobCategory.MISC)
 					.sized(0.8F, 0.9F)
@@ -395,34 +395,35 @@ public final class FmabEntities {
 	}
 
 	public static void register() {
-		FabricDefaultAttributeRegistry.register(IZUMI, IzumiEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(STATE_EXAMINER, StateExaminerEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(STONE_GOLEM, StoneGolemEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(TRUTH, TruthEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(WINRY, WinryEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(LUST, LustEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(GLUTTONY, GluttonyEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(ENVY, EnvyEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(GREED, GreedEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(SLOTH, SlothEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(WRATH, WrathEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(PRIDE, PrideEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(FATHER, FatherEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(MAY_CHANG, MayChangEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(DRACHMA_SOLDIER, DrachmaSoldierEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(OLIVIER, OlivierEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(AMESTRIAN_SOLDIER, AmestrianSoldierEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(IMMORTAL_SOLDIER, ImmortalSoldierEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(HAUNTED_ARMOR, HauntedArmorEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(BARRY, BarryEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(CHIMERA_BEAST, ChimeraBeastEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(CHIMERA_CRAWLER, ChimeraCrawlerEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(CORNELLO, CornelloEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(SCAR, ScarEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(HOHENHEIM, HohenheimEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(MARCOH, MarcohEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(BRIGGS_SOLDIER, AmestrianSoldierEntity.createAttributes());
-		FabricDefaultAttributeRegistry.register(WHEELCHAIR, WheelchairEntity.createAttributes());
+		Content content = Platform.get().content();
+		content.attributes(IZUMI, IzumiEntity.createAttributes());
+		content.attributes(STATE_EXAMINER, StateExaminerEntity.createAttributes());
+		content.attributes(STONE_GOLEM, StoneGolemEntity.createAttributes());
+		content.attributes(TRUTH, TruthEntity.createAttributes());
+		content.attributes(WINRY, WinryEntity.createAttributes());
+		content.attributes(LUST, LustEntity.createAttributes());
+		content.attributes(GLUTTONY, GluttonyEntity.createAttributes());
+		content.attributes(ENVY, EnvyEntity.createAttributes());
+		content.attributes(GREED, GreedEntity.createAttributes());
+		content.attributes(SLOTH, SlothEntity.createAttributes());
+		content.attributes(WRATH, WrathEntity.createAttributes());
+		content.attributes(PRIDE, PrideEntity.createAttributes());
+		content.attributes(FATHER, FatherEntity.createAttributes());
+		content.attributes(MAY_CHANG, MayChangEntity.createAttributes());
+		content.attributes(DRACHMA_SOLDIER, DrachmaSoldierEntity.createAttributes());
+		content.attributes(OLIVIER, OlivierEntity.createAttributes());
+		content.attributes(AMESTRIAN_SOLDIER, AmestrianSoldierEntity.createAttributes());
+		content.attributes(IMMORTAL_SOLDIER, ImmortalSoldierEntity.createAttributes());
+		content.attributes(HAUNTED_ARMOR, HauntedArmorEntity.createAttributes());
+		content.attributes(BARRY, BarryEntity.createAttributes());
+		content.attributes(CHIMERA_BEAST, ChimeraBeastEntity.createAttributes());
+		content.attributes(CHIMERA_CRAWLER, ChimeraCrawlerEntity.createAttributes());
+		content.attributes(CORNELLO, CornelloEntity.createAttributes());
+		content.attributes(SCAR, ScarEntity.createAttributes());
+		content.attributes(HOHENHEIM, HohenheimEntity.createAttributes());
+		content.attributes(MARCOH, MarcohEntity.createAttributes());
+		content.attributes(BRIGGS_SOLDIER, AmestrianSoldierEntity.createAttributes());
+		content.attributes(WHEELCHAIR, WheelchairEntity.createAttributes());
 		// Les chimères rôdent la nuit, comme tout monstre ; on en croise un peu partout.
 		SpawnPlacements.register(CHIMERA_BEAST, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 				Monster::checkMonsterSpawnRules);
@@ -431,10 +432,9 @@ public final class FmabEntities {
 		SpawnPlacements.register(IMMORTAL_SOLDIER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 				Monster::checkMonsterSpawnRules);
 		// Partout où rôdent les monstres : pas dans les îles champignons ni au fond des grottes profondes.
-		var chimeraLands = BiomeSelectors.tag(BiomeTags.IS_OVERWORLD)
-				.and(BiomeSelectors.excludeByKey(Biomes.MUSHROOM_FIELDS, Biomes.DEEP_DARK));
-		BiomeModifications.addSpawn(chimeraLands, MobCategory.MONSTER, CHIMERA_BEAST, 6, 1, 1);
-		BiomeModifications.addSpawn(chimeraLands, MobCategory.MONSTER, CHIMERA_CRAWLER, 10, 1, 2);
+		var notThere = Set.of(Biomes.MUSHROOM_FIELDS, Biomes.DEEP_DARK);
+		content.addSpawn(BiomeTags.IS_OVERWORLD, notThere, MobCategory.MONSTER, CHIMERA_BEAST, 6, 1, 1);
+		content.addSpawn(BiomeTags.IS_OVERWORLD, notThere, MobCategory.MONSTER, CHIMERA_CRAWLER, 10, 1, 2);
 		// Les soldats de Drachma n'apparaissent que dans le noir, comme tout monstre.
 		// Ils rôdent au pied du mur, pas dans le fort : jamais sur un sol bâti.
 		SpawnPlacements.register(DRACHMA_SOLDIER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,

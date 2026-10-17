@@ -223,7 +223,7 @@ public class GreedEntity extends HomunculusEntity {
 		nextWage = level().getGameTime() + WAGE_PERIOD;
 		setTarget(null);
 		player.sendSystemMessage(Component.translatable("homunculus.fmab.greed_pact"));
-		player.setAttached(FmabAttachments.GREED_PACT, true);
+		FmabAttachments.GREED_PACT.set(player, true);
 		Milestones.reach(player, "greed_pact");
 		level().playSound(null, blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.NEUTRAL, 1, 0.7f);
 	}

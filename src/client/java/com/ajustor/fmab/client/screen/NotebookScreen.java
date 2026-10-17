@@ -19,7 +19,6 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.IssueText;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -40,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Carnet de cercles (sa touche l'ouvre) : on y trace ses cercles sur une grille de 32 cases, on les
@@ -718,7 +718,7 @@ public class NotebookScreen extends Screen {
 	private void save(boolean announce) {
 		store();
 		contents = contents.select(Math.min(page, Math.max(0, contents.pages().size() - 1)));
-		ClientPlayNetworking.send(new SaveNotebookPayload(contents));
+		ClientPlatform.get().send(new SaveNotebookPayload(contents));
 		if (announce) {
 			status = Component.translatable("notebook.fmab.saved");
 		}
@@ -805,7 +805,7 @@ public class NotebookScreen extends Screen {
 
 	private AlchemistData alchemist() {
 		Player player = minecraft == null ? null : minecraft.player;
-		AlchemistData data = player == null ? null : player.getAttached(FmabAttachments.ALCHEMIST);
+		AlchemistData data = player == null ? null : FmabAttachments.ALCHEMIST.get(player);
 		return data == null ? AlchemistData.NEW : data;
 	}
 

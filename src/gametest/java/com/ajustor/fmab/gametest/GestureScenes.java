@@ -66,7 +66,7 @@ public class GestureScenes implements FabricClientGameTest {
 				sp.getServer().runOnServer(server -> TransmutationPose.strike(server.getPlayerList().getPlayers().getFirst(),
 						kind, 14));
 				sp.getConnection().waitForClientboundPackets();
-				check(context.computeOnClient(mc -> mc.player.getAttachedOrElse(FmabAttachments.POSE, TransmutationPose.NONE)
+				check(context.computeOnClient(mc -> FmabAttachments.POSE.getOrElse(mc.player, TransmutationPose.NONE)
 						.kind()) == kind, "le client devrait recevoir le geste " + kind);
 				int at = 0;
 				for (int frame : FRAMES) {
@@ -99,8 +99,8 @@ public class GestureScenes implements FabricClientGameTest {
 			// Le bras gauche d'automail suit le geste comme le bras de chair.
 			sp.getServer().runOnServer(server -> {
 				ServerPlayer p = server.getPlayerList().getPlayers().getFirst();
-				p.setAttached(FmabAttachments.GATE, GateState.NONE.pay(BodyPart.LEFT_ARM));
-				p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE
+				FmabAttachments.GATE.set(p, GateState.NONE.pay(BodyPart.LEFT_ARM));
+				FmabAttachments.AUTOMAIL.set(p, Automail.NONE
 						.with(BodyPart.LEFT_ARM, new ItemStack(FmabItems.IRON_AUTOMAIL_ARM)));
 			});
 			firstPerson(context, sp, TransmutationPose.Kind.CLAP, "gesture_fp_automail_clap");

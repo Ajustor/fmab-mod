@@ -13,7 +13,6 @@ import com.ajustor.fmab.network.AddToNotebookPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.google.gson.JsonParser;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Le Traité d'alchimie : sommaire, chapitres de texte, catalogue des glyphes (on y étudie chaque
@@ -197,12 +197,12 @@ public class TreatiseScreen extends Screen {
 		}
 		if (e.glyph() != null) {
 			glyphExample(e.glyph()).ifPresent(ex ->
-					ClientPlayNetworking.send(new AddToNotebookPayload("@" + ex.getKey(), ex.getValue())));
+					ClientPlatform.get().send(new AddToNotebookPayload("@" + ex.getKey(), ex.getValue())));
 		} else if (e.page() instanceof Treatise.ExamplePage example) {
 			String title = exampleTitle(Component.translatable(example.textKey()).getString());
-			ClientPlayNetworking.send(new AddToNotebookPayload(title, example.drawing()));
+			ClientPlatform.get().send(new AddToNotebookPayload(title, example.drawing()));
 		} else if (e.page() instanceof Treatise.SealPage && minecraft != null && minecraft.player != null) {
-			ClientPlayNetworking.send(new AddToNotebookPayload(Component.translatable("gate.fmab.page.seal",
+			ClientPlatform.get().send(new AddToNotebookPayload(Component.translatable("gate.fmab.page.seal",
 					minecraft.player.getName().getString()).getString(), mySeal()));
 		}
 		notebookButton.active = false;
@@ -343,7 +343,7 @@ public class TreatiseScreen extends Screen {
 
 	private AlchemistData alchemist() {
 		AlchemistData data = minecraft == null || minecraft.player == null ? null
-				: minecraft.player.getAttached(FmabAttachments.ALCHEMIST);
+				: FmabAttachments.ALCHEMIST.get(minecraft.player);
 		return data == null ? AlchemistData.NEW : data;
 	}
 

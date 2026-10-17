@@ -41,7 +41,7 @@ public abstract class AvatarRendererMixin {
 	@Inject(method = "extractRenderState(Lnet/minecraft/world/entity/Avatar;"
 			+ "Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;F)V", at = @At("TAIL"))
 	private void fmab$extractPose(Avatar entity, AvatarRenderState state, float partialTicks, CallbackInfo ci) {
-		TransmutationPose pose = entity.getAttached(FmabAttachments.POSE);
+		TransmutationPose pose = FmabAttachments.POSE.get(entity);
 		long now = entity.level().getGameTime();
 		PoseHolder holder = (PoseHolder) state;
 		if (pose == null || !pose.active(now)) {

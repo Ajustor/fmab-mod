@@ -38,6 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 import static com.ajustor.fmab.gametest.GametestAsserts.check;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Fabriquer un objet par l'alchimie, en jeu : on décompose une pioche pour la comprendre (elle rend
@@ -61,11 +62,11 @@ public class RecompositionScenes implements FabricClientGameTest {
 			sp.getServer().runCommand("tp @p 0.5 -60 -1.0 0 30");
 			sp.getConnection().waitForChunksRender();
 			server(context, sp, (level, p) -> {
-				AlchemistData data = p.getAttachedOrCreate(FmabAttachments.ALCHEMIST).withRank(Rank.ALCHEMIST);
+				AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(p).withRank(Rank.ALCHEMIST);
 				for (Glyph g : AlchemyRules.of(level.registryAccess()).glyphs()) {
 					data = data.learn(g.id());
 				}
-				p.setAttached(FmabAttachments.ALCHEMIST, data);
+				FmabAttachments.ALCHEMIST.set(p, data);
 				p.getInventory().clearContent();
 				return null;
 			});
@@ -82,7 +83,7 @@ public class RecompositionScenes implements FabricClientGameTest {
 			check(count(context, sp, Items.IRON_INGOT) == 3, "la pioche devrait rendre trois lingots : "
 					+ count(context, sp, Items.IRON_INGOT));
 			check(count(context, sp, Items.OAK_PLANKS) == 1, "et une planche (deux bâtons)");
-			check(server(context, sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.UNDERSTOOD)
+			check(server(context, sp, (level, p) -> FmabAttachments.UNDERSTOOD.getOrCreate(p)
 					.contains("minecraft:iron_pickaxe")), "l'alchimiste devrait avoir compris la pioche");
 			context.takeScreenshot("recomposition_01_pickaxe_broken_down");
 
@@ -124,17 +125,17 @@ public class RecompositionScenes implements FabricClientGameTest {
 			clear(context, sp);
 
 			// 6. La page de conception : on pense à la pioche de fer.
-			context.runOnClient(mc -> ClientPlayNetworking.send(RequestDesignsPayload.INSTANCE));
+			context.runOnClient(mc -> ClientPlatform.get().send(RequestDesignsPayload.INSTANCE));
 			context.waitForScreen(DesignScreen.class);
 			context.takeScreenshot("recomposition_06_design_page");
-			context.runOnClient(mc -> ClientPlayNetworking.send(new ChooseDesignPayload("minecraft:iron_pickaxe")));
+			context.runOnClient(mc -> ClientPlatform.get().send(new ChooseDesignPayload("minecraft:iron_pickaxe")));
 			sp.getConnection().waitForServerboundPackets();
 			context.waitTicks(2);
-			context.runOnClient(mc -> ClientPlayNetworking.send(RequestDesignsPayload.INSTANCE));
+			context.runOnClient(mc -> ClientPlatform.get().send(RequestDesignsPayload.INSTANCE));
 			context.waitTicks(5);
 			context.takeScreenshot("recomposition_07_design_chosen");
 			context.setScreen(() -> null);
-			check(server(context, sp, (level, p) -> "minecraft:iron_pickaxe".equals(p.getAttached(FmabAttachments.DESIGN))),
+			check(server(context, sp, (level, p) -> "minecraft:iron_pickaxe".equals(FmabAttachments.DESIGN.get(p))),
 					"la conception devrait être la pioche de fer");
 
 			// 7. Sans modèle : le cercle crée l'objet auquel on pense ; un lingot de plus le rend plus solide.
@@ -164,7 +165,7 @@ public class RecompositionScenes implements FabricClientGameTest {
 			clear(context, sp);
 			server(context, sp, (level, p) -> {
 				p.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
-				p.removeAttached(FmabAttachments.DESIGN);
+				FmabAttachments.DESIGN.remove(p);
 				return null;
 			});
 
@@ -197,7 +198,7 @@ public class RecompositionScenes implements FabricClientGameTest {
 			drop(context, sp, new ItemStack(Items.DIAMOND));
 			cast(context, sp, "fmab:carbone", "fmab:decomposer");
 			check(count(context, sp, Items.DIAMOND) == 1, "le diamant reste un diamant");
-			check(server(context, sp, (level, p) -> p.getAttachedOrCreate(FmabAttachments.UNDERSTOOD)
+			check(server(context, sp, (level, p) -> FmabAttachments.UNDERSTOOD.getOrCreate(p)
 					.contains("minecraft:diamond")), "l'alchimiste devrait avoir compris le diamant");
 			drop(context, sp, new ItemStack(Items.COAL, 64));
 			cast(context, sp, "fmab:carbone", "fmab:recomposer");
@@ -294,8 +295,8 @@ public class RecompositionScenes implements FabricClientGameTest {
 			if (level.getBlockEntity(CIRCLE) instanceof TransmutationCircleBlockEntity be) {
 				be.setDrawing(drawing);
 			}
-			AlchemistData data = p.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
-			p.setAttached(FmabAttachments.ALCHEMIST, data);
+			AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(p);
+			FmabAttachments.ALCHEMIST.set(p, data);
 			Concentration.set(p, Concentration.max(p));
 			return Transmutation.activate(level, CIRCLE, state, drawing, p, CircleSize.NORMAL);
 		});

@@ -76,18 +76,6 @@ import com.ajustor.fmab.registry.FmabMenus;
 import com.ajustor.fmab.stone.Eclipse;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -103,10 +91,15 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
+import com.ajustor.fmab.platform.client.ClientEvents;
+import com.ajustor.fmab.platform.client.ClientPlatform;
 
-public class FmabClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public final class FmabClient {
+	private FmabClient() {
+	}
+
+	/** Lance le client du mod : appelé par le point d'entrée du loader, une fois ses événements branchés. */
+	public static void init() {
 		// Avant le premier chargement des langues : celle choisie pour le mod s'y applique déjà.
 		FmabClientConfig.load();
 		Fmab.setClientHooks((kind, hand) -> {
@@ -115,32 +108,32 @@ public class FmabClient implements ClientModInitializer {
 			}
 		});
 		KeyMapping.Category category = KeyMapping.Category.register(Fmab.id("alchemy"));
-		KeyMapping cast = KeyMappingHelper.registerKeyMapping(
+		KeyMapping cast = ClientPlatform.get().keyMapping(
 				new KeyMapping("key.fmab.cast_gloves", GLFW.GLFW_KEY_G, category));
-		KeyMapping gloves = KeyMappingHelper.registerKeyMapping(
+		KeyMapping gloves = ClientPlatform.get().keyMapping(
 				new KeyMapping("key.fmab.gloves", GLFW.GLFW_KEY_H, category));
-		KeyMapping notebook = KeyMappingHelper.registerKeyMapping(
+		KeyMapping notebook = ClientPlatform.get().keyMapping(
 				new KeyMapping("key.fmab.notebook", GLFW.GLFW_KEY_N, category));
 		// La page de conception : l'objet auquel on pense en recomposant.
-		KeyMapping design = KeyMappingHelper.registerKeyMapping(
+		KeyMapping design = ClientPlatform.get().keyMapping(
 				new KeyMapping("key.fmab.design", GLFW.GLFW_KEY_J, category));
-		KeyMapping wheel = KeyMappingHelper.registerKeyMapping(
+		KeyMapping wheel = ClientPlatform.get().keyMapping(
 				new KeyMapping("key.fmab.circle_wheel", GLFW.GLFW_KEY_R, category));
 		// Passer d'un cercle à l'autre sans ouvrir la roue : sans touche par défaut.
-		KeyMapping next = KeyMappingHelper.registerKeyMapping(
+		KeyMapping next = ClientPlatform.get().keyMapping(
 				new KeyMapping("key.fmab.next_circle", InputConstants.UNKNOWN.getValue(), category));
-		KeyMapping previous = KeyMappingHelper.registerKeyMapping(
+		KeyMapping previous = ClientPlatform.get().keyMapping(
 				new KeyMapping("key.fmab.previous_circle", InputConstants.UNKNOWN.getValue(), category));
 		// L'âme en armure se fige (une armure qu'on peut revêtir), s'éveille, ou relâche qui est dedans.
-		KeyMapping shell = KeyMappingHelper.registerKeyMapping(
+		KeyMapping shell = ClientPlatform.get().keyMapping(
 				new KeyMapping("key.fmab.shell", GLFW.GLFW_KEY_V, category));
-		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
+		ClientEvents.END_TICK.register(mc -> {
 			while (shell.consumeClick()) {
-				ClientPlayNetworking.send(ShellKeyPayload.INSTANCE);
+				ClientPlatform.get().send(ShellKeyPayload.INSTANCE);
 			}
 			while (cast.consumeClick()) {
 				// Maj : joindre les mains, les deux gants agissent.
-				ClientPlayNetworking.send(new CastGlovesPayload(mc.hasShiftDown()));
+				ClientPlatform.get().send(new CastGlovesPayload(mc.hasShiftDown()));
 			}
 			while (gloves.consumeClick()) {
 				mc.gui.setScreen(new GlovesScreen());
@@ -149,7 +142,7 @@ public class FmabClient implements ClientModInitializer {
 				mc.gui.setScreen(new NotebookScreen());
 			}
 			while (design.consumeClick()) {
-				ClientPlayNetworking.send(RequestDesignsPayload.INSTANCE);
+				ClientPlatform.get().send(RequestDesignsPayload.INSTANCE);
 			}
 			while (wheel.consumeClick()) {
 				CircleWheelScreen.open(wheel);
@@ -161,111 +154,110 @@ public class FmabClient implements ClientModInitializer {
 				cycleCircle(mc, -1);
 			}
 		});
-		EntityRendererRegistry.register(FmabEntities.IZUMI, IzumiRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.STATE_EXAMINER, StateExaminerRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.STONE_GOLEM, StoneGolemRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.TRUTH, TruthRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.WINRY, WinryRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.WHEELCHAIR, WheelchairRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.LUST, LustRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.GLUTTONY, GluttonyRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.ENVY, EnvyRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.GREED, GreedRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.SLOTH, SlothRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.WRATH, WrathRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.PRIDE, PrideRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.FATHER, FatherRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.KUNAI, KunaiRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.MAY_CHANG, MayChangRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.DRACHMA_SOLDIER, DrachmaSoldierRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.OLIVIER, OlivierRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.AMESTRIAN_SOLDIER, c -> new SoldierRenderer(c, "amestrian_soldier"));
-		EntityRendererRegistry.register(FmabEntities.BRIGGS_SOLDIER, c -> new SoldierRenderer(c, "briggs_soldier"));
-		EntityRendererRegistry.register(FmabEntities.IMMORTAL_SOLDIER, ImmortalSoldierRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.HAUNTED_ARMOR, c -> new HauntedArmorRenderer<>(c, "haunted_armor"));
-		EntityRendererRegistry.register(FmabEntities.BARRY, c -> new HauntedArmorRenderer<>(c, "barry", BossModels.barry()));
-		EntityRendererRegistry.register(FmabEntities.CHIMERA_BEAST, ChimeraBeastRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.CHIMERA_CRAWLER, ChimeraCrawlerRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.ALCHEMICAL_MINE, NoopRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.THROWING_KNIFE, ThrowingKnifeRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.CORNELLO, CornelloRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.SCAR, ScarRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.HOHENHEIM, HohenheimRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.MARCOH, MarcohRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.GATE_HAND, GateHandRenderer::new);
-		EntityRendererRegistry.register(FmabEntities.FATHER_SUN, c -> new ThrownItemRenderer<>(c, 4.0F, true));
+		ClientPlatform.get().entityRenderer(FmabEntities.IZUMI, IzumiRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.STATE_EXAMINER, StateExaminerRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.STONE_GOLEM, StoneGolemRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.TRUTH, TruthRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.WINRY, WinryRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.WHEELCHAIR, WheelchairRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.LUST, LustRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.GLUTTONY, GluttonyRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.ENVY, EnvyRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.GREED, GreedRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.SLOTH, SlothRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.WRATH, WrathRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.PRIDE, PrideRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.FATHER, FatherRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.KUNAI, KunaiRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.MAY_CHANG, MayChangRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.DRACHMA_SOLDIER, DrachmaSoldierRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.OLIVIER, OlivierRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.AMESTRIAN_SOLDIER, c -> new SoldierRenderer(c, "amestrian_soldier"));
+		ClientPlatform.get().entityRenderer(FmabEntities.BRIGGS_SOLDIER, c -> new SoldierRenderer(c, "briggs_soldier"));
+		ClientPlatform.get().entityRenderer(FmabEntities.IMMORTAL_SOLDIER, ImmortalSoldierRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.HAUNTED_ARMOR, c -> new HauntedArmorRenderer<>(c, "haunted_armor"));
+		ClientPlatform.get().entityRenderer(FmabEntities.BARRY, c -> new HauntedArmorRenderer<>(c, "barry", BossModels.barry()));
+		ClientPlatform.get().entityRenderer(FmabEntities.CHIMERA_BEAST, ChimeraBeastRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.CHIMERA_CRAWLER, ChimeraCrawlerRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.ALCHEMICAL_MINE, NoopRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.THROWING_KNIFE, ThrowingKnifeRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.CORNELLO, CornelloRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.SCAR, ScarRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.HOHENHEIM, HohenheimRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.MARCOH, MarcohRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.GATE_HAND, GateHandRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.FATHER_SUN, c -> new ThrownItemRenderer<>(c, 4.0F, true));
 		// Les automails se dessinent sur le corps du joueur, à la place des membres perdus.
-		LivingEntityRenderLayerRegistrationCallback.EVENT.register((type, renderer, helper, context) -> {
+		ClientPlatform.get().renderLayers((type, renderer, layers, context) -> {
 			if (renderer instanceof AvatarRenderer avatar) {
-				helper.register(new AutomailLayer(avatar, context));
+				layers.add(new AutomailLayer(avatar, context));
 			}
 			// Les volumes des tenues (capuche, pans, épaulières...), sur tout corps humanoïde qui les porte.
 			if (renderer.getModel() instanceof net.minecraft.client.model.HumanoidModel<?>) {
-				registerOutfits(helper, renderer);
+				registerOutfits(layers, renderer);
 			}
 		});
-		ClientPlayNetworking.registerGlobalReceiver(CinematicPayload.TYPE, (payload, context) -> Cinematics.start(payload));
-		ClientTickEvents.END_CLIENT_TICK.register(mc -> Cinematics.tick());
+		ClientPlatform.get().receive(CinematicPayload.TYPE, (payload, client) -> Cinematics.start(payload));
+		ClientEvents.END_TICK.register(mc -> Cinematics.tick());
 		// Pendant une cinématique, le chat est caché sous les bandes noires : ce que dit la Vérité
 		// s'affiche aussi en sous-titre.
-		ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
+		ClientEvents.GAME_MESSAGE.register((message, overlay) -> {
 			if (!overlay) {
 				Cinematics.subtitle(message);
 			}
 		});
 		// Une nouvelle connexion (ou un autre monde) repart sans cinématique en cours.
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> Cinematics.stop());
-		ClientPlayNetworking.registerGlobalReceiver(OpenTruthPayload.TYPE,
-				(payload, context) -> context.client().gui.setScreen(new TruthScreen(payload)));
-		ClientPlayNetworking.registerGlobalReceiver(StoneChoicePayload.TYPE,
-				(payload, context) -> context.client().gui.setScreen(new StoneChoiceScreen(payload)));
-		ClientPlayNetworking.registerGlobalReceiver(BargainPayload.TYPE, (payload, context) -> {
-			if (context.client().gui.screen() instanceof BargainScreen open) {
+		ClientEvents.DISCONNECT.register(client -> Cinematics.stop());
+		ClientPlatform.get().receive(OpenTruthPayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new TruthScreen(payload)));
+		ClientPlatform.get().receive(StoneChoicePayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new StoneChoiceScreen(payload)));
+		ClientPlatform.get().receive(BargainPayload.TYPE, (payload, client) -> {
+			if (client.gui.screen() instanceof BargainScreen open) {
 				if (payload.souls() < 0) {
 					open.closeSilently();
 				} else {
 					open.update(payload);
 				}
 			} else if (payload.souls() >= 0) {
-				context.client().gui.setScreen(new BargainScreen(payload));
+				client.gui.setScreen(new BargainScreen(payload));
 			}
 		});
-		ClientPlayNetworking.registerGlobalReceiver(OpenWinryPayload.TYPE,
-				(payload, context) -> context.client().gui.setScreen(new WinryScreen(payload.entityId())));
-		ClientPlayNetworking.registerGlobalReceiver(OpenDesignsPayload.TYPE,
-				(payload, context) -> context.client().gui.setScreen(new DesignScreen(payload)));
-		ClientPlayNetworking.registerGlobalReceiver(OpenTattooPayload.TYPE,
-				(payload, context) -> context.client().gui.setScreen(new TattooScreen(payload)));
-		ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> {
+		ClientPlatform.get().receive(OpenWinryPayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new WinryScreen(payload.entityId())));
+		ClientPlatform.get().receive(OpenDesignsPayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new DesignScreen(payload)));
+		ClientPlatform.get().receive(OpenTattooPayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new TattooScreen(payload)));
+		ClientEvents.ITEM_TOOLTIP.register((stack, context, flag, lines) -> {
 			ItemHints.append(stack, lines);
 			if (stack.has(FmabComponents.EMBROIDERY)) {
 				lines.add(Component.translatable("item.fmab.embroidered").withStyle(ChatFormatting.DARK_AQUA));
 			}
 			// Décomposé une fois sur un cercle : l'alchimiste sait le recomposer d'après modèle.
 			var player = Minecraft.getInstance().player;
-			if (player != null && player.getAttachedOrCreate(FmabAttachments.UNDERSTOOD)
+			if (player != null && FmabAttachments.UNDERSTOOD.getOrCreate(player)
 					.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString())) {
 				lines.add(Component.translatable("item.fmab.understood").withStyle(ChatFormatting.DARK_AQUA));
 			}
 		});
-		ClientPlayNetworking.registerGlobalReceiver(OpenExamPayload.TYPE,
-				(payload, context) -> context.client().gui.setScreen(new ExamScreen(payload)));
-		ClientPlayNetworking.registerGlobalReceiver(OpenIzumiPayload.TYPE,
-				(payload, context) -> context.client().gui.setScreen(new IzumiScreen(payload)));
-		BlockEntityRendererRegistry.register(FmabBlockEntities.TRANSMUTATION_CIRCLE, TransmutationCircleRenderer::new);
+		ClientPlatform.get().receive(OpenExamPayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new ExamScreen(payload)));
+		ClientPlatform.get().receive(OpenIzumiPayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new IzumiScreen(payload)));
+		ClientPlatform.get().blockEntityRenderer(FmabBlockEntities.TRANSMUTATION_CIRCLE, TransmutationCircleRenderer::new);
 		MenuScreens.register(FmabMenus.BODY, BodyScreen::new);
-		InventoryTabs.register();
-		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("concentration"),
+		ClientPlatform.get().hudElement(Fmab.id("concentration"), ClientPlatform.HudAnchor.AFTER_FOOD_BAR,
 				(graphics, delta) -> concentrationBar(graphics));
-		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("lost_sight"),
+		ClientPlatform.get().hudElement(Fmab.id("lost_sight"), ClientPlatform.HudAnchor.BEFORE_MISC_OVERLAYS,
 				(graphics, delta) -> lostSight(graphics));
-		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("shell_slit"),
+		ClientPlatform.get().hudElement(Fmab.id("shell_slit"), ClientPlatform.HudAnchor.BEFORE_MISC_OVERLAYS,
 				(graphics, delta) -> shellSlit(graphics));
-		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("eclipse"),
+		ClientPlatform.get().hudElement(Fmab.id("eclipse"), ClientPlatform.HudAnchor.BEFORE_MISC_OVERLAYS,
 				(graphics, delta) -> eclipse(graphics));
-		HudElementRegistry.attachElementAfter(VanillaHudElements.FOOD_BAR, Fmab.id("living_stone"),
+		ClientPlatform.get().hudElement(Fmab.id("living_stone"), ClientPlatform.HudAnchor.AFTER_FOOD_BAR,
 				(graphics, delta) -> livingStone(graphics));
-		HudElementRegistry.attachElementBefore(VanillaHudElements.MISC_OVERLAYS, Fmab.id("alchemist_panel"),
+		ClientPlatform.get().hudElement(Fmab.id("alchemist_panel"), ClientPlatform.HudAnchor.BEFORE_MISC_OVERLAYS,
 				(graphics, delta) -> AlchemyHud.draw(graphics));
 	}
 
@@ -284,7 +276,7 @@ public class FmabClient implements ClientModInitializer {
 			return;
 		}
 		int index = Math.floorMod(contents.selected() + delta, contents.pages().size());
-		ClientPlayNetworking.send(new SelectCirclePayload(index, false));
+		ClientPlatform.get().send(new SelectCirclePayload(index, false));
 	}
 
 	/**
@@ -296,7 +288,7 @@ public class FmabClient implements ClientModInitializer {
 		if (mc.player == null) {
 			return;
 		}
-		GateState gate = mc.player.getAttached(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.get(mc.player);
 		if (gate == null) {
 			return;
 		}
@@ -349,7 +341,7 @@ public class FmabClient implements ClientModInitializer {
 		if (mc.player == null) {
 			return;
 		}
-		Integer souls = mc.player.getAttached(FmabAttachments.LIVING_STONE);
+		Integer souls = FmabAttachments.LIVING_STONE.get(mc.player);
 		if (souls == null || souls <= 0) {
 			return;
 		}
@@ -395,8 +387,8 @@ public class FmabClient implements ClientModInitializer {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private static void registerOutfits(LivingEntityRenderLayerRegistrationCallback.RegistrationHelper helper,
+	private static void registerOutfits(ClientPlatform.LayerSink layers,
 			net.minecraft.client.renderer.entity.LivingEntityRenderer<?, ?, ?> renderer) {
-		helper.register(new OutfitLayer((net.minecraft.client.renderer.entity.RenderLayerParent) renderer));
+		layers.add(new OutfitLayer((net.minecraft.client.renderer.entity.RenderLayerParent) renderer));
 	}
 }

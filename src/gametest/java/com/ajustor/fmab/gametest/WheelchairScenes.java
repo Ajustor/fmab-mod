@@ -71,8 +71,7 @@ public class WheelchairScenes implements FabricClientGameTest {
 	/** Sans jambes, debout c'est fini : on rampe. */
 	private static void crawl(ClientGameTestContext context, TestSingleplayerContext sp) {
 		sp.getServer().runCommand("tp @p 0 -60 0 0 0");
-		onPlayer(context, sp, p -> p.setAttached(FmabAttachments.GATE,
-				GateState.NONE.pay(BodyPart.LEFT_LEG).pay(BodyPart.RIGHT_LEG)));
+		onPlayer(context, sp, p -> FmabAttachments.GATE.set(p, GateState.NONE.pay(BodyPart.LEFT_LEG).pay(BodyPart.RIGHT_LEG)));
 		context.waitTicks(20);
 		Pose pose = context.computeOnClient(mc -> mc.player.getPose());
 		check(pose == Pose.SWIMMING, "sans jambes, le joueur devrait ramper, pas " + pose);
@@ -171,9 +170,9 @@ public class WheelchairScenes implements FabricClientGameTest {
 	/** Un seul bras ne fait tourner qu'une roue : on n'avance pas. */
 	private static void oneArm(ClientGameTestContext context, TestSingleplayerContext sp) {
 		onPlayer(context, sp, p -> {
-			p.setAttached(FmabAttachments.GATE, GateState.NONE.pay(BodyPart.LEFT_LEG).pay(BodyPart.RIGHT_LEG)
+			FmabAttachments.GATE.set(p, GateState.NONE.pay(BodyPart.LEFT_LEG).pay(BodyPart.RIGHT_LEG)
 					.pay(BodyPart.LEFT_ARM));
-			p.setAttached(FmabAttachments.AUTOMAIL, Automail.NONE);
+			FmabAttachments.AUTOMAIL.set(p, Automail.NONE);
 		});
 		Vec3 before = clientPosition(context);
 		context.getInput().holdKeyFor(options -> options.keyUp, 20);
@@ -238,7 +237,7 @@ public class WheelchairScenes implements FabricClientGameTest {
 			p.stopRiding();
 			chair.letGo();
 			p.level().getEntitiesOfClass(Villager.class, p.getBoundingBox().inflate(6)).forEach(Villager::discard);
-			p.setAttached(FmabAttachments.GATE, GateState.NONE);
+			FmabAttachments.GATE.set(p, GateState.NONE);
 			Villager rider = EntityTypes.VILLAGER.create(p.level(), EntitySpawnReason.COMMAND);
 			rider.snapTo(chair.getX(), chair.getY(), chair.getZ(), 0, 0);
 			p.level().addFreshEntity(rider);

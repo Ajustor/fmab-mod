@@ -41,21 +41,21 @@ public final class Trainings {
 
 	/** Une épreuve est réussie ; elle ne compte qu'une fois le joueur présenté à Izumi. */
 	public static void achieve(ServerPlayer player, Trial trial) {
-		Training training = player.getAttachedOrCreate(FmabAttachments.TRAINING);
+		Training training = FmabAttachments.TRAINING.getOrCreate(player);
 		if (!training.met() || training.achieved().contains(trial.id())) {
 			return;
 		}
-		player.setAttached(FmabAttachments.TRAINING, training.achieve(trial.id()));
+		FmabAttachments.TRAINING.set(player, training.achieve(trial.id()));
 		player.sendSystemMessage(Component.translatable("trial.fmab.achieved", Component.translatable(trial.translationKey())));
 	}
 
 	/** Rendre compte d'une épreuve réussie à Izumi : la récompense est accordée une fois. */
 	public static boolean claim(ServerPlayer player, Trial trial) {
-		Training training = player.getAttachedOrCreate(FmabAttachments.TRAINING);
+		Training training = FmabAttachments.TRAINING.getOrCreate(player);
 		if (!training.achieved().contains(trial.id()) || training.rewarded().contains(trial.id())) {
 			return false;
 		}
-		AlchemistData data = player.getAttachedOrCreate(FmabAttachments.ALCHEMIST);
+		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		for (Map.Entry<String, Integer> m : trial.mastery().entrySet()) {
 			data = data.addMastery(m.getKey(), m.getValue());
 		}
@@ -66,14 +66,14 @@ public final class Trainings {
 					.ifPresent(key -> player.sendSystemMessage(Component.translatable("knowledge.fmab.unlocked",
 							Component.translatable(key))));
 		}
-		player.setAttached(FmabAttachments.ALCHEMIST, data);
+		FmabAttachments.ALCHEMIST.set(player, data);
 		trial.tome().ifPresent(t -> {
 			ItemStack tome = Tomes.stack(t);
 			if (!player.getInventory().add(tome)) {
 				player.drop(tome, false);
 			}
 		});
-		player.setAttached(FmabAttachments.TRAINING, training.reward(trial.id()));
+		FmabAttachments.TRAINING.set(player, training.reward(trial.id()));
 		player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1, 1.2f);
 		return true;
 	}

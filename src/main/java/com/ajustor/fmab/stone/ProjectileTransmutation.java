@@ -7,8 +7,6 @@ import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.transmutation.ItemCompositions;
 import com.ajustor.fmab.util.PlayerMaps;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
@@ -33,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import com.ajustor.fmab.platform.event.LivingEvents;
+import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Ce qu'on lance sur une Pierre vivante se défait avant de la toucher : flèches, tridents, boules de
@@ -66,7 +66,7 @@ public final class ProjectileTransmutation {
 	}
 
 	public static void register() {
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
+		ServerEvents.END_TICK.register(server -> {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				if (player.isAlive() && !player.isSpectator() && LivingStone.is(player)) {
 					watch(player);
@@ -76,7 +76,7 @@ public final class ProjectileTransmutation {
 		// Les balles ne sont pas des projectiles. Ce qui aurait échappé au guet (l'explosion d'une boule
 		// de feu sur le mur d'à côté, l'éclaboussure d'une potion) ne la blesse pas davantage, mais ne
 		// lui rend rien : sa matière est partie dans l'explosion.
-		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+		LivingEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
 			if (!(entity instanceof ServerPlayer stone) || source.getEntity() == stone || !LivingStone.is(stone)) {
 				return true;
 			}

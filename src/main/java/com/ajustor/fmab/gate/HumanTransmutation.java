@@ -88,7 +88,7 @@ public final class HumanTransmutation {
 		ServerPlayer caster = ctx.caster();
 		ServerLevel level = ctx.level();
 		BlockPos circle = ctx.circle();
-		if (caster.getAttachedOrCreate(FmabAttachments.GATE).visit().isPresent()) {
+		if (FmabAttachments.GATE.getOrCreate(caster).visit().isPresent()) {
 			return Effects.Result.NO_TARGET;
 		}
 		if (LivingStone.tryRitual(caster, circle)) {
@@ -113,7 +113,7 @@ public final class HumanTransmutation {
 	 * ce qui naît du cercle n'est pas humain, et la Porte l'appelle.
 	 */
 	static void openGate(ServerPlayer caster, ServerLevel level, BlockPos circle) {
-		GateState gate = caster.getAttachedOrCreate(FmabAttachments.GATE);
+		GateState gate = FmabAttachments.GATE.getOrCreate(caster);
 		AABB area = new AABB(circle).inflate(REACH, 1, REACH);
 		List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, area, ItemEntity::isAlive);
 		int sets = sets(items);
@@ -135,7 +135,7 @@ public final class HumanTransmutation {
 		caster.sendSystemMessage(Component.translatable(severe ? "gate.fmab.pulled_severe" : "gate.fmab.pulled"));
 		// Des bras noirs jaillissent du cercle et agrippent l'alchimiste : la Porte l'appelle.
 		GateOfTruth.pullFromCircle(level, circle, caster);
-		caster.setAttached(FmabAttachments.GATE, gate.withVisit(new GateState.Visit(
+		FmabAttachments.GATE.set(caster, gate.withVisit(new GateState.Visit(
 				level.dimension().identifier().toString(), circle, ambition, severe, -GateOfTruth.PULL)));
 	}
 

@@ -292,7 +292,7 @@ public final class Effects {
 		}
 		// Une âme scellée dans une armure, debout sur le cercle : on la répare comme Ed répare Al.
 		for (ServerPlayer soul : level.getEntitiesOfClass(ServerPlayer.class, ctx.onCircle().expandTowards(0, 1, 0),
-				p -> p.getAttachedOrCreate(FmabAttachments.GATE).soulBound())) {
+				p -> FmabAttachments.GATE.getOrCreate(p).soulBound())) {
 			for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS,
 					EquipmentSlot.FEET}) {
 				ItemStack piece = soul.getItemBySlot(slot);
