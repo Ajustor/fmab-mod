@@ -98,9 +98,11 @@ public final class Alkahestry {
 		// L'école de la Médecine : moins cher, plus large, plus long à mesure qu'on la pratique.
 		Knowledge knowledge = AlchemyRules.of(level.registryAccess()).knowledge(alchemist);
 		float cost = (float) Math.max(1, COST * knowledge.practice(SCHOOL) - knowledge.perk(SCHOOL, "concentration_discount"));
-		// Une Pierre vivante n'a plus de concentration à dépenser.
-		boolean living = LivingStone.is(thrower);
-		if (!thrower.isCreative() && !living) {
+		// Une Pierre vivante ne puise pas dans sa concentration, mais dans ses âmes.
+		boolean living = LivingStone.fuels(thrower);
+		if (living) {
+			LivingStone.spend(thrower, 1);
+		} else if (!thrower.isCreative()) {
 			float concentration = Concentration.of(thrower);
 			if (concentration < cost) {
 				thrower.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", (int) cost,

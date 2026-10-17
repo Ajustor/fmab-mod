@@ -71,6 +71,9 @@ public final class PhilosopherStones {
 		return 1 + analysis.parsed().stages().size();
 	}
 
+	/** Une prolongation sur quatre puise une âme dans la Pierre qui la nourrit. */
+	public static final int CHANNEL_SOUL_EVERY = 4;
+
 	/** Puise des âmes dans la Pierre ; vide, elle tombe en poussière. */
 	public static void drain(ServerPlayer player, ItemStack stone, int souls) {
 		if (player.isCreative()) {

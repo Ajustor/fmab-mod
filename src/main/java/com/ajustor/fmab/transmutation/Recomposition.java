@@ -197,7 +197,7 @@ public final class Recomposition {
 
 	/** On porte ou l'on est une Pierre philosophale : la matière se crée de toutes pièces. */
 	private static boolean fromNothing(ServerPlayer caster) {
-		return PhilosopherStones.held(caster).isPresent() || LivingStone.souls(caster) > 0;
+		return PhilosopherStones.held(caster).isPresent() || LivingStone.fuels(caster);
 	}
 
 	/**

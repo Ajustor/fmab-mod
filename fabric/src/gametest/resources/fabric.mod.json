@@ -29,7 +29,8 @@
 			"com.ajustor.fmab.gametest.UniquePlacesScenes",
 			"com.ajustor.fmab.gametest.RecruitScenes",
 			"com.ajustor.fmab.gametest.PracticeScenes",
-			"com.ajustor.fmab.gametest.WelcomeScenes"
+			"com.ajustor.fmab.gametest.WelcomeScenes",
+			"com.ajustor.fmab.gametest.StoneCostScenes"
 		]
 	},
 	"depends": {
