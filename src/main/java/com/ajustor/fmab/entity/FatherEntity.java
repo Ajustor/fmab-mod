@@ -201,7 +201,7 @@ public class FatherEntity extends HomunculusEntity {
 		if (getTarget() instanceof Player p && canReach(p, REACH)) {
 			return p;
 		}
-		Player near = level.getNearestPlayer(this, REACH);
+		Player near = nearestPrey(level, REACH);
 		if (near != null && !near.isCreative() && !near.isSpectator() && hasLineOfSight(near)) {
 			setTarget(near);
 			return near;

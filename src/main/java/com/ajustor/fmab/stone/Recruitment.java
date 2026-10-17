@@ -49,6 +49,17 @@ public final class Recruitment {
 	}
 
 	/** Lust attend-elle encore une réponse, après tant de ticks, le joueur à cette distance ? */
+	/**
+	 * La paix promise à qui a accepté l'offre de Père : les homonculus ne s'en prennent pas à lui, sauf
+	 * s'il les frappe le premier.
+	 *
+	 * @param answer   sa réponse à l'offre ({@link #ACCEPTED}, {@link #REFUSED} ou rien)
+	 * @param struckUs il vient de frapper cet homonculus
+	 */
+	public static boolean spared(@Nullable String answer, boolean struckUs) {
+		return ACCEPTED.equals(answer) && !struckUs;
+	}
+
 	public static boolean stillWaiting(int waited, double distance) {
 		return waited < PATIENCE && distance <= WALK_AWAY;
 	}

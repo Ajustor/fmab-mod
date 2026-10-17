@@ -43,4 +43,12 @@ class RecruitmentTest {
 		assertFalse(Recruitment.stillWaiting(Recruitment.PATIENCE, 5));
 		assertFalse(Recruitment.stillWaiting(10, Recruitment.WALK_AWAY + 1));
 	}
+
+	@Test
+	void recruitsAreSparedUntilTheyStrike() {
+		assertTrue(Recruitment.spared(Recruitment.ACCEPTED, false), "la paix promise par Père");
+		assertFalse(Recruitment.spared(Recruitment.ACCEPTED, true), "qui frappe un homonculus se fait frapper");
+		assertFalse(Recruitment.spared(Recruitment.REFUSED, false));
+		assertFalse(Recruitment.spared(null, false), "sans réponse, pas de paix");
+	}
 }
