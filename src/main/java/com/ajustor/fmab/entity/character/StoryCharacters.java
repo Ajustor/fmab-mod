@@ -3,6 +3,7 @@ package com.ajustor.fmab.entity.character;
 import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Items;
 
 import java.util.List;
@@ -56,10 +57,17 @@ public final class StoryCharacters {
 			sells(() -> new ItemStack(FmabItems.ALCHEMICAL_INK), () -> Items.EMERALD, 3),
 			sells(() -> new ItemStack(FmabItems.ALCHEMICAL_THREAD), () -> Items.EMERALD, 2),
 			sells(() -> new ItemStack(FmabItems.ALCHEMICAL_PAINT), () -> Items.EMERALD, 2)));
+	/** Les Ishvaliens revenus dans les ruines : ils échangent le savoir de leur alchimie, et ce qu'ils fabriquent. */
+	public static final StoryCharacter ISHVALAN = new StoryCharacter("ishvalan", 4, List.of(
+			sells(() -> Tomes.stack(Tomes.LIVING_MATTER), () -> Items.EMERALD, 6),
+			sells(() -> Tomes.stack(Tomes.SULFUR_AND_LIME), () -> Items.EMERALD, 6),
+			sells(() -> new ItemStack(Items.TERRACOTTA, 8), () -> Items.EMERALD, 1),
+			sells(() -> new ItemStack(Items.DYE.pick(DyeColor.RED), 4), () -> Items.EMERALD, 1),
+			sells(() -> new ItemStack(Items.EMERALD), () -> Items.BREAD, 6)));
 	public static final StoryCharacter TUCKER = new StoryCharacter("tucker", 3, List.of(), Tucker::unmasked);
 
 	public static final List<StoryCharacter> ALL = List.of(MUSTANG, HAWKEYE, ARMSTRONG, HUGHES, LING, LAN_FAN,
-			ALPHONSE, PINAKO, BASQUE_GRAND, MCDOUGAL, TATTOOIST, TUCKER);
+			ALPHONSE, PINAKO, BASQUE_GRAND, MCDOUGAL, TATTOOIST, ISHVALAN, TUCKER);
 
 	private StoryCharacters() {
 	}

@@ -1798,6 +1798,71 @@ def tucker(s):
     boots(s, color="#3a2a20", rows=2)
 
 
+@skin("ishvalan")
+def ishvalan(s):
+    """Un Ishvalien : la peau mate, les yeux rouges, les cheveux blancs, des étoffes couleur de sable
+    nouées d'une ceinture rouge sombre, les sandales."""
+    tone = ISHVAL
+    skin_face(s, tone, mouth="#5a2a20")
+    eyes(s, "#b0202a", brow="#d8d4cc")
+    short_hair(s, "#e4e0d8", fringe=1, back=5)
+    hair_volume(s, "#e4e0d8", sides=3, back=5)
+    sand = "#c8a46a"
+    for part in ("body", "rarm", "larm"):
+        s.fill(part, sand, "cloth")
+    # L'étoffe drapée en travers du buste, plus claire.
+    for i in range(8):
+        s.px("body", "front", i, min(11, 2 + i), "#e0c890")
+        s.px("body", "back", 7 - i, min(11, 2 + i), "#e0c890")
+    belt(s, y=8, color="#7a1c1c", buckle="#7a1c1c")
+    hands(s, tone, rows=3)
+    pants(s, "#b08a52")
+    # Des sandales : la peau nue, des lanières de cuir.
+    boots(s, color=tone, rows=2, sole="#4a2e1a", mat="skin")
+    for leg in ("rleg", "lleg"):
+        s.band(leg, 10, 1, "#5a3a20")
+
+
+@skin("drachma_general")
+def drachma_general(s):
+    """Un général de Drachma : la haute chapka de fourrure à l'étoile rouge, la barbe grise, la longue
+    capote vert sombre aux épaulettes et aux boutons d'or."""
+    tone = "#e3bea0"
+    fur = "#3e2e22"
+    coat = "#2f3d2a"
+    skin_face(s, tone, mouth="#93554d")
+    eyes(s, "#4a5a6a", brow="#9a9a94")
+    short_hair(s, "#8a8a84", fringe=0, back=5)
+    # La barbe grise, du menton aux joues.
+    s.rect("head", "front", 1, 6, 6, 2, "#a8a8a2")
+    s.rect("head", "front", 0, 5, 1, 3, "#a8a8a2")
+    s.rect("head", "front", 7, 5, 1, 3, "#a8a8a2")
+    mustache(s, "#9a9a94", wide=True)
+    # La chapka haute, sur la couche du chapeau : fourrure tout autour, étoile rouge devant.
+    s.material("hat", "top", shade(fur, 1.1), "fur")
+    for f in SIDES:
+        s.material("hat", f, fur, "fur", h=4)
+    s.material("hat", "back", fur, "fur", h=6)
+    s.rect("hat", "front", 3, 1, 2, 2, "#c8202c")
+    s.px("hat", "front", 3, 1, "#e8484e")
+    for part in ("body", "rarm", "larm"):
+        s.fill(part, coat, "cloth")
+    s.material("jacket", "front", fur, "fur", h=1)
+    s.seam("body", "front", 3, 1, 11, None, k=0.75)
+    for y in (2, 4, 6, 8, 10):
+        s.px("body", "front", 4, y, GOLD)
+    # Les épaulettes d'or.
+    for arm in ("rarm", "larm"):
+        s.material(arm, "top", GOLD, "metal")
+        s.band(arm, 0, 1, GOLD)
+        s.band(arm, 9, 1, fur, "fur")
+    belt(s, y=8, color="#2a1e14", buckle=GOLD)
+    hands(s, tone, rows=2, glove="#1e1a16")
+    coat_tails(s, coat, rows=6)
+    pants(s, "#2a3424")
+    boots(s, rows=5)
+
+
 def build(names=None):
     os.makedirs(OUT, exist_ok=True)
     for name in names or SKINS:
