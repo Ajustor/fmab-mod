@@ -1,5 +1,5 @@
 {
-  "parent": "fmab:alchemist/rank_state",
+  "parent": "fmab:alchemist/root",
   "criteria": {
     "slain_envy": {
       "trigger": "fmab:milestone",

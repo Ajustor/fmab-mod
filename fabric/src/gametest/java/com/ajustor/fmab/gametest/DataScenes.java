@@ -42,7 +42,22 @@ public class DataScenes implements FabricClientGameTest {
 					.listElementIds().map(key -> key.identifier()).collect(Collectors.toSet()));
 			expect(sp, "villager_trade", server -> server.registryAccess().lookupOrThrow(Registries.VILLAGER_TRADE)
 					.listElementIds().map(key -> key.identifier()).collect(Collectors.toSet()));
+			// L'arbre chargé (overlays compris) suit l'ordre du jeu : le Labo 5 après l'examen d'État, etc.
+			parent(sp, "visit_laboratory_5", "rank_state");
+			parent(sp, "slain_barry", "visit_laboratory_5");
+			parent(sp, "philosopher_stone", "visit_blood_crest");
+			parent(sp, "rank_gate", "transmuted");
+			parent(sp, "visit_central", "root");
 		}
+	}
+
+	/** Le progrès {@code name} a {@code parent} pour parent, une fois chargé par le jeu. */
+	private static void parent(TestSingleplayerContext sp, String name, String parent) {
+		String loaded = sp.getServer().computeOnServer(server -> {
+			var holder = server.getAdvancements().get(Identifier.fromNamespaceAndPath("fmab", "alchemist/" + name));
+			return holder == null ? "absent" : holder.value().parent().map(Identifier::toString).orElse("aucun");
+		});
+		check(loaded.equals("fmab:alchemist/" + parent), name + " devrait suivre " + parent + ", pas " + loaded);
 	}
 
 	/** Tous les fichiers de {@code data/fmab/<dossier>} sont chargés. */

@@ -69,4 +69,39 @@ class AdvancementTest {
 			}
 		}
 	}
+
+	/**
+	 * L'arbre suit l'ordre du jeu : un progrès ne descend pas d'un autre qu'on peut ne jamais obtenir
+	 * avant lui (sans quoi le jeu l'affiche hors de portée alors qu'on vient de l'obtenir).
+	 */
+	@Test
+	void orderFollowsTheGame() throws IOException {
+		Map<String, JsonObject> all = load();
+		// La carte du Laboratoire 5 est la récompense de l'examen d'État ; Barry y garde l'entrée.
+		assertTrue(descends(all, "visit_laboratory_5", "rank_state"));
+		assertTrue(descends(all, "slain_barry", "visit_laboratory_5"));
+		// Une Pierre se fait par le sacrifice, avec le sang des points de sang : nul besoin de Lust.
+		assertTrue(descends(all, "philosopher_stone", "visit_blood_crest"));
+		assertTrue(!descends(all, "philosopher_stone", "slain_lust"));
+		// La Porte s'ouvre à qui tente la transmutation humaine, quel que soit son rang.
+		assertTrue(!descends(all, "rank_gate", "rank_alchemist"));
+		// L'examen se passe au QG de Central, où l'on peut se rendre dès le début ; Envy rôde partout.
+		assertTrue(descends(all, "rank_state", "visit_central"));
+		for (String anyTime : new String[]{"visit_central", "visit_devils_nest", "slain_envy"}) {
+			assertTrue(!descends(all, anyTime, "rank_alchemist") && !descends(all, anyTime, "rank_state"), anyTime);
+		}
+	}
+
+	/** {@code ancestor} est-il un parent, direct ou non, de {@code name} ? */
+	private static boolean descends(Map<String, JsonObject> all, String name, String ancestor) {
+		JsonObject adv = all.get("fmab:alchemist/" + name);
+		while (adv != null && adv.has("parent")) {
+			String parent = adv.get("parent").getAsString();
+			if (parent.equals("fmab:alchemist/" + ancestor)) {
+				return true;
+			}
+			adv = all.get(parent);
+		}
+		return false;
+	}
 }

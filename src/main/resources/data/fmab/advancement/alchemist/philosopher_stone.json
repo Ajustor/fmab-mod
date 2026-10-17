@@ -1,5 +1,5 @@
 {
-  "parent": "fmab:alchemist/slain_lust",
+  "parent": "fmab:alchemist/visit_blood_crest",
   "criteria": {
     "philosopher_stone": {
       "trigger": "minecraft:inventory_changed",
