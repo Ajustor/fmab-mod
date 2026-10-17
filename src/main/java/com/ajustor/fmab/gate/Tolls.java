@@ -27,6 +27,7 @@ import com.ajustor.fmab.platform.event.InteractionEvents;
 import com.ajustor.fmab.platform.event.LivingEvents;
 import com.ajustor.fmab.platform.event.PlayerEvents;
 import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Ce que coûte au quotidien ce que la Vérité a pris :
@@ -194,7 +195,7 @@ public final class Tolls {
 				return;
 			}
 		}
-		player.drop(stack, false);
+		EntityCompat.drop(player, stack);
 	}
 
 	private static void legs(ServerPlayer player) {
@@ -337,7 +338,7 @@ public final class Tolls {
 		for (EquipmentSlot slot : SoulArmor.SLOTS) {
 			ItemStack piece = player.getItemBySlot(slot);
 			if (!piece.isEmpty() && slot != EquipmentSlot.CHEST) {
-				player.drop(piece.copy(), false);
+				EntityCompat.drop(player, piece.copy());
 			}
 			player.setItemSlot(slot, ItemStack.EMPTY);
 		}

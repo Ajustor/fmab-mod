@@ -37,6 +37,7 @@ import java.util.UUID;
 import com.ajustor.fmab.platform.event.InteractionEvents;
 import com.ajustor.fmab.platform.event.PlayerEvents;
 import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * La Pierre philosophale vivante, comme Van Hohenheim : l'alchimiste a fondu dans son corps les âmes
@@ -195,7 +196,7 @@ public final class LivingStone {
 				? grip.streak() + 1 : 0;
 		GRIPS.put(absorber.getUUID(), new Grip(target.getUUID(), now, streak));
 		int rate = Math.min(MAX_RATE, 1 + streak / 3);
-		absorber.swing(InteractionHand.MAIN_HAND, true);
+		EntityCompat.swing(absorber, InteractionHand.MAIN_HAND, true);
 		TransmutationPose.strike(absorber, TransmutationPose.Kind.REACH, ABSORB_GAP + 2);
 		draw(level, target, absorber);
 

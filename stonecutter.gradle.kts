@@ -7,6 +7,18 @@ plugins {
 
 stonecutter active "26.2"
 
+// Ce qui ne fait que changer de nom d'une version de Minecraft à l'autre : les sources sont écrites
+// pour la version active, Stonecutter les réécrit pour les autres. Les changements de forme passent
+// par com.ajustor.fmab.compat (voir ARCHITECTURE.md).
+stonecutter parameters {
+	replacements {
+		string(current.parsed >= "26.3") {
+			replace("PushReaction.DESTROY", "PushReaction.POPPED")
+			replace("state.attackTime", "state.swingAnimation")
+		}
+	}
+}
+
 // La version du mod suit les tags git (v1.2.3, v1.2.3-beta) :
 // - sur un tag, c'est la version du tag (le workflow de release la passe aussi en -PreleaseVersion) ;
 // - après un tag, la version suivante en développement : v1.2.3 + 5 commits → 1.2.4-dev.5,

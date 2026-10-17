@@ -1,0 +1,36 @@
+{
+  "parent": "fmab:alchemist/visit_blood_crest",
+  "criteria": {
+    "visit_liore": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:location": {
+              "structures": "fmab:liore"
+            }
+          }
+        }
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:gold_block"
+    },
+    "frame": "task",
+    "title": {
+      "translate": "advancements.fmab.visit_liore.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.visit_liore.description"
+    }
+  },
+  "requirements": [
+    [
+      "visit_liore"
+    ]
+  ]
+}

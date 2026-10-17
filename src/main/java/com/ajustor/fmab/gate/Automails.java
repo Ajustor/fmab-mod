@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import com.ajustor.fmab.platform.event.InteractionEvents;
 import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Les règles de l'automail : on ne le pose que sur un membre perdu ; il s'use (un coup ou un bloc
@@ -205,7 +206,7 @@ public final class Automails {
 		stack.remove(FmabComponents.AUTOMAIL_BLADE);
 		FmabAttachments.AUTOMAIL.set(player, automail.with(part, ItemStack.EMPTY));
 		if (!player.getInventory().add(stack.copy())) {
-			player.drop(stack.copy(), false);
+			EntityCompat.drop(player, stack.copy());
 		}
 	}
 

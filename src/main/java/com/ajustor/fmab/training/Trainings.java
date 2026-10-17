@@ -16,6 +16,7 @@ import net.minecraft.sounds.SoundSource;
 
 import java.util.Collection;
 import java.util.Map;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /** Constater les épreuves réussies et les récompenser. */
 public final class Trainings {
@@ -70,7 +71,7 @@ public final class Trainings {
 		trial.tome().ifPresent(t -> {
 			ItemStack tome = Tomes.stack(t);
 			if (!player.getInventory().add(tome)) {
-				player.drop(tome, false);
+				EntityCompat.drop(player, tome);
 			}
 		});
 		FmabAttachments.TRAINING.set(player, training.reward(trial.id()));

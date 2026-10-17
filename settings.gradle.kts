@@ -17,7 +17,7 @@ plugins {
 // sont dans stonecutter.properties.toml.
 stonecutter {
 	create(rootProject) {
-		versions("26.2")
+		versions("26.2", "26.3")
 		// La version des sources telles qu'elles sont commitées.
 		vcsVersion = "26.2"
 		branch("fabric")

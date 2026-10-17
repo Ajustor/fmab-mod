@@ -61,7 +61,7 @@ public class OutfitScenes implements FabricClientGameTest {
 				});
 			}
 			// Les volumes des tenues se dessinent sur le joueur comme sur les porte-armures.
-			check(context.computeOnClient(mc -> hasOutfitLayer(mc.getEntityRenderDispatcher().getPlayerRenderer(mc.player))),
+			check(context.computeOnClient(mc -> hasOutfitLayer(mc.getEntityRenderDispatcher().getRenderer(mc.player))),
 					"le joueur devrait avoir la couche des tenues");
 
 			for (int i = 0; i < OUTFITS.size(); i++) {

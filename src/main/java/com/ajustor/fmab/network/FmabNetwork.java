@@ -32,6 +32,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import com.ajustor.fmab.compat.EntityCompat;
 
 public final class FmabNetwork {
 	/** La page de conception parcourt tout ce que le joueur a compris : une par seconde suffit. */
@@ -195,7 +196,7 @@ public final class FmabNetwork {
 		}
 		FmabAttachments.GLOVES.set(player, gloves.with(left, ItemStack.EMPTY));
 		if (!player.getInventory().add(glove)) {
-			player.drop(glove, false);
+			EntityCompat.drop(player, glove);
 		}
 	}
 

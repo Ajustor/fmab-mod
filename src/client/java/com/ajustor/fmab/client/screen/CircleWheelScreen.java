@@ -15,8 +15,8 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 import com.ajustor.fmab.platform.client.ClientPlatform;
+import com.mojang.blaze3d.platform.InputConstants;
 
 /**
  * La roue des cercles : les pages du carnet en couronne autour du viseur, dans l'ordre du carnet. On
@@ -157,8 +157,8 @@ public class CircleWheelScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (event.key() >= GLFW.GLFW_KEY_1 && event.key() <= GLFW.GLFW_KEY_9) {
-			int index = event.key() - GLFW.GLFW_KEY_1;
+		if (event.key() >= InputConstants.KEY_1 && event.key() <= InputConstants.KEY_9) {
+			int index = event.key() - InputConstants.KEY_1;
 			if (index < count()) {
 				choose(index, false);
 			}
@@ -174,7 +174,7 @@ public class CircleWheelScreen extends Screen {
 			onClose();
 			return true;
 		}
-		choose(index, gate && event.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT);
+		choose(index, gate && event.button() == InputConstants.MOUSE_BUTTON_LEFT);
 		return true;
 	}
 

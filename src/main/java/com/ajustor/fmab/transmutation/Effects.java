@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Les effets que les combinaisons peuvent déclencher, par identifiant ({@code fmab:wall}...).
@@ -371,7 +372,7 @@ public final class Effects {
 				continue;
 			}
 			e.push(d.getStepX() * 1.6, 0.4, d.getStepZ() * 1.6);
-			e.hurtMarked = true;
+			EntityCompat.syncVelocity(e);
 			if (e instanceof LivingEntity living) {
 				ctx.afflict(living);
 			}
@@ -688,7 +689,7 @@ public final class Effects {
 					living.hurtServer(level, level.damageSources().magic(), damage);
 					living.setDeltaMovement(living.getDeltaMovement().add(up.getStepX() * 0.8,
 							up == Direction.DOWN ? -0.4 : 0.8, up.getStepZ() * 0.8));
-					living.hurtMarked = true;
+					EntityCompat.syncVelocity(living);
 					ctx.afflict(living);
 				}
 			}

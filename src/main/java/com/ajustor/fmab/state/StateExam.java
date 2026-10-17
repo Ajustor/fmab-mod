@@ -39,6 +39,7 @@ import net.minecraft.world.phys.AABB;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * L'examen d'Alchimiste d'État : remettre à l'examinateur des objets qui prouvent la maîtrise,
@@ -166,7 +167,7 @@ public final class StateExam {
 		}
 		for (ItemStack reward : new ItemStack[]{new ItemStack(FmabItems.STATE_WATCH), Tomes.stack(Tomes.FLAME)}) {
 			if (!player.getInventory().add(reward)) {
-				player.drop(reward, false);
+				EntityCompat.drop(player, reward);
 			}
 		}
 		// Sa première mission : le Laboratoire 5.

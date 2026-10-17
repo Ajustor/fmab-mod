@@ -28,7 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         # Les versions de Minecraft de settings.gradle.kts.
-        minecraft: ['26.2']
+        minecraft: ['26.2', '26.3']
     steps:
       - name: checkout repository
         uses: actions/checkout@v6

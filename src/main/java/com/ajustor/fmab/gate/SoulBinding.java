@@ -49,6 +49,7 @@ import java.util.Optional;
 import java.util.UUID;
 import com.ajustor.fmab.platform.event.InteractionEvents;
 import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Le cercle d'âme (Humain et Fixer) : il appelle une âme qui erre devant la Porte et la fixe dans
@@ -212,7 +213,7 @@ public final class SoulBinding {
 			if (shell != null) {
 				shell.setItemSlot(slot, piece.copy());
 			} else {
-				soul.drop(piece.copy(), false);
+				EntityCompat.drop(soul, piece.copy());
 			}
 		}
 		if (shell == null) {

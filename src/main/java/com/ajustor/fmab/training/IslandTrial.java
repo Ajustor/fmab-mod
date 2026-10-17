@@ -43,7 +43,7 @@ public final class IslandTrial {
 		ServerLevel level = player.level();
 		var structure = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getValue(YOCK);
 		boolean onIsland = structure != null
-				&& level.structureManager().getStructureWithPieceAt(player.blockPosition(), structure).isValid();
+				&& level.structureManager().getStructureWithPieceAt(player.blockPosition(), holder -> holder.value() == structure).isValid();
 		Integer before = FmabAttachments.ISLAND_TIME.get(player);
 		int time = before == null ? 0 : before;
 		if (!onIsland) {

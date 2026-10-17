@@ -1,6 +1,6 @@
 # FMAB — Alchemy of Amestris
 
-Mod Minecraft (Fabric, Java Edition 26.2) inspiré de *Fullmetal Alchemist: Brotherhood* : échange
+Mod Minecraft (Fabric, Java Edition 26.2 et 26.3) inspiré de *Fullmetal Alchemist: Brotherhood* : échange
 équivalent, cercles de transmutation dessinés par le joueur, la Porte de la Vérité, les homonculus
 et le Jour promis. Site : <https://ajustor.github.io/fmab-mod/> (éditeur de cercles en ligne,
 versions, changelog). *English below.*
@@ -12,8 +12,9 @@ premier tag `v1.0.0`.
 
 ### Installation
 
-Minecraft 26.2, [Fabric Loader](https://fabricmc.net/) ≥ 0.19.3, [Fabric API](https://modrinth.com/mod/fabric-api)
-≥ 0.161.0 et Java 25. Posez le jar du mod dans `mods/`. Les jars de chaque version sont sur la page
+Minecraft 26.2 ou 26.3, [Fabric Loader](https://fabricmc.net/) ≥ 0.19.3, [Fabric API](https://modrinth.com/mod/fabric-api)
+et Java 25. Posez dans `mods/` le jar du mod de votre version de Minecraft (`fmab-fabric-<version>+26.3.jar`
+pour 26.3). Les jars de chaque version sont sur la page
 [Releases](https://github.com/Ajustor/fmab-mod/releases) ; chaque build de `master` en produit un
 aussi, dans les artefacts de l'onglet Actions.
 
@@ -188,8 +189,8 @@ changelog).
 
 ### Installation
 
-Minecraft 26.2, Fabric Loader ≥ 0.19.3, Fabric API ≥ 0.161.0 and Java 25. Drop the mod jar into
-`mods/`. Jars are on the [Releases](https://github.com/Ajustor/fmab-mod/releases) page; every
+Minecraft 26.2 or 26.3, Fabric Loader ≥ 0.19.3, Fabric API and Java 25. Drop the mod jar for your
+Minecraft version into `mods/` (`fmab-fabric-<version>+26.3.jar` for 26.3). Jars are on the [Releases](https://github.com/Ajustor/fmab-mod/releases) page; every
 `master` build also produces one in the Actions artifacts.
 
 With [Mod Menu](https://modrinth.com/mod/modmenu) (optional), the mod's settings button lets you pick the

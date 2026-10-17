@@ -27,6 +27,18 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+// Les données dont le format change d'une version de Minecraft à l'autre : src/overlays/<version>/
+// remplace, pour cette version et les suivantes, les fichiers de même chemin de src/main/resources
+// (comme les « overlays » des packs du jeu). Le code, lui, passe par com.ajustor.fmab.compat.
+val overlays = rootProject.file("src/overlays").listFiles().orEmpty()
+	.filter { it.isDirectory && sc.current.parsed >= it.name }
+	.sortedWith(compareBy<File>({ it.name.split('.').getOrNull(0)?.toIntOrNull() }, { it.name.split('.').getOrNull(1)?.toIntOrNull() }))
+tasks.processResources {
+	overlays.forEach { from(it) }
+	// Le dernier copié l'emporte : la version la plus récente qui s'applique.
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
 java {
 	sourceCompatibility = JavaVersion.VERSION_25
 	targetCompatibility = JavaVersion.VERSION_25

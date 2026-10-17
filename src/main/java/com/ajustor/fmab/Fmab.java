@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ajustor.fmab.platform.event.InteractionEvents;
 import com.ajustor.fmab.platform.event.PlayerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 public final class Fmab {
 	public static final String MOD_ID = "fmab";
@@ -139,7 +140,7 @@ public final class Fmab {
 		for (ItemStack stack : new ItemStack[]{new ItemStack(FmabItems.ALCHEMY_TREATISE),
 				Tomes.stack(Tomes.RUDIMENTS), new ItemStack(FmabItems.CHALK)}) {
 			if (!player.getInventory().add(stack)) {
-				player.drop(stack, false);
+				EntityCompat.drop(player, stack);
 			}
 		}
 	}

@@ -30,6 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import java.util.Optional;
 import java.util.UUID;
 import com.ajustor.fmab.platform.event.InteractionEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Table d'alchimiste : on y brode (au fil alchimique) ou grave (au burin) sur un gant le cercle
@@ -167,7 +168,7 @@ public class AlchemistTableBlock extends FurnitureBlock {
 		ItemStack sealed = SoulArmor.sealed(level.registryAccess(), owner.get(), stack);
 		stack.shrink(1);
 		if (!player.getInventory().add(sealed)) {
-			player.drop(sealed, false);
+			EntityCompat.drop(player, sealed);
 		}
 		level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 0.8f);
 		player.sendOverlayMessage(Component.translatable("block.fmab.alchemist_table.sealed"));

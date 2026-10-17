@@ -26,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Wrath (Colère) : King Bradley, Généralissime d'Amestris. Un homonculus sans Pierre à épuiser : il
@@ -120,7 +121,7 @@ public class WrathEntity extends HomunculusEntity {
 			setTarget(attacker);
 			if (distanceTo(attacker) < 3.5) {
 				doHurtTarget(level, attacker);
-				swing(InteractionHand.MAIN_HAND);
+				EntityCompat.swing(this, InteractionHand.MAIN_HAND);
 			}
 			if (attacker instanceof ServerPlayer p && random.nextInt(4) == 0) {
 				p.sendOverlayMessage(Component.translatable("homunculus.fmab.wrath_eye"));

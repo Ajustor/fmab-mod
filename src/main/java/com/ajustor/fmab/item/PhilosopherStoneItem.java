@@ -25,6 +25,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * La Pierre philosophale : des âmes humaines condensées en une pierre rouge (sa barre d'usure
@@ -72,7 +73,7 @@ public class PhilosopherStoneItem extends Item {
 		for (Map.Entry<BodyPart, ItemStack> limb : automail.limbs().entrySet()) {
 			if (plan.restored().contains(limb.getKey())) {
 				if (!player.getInventory().add(limb.getValue().copy())) {
-					player.drop(limb.getValue().copy(), false);
+					EntityCompat.drop(player, limb.getValue().copy());
 				}
 				automail = automail.with(limb.getKey(), ItemStack.EMPTY);
 			}

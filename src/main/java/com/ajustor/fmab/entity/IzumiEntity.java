@@ -43,6 +43,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.UUID;
 import com.ajustor.fmab.network.FmabNetwork;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Izumi Curtis, maîtresse d'entraînement. Elle propose des épreuves et, à qui le demande, un combat
@@ -208,7 +209,7 @@ public class IzumiEntity extends PathfinderMob {
 		player.setPos(player.getX(), feet.getY() + 1, player.getZ());
 		player.hurtServer(level, level.damageSources().mobAttack(this), CLAP_DAMAGE);
 		player.setDeltaMovement(player.getDeltaMovement().add(0, 0.6, 0));
-		player.hurtMarked = true;
+		EntityCompat.syncVelocity(player);
 	}
 
 	private void endSpar(ServerPlayer player, boolean studentHeld) {

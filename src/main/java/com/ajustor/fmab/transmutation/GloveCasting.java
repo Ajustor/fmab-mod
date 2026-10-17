@@ -30,6 +30,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Lancer le cercle d'un gant : sur la surface visée, à portée de main (ou à distance pour les gants
@@ -108,7 +109,7 @@ public final class GloveCasting {
 			return;
 		}
 		player.level().playSound(null, player.blockPosition(), FmabSounds.CLAP, SoundSource.PLAYERS, 1, 1);
-		player.swing(InteractionHand.OFF_HAND, true);
+		EntityCompat.swing(player, InteractionHand.OFF_HAND, true);
 		Transmutation.activate(player.level(), hit.getBlockPos().relative(hit.getDirection()),
 				CircleFrame.forFace(hit.getDirection(), player.getDirection()), drawing, player, false, Integer.MAX_VALUE);
 		TransmutationPose.strike(player, TransmutationPose.Kind.CLAP, 14);

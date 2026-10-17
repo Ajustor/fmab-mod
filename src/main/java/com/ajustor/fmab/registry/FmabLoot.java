@@ -6,7 +6,6 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.Map;
 import com.ajustor.fmab.platform.event.ContentEvents;
@@ -32,7 +31,6 @@ public final class FmabLoot {
 				return;
 			}
 			table.withPool(LootPool.lootPool()
-					.setRolls(ConstantValue.exactly(1))
 					.when(LootItemRandomChanceCondition.randomChance(chance))
 					.add(LootItem.lootTableItem(FmabItems.HUMAN_TRANSMUTATION_NOTES)));
 		});

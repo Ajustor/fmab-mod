@@ -40,6 +40,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Optional;
 import com.ajustor.fmab.platform.event.PlayerEvents;
 import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * La visite de l'Espace blanc : l'alchimiste arrive devant sa Porte, face à sa Vérité (sa copie toute
@@ -172,7 +173,7 @@ public final class GateOfTruth {
 		if (visit.ticks() < -1 && player.level() != space) {
 			// Les bras noirs le tiennent : il ne bouge plus, le monde s'assombrit.
 			player.setDeltaMovement(player.getDeltaMovement().multiply(0.2, 0.2, 0.2));
-			player.hurtMarked = true;
+			EntityCompat.syncVelocity(player);
 			FmabAttachments.GATE.set(player, gate.withVisit(visit.tick()));
 			return;
 		}
@@ -230,7 +231,7 @@ public final class GateOfTruth {
 			Vec3 back = at(player, ARRIVAL);
 			player.teleportTo(back.x, back.y, back.z);
 			player.setDeltaMovement(Vec3.ZERO);
-			player.hurtMarked = true;
+			EntityCompat.syncVelocity(player);
 		}
 		if (t >= CLOSING && t < CLOSING + DOOR_PERIOD * DOOR_STEPS && (t - CLOSING) % DOOR_PERIOD == 0) {
 			closeDoors(space, player, (t - CLOSING) / DOOR_PERIOD);
@@ -477,7 +478,7 @@ public final class GateOfTruth {
 			space.sendParticles(ParticleTypes.SQUID_INK, x, y, z, 0, toward.x, toward.y, toward.z, 1);
 		}
 		player.push(0, 0, -0.02);
-		player.hurtMarked = true;
+		EntityCompat.syncVelocity(player);
 		if (space.getRandom().nextInt(6) == 0) {
 			space.playSound(null, player.blockPosition(), FmabSounds.GATE_HANDS, SoundSource.PLAYERS, 0.8f,
 					0.8f + space.getRandom().nextFloat() * 0.4f);

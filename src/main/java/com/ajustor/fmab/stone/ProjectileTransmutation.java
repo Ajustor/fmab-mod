@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.UUID;
 import com.ajustor.fmab.platform.event.LivingEvents;
 import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Ce qu'on lance sur une Pierre vivante se défait avant de la toucher : flèches, tridents, boules de
@@ -57,8 +58,13 @@ public final class ProjectileTransmutation {
 	/** Sous cette vitesse (en blocs par tick), un projectile est au repos : planté, ou posé. */
 	private static final double AT_REST = 0.01;
 	/** Le projectile s'est défait au contact : il ne touche pas, et ne rebondit pas. */
+	//? if >=26.3 {
+	/*public static final ProjectileDeflection TRANSMUTED = (projectile, by, random, velocity) -> {
+	};
+	*///?} else {
 	public static final ProjectileDeflection TRANSMUTED = (projectile, by, random) -> {
 	};
+	//?}
 
 	private static final Map<UUID, MassBalance> BALANCES = PlayerMaps.track(new HashMap<>());
 
@@ -199,7 +205,7 @@ public final class ProjectileTransmutation {
 	 */
 	private static void refund(ServerPlayer stone, ItemStack stack, Optional<Composition> composition) {
 		if (composition.isEmpty()) {
-			stone.getInventory().placeItemBackInInventory(stack);
+			EntityCompat.placeBack(stone, stack);
 			return;
 		}
 		ServerLevel level = stone.level();
@@ -210,7 +216,7 @@ public final class ProjectileTransmutation {
 			for (ItemStack unit : ItemCompositions.units(level, element, mass)) {
 				given += unit.getCount() * (int) Math.round(ItemCompositions.of(level, unit.getItem())
 						.map(Composition::total).orElse(0.0));
-				stone.getInventory().placeItemBackInInventory(unit);
+				EntityCompat.placeBack(stone, unit);
 			}
 			// Ce qui ne fait pas une pièce (une masse de bois, quand la planche en pèse deux) attend la suite.
 			balance.add(element, mass - given);

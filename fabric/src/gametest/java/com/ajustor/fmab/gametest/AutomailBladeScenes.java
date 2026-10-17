@@ -16,6 +16,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Le bras d'automail transmuté en lame, comme celui d'Ed : avant, la lame sortie (de face, de
@@ -95,7 +96,7 @@ public class AutomailBladeScenes implements FabricClientGameTest {
 			turn(context, 60, -30);
 			context.takeScreenshot("automail_blade_3_out_side");
 			// Le bras levé pour frapper.
-			context.runOnClient(mc -> mc.player.swing(net.minecraft.world.InteractionHand.MAIN_HAND));
+			context.runOnClient(mc -> EntityCompat.swing(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND));
 			context.waitTicks(2);
 			context.takeScreenshot("automail_blade_4_out_swing");
 			turn(context, 0, 0);

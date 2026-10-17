@@ -18,6 +18,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 import java.util.function.Consumer;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Gant d'alchimiste : il porte un cercle, brodé ou gravé à la table d'alchimiste, qu'on lance avec la
@@ -102,7 +103,7 @@ public class GloveItem extends Item {
 		FmabAttachments.GLOVES.set(player, gloves.with(left, stack.copyWithCount(1)));
 		stack.shrink(1);
 		if (!previous.isEmpty() && !player.getInventory().add(previous)) {
-			player.drop(previous, false);
+			EntityCompat.drop(player, previous);
 		}
 		level.playSound(null, player.blockPosition(), SoundEvents.ARMOR_EQUIP_LEATHER.value(), SoundSource.PLAYERS,
 				1, 1);

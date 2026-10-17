@@ -38,6 +38,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Scar, l'Ishvalien au bras tatoué, dans les ruines de son peuple. Il traque les Alchimistes d'État,
@@ -93,10 +94,10 @@ public class ScarEntity extends PathfinderMob {
 	/** Chaque coup de son bras décompose : la chair, et la pierre sous les pieds de sa cible. */
 	@Override
 	public boolean doHurtTarget(ServerLevel level, Entity target) {
-		swing(InteractionHand.MAIN_HAND);
+		EntityCompat.swing(this, InteractionHand.MAIN_HAND);
 		boolean hit = super.doHurtTarget(level, target);
 		if (hit && target instanceof LivingEntity living) {
-			living.invulnerableTime = 0;
+			EntityCompat.setInvulnerableTime(living, 0);
 			living.hurtServer(level, damageSources().indirectMagic(this, this), DECOMPOSE);
 			level.sendParticles(ParticleTypes.ELECTRIC_SPARK, living.getX(), living.getY(0.5), living.getZ(), 30, 0.3,
 					0.5, 0.3, 0.15);

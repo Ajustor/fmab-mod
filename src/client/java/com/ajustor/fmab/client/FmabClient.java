@@ -90,7 +90,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import org.lwjgl.glfw.GLFW;
 import com.ajustor.fmab.platform.client.ClientEvents;
 import com.ajustor.fmab.platform.client.ClientPlatform;
 
@@ -109,16 +108,16 @@ public final class FmabClient {
 		});
 		KeyMapping.Category category = KeyMapping.Category.register(Fmab.id("alchemy"));
 		KeyMapping cast = ClientPlatform.get().keyMapping(
-				new KeyMapping("key.fmab.cast_gloves", GLFW.GLFW_KEY_G, category));
+				new KeyMapping("key.fmab.cast_gloves", InputConstants.KEY_G, category));
 		KeyMapping gloves = ClientPlatform.get().keyMapping(
-				new KeyMapping("key.fmab.gloves", GLFW.GLFW_KEY_H, category));
+				new KeyMapping("key.fmab.gloves", InputConstants.KEY_H, category));
 		KeyMapping notebook = ClientPlatform.get().keyMapping(
-				new KeyMapping("key.fmab.notebook", GLFW.GLFW_KEY_N, category));
+				new KeyMapping("key.fmab.notebook", InputConstants.KEY_N, category));
 		// La page de conception : l'objet auquel on pense en recomposant.
 		KeyMapping design = ClientPlatform.get().keyMapping(
-				new KeyMapping("key.fmab.design", GLFW.GLFW_KEY_J, category));
+				new KeyMapping("key.fmab.design", InputConstants.KEY_J, category));
 		KeyMapping wheel = ClientPlatform.get().keyMapping(
-				new KeyMapping("key.fmab.circle_wheel", GLFW.GLFW_KEY_R, category));
+				new KeyMapping("key.fmab.circle_wheel", InputConstants.KEY_R, category));
 		// Passer d'un cercle à l'autre sans ouvrir la roue : sans touche par défaut.
 		KeyMapping next = ClientPlatform.get().keyMapping(
 				new KeyMapping("key.fmab.next_circle", InputConstants.UNKNOWN.getValue(), category));
@@ -126,7 +125,7 @@ public final class FmabClient {
 				new KeyMapping("key.fmab.previous_circle", InputConstants.UNKNOWN.getValue(), category));
 		// L'âme en armure se fige (une armure qu'on peut revêtir), s'éveille, ou relâche qui est dedans.
 		KeyMapping shell = ClientPlatform.get().keyMapping(
-				new KeyMapping("key.fmab.shell", GLFW.GLFW_KEY_V, category));
+				new KeyMapping("key.fmab.shell", InputConstants.KEY_V, category));
 		ClientEvents.END_TICK.register(mc -> {
 			while (shell.consumeClick()) {
 				ClientPlatform.get().send(ShellKeyPayload.INSTANCE);

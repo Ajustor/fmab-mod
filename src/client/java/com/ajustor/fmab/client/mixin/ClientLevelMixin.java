@@ -17,7 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(ClientLevel.class)
 public abstract class ClientLevelMixin {
+	// Les couleurs du ciel et de la brume sont des vecteurs à partir de 26.3.
+	//? if >=26.3 {
+	/*private static final org.joml.Vector3fc DUSK = ARGB.vector3fFromRGB24(ARGB.color(70, 18, 20));
+	*///?} else {
 	private static final int DUSK = ARGB.color(70, 18, 20);
+	//?}
 
 	@Inject(method = "addEnvironmentAttributeLayers", at = @At("RETURN"))
 	private void fmab$eclipse(EnvironmentAttributeSystem.Builder builder,

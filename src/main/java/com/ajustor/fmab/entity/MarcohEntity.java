@@ -26,6 +26,7 @@ import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Le docteur Tim Marcoh, l'Alchimiste de cristal, caché dans un dispensaire de campagne. Il a fait
@@ -68,7 +69,7 @@ public class MarcohEntity extends PathfinderMob {
 			ItemStack tome = CipheredNotesItem.decipher(held);
 			held.consume(1, p);
 			if (!p.getInventory().add(tome)) {
-				p.drop(tome, false);
+				EntityCompat.drop(p, tome);
 			}
 			p.sendSystemMessage(Component.translatable("npc.fmab.marcoh.deciphers"));
 			Milestones.reach(p, "marcoh_notes");

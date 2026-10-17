@@ -10,6 +10,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.resources.Identifier;
+import com.ajustor.fmab.client.compat.RenderCompat;
 
 /**
  * Les armures habitées (et Barry) : une armure d'acier vide. Effondrée, elle gît à terre, en morceaux
@@ -71,7 +72,7 @@ public class HauntedArmorRenderer<T extends HauntedArmorEntity>
 		super.setupRotations(state, poseStack, bodyRot, entityScale);
 		if (state.collapsed) {
 			// À plat, sur le dos.
-			poseStack.mulPose(Axis.XP.rotationDegrees(-90));
+			RenderCompat.rotate(poseStack, Axis.XP.rotationDegrees(-90));
 			poseStack.translate(0, -0.9, 0.1);
 		}
 	}

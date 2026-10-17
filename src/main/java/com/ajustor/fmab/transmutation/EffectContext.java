@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Ce qu'un effet sait de la transmutation en cours.
@@ -103,7 +104,7 @@ public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame fram
 		if (stage.infused("air")) {
 			Direction d = direction();
 			target.push(d.getStepX() * 0.8, 0.3, d.getStepZ() * 0.8);
-			target.hurtMarked = true;
+			EntityCompat.syncVelocity(target);
 		}
 	}
 }

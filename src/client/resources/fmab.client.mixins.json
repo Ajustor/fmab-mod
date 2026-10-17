@@ -12,7 +12,7 @@
 		"EntityRenderDispatcherMixin",
 		"HudMixin",
 		"InventoryScreenMixin",
-		"ItemInHandRendererMixin",
+		"FirstPersonHandsMixin",
 		"PlayerModelMixin",
 		"ScreenInvoker",
 		"SkyRendererMixin"

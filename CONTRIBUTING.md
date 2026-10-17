@@ -13,6 +13,9 @@ Il faut un **JDK 25** (ou plus récent).
 ./gradlew :26.2:test                # les tests unitaires du cœur, pour une version
 ```
 
+Après avoir modifié des données (`src/main/resources/data`) : `python tools/data/migrate.py`, qui
+régénère leurs versions pour les Minecraft plus récents (`src/overlays/`), à committer avec.
+
 Le mod est découpé en un cœur sans loader (`src/`) et un adaptateur par loader (`fabric/`), construits
 pour chaque version de Minecraft prise en charge : voir [ARCHITECTURE.md](ARCHITECTURE.md). Le code du
 jeu va dans le cœur ; il ne parle au loader que par ses ports (`com.ajustor.fmab.platform`).

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * L'épée de Xing, celle de Ling Yao : légère et rapide. Les coups qui s'enchaînent sans pause
@@ -52,7 +53,7 @@ public class XingSwordItem extends Item {
 		int count = combo != null && now >= combo.last() && now - combo.last() <= CHAIN ? Math.min(MAX_COMBO, combo.count() + 1) : 0;
 		COMBOS.put(attacker.getUUID(), new Combo(now, count));
 		if (count > 0 && target.isAlive()) {
-			target.invulnerableTime = 0;
+			EntityCompat.setInvulnerableTime(target, 0);
 			target.hurtServer(level, level.damageSources().mobAttack(attacker), count);
 			if (attacker instanceof Player p) {
 				p.sendOverlayMessage(Component.translatable("item.fmab.xing_sword.combo", count + 1));

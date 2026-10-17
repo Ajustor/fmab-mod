@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import com.ajustor.fmab.platform.event.ServerEvents;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * Activation d'un cercle par un alchimiste : le serveur relit le tracé, vérifie le savoir, le
@@ -246,7 +247,7 @@ public final class Transmutation {
 		dropAll(level, circle, flow);
 		// Le geste : la paume plaquée sur le cercle (les mains jointes, l'appelant les remplace).
 		if (!remote) {
-			caster.swing(InteractionHand.MAIN_HAND, true);
+			EntityCompat.swing(caster, InteractionHand.MAIN_HAND, true);
 			TransmutationPose.strike(caster, TransmutationPose.Kind.PALM, 14);
 		}
 		if (anything) {
@@ -355,7 +356,7 @@ public final class Transmutation {
 					.orElse(Effects.Result.NO_TARGET);
 			anything |= result == Effects.Result.DONE;
 		}
-		caster.swing(InteractionHand.MAIN_HAND, true);
+		EntityCompat.swing(caster, InteractionHand.MAIN_HAND, true);
 		TransmutationPose.strike(caster, TransmutationPose.Kind.HOLD, CHANNEL_GAP + 2);
 		if (!anything) {
 			// Plus de matière, ou rien qui puisse grandir : l'énergie s'arrête.

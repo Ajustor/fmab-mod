@@ -104,3 +104,17 @@ jobs:
         run: npm test
       - name: build
         run: npm run build
+
+  # Les données des versions de Minecraft plus récentes que celle des sources sont dérivées des
+  # sources (tools/data/migrate.py) : les overlays commités doivent être ceux que donne la migration.
+  data:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: migrate and compare
+        run: python tools/data/migrate.py --check

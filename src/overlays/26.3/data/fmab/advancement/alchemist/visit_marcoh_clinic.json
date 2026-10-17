@@ -1,0 +1,36 @@
+{
+  "parent": "fmab:alchemist/transmuted",
+  "criteria": {
+    "visit_marcoh_clinic": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:location": {
+              "structures": "fmab:marcoh_clinic"
+            }
+          }
+        }
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:glass_bottle"
+    },
+    "frame": "task",
+    "title": {
+      "translate": "advancements.fmab.visit_marcoh_clinic.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.visit_marcoh_clinic.description"
+    }
+  },
+  "requirements": [
+    [
+      "visit_marcoh_clinic"
+    ]
+  ]
+}

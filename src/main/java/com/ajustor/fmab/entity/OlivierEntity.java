@@ -26,6 +26,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import com.ajustor.fmab.compat.EntityCompat;
 
 /**
  * La générale Olivier Mira Armstrong, qui tient Fort Briggs. Elle taille en pièces les soldats de
@@ -81,7 +82,7 @@ public class OlivierEntity extends PathfinderMob {
 			FmabAttachments.BRIGGS_ALLY.set(p, true);
 			ItemStack sabre = new ItemStack(FmabItems.BRIGGS_SABRE);
 			if (!p.getInventory().add(sabre)) {
-				p.drop(sabre, false);
+				EntityCompat.drop(p, sabre);
 			}
 			level.playSound(null, blockPosition(), SoundEvents.ARMOR_EQUIP_IRON.value(), SoundSource.NEUTRAL, 1, 0.8f);
 			p.sendSystemMessage(Component.translatable("npc.fmab.olivier.ally"));
