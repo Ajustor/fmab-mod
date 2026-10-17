@@ -63,6 +63,11 @@ public class PhilosopherStoneItem extends Item {
 	 * qui reste debout, vide ; les automails des membres rendus retournent au sac.
 	 */
 	public static void restore(ServerPlayer player, GateState gate, Restoration.Plan plan) {
+		restore(player, gate, plan, true);
+	}
+
+	/** @param announce dire au joueur ce que la Pierre a payé (sinon, celui qui paie le dit lui-même) */
+	public static void restore(ServerPlayer player, GateState gate, Restoration.Plan plan, boolean announce) {
 		ServerLevel level = player.level();
 		if (plan.restored().contains(BodyPart.BODY) && gate.inArmor()) {
 			SoulBinding.leaveShell(player, false);
@@ -82,9 +87,11 @@ public class PhilosopherStoneItem extends Item {
 		player.setHealth(player.getMaxHealth());
 		level.sendParticles(RED, player.getX(), player.getY(0.5), player.getZ(), 120, 0.5, 1, 0.5, 0);
 		level.playSound(null, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.PLAYERS, 1, 1.2f);
-		for (BodyPart part : plan.restored()) {
-			player.sendSystemMessage(Component.translatable("item.fmab.philosopher_stone.restored",
-					Component.translatable(part.translationKey()), Restoration.cost(part)).withStyle(ChatFormatting.RED));
+		if (announce) {
+			for (BodyPart part : plan.restored()) {
+				player.sendSystemMessage(Component.translatable("item.fmab.philosopher_stone.restored",
+						Component.translatable(part.translationKey()), Restoration.cost(part)).withStyle(ChatFormatting.RED));
+			}
 		}
 	}
 

@@ -48,6 +48,7 @@ import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TattooScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
+import com.ajustor.fmab.client.screen.SoulGiftScreen;
 import com.ajustor.fmab.client.screen.SoulOfferScreen;
 import com.ajustor.fmab.client.screen.StoneChoiceScreen;
 import com.ajustor.fmab.client.screen.TruthScreen;
@@ -64,6 +65,7 @@ import com.ajustor.fmab.network.OpenExamPayload;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.network.OpenTruthPayload;
+import com.ajustor.fmab.network.SoulGiftPayload;
 import com.ajustor.fmab.network.SoulOfferPayload;
 import com.ajustor.fmab.network.StoneChoicePayload;
 import com.ajustor.fmab.network.OpenWinryPayload;
@@ -211,6 +213,8 @@ public final class FmabClient {
 		ClientEvents.DISCONNECT.register(client -> Cinematics.stop());
 		ClientPlatform.get().receive(OpenTruthPayload.TYPE,
 				(payload, client) -> client.gui.setScreen(new TruthScreen(payload)));
+		ClientPlatform.get().receive(SoulGiftPayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new SoulGiftScreen(payload)));
 		ClientPlatform.get().receive(SoulOfferPayload.TYPE,
 				(payload, client) -> client.gui.setScreen(new SoulOfferScreen(payload)));
 		ClientPlatform.get().receive(StoneChoicePayload.TYPE,

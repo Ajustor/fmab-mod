@@ -438,7 +438,7 @@
   "treatise.fmab.ch8.p2": "Ce qui naît du cercle n'a rien d'humain. L'alchimiste, lui, est happé vers sa Porte, dans l'Espace blanc, où la Vérité prend son péage : un bras, une jambe, les organes, la vue. Plus il a tenté (ingrédients en surplus, humains dans le cercle, ouvertures passées), plus le prix est lourd.\n\nS'il manque un ingrédient, la Vérité prend le corps entier.",
   "treatise.fmab.ch8.p3": "En échange, l'alchimiste a vu la Porte, et ce qu'il y a derrière : il en revient en comprenant tous les glyphes. Il joint les mains (Maj + touche des gants) : le cercle sélectionné dans son carnet agit sur la surface visée, sans craie. La roue des cercles (R, maintenue) change de cercle d'un geste ; un clic gauche sur la roue joint aussitôt les mains. Il lui faut deux mains.\n\nChaque nouvelle ouverture coûte un nouveau péage.",
   "treatise.fmab.ch8.p4": "Un bras ou une jambe perdus se remplacent par l'automail : fer standard, acier léger de Rush Valley (plus rapide, plus fragile) ou modèle d'hiver de Briggs (contre le gel). On le pose à l'établi d'automail ou chez Winry, à Rush Valley. Il s'use ; usé, il ne répond plus, et Winry le répare contre du fer.\n\nSans jambes, on rampe ; ou l'on s'assied dans un fauteuil roulant, qu'on fabrique ou qu'achète au forgeron : deux bras pour les roues, ou quelqu'un pour le pousser.",
-  "treatise.fmab.ch8.soul": "Cercle d'âme (Alchimiste) : Humain et Fixer, dans un hexagone. Posez sur le cercle une armure (sur un porte-armure ou au sol) : il appelle l'âme dont le plastron porte le sceau ; nu, il appelle l'âme en armure qui l'active (elle change d'armure et laisse l'ancienne debout), sinon l'âme qui erre depuis le plus longtemps.\n\nAccroupi à la table d'alchimiste, on trace son sceau dans un plastron, à l'encre alchimique ou de son sang. Posé sur un porte-armure au-dessus d'un cercle d'âme, il attend : une âme errante demande à sa Vérité de l'y rappeler.\n\nL'âme d'un autre ne revient pas pour rien : il faut avoir vu sa Porte, tracer une transmutation humaine sous l'armure et offrir un morceau de soi (un bras, une jambe, la vue, ses organes). Les âmes qui errent sont appelées de la plus ancienne à la plus récente ; celle qui accepte, on la voit avant de payer.",
+  "treatise.fmab.ch8.soul": "Cercle d'âme (Alchimiste) : Humain et Fixer, dans un hexagone. Posez sur le cercle une armure (sur un porte-armure ou au sol) : il appelle l'âme dont le plastron porte le sceau ; nu, il appelle l'âme en armure qui l'active (elle change d'armure et laisse l'ancienne debout), sinon l'âme qui erre depuis le plus longtemps.\n\nAccroupi à la table d'alchimiste, on trace son sceau dans un plastron, à l'encre alchimique ou de son sang. Posé sur un porte-armure au-dessus d'un cercle d'âme, il attend : une âme errante demande à sa Vérité de l'y rappeler.\n\nL'âme d'un autre ne revient pas pour rien : il faut avoir vu sa Porte, tracer une transmutation humaine sous l'armure et offrir un morceau de soi (un bras, une jambe, la vue, ses organes). Les âmes qui errent sont appelées de la plus ancienne à la plus récente ; celle qui accepte, on la voit avant de payer.\n\nCe que la Porte a pris à un autre, on peut le lui rendre : un allié debout dans une transmutation humaine, on paie de sa propre âme (la Vérité prend tout le corps, on se réveille dans une armure) ou des âmes de sa Pierre, au même prix que devant la Porte.",
   "treatise.fmab.ch8.seal": "Votre sceau de sang : il n'appartient qu'à vous. Ajoutez-le au carnet, sélectionnez-le, puis, accroupi à la table d'alchimiste, tracez-le dans un plastron (encre alchimique ou votre sang).\n\nPartagez son code avec un ami : il pourra tracer votre sceau pour vous.",
 
   "treatise.fmab.ch9.title": "IX. Les homonculus",
@@ -1221,5 +1221,25 @@
   "gate.fmab.offer.bound": "%s a payé de sa chair : vous vous réveillez dans une armure.",
   "gate.fmab.soul.needs_sacrifice": "L'âme d'un autre ne revient qu'au prix d'un morceau de soi : tracez une transmutation humaine sous l'armure.",
   "config.fmab.soul_binding_requires_sacrifice": "Lier une âme coûte un membre",
-  "config.fmab.soul_binding_requires_sacrifice.tooltip": "Lier l'âme d'un autre joueur à une armure demande de sacrifier un membre (transmutation humaine sous l'armure, après avoir vu sa Porte). Sinon, le cercle d'âme l'appelle gratuitement."
+  "config.fmab.soul_binding_requires_sacrifice.tooltip": "Lier l'âme d'un autre joueur à une armure demande de sacrifier un membre (transmutation humaine sous l'armure, après avoir vu sa Porte). Sinon, le cercle d'âme l'appelle gratuitement.",
+
+  "gate.fmab.gift.choose.title": "Rendre ce qui fut pris",
+  "gate.fmab.gift.choose.text": "La Porte a pris ceci à %1$s. Que lui rendez-vous, et au prix de quoi ? Votre âme : la Vérité prendra tout votre corps et vous vous réveillerez dans une armure. Ou des âmes de votre Pierre (elle en garde %2$s).",
+  "gate.fmab.gift.pay.own_soul": "Mon âme",
+  "gate.fmab.gift.pay.stone": "Pierre (%s)",
+  "gate.fmab.gift.price.own_soul": "son âme (la Vérité prendra tout son corps)",
+  "gate.fmab.gift.price.stone": "%s âmes de sa Pierre",
+  "gate.fmab.gift.propose.title": "Ce que la Porte vous a pris",
+  "gate.fmab.gift.propose.text": "%1$s offre %2$s pour vous rendre ceci : %3$s. Acceptez-vous ?",
+  "gate.fmab.gift.confirm.title": "Votre âme",
+  "gate.fmab.gift.confirm.text": "%1$s accepte. La Vérité prendra tout votre corps pour lui rendre ceci : %2$s. Votre âme se réveillera dans une armure de fer, liée par un sceau de sang.",
+  "gate.fmab.gift.give_soul": "Donner mon âme",
+  "gate.fmab.gift.nothing_lost": "La Porte n'a rien pris à celui qui se tient dans le cercle.",
+  "gate.fmab.gift.asking": "%s doit accepter…",
+  "gate.fmab.gift.refused": "L'offre est refusée : rien n'est pris.",
+  "gate.fmab.gift.withdrawn": "Vous renoncez : rien n'est pris.",
+  "gate.fmab.gift.restored_soul": "%1$s a donné son âme : la Vérité vous rend ceci : %2$s.",
+  "gate.fmab.gift.restored_stone": "%1$s a payé de sa Pierre : la Vérité vous rend ceci : %2$s.",
+  "gate.fmab.gift.gave_soul": "Vous avez donné votre âme : %1$s retrouve ceci : %2$s.",
+  "gate.fmab.gift.gave_stone": "%1$s retrouve ceci : %2$s (%3$s âmes de votre Pierre)."
 }

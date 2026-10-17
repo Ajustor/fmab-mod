@@ -24,7 +24,8 @@
 			"com.ajustor.fmab.gametest.ConfigScenes",
 			"com.ajustor.fmab.gametest.DataScenes",
 			"com.ajustor.fmab.gametest.SoulLegsScenes",
-			"com.ajustor.fmab.gametest.SoulOfferingScenes"
+			"com.ajustor.fmab.gametest.SoulOfferingScenes",
+			"com.ajustor.fmab.gametest.SoulGiftScenes"
 		]
 	},
 	"depends": {
