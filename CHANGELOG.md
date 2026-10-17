@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.8.0 — 2026-10-17
+
+### New features
+
+- An alchemist who has seen their Gate can sacrifice a limb, through a human transmutation under an armour, to bind another player's soul to it; both accept on screen. By default, this is now the only way to bind someone else's soul (configurable).
+- An alchemist who has seen their Gate can give an ally back a lost limb, sight or organs through a human transmutation the ally stands in: they pay with their own soul (and wake up in an armour) or with souls from their Stone; both accept on screen.
+- A soul in armour can get its body back: an ally pays with their soul, their Stone's souls, or their Gate, like Edward, and then never performs alchemy again.
+
+### Fixes
+
+- An inhabited armour without leggings now moves like a legless player (slower, no jumping, crawling) until leggings are put back on.
 ## 1.7.0 — 2026-10-17
 
 ### New features

@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 1.8.0 — 2026-10-17
+
+### Nouveautés
+
+- Un alchimiste qui a vu sa Porte peut sacrifier un membre, par une transmutation humaine sous une armure, pour y lier l'âme d'un autre joueur ; chacun accepte à l'écran. Par défaut, c'est désormais le seul moyen de lier l'âme d'un autre (réglable).
+- Un alchimiste qui a vu sa Porte peut rendre à un allié un membre, la vue ou les organes perdus, par une transmutation humaine où l'allié se tient : il paie de sa propre âme (et se réveille dans une armure) ou des âmes de sa Pierre ; chacun accepte à l'écran.
+- Une âme en armure peut retrouver son corps : un allié le paie de son âme, des âmes de sa Pierre, ou de sa Porte, comme Edward, et ne pratique alors plus jamais l'alchimie.
+
+### Corrections
+
+- Une armure habitée sans jambières se déplace désormais comme un joueur sans jambes (moins vite, sans sauter, en rampant) jusqu'à ce qu'on lui en remette.
 ## 1.7.0 — 2026-10-17
 
 ### Nouveautés
