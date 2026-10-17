@@ -47,10 +47,13 @@ jobs:
         run: chmod +x ./gradlew
       # Un écran virtuel et le rendu OpenGL logiciel de Mesa : pas de carte graphique sur le runner.
       - name: install a virtual display
-        run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libegl1 mesa-utils
       - name: run client gametests
         env:
           SCENES: ${{ inputs.scenes }}
+          # À partir de 26.3, la fenêtre du jeu passe par SDL3, qui demande un tampon d'image sRGB : les
+          # visuels GLX de Xvfb n'en ont pas, ceux d'EGL (Mesa) si. Sans effet sur les versions en GLFW.
+          SDL_VIDEO_FORCE_EGL: '1'
         run: |
           args=""
           if [ -n "$SCENES" ]; then args="-PfmabGametest=$SCENES"; fi
