@@ -40,7 +40,8 @@
 			"com.ajustor.fmab.gametest.LootScenes",
 			"com.ajustor.fmab.gametest.CharacterScenes",
 			"com.ajustor.fmab.gametest.BossScenes",
-			"com.ajustor.fmab.gametest.DrachmaScenes"
+			"com.ajustor.fmab.gametest.DrachmaScenes",
+			"com.ajustor.fmab.gametest.XingScenes"
 		]
 	},
 	"depends": {

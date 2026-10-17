@@ -59,6 +59,9 @@ class BlueprintsTest {
 		put(out, "fort_briggs", FortBriggs.SIZE_X, FortBriggs.SIZE_Y, FortBriggs.SIZE_Z, 0);
 		put(out, "blood_crest", BloodCrestStructure.SIZE, 6, BloodCrestStructure.SIZE, 0);
 		put(out, "xing_pavilion", XingStructure.SIZE, 12, XingStructure.SIZE, 0);
+		put(out, "xing_grounds", XingStructure.GROUNDS, 1, XingStructure.GROUNDS, 0);
+		put(out, "xing_shrine", XingStructure.HALL, 8, XingStructure.HALL, 1);
+		put(out, "xing_house", XingStructure.HALL, 8, XingStructure.HALL, 1);
 		put(out, "yock_island", YockIslandStructure.SIZE, 10, YockIslandStructure.SIZE, 4);
 		for (String stall : List.of("market_stall", "desert_stall")) {
 			put(out, stall, 3, 5, 3, 0);
