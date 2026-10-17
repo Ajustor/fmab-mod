@@ -45,7 +45,7 @@ public final class FmabAttachments {
 			.persistent(Gloves.CODEC)
 			.initializer(() -> Gloves.NONE)
 			.copyOnDeath()
-			.syncWith(Gloves.STREAM_CODEC, DataSlot.Sync.OWNER)
+			.syncWith(Gloves.STREAM_CODEC, DataSlot.Sync.ALL)
 			.register(Fmab.id("gloves"));
 
 	/** Les épreuves d'Izumi : gardées à la mort, inutiles au client. */
@@ -62,12 +62,12 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.register(Fmab.id("exam"));
 
-	/** Cercles tatoués : permanents, gardés à la mort, visibles du joueur seul. */
+	/** Cercles tatoués : permanents, gardés à la mort, visibles de tous (ils se dessinent sur le corps). */
 	public static final DataSlot<Tattoos> TATTOOS = DataSlot.<Tattoos>builder()
 			.persistent(Tattoos.CODEC)
 			.initializer(() -> Tattoos.NONE)
 			.copyOnDeath()
-			.syncWith(Tattoos.STREAM_CODEC, DataSlot.Sync.OWNER)
+			.syncWith(Tattoos.STREAM_CODEC, DataSlot.Sync.ALL)
 			.register(Fmab.id("tattoos"));
 
 	/**

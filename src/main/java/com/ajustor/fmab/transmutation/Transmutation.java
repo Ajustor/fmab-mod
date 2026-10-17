@@ -28,6 +28,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -279,7 +280,9 @@ public final class Transmutation {
 				CHANNELS.put(caster.getUUID(), new Channel(circle, level.getGameTime(), 0));
 			}
 			TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 1);
-			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 1.4f);
+			// Le souffle de l'alchimie, puis le son de ce qu'elle a fait de la matière.
+			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 0.5f, 1.4f);
+			level.playSound(null, circle, schoolSound(practiced.getFirst()), SoundSource.PLAYERS, 1, 1);
 			practice(caster, rules, knowledge, practiced);
 			Trainings.onTransmutation(caster, analysis, frame, inscribed, done);
 			Belly.transmuted(caster);
@@ -294,6 +297,19 @@ public final class Transmutation {
 				: "transmutation.fmab.no_target"));
 		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.3);
 		return Result.NOTHING;
+	}
+
+	/** Chaque école sonne comme sa matière : la pierre qui se pose, le métal frappé, l'eau, la flamme... */
+	static SoundEvent schoolSound(String school) {
+		return switch (school) {
+			case "earth", "destruction" -> SoundEvents.STONE_PLACE;
+			case "metal" -> SoundEvents.ANVIL_USE;
+			case "water" -> SoundEvents.GLASS_PLACE;
+			case "fire", "explosion" -> SoundEvents.FIRECHARGE_USE;
+			case "air" -> SoundEvents.ENDER_DRAGON_FLAP;
+			case "life", "medicine" -> SoundEvents.AMETHYST_BLOCK_CHIME;
+			default -> SoundEvents.ILLUSIONER_CAST_SPELL;
+		};
 	}
 
 	/** Un Apprenti devient Alchimiste dès que sa maîtrise le permet, d'où qu'elle vienne. */

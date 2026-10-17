@@ -1322,6 +1322,7 @@
   "config.fmab.title": "FMAB — Settings",
   "config.fmab.section.interface": "Display",
   "config.fmab.section.world": "Single-player worlds",
+  "config.fmab.section.world.remote": "Single-player worlds (no effect on this server)",
   "config.fmab.language": "Mod language",
   "config.fmab.language.game": "Game language",
   "config.fmab.language.tooltip": "The language of this mod's texts only, whatever the game's language: keep the game in English and the mod in your own language, or the other way round.",

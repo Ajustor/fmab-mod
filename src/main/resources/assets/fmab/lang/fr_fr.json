@@ -1322,6 +1322,7 @@
   "config.fmab.title": "FMAB — Réglages",
   "config.fmab.section.interface": "Affichage",
   "config.fmab.section.world": "Mondes solo",
+  "config.fmab.section.world.remote": "Mondes solo (sans effet sur ce serveur)",
   "config.fmab.language": "Langue du mod",
   "config.fmab.language.game": "Langue du jeu",
   "config.fmab.language.tooltip": "La langue des textes de ce mod seulement, quelle que soit celle du jeu : garder le jeu en anglais et le mod dans sa langue, ou l'inverse.",

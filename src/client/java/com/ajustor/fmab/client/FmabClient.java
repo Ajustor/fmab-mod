@@ -1,5 +1,6 @@
 package com.ajustor.fmab.client;
 
+import com.ajustor.fmab.client.render.HandsLayer;
 import com.ajustor.fmab.client.render.Temper;
 import com.ajustor.fmab.client.render.FigureModels;
 import com.ajustor.fmab.client.render.FigureRenderer;
@@ -102,6 +103,9 @@ import com.ajustor.fmab.platform.client.ClientEvents;
 import com.ajustor.fmab.platform.client.ClientPlatform;
 
 public final class FmabClient {
+	/** Le dernier appui envoyé sur la touche de la coquille (voir {@link Shells#KEY_DELAY}). */
+	private static long lastShell = Long.MIN_VALUE / 2;
+
 	private FmabClient() {
 	}
 
@@ -136,7 +140,11 @@ public final class FmabClient {
 				new KeyMapping("key.fmab.shell", InputConstants.KEY_V, category));
 		ClientEvents.END_TICK.register(mc -> {
 			while (shell.consumeClick()) {
-				ClientPlatform.get().send(ShellKeyPayload.INSTANCE);
+				long now = mc.level == null ? 0 : mc.level.getGameTime();
+				if (now - lastShell >= Shells.KEY_DELAY || now < lastShell) {
+					lastShell = now;
+					ClientPlatform.get().send(ShellKeyPayload.INSTANCE);
+				}
 			}
 			while (cast.consumeClick()) {
 				// Maj : joindre les mains, les deux gants agissent.
@@ -205,6 +213,8 @@ public final class FmabClient {
 		ClientPlatform.get().renderLayers((type, renderer, layers, context) -> {
 			if (renderer instanceof AvatarRenderer avatar) {
 				layers.add(new AutomailLayer(avatar, context));
+				// Les gants et les tatouages, vus de tous.
+				layers.add(new HandsLayer(avatar, context));
 			}
 			// Les volumes des tenues (capuche, pans, épaulières...), sur tout corps humanoïde qui les porte.
 			if (renderer.getModel() instanceof net.minecraft.client.model.HumanoidModel<?>) {

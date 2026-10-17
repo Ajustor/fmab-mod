@@ -62,6 +62,10 @@ public final class Shells {
 		}
 	}
 
+	/** Le délai entre deux appuis sur la touche de la coquille : une seconde. */
+	public static final int KEY_DELAY = 20;
+	public static final com.ajustor.fmab.util.Throttle KEY = new com.ajustor.fmab.util.Throttle(KEY_DELAY);
+
 	private Shells() {
 	}
 

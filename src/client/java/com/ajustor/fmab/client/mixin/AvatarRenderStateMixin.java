@@ -36,6 +36,18 @@ public abstract class AvatarRenderStateMixin implements PoseHolder, BodyHolder {
 	private Map<BodyPart, PartPose> fmab$skeleton = Map.of();
 	@Unique
 	private WheelchairPose fmab$wheelchair = WheelchairPose.NONE;
+	@Unique
+	private java.util.List<Worn> fmab$worn = java.util.List.of();
+
+	@Override
+	public java.util.List<Worn> fmab$worn() {
+		return fmab$worn;
+	}
+
+	@Override
+	public void fmab$setWorn(java.util.List<Worn> worn) {
+		fmab$worn = worn;
+	}
 
 	@Override
 	public TransmutationPose.Kind fmab$pose() {

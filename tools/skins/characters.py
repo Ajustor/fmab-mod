@@ -1863,6 +1863,65 @@ def drachma_general(s):
     boots(s, rows=5)
 
 
+# --- ce qu'on porte sur soi : gants et tatouages, dessinés sur le corps du joueur ----------------------
+# Des calques au gabarit d'une peau de joueur, transparents sauf là où ils se posent (voir HandsLayer).
+GLOVE_COLORS = {"cloth": "#ececec", "leather": "#7a4a26", "spark": "#f7f7f7", "gauntlet": "#4f545b",
+                "state": "#f4f4f4"}
+
+
+def glove_layer(kind):
+    def draw(s):
+        color = GLOVE_COLORS[kind]
+        hands(s, color, rows=4, glove=color)
+        for arm in ("rarm", "larm"):
+            if kind == "spark":
+                # Le cercle rouge brodé sur le dos de la main.
+                ink_ring(s, arm, "back", 1.5, 9.5, 1.2, "#c0202a")
+            if kind == "state":
+                # Le revers doré des gants d'État.
+                s.band(arm, 8, 1, "#c9a23a")
+            if kind == "gauntlet":
+                s.band(arm, 8, 1, "#2e3238")
+    return draw
+
+
+def ink_ring(s, part, f, cx, cy, r, color):
+    """Un cercle d'encre sur une face : les pixels à un demi-pixel du rayon."""
+    w, h = s.size(part, f)
+    for y in range(h):
+        for x in range(w):
+            if abs(((x - cx) ** 2 + (y - cy) ** 2) ** 0.5 - r) < 0.6:
+                s.px(part, f, x, y, color)
+
+
+TATTOO_INK = "#1b1626"
+TATTOO_PLACES = {
+    "palm_right": ("rarm", "front", 1.5, 9.5, 1.3),
+    "palm_left": ("larm", "front", 1.5, 9.5, 1.3),
+    "forearm_right": ("rarm", "right", 1.5, 5.5, 1.4),
+    "forearm_left": ("larm", "left", 1.5, 5.5, 1.4),
+    "back": ("body", "back", 3.5, 5.5, 3.0),
+    "chest": ("body", "front", 3.5, 4.5, 2.6),
+}
+
+
+def tattoo_layer(slot):
+    def draw(s):
+        part, f, cx, cy, r = TATTOO_PLACES[slot]
+        ink_ring(s, part, f, cx, cy, r, TATTOO_INK)
+        if r > 2:
+            # Sur le dos et la poitrine, un second anneau et le point du centre.
+            ink_ring(s, part, f, cx, cy, r - 1.5, TATTOO_INK)
+            s.px(part, f, int(cx + 0.5), int(cy + 0.5), TATTOO_INK)
+    return draw
+
+
+for _kind in GLOVE_COLORS:
+    skin("worn/glove_" + _kind, volume=False)(glove_layer(_kind))
+for _slot in TATTOO_PLACES:
+    skin("worn/tattoo_" + _slot, volume=False)(tattoo_layer(_slot))
+
+
 def build(names=None):
     os.makedirs(OUT, exist_ok=True)
     for name in names or SKINS:

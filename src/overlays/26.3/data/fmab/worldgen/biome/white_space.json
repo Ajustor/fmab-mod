@@ -1,6 +1,16 @@
 {
   "attributes": {
     "minecraft:visual/sky_color": "#ffffff",
+    "minecraft:audio/background_music": {
+      "default": {
+        "max_delay": 6000,
+        "min_delay": 600,
+        "sound": "minecraft:music.end"
+      }
+    },
+    "minecraft:audio/ambient_sounds": {
+      "loop": "minecraft:ambient.warped_forest.loop"
+    },
     "minecraft:gameplay/natural_mob_spawns": {
       "argument": {
         "spawn_costs": {},

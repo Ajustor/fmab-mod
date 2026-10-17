@@ -159,7 +159,7 @@ public class AutomailLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 			leftLeg.visible = automails.get(BodyPart.LEFT_LEG) == kind;
 		}
 
-		private static void load(ModelPart part, PartPose pose) {
+		static void load(ModelPart part, PartPose pose) {
 			if (pose == null) {
 				part.resetPose();
 			} else {

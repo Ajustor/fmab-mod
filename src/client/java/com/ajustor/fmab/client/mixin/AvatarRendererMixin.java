@@ -72,6 +72,35 @@ public abstract class AvatarRendererMixin {
 		BodyCache.Body body = BodyCache.of(entity);
 		holder.fmab$setBody(body.lost(), body.automails());
 		holder.fmab$setBlades(body.blades());
+		holder.fmab$setWorn(fmab$worn(entity));
+	}
+
+	/** Ses gants (une sorte par main) et ses tatouages, à dessiner sur son corps. */
+	@Unique
+	private static java.util.List<BodyHolder.Worn> fmab$worn(Avatar entity) {
+		java.util.List<BodyHolder.Worn> out = new java.util.ArrayList<>();
+		com.ajustor.fmab.data.Gloves gloves = FmabAttachments.GLOVES.get(entity);
+		if (gloves != null) {
+			for (boolean left : new boolean[]{false, true}) {
+				if (gloves.get(left).getItem() instanceof com.ajustor.fmab.item.GloveItem glove) {
+					out.add(new BodyHolder.Worn("glove_" + glove.kind().name().toLowerCase(java.util.Locale.ROOT),
+							left ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM));
+				}
+			}
+		}
+		com.ajustor.fmab.data.Tattoos tattoos = FmabAttachments.TATTOOS.get(entity);
+		if (tattoos != null) {
+			for (com.ajustor.fmab.tattoo.TattooSlot slot : com.ajustor.fmab.tattoo.TattooSlot.values()) {
+				if (tattoos.get(slot).isPresent()) {
+					BodyPart part = switch (slot) {
+						case BACK, CHEST -> BodyPart.BODY;
+						default -> slot.isLeft() ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM;
+					};
+					out.add(new BodyHolder.Worn("tattoo_" + slot.id(), part));
+				}
+			}
+		}
+		return out;
 	}
 
 	@Inject(method = "renderRightHand", at = @At("HEAD"), cancellable = true)
