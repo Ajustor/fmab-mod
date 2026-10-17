@@ -37,7 +37,8 @@
 			"com.ajustor.fmab.gametest.GoldScenes",
 			"com.ajustor.fmab.gametest.AlliesScenes",
 			"com.ajustor.fmab.gametest.EndingScenes",
-			"com.ajustor.fmab.gametest.LootScenes"
+			"com.ajustor.fmab.gametest.LootScenes",
+			"com.ajustor.fmab.gametest.CharacterScenes"
 		]
 	},
 	"depends": {

@@ -89,6 +89,28 @@ public interface Blueprint {
 		return java.util.Optional.empty();
 	}
 
+	/** Ce plan, plus ces créatures. */
+	static Blueprint withSpawns(Blueprint plan, java.util.function.Function<Plot, List<Spawn>> more) {
+		return new Blueprint() {
+			@Override
+			public BlockState at(int x, int y, int z, Plot p) {
+				return plan.at(x, y, z, p);
+			}
+
+			@Override
+			public List<Chest> chests(Plot p) {
+				return plan.chests(p);
+			}
+
+			@Override
+			public List<Spawn> spawns(Plot p) {
+				List<Spawn> out = new java.util.ArrayList<>(plan.spawns(p));
+				out.addAll(more.apply(p));
+				return out;
+			}
+		};
+	}
+
 	/** Ce plan, plus un coffre à cette hauteur (à la première place libre, voir {@link #freeSpot}). */
 	static Blueprint withChest(Blueprint plan, int y, String table) {
 		return new Blueprint() {

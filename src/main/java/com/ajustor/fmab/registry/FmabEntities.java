@@ -1,5 +1,10 @@
 package com.ajustor.fmab.registry;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+import com.ajustor.fmab.entity.character.StoryCharacters;
+import com.ajustor.fmab.entity.character.StoryCharacterEntity;
+import com.ajustor.fmab.entity.character.StoryCharacter;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.AlchemicalMineEntity;
 import com.ajustor.fmab.entity.AmestrianSoldierEntity;
@@ -394,8 +399,31 @@ public final class FmabEntities {
 	private FmabEntities() {
 	}
 
+	/** Les personnages de l'histoire ({@link StoryCharacters}), par identifiant. */
+	public static final Map<String, EntityType<StoryCharacterEntity>> CHARACTERS = characters();
+
+	private static Map<String, EntityType<StoryCharacterEntity>> characters() {
+		Map<String, EntityType<StoryCharacterEntity>> out = new LinkedHashMap<>();
+		for (StoryCharacter character : StoryCharacters.ALL) {
+			ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id(character.id()));
+			out.put(character.id(), Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, key,
+					EntityType.Builder.<StoryCharacterEntity>of(
+									(type, level) -> new StoryCharacterEntity(type, level, character), MobCategory.MISC)
+							.sized(0.6F, 1.8F)
+							.eyeHeight(1.62F)
+							.clientTrackingRange(10)
+							.build(key)));
+		}
+		return out;
+	}
+
+	public static EntityType<StoryCharacterEntity> character(StoryCharacter character) {
+		return CHARACTERS.get(character.id());
+	}
+
 	public static void register() {
 		Content content = Platform.get().content();
+		CHARACTERS.values().forEach(type -> content.attributes(type, StoryCharacterEntity.createAttributes()));
 		content.attributes(IZUMI, IzumiEntity.createAttributes());
 		content.attributes(STATE_EXAMINER, StateExaminerEntity.createAttributes());
 		content.attributes(STONE_GOLEM, StoneGolemEntity.createAttributes());

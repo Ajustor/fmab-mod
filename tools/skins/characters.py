@@ -1468,6 +1468,336 @@ def greatcoat_extras(s):
     s.fill("long_tails", shade(coat, 0.7), "cloth", faces=("top",))
 
 
+# --- les personnages du BRIEF (FMAB-59) ---------------------------------------------------------
+def glasses(s, frame, y=4):
+    """Des lunettes rondes : la monture autour des yeux et le pont sur le nez."""
+    s.rect("head", "front", 0, y - 1, 3, 1, frame)
+    s.rect("head", "front", 5, y - 1, 3, 1, frame)
+    s.px("head", "front", 0, y, frame)
+    s.px("head", "front", 7, y, frame)
+    s.rect("head", "front", 3, y, 2, 1, frame)
+
+
+def mustache(s, color, wide=False):
+    """Une moustache sous le nez ; large, elle déborde jusqu'aux joues."""
+    x0, w = (0, 8) if wide else (2, 4)
+    s.rect("head", "front", x0, 6, w, 1, color)
+    s.tint("head", "front", x0, 6, w, 1, 0.9)
+    if wide:
+        s.px("head", "front", 0, 5, color)
+        s.px("head", "front", 7, 5, color)
+
+
+def apron(s, color, mat="leather", y=2):
+    """Un tablier sur le devant du buste et des cuisses."""
+    s.material("body", "front", color, mat, x=1, w=6, y=y, h=12 - y)
+    s.px("body", "front", 0, y, shade(color, 0.7))
+    s.px("body", "front", 7, y, shade(color, 0.7))
+    for leg in ("rleg", "lleg"):
+        s.material(leg, "front", color, mat, h=6)
+        s.tint(leg, "front", 0, 5, 4, 1, 0.8)
+
+
+@skin("mustang")
+def mustang(s):
+    """Roy Mustang, l'Alchimiste de flamme : cheveux noirs, uniforme d'officier, gants blancs au
+    cercle rouge."""
+    skin_face(s, FAIR, mouth="#9a5a52")
+    eyes(s, "#1c1a1e", brow="#141216")
+    hair = "#16141a"
+    short_hair(s, hair, fringe=0, back=5)
+    fringe(s, hair, [2, 3, 1, 2, 1, 3, 2, 2])
+    hair_volume(s, hair, sides=3, back=5)
+    amestris_uniform(s, officer=True, gloves="#f4f2ec")
+    # Le cercle de transmutation, rouge, sur le dos de chaque gant.
+    for arm in ("rarm", "larm"):
+        w, _ = s.size(arm, "front")
+        s.px(arm, "front", w // 2 - 1, 10, "#c0182c")
+        s.px(arm, "front", w // 2, 11, "#c0182c")
+        s.px(arm, "back", w // 2 - 1, 10, "#c0182c")
+        s.px(arm, "back", w // 2, 11, "#c0182c")
+
+
+@skin("hawkeye", slim=True)
+def hawkeye(s):
+    """Riza Hawkeye : les cheveux blonds relevés en chignon, l'uniforme, le regard brun et droit."""
+    blond = "#e8cf7a"
+    skin_face(s, PALE, mouth="#b0645c")
+    eyes(s, "#5a3a22", brow=shade(blond, 0.75), lid="#3a2a20")
+    short_hair(s, blond, fringe=0, back=6)
+    fringe(s, blond, [3, 2, 1, 1, 2, 1, 2, 3])
+    hair_volume(s, blond, sides=3, back=6)
+    # Le chignon, épinglé à l'arrière de la tête.
+    s.rect("hat", "back", 2, 2, 4, 3, shade(blond, 0.9))
+    s.px("hat", "back", 3, 3, "#3a3036")
+    amestris_uniform(s, tone=PALE)
+
+
+@skin("armstrong")
+def armstrong(s):
+    """Alex Louis Armstrong, l'Alchimiste au bras puissant : crâne nu, une boucle blonde, grosse
+    moustache, gantelets à pointes."""
+    blond = "#ecd27a"
+    skin_face(s, PALE, mouth=None)
+    eyes(s, "#5a7ab0", brow=blond)
+    s.material("head", "top", shade(PALE, 0.96), "skin")
+    # La boucle unique sur le front, et la moustache en croc.
+    s.px("head", "front", 3, 0, blond)
+    s.px("head", "front", 4, 0, blond)
+    s.px("head", "front", 4, 1, shade(blond, 0.85))
+    mustache(s, blond, wide=True)
+    amestris_uniform(s, officer=True, tone=PALE, gloves="#3a3d44")
+    # Les pointes des gantelets.
+    for arm in ("rarm", "larm"):
+        w, _ = s.size(arm, "front")
+        for x in range(0, w, 2):
+            s.px(arm, "front", x, 10, "#9aa2ad")
+        s.band(arm, 9, 1, "#22252b", "metal")
+
+
+@skin("hughes")
+def hughes(s):
+    """Maes Hughes : cheveux noirs courts, lunettes, une barbe de quelques jours, l'uniforme."""
+    skin_face(s, FAIR, mouth="#9a5a52")
+    eyes(s, "#4a8a50", brow="#1e1a1c")
+    glasses(s, "#2a2a30")
+    short_hair(s, "#1e1a1c", fringe=1, back=5)
+    for x in range(1, 7):
+        s.tint("head", "front", x, 7, 1, 1, 0.82)
+    s.tint("head", "front", 0, 6, 1, 2, 0.88)
+    s.tint("head", "front", 7, 6, 1, 2, 0.88)
+    amestris_uniform(s, officer=True)
+
+
+@skin("ling")
+def ling(s):
+    """Ling Yao, prince de Xing : cheveux noirs noués, yeux étirés, tenue blanche à bandes bleu nuit."""
+    tone = "#f0d4b4"
+    skin_face(s, tone, mouth="#a8645a")
+    s.rect("head", "front", 1, 4, 2, 1, "#2a2224")
+    s.rect("head", "front", 5, 4, 2, 1, "#2a2224")
+    s.rect("head", "front", 1, 3, 2, 1, "#141016")
+    s.rect("head", "front", 5, 3, 2, 1, "#141016")
+    hair = "#141016"
+    short_hair(s, hair, fringe=0, back=7)
+    fringe(s, hair, [3, 2, 2, 1, 1, 2, 2, 3])
+    hair_volume(s, hair, sides=4, back=7)
+    long_hair_back(s, hair, rows=5, width=2)
+    white, navy = "#f0eee6", "#1e2a4a"
+    for part in ("body", "rarm", "larm"):
+        s.fill(part, white, "cloth")
+    s.material("body", "front", navy, "cloth", x=0, w=2)
+    s.material("body", "front", navy, "cloth", x=6, w=2)
+    s.band("body", 8, 1, navy)
+    for arm in ("rarm", "larm"):
+        s.band(arm, 9, 1, navy)
+    hands(s, tone, rows=2)
+    pants(s, navy)
+    boots(s, color="#1a1a20", rows=3)
+
+
+@skin("lan_fan", slim=True)
+def lan_fan(s):
+    """Lan Fan, garde du corps de Ling : tenue noire, masque blanc aux traits rouges, bras gauche
+    d'automail."""
+    tone = "#f0d4b4"
+    skin_face(s, tone, mouth=None)
+    hair = "#141016"
+    short_hair(s, hair, fringe=0, back=7)
+    hair_volume(s, hair, sides=3, back=7)
+    long_hair_back(s, hair, rows=4, width=2)
+    # Le masque blanc, ses fentes et ses marques rouges.
+    s.rect("hat", "front", 0, 1, 8, 6, "#f4f2ee")
+    s.rect("hat", "front", 1, 3, 2, 1, "#141016")
+    s.rect("hat", "front", 5, 3, 2, 1, "#141016")
+    s.rect("hat", "front", 3, 5, 2, 1, "#c0182c")
+    s.px("hat", "front", 2, 2, "#c0182c")
+    s.px("hat", "front", 5, 2, "#c0182c")
+    black = "#1c1a20"
+    for part in ("body", "rarm", "larm"):
+        s.fill(part, black, "cloth")
+    s.band("body", 8, 1, "#3a3036", "leather")
+    hands(s, tone, rows=1)
+    # L'automail du bras gauche, à nu.
+    s.fill("larm", "#9aa2ad", "metal")
+    for y in (3, 7):
+        s.band("larm", y, 1, "#5d6670", "metal")
+    pants(s, black)
+    boots(s, color="#101014", rows=4)
+
+
+@skin("alphonse")
+def alphonse(s):
+    """Alphonse Elric : la grande armure d'acier, ses yeux rouges dans la fente du heaume, le pagne
+    rouge et les sangles de cuir."""
+    armor(s, ALPHONSE_STEEL, ALPHONSE_TRIM, eye="#ff4a3a")
+    # La corne du front, au-dessus de la fente.
+    s.px("head", "front", 3, 1, "#d8e0ea")
+    s.px("head", "front", 4, 1, "#d8e0ea")
+    s.rect("hat", "top", 3, 3, 2, 2, "#e8e8e0")
+    s.material("hat", "back", "#e8e8e0", "hair", x=3, w=2, h=7)
+    # Le pagne rouge, devant et derrière, et les sangles de cuir en travers du ventre.
+    s.material("body", "front", "#9a2228", "cloth", x=2, w=4, y=9, h=3)
+    s.material("body", "back", "#9a2228", "cloth", x=2, w=4, y=9, h=3)
+    s.band("body", 8, 1, "#5a3a22", "leather")
+    for leg in ("rleg", "lleg"):
+        s.band(leg, 0, 1, "#5a3a22", "leather")
+
+
+@skin("pinako", slim=True)
+def pinako(s):
+    """Pinako Rockbell : la vieille mécanicienne, chignon gris sur le crâne, lunettes rondes, tenue
+    sombre et tablier."""
+    tone = "#e6c4a4"
+    skin_face(s, tone, mouth="#8a5a52")
+    eyes(s, "#3a3036", brow="#9a9590")
+    glasses(s, "#3a3036")
+    grey = "#a8a49e"
+    short_hair(s, grey, fringe=1, back=6)
+    hair_volume(s, grey, sides=3, back=6)
+    # Le chignon dressé sur le dessus de la tête.
+    s.rect("hat", "top", 2, 2, 4, 4, shade(grey, 1.05))
+    s.rect("hat", "front", 2, 0, 4, 1, shade(grey, 0.9))
+    for x in (1, 6):
+        s.tint("head", "front", x, 6, 1, 1, 0.85)
+    dark = "#3a3036"
+    for part in ("body", "rarm", "larm"):
+        s.fill(part, dark, "cloth")
+    apron(s, "#c8b8a0", "cloth")
+    hands(s, tone, rows=2)
+    pants(s, "#4a3e3a")
+    boots(s, color="#2a2226", rows=2)
+
+
+@skin("basque_grand")
+def basque_grand(s):
+    """Basque Grand, l'Alchimiste au sang de fer : mâchoire carrée, grosse moustache brune, l'uniforme."""
+    skin_face(s, FAIR, mouth=None)
+    eyes(s, "#3a2a20", brow="#4a3020")
+    short_hair(s, "#4a3020", fringe=1, back=4)
+    mustache(s, "#5a3a24", wide=True)
+    s.tint("head", "front", 0, 7, 8, 1, 0.85)
+    amestris_uniform(s, officer=True)
+
+
+@skin("mcdougal")
+def mcdougal(s):
+    """Isaac McDougal, l'Alchimiste de glace : peau pâle, cheveux gris-bleu, long manteau sombre aux
+    reflets de givre."""
+    skin_face(s, PALE, mouth="#8a5a5a")
+    eyes(s, "#8ab8d8", brow="#6a7a8a")
+    short_hair(s, "#7a8a9a", fringe=2, back=5)
+    coat, frost = "#26303a", "#a8d8f0"
+    for part in ("body", "rarm", "larm"):
+        s.fill(part, coat, "cloth")
+    s.seam("body", "front", 4, 1, 11, frost, k=0.8)
+    s.band("body", 0, 1, frost)
+    for arm in ("rarm", "larm"):
+        s.band(arm, 9, 1, frost)
+    hands(s, PALE, rows=2, glove="#d8e8f0")
+    coat_tails(s, coat, rows=6)
+    pants(s, "#1c2228")
+    boots(s, rows=4)
+
+
+@skin("tattooist")
+def tattooist(s):
+    """Le tatoueur de Rush Valley : peau tannée, crâne rasé, bouc, avant-bras couverts d'encre et
+    tablier de cuir."""
+    tone = "#b07a52"
+    skin_face(s, tone, mouth="#6a3a2a")
+    eyes(s, "#2a2018", brow="#2a2018")
+    s.material("head", "top", shade(tone, 0.95), "skin")
+    s.rect("head", "front", 3, 7, 2, 1, "#2a2018")
+    s.px("head", "front", 3, 6, "#2a2018")
+    s.px("head", "front", 4, 6, "#2a2018")
+    s.fill("body", "#e0d6c4", "cloth")
+    bare_arms(s, tone)
+    # Les motifs d'encre sur les avant-bras.
+    ink = "#1c2430"
+    for arm in ("rarm", "larm"):
+        w, _ = s.size(arm, "front")
+        for f in ("front", "back"):
+            for y in range(5, 11, 2):
+                for x in range((y // 2) % 2, w, 2):
+                    s.px(arm, f, x, y, ink)
+    s.material("body", "front", "#e0d6c4", "cloth", h=2)
+    apron(s, "#6a4a2e")
+    pants(s, "#3a3430")
+    boots(s, color="#4a3426", rows=3)
+
+
+@skin("kimblee")
+def kimblee(s):
+    """Solf J. Kimblee, l'Alchimiste écarlate : costume et chapeau blancs, longs cheveux noirs noués
+    bas, yeux d'or, un cercle tatoué dans chaque paume."""
+    skin_face(s, FAIR, mouth="#8a4a4a")
+    eyes(s, "#d8a820", brow="#141216", pupil="#6a4a10")
+    hair = "#141216"
+    short_hair(s, hair, fringe=1, back=8)
+    hair_volume(s, hair, sides=4, back=8)
+    long_hair_back(s, hair, rows=6, width=2)
+    white = "#ecebe6"
+    # Le chapeau blanc, son ruban sombre.
+    s.material("hat", "top", white, "cloth")
+    for f in SIDES:
+        s.material("hat", f, white, "cloth", y=0, h=2)
+        s.material("hat", f, "#2a2a30", "cloth", y=2, h=1)
+    for part in ("body", "rarm", "larm"):
+        s.fill(part, white, "cloth")
+    s.material("body", "front", "#2a2a30", "cloth", x=3, w=2, h=8)
+    s.px("body", "front", 3, 1, "#c0182c")
+    s.px("body", "front", 4, 1, "#c0182c")
+    hands(s, FAIR, rows=2)
+    # Le soleil dans une paume, la lune dans l'autre, sur le dessous des mains.
+    s.px("rarm", "bottom", 1, 1, "#c0182c")
+    s.px("rarm", "bottom", 2, 2, "#c0182c")
+    s.px("larm", "bottom", 1, 1, "#141216")
+    s.px("larm", "bottom", 2, 2, "#141216")
+    for arm in ("rarm", "larm"):
+        s.px(arm, "front", 1, 11, "#c0182c" if arm == "rarm" else "#141216")
+    pants(s, white)
+    boots(s, color="#e8e6e0", rows=2, sole="#8a8680")
+
+
+@skin("slicer")
+def slicer(s):
+    """Les frères Slicer, deux âmes dans une armure rouillée et cabossée, le 48 sur le plastron."""
+    armor(s, "#7a6a5c", "#4a3a2e", eye="#ff3b2b", dented=True)
+    rust = "#8a4a22"
+    for part, f, x, y in (("body", "front", 1, 4), ("body", "front", 6, 9), ("head", "front", 1, 1),
+                          ("larm", "front", 1, 6), ("rleg", "front", 2, 3), ("lleg", "front", 1, 8)):
+        s.px(part, f, x, y, rust)
+    # Le « 48 » gravé sur le plastron.
+    num = "#2a2420"
+    for x, y in ((1, 2), (1, 3), (2, 3), (2, 2), (2, 4)):
+        s.px("body", "front", x, y, num)
+    for x, y in ((5, 2), (6, 2), (5, 3), (6, 3), (5, 4), (6, 4)):
+        s.px("body", "front", x, y, num)
+    s.px("body", "front", 6, 3, "#7a6a5c")
+
+
+@skin("tucker")
+def tucker(s):
+    """Shou Tucker, l'Alchimiste des liens vitaux : maigre, cheveux bruns, lunettes rondes, gilet beige
+    et pantalon vert."""
+    tone = "#e6c8a8"
+    skin_face(s, tone, mouth="#8a5a52")
+    eyes(s, "#4a3a2a", brow="#5a4030")
+    glasses(s, "#5a5048")
+    short_hair(s, "#5a4030", fringe=2, back=5)
+    hair_volume(s, "#5a4030", sides=3, back=5)
+    for part in ("body", "rarm", "larm"):
+        s.fill(part, "#d8c8a0", "cloth")
+    s.material("body", "front", "#f0ece0", "cloth", x=3, w=2, h=6)
+    s.seam("body", "front", 4, 2, 10, None, k=0.8)
+    for y in (4, 7, 10):
+        s.px("body", "front", 3, y, "#8a7a5a")
+    hands(s, tone, rows=2)
+    pants(s, "#4a6a3a")
+    boots(s, color="#3a2a20", rows=2)
+
+
 def build(names=None):
     os.makedirs(OUT, exist_ok=True)
     for name in names or SKINS:

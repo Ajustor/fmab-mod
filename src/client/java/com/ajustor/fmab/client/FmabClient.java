@@ -1,5 +1,6 @@
 package com.ajustor.fmab.client;
 
+import com.ajustor.fmab.client.render.StoryCharacterRenderer;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.FmabClientConfig;
 import com.ajustor.fmab.client.render.AutomailLayer;
@@ -173,6 +174,8 @@ public final class FmabClient {
 		ClientPlatform.get().entityRenderer(FmabEntities.FATHER, FatherRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.KUNAI, KunaiRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.MAY_CHANG, MayChangRenderer::new);
+		FmabEntities.CHARACTERS.forEach((id, type) ->
+				ClientPlatform.get().entityRenderer(type, context -> new StoryCharacterRenderer(context, id)));
 		ClientPlatform.get().entityRenderer(FmabEntities.DRACHMA_SOLDIER, DrachmaSoldierRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.OLIVIER, OlivierRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.AMESTRIAN_SOLDIER, c -> new SoldierRenderer(c, "amestrian_soldier"));

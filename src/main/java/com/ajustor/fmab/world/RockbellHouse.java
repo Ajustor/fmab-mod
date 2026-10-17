@@ -1,5 +1,7 @@
 package com.ajustor.fmab.world;
 
+import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.entity.character.StoryCharacters;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,6 +27,7 @@ final class RockbellHouse implements Blueprint {
 
 	@Override
 	public List<Spawn> spawns(Plot p) {
-		return List.of(new Spawn(EntityTypes.VILLAGER, new BlockPos(p.sizeX() / 2, 1, 2)));
+		// Pinako tient l'atelier d'automail de la famille.
+		return List.of(new Spawn(FmabEntities.character(StoryCharacters.PINAKO), new BlockPos(p.sizeX() / 2, 1, 2)));
 	}
 }

@@ -1,5 +1,6 @@
 package com.ajustor.fmab.world;
 
+import com.ajustor.fmab.entity.character.StoryCharacters;
 import com.ajustor.fmab.registry.FmabEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
@@ -67,6 +68,10 @@ final class Headquarters implements Blueprint {
 		// L'examinateur attend dans la cour, face au portail ; la garde se tient au portail et dans la cour.
 		int sx = p.sizeX(), sz = p.sizeZ();
 		return List.of(new Spawn(FmabEntities.STATE_EXAMINER, new BlockPos(sx / 2, 0, sz - 8)),
+				new Spawn(FmabEntities.character(StoryCharacters.MUSTANG), new BlockPos(sx / 2 - 3, 0, sz - 6)),
+				new Spawn(FmabEntities.character(StoryCharacters.HAWKEYE), new BlockPos(sx / 2 - 4, 0, sz - 6)),
+				new Spawn(FmabEntities.character(StoryCharacters.ARMSTRONG), new BlockPos(sx / 2 + 3, 0, sz - 6)),
+				new Spawn(FmabEntities.character(StoryCharacters.HUGHES), new BlockPos(sx / 2 + 4, 0, sz - 6)),
 				new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(sx / 2 - 2, 0, 2)),
 				new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(sx / 2 + 2, 0, 2)),
 				new Spawn(FmabEntities.AMESTRIAN_SOLDIER, new BlockPos(8, 0, sz - 9)),

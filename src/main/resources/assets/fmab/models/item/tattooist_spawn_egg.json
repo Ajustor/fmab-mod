@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "fmab:item/tattooist_spawn_egg"
+  }
+}

@@ -419,6 +419,97 @@ def _(e):
     e.px(7, 11, "#ffffff")
 
 
+@egg("mustang")
+def _(e):
+    portrait(e, "#16141a", "#e8c29e", "#2f4f93", mouth="#9a5a52")
+    e.px(7, 12, "#d9b440")
+    e.px(8, 12, "#d9b440")
+
+
+@egg("hawkeye")
+def _(e):
+    portrait(e, "#e8cf7a", "#f0d4b8", "#2f4f93", eye="#5a3a22")
+
+
+@egg("armstrong")
+def _(e):
+    portrait(e, "#f0d4b8", "#f0d4b8", "#2f4f93", eye="#5a7ab0", fringe=False)
+    e.px(7, 2, "#ecd27a")
+    e.px(8, 2, "#ecd27a")
+    e.row(9, 4, 11, "#ecd27a")
+
+
+@egg("hughes")
+def _(e):
+    portrait(e, "#1e1a1c", "#e8c29e", "#2f4f93", eye="#4a8a50")
+    e.row(7, 4, 6, "#2a2a30")
+    e.row(7, 9, 11, "#2a2a30")
+
+
+@egg("ling")
+def _(e):
+    portrait(e, "#141016", "#f0d4b4", "#f0eee6")
+    e.row(11, 3, 12, "#1e2a4a")
+
+
+@egg("lan_fan")
+def _(e):
+    portrait(e, "#141016", "#f4f2ee", "#1c1a20", eye="#141016")
+    e.px(7, 9, "#c0182c")
+    e.px(8, 9, "#c0182c")
+
+
+@egg("alphonse")
+def _(e):
+    portrait(e, "#8f9aa6", "#5d6670", "#8f9aa6", eye="#ff4a3a", fringe=False)
+    e.row(13, 5, 10, "#9a2228")
+
+
+@egg("pinako")
+def _(e):
+    portrait(e, "#a8a49e", "#e6c4a4", "#3a3036", eye="#3a3036")
+    e.row(12, 5, 10, "#c8b8a0")
+
+
+@egg("basque_grand")
+def _(e):
+    portrait(e, "#4a3020", "#e8c29e", "#2f4f93", eye="#3a2a20")
+    e.row(9, 3, 12, "#5a3a24")
+
+
+@egg("mcdougal")
+def _(e):
+    portrait(e, "#7a8a9a", "#f0d4b8", "#26303a", eye="#8ab8d8")
+    e.row(12, 7, 8, "#a8d8f0")
+
+
+@egg("tattooist")
+def _(e):
+    portrait(e, "#b07a52", "#b07a52", "#6a4a2e", eye="#2a2018", fringe=False)
+    e.row(9, 7, 8, "#2a2018")
+
+
+@egg("kimblee")
+def _(e):
+    portrait(e, "#ecebe6", "#e8c29e", "#ecebe6", eye="#d8a820", hair_to=3)
+    e.row(4, 3, 12, "#141216")
+    e.px(7, 12, "#c0182c")
+
+
+@egg("slicer")
+def _(e):
+    portrait(e, "#7a6a5c", "#4a3a2e", "#7a6a5c", eye="#ff3b2b", fringe=False)
+    e.px(6, 12, "#8a4a22")
+    e.px(9, 13, "#8a4a22")
+
+
+@egg("tucker")
+def _(e):
+    portrait(e, "#5a4030", "#e6c8a8", "#d8c8a0", eye="#4a3a2a")
+    e.row(7, 4, 6, "#5a5048")
+    e.row(7, 9, 11, "#5a5048")
+
+
 def build(names=None):
     for name in names or EGGS:
         e = Egg(name)

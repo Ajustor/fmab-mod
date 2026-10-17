@@ -1,5 +1,6 @@
 package com.ajustor.fmab.world;
 
+import com.ajustor.fmab.entity.character.StoryCharacters;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
 import net.minecraft.core.BlockPos;
@@ -47,6 +48,11 @@ final class Workshop implements Blueprint {
 	public List<Spawn> spawns(Plot p) {
 		Spawn resident = new Spawn(winry ? FmabEntities.WINRY : EntityTypes.VILLAGER,
 				new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2));
-		return List.of(resident);
+		if (winry) {
+			return List.of(resident);
+		}
+		// Dans l'atelier voisin, le tatoueur de Rush Valley tient boutique d'encre et de fil.
+		return List.of(resident, new Spawn(FmabEntities.character(StoryCharacters.TATTOOIST),
+				new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2 - 1)));
 	}
 }
