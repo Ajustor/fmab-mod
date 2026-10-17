@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.7.0 — 2026-10-17
+
+### Nouveautés
+
+- Le mod est disponible pour Minecraft 26.3 en plus de 26.2 : chaque version a son jar.
 ## 1.6.0 — 2026-10-16
 
 ### Nouveautés

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.0 — 2026-10-17
+
+### New features
+
+- The mod is available for Minecraft 26.3 as well as 26.2: each version has its own jar.
 ## 1.6.0 — 2026-10-16
 
 ### New features
