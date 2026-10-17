@@ -3,6 +3,7 @@ package com.ajustor.fmab.world;
 import com.ajustor.fmab.world.Hamlet.Spot;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
@@ -40,11 +41,16 @@ public class RushValleyStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		if (Clearance.nearCentral(context)) {
+		return UniqueSite.only(this, context, this::at);
+	}
+
+	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
+	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+		if (Clearance.nearCentral(context, chunk)) {
 			return Optional.empty();
 		}
-		int cx = context.chunkPos().getMiddleBlockX();
-		int cz = context.chunkPos().getMiddleBlockZ();
+		int cx = chunk.getMiddleBlockX();
+		int cz = chunk.getMiddleBlockZ();
 		int y = Hamlet.height(context, cx, cz);
 		if (y <= context.chunkGenerator().getSeaLevel()) {
 			return Optional.empty();

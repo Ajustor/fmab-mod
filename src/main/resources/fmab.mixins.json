@@ -8,6 +8,7 @@
 		"EntityMixin",
 		"LivingEntityMixin",
 		"MonsterVoiceMixin",
+		"PlaceCommandMixin",
 		"PlayerMixin",
 		"StepMixin",
 		"VoiceMixin"

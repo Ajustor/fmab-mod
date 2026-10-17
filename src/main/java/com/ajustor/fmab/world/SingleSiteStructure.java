@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -53,11 +54,16 @@ public class SingleSiteStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		if (Clearance.nearCentral(context) || avoid.stream().anyMatch(s -> Clearance.near(context, s, AVOID_CHUNKS))) {
+		return UniqueSite.only(this, context, this::at);
+	}
+
+	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
+	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+		if (Clearance.nearCentral(context, chunk) || avoid.stream().anyMatch(s -> Clearance.near(context, chunk, s, AVOID_CHUNKS))) {
 			return Optional.empty();
 		}
-		int cx = context.chunkPos().getMiddleBlockX();
-		int cz = context.chunkPos().getMiddleBlockZ();
+		int cx = chunk.getMiddleBlockX();
+		int cz = chunk.getMiddleBlockZ();
 		int y = context.chunkGenerator().getFirstFreeHeight(cx, cz, Heightmap.Types.WORLD_SURFACE_WG,
 				context.heightAccessor(), context.randomState());
 		if (y <= context.chunkGenerator().getSeaLevel()) {
