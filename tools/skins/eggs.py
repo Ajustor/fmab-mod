@@ -510,6 +510,21 @@ def _(e):
     e.row(7, 9, 11, "#5a5048")
 
 
+@egg("ishvalan")
+def _(e):
+    portrait(e, "#e4e0d8", "#8a5634", "#c8a46a", eye="#b0202a")
+    e.row(12, 2, 13, "#7a1c1c")
+
+
+@egg("drachma_general")
+def _(e):
+    portrait(e, "#3e2e22", "#e3bea0", "#2f3d2a", eye="#4a5a6a", hair_to=4, fringe=False)
+    e.row(2, 7, 8, "#c8202c")
+    e.row(9, 4, 11, "#a8a8a2")
+    e.row(10, 2, 3, "#d9b440")
+    e.row(10, 12, 13, "#d9b440")
+
+
 def build(names=None):
     for name in names or EGGS:
         e = Egg(name)

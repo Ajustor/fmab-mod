@@ -63,6 +63,10 @@ final class IshvalRuins implements Blueprint {
 				new Spawn(FmabEntities.character(StoryCharacters.BASQUE_GRAND), new BlockPos(c + 2, 1, c + 2)),
 				new Spawn(FmabEntities.character(StoryCharacters.MCDOUGAL), new BlockPos(c + 2, 1, c + 3)),
 				// Kimblee revient là où il a fait la guerre.
-				new Spawn(FmabEntities.KIMBLEE, new BlockPos(c, 1, c - 4)));
+				new Spawn(FmabEntities.KIMBLEE, new BlockPos(c, 1, c - 4)),
+				// Les Ishvaliens revenus dans leurs ruines.
+				new Spawn(FmabEntities.character(StoryCharacters.ISHVALAN), new BlockPos(c - 3, 1, c - 2)),
+				new Spawn(FmabEntities.character(StoryCharacters.ISHVALAN), new BlockPos(c + 3, 1, c)),
+				new Spawn(FmabEntities.character(StoryCharacters.ISHVALAN), new BlockPos(c - 1, 1, c + 4)));
 	}
 }

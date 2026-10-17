@@ -19,7 +19,8 @@ public class StoryCharacterRenderer extends FigureRenderer.Simple<StoryCharacter
 			Map.entry("ling", Temper.MAY), Map.entry("lan_fan", Temper.SOLDIER),
 			Map.entry("alphonse", Temper.HOHENHEIM), Map.entry("pinako", Temper.MARCOH),
 			Map.entry("basque_grand", Temper.OFFICER), Map.entry("mcdougal", Temper.OFFICER),
-			Map.entry("tattooist", Temper.IZUMI), Map.entry("tucker", Temper.MARCOH));
+			Map.entry("tattooist", Temper.IZUMI), Map.entry("ishvalan", Temper.CORNELLO),
+			Map.entry("tucker", Temper.MARCOH));
 
 	public StoryCharacterRenderer(EntityRendererProvider.Context context, String id) {
 		super(context, FigureModels.plain(SLIM.contains(id)), Fmab.id("textures/entity/" + id + ".png"),

@@ -358,6 +358,18 @@ public final class GateOfTruth {
 	private static void build(ServerLevel space, ServerPlayer player) {
 		BlockPos o = origin(player);
 		BlockState air = Blocks.AIR.defaultBlockState();
+		// Le monument autour des battants : socle, piliers, linteau, corniche (voir GateFrame).
+		int reach = GateFrame.reach(GATE_HALF_WIDTH);
+		for (int x = -reach; x < reach; x++) {
+			for (int y = 0; y <= GateFrame.top(GATE_HEIGHT); y++) {
+				if (GateFrame.at(x, y, GATE_HALF_WIDTH, GATE_HEIGHT)) {
+					// Une pierre plus sombre que les battants : le cadre se détache sur le blanc.
+					boolean ledge = y == 0 || y > GATE_HEIGHT + GateFrame.THICKNESS;
+					space.setBlockAndUpdate(o.offset(x, y, GATE_Z),
+							(ledge ? Blocks.DEEPSLATE_TILES : Blocks.POLISHED_DEEPSLATE).defaultBlockState());
+				}
+			}
+		}
 		for (int x = -GATE_HALF_WIDTH; x < GATE_HALF_WIDTH; x++) {
 			for (int y = 1; y <= GATE_HEIGHT; y++) {
 				space.setBlockAndUpdate(o.offset(x, y, GATE_Z), FmabBlocks.GATE_STONE.defaultBlockState());
