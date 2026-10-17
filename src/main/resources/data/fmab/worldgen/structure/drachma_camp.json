@@ -1,0 +1,12 @@
+{
+  "type": "fmab:single_site",
+  "biomes": "#fmab:has_structure/drachma_camp",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "piece": "drachma_camp",
+  "size": 15,
+  "height": 6,
+  "ground": 0,
+  "unique": false
+}

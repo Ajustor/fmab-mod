@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * changer aux structures garde la même empreinte ; un changement voulu de plan la met à jour ici.
  */
 class BlueprintsFingerprintTest {
-	/** L'empreinte des plans après les Ishvaliens (FMAB-60). */
-	private static final String EXPECTED = "d99983d98c496a2c26b5811c81560bb678a9b3fd29841c828e9364b5dce66e84";
+	/** L'empreinte des plans après Drachma et Xing (FMAB-60). */
+	private static final String EXPECTED = "c950d51d24d240ee19678d181187199f5465db7a9afd083e6afa07c63a0a1a6c";
 
 	@BeforeAll
 	static void bootstrap() {

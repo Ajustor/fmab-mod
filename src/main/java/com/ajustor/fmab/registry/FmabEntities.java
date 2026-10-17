@@ -1,5 +1,6 @@
 package com.ajustor.fmab.registry;
 
+import com.ajustor.fmab.entity.DrachmaGeneralEntity;
 import com.ajustor.fmab.entity.KimbleeEntity;
 import com.ajustor.fmab.entity.SlicerEntity;
 import java.util.Map;
@@ -269,6 +270,16 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(BARRY_KEY));
 
+	private static final ResourceKey<EntityType<?>> DRACHMA_GENERAL_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("drachma_general"));
+
+	/** Le général de Drachma, dans le donjon de son fort. */
+	public static final EntityType<DrachmaGeneralEntity> DRACHMA_GENERAL = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, DRACHMA_GENERAL_KEY,
+			EntityType.Builder.<DrachmaGeneralEntity>of(DrachmaGeneralEntity::new, MobCategory.MONSTER)
+					.sized(0.6F, 1.95F)
+					.eyeHeight(1.74F)
+					.clientTrackingRange(10)
+					.build(DRACHMA_GENERAL_KEY));
+
 	private static final ResourceKey<EntityType<?>> SLICER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("slicer"));
 
 	/** Les frères Slicer, deux âmes dans une armure, au Laboratoire 5. */
@@ -467,6 +478,7 @@ public final class FmabEntities {
 		content.attributes(HAUNTED_ARMOR, HauntedArmorEntity.createAttributes());
 		content.attributes(BARRY, BarryEntity.createAttributes());
 		content.attributes(SLICER, SlicerEntity.createAttributes());
+		content.attributes(DRACHMA_GENERAL, DrachmaGeneralEntity.createAttributes());
 		content.attributes(KIMBLEE, KimbleeEntity.createAttributes());
 		content.attributes(CHIMERA_BEAST, ChimeraBeastEntity.createAttributes());
 		content.attributes(CHIMERA_CRAWLER, ChimeraCrawlerEntity.createAttributes());

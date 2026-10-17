@@ -1,5 +1,6 @@
 package com.ajustor.fmab.world;
 
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
@@ -31,6 +32,11 @@ public interface Blueprint {
 	 */
 	default List<Chest> chests(Plot plot) {
 		return List.of();
+	}
+
+	/** Le biome que la pièce peint sur toute son emprise (Xing), ou aucun. */
+	default java.util.Optional<ResourceKey<Biome>> biome() {
+		return java.util.Optional.empty();
 	}
 
 	/** Créatures à faire apparaître, en coordonnées locales. */
