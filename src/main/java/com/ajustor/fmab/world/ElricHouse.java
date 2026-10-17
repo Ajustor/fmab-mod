@@ -1,9 +1,6 @@
 package com.ajustor.fmab.world;
 
-import com.ajustor.fmab.item.Tomes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -36,10 +33,6 @@ final class ElricHouse implements Blueprint {
 
 	@Override
 	public List<Chest> chests(Plot p) {
-		return List.of(new Chest(new BlockPos(1, 1, p.sizeZ() - 2), plot -> List.of(
-				Tomes.stack(Tomes.HOHENHEIM),
-				Tomes.stack(Tomes.RUDIMENTS),
-				new ItemStack(Items.PAPER, 3 + plot.noise(1, 1, 1, 5)),
-				new ItemStack(Items.BONE_MEAL, 2 + plot.noise(2, 1, 1, 4)))));
+		return List.of(Chest.loot(new BlockPos(1, 1, p.sizeZ() - 2), "elric_house"));
 	}
 }

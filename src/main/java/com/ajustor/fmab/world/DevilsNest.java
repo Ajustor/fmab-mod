@@ -2,8 +2,6 @@ package com.ajustor.fmab.world;
 
 import com.ajustor.fmab.registry.FmabEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -50,10 +48,7 @@ final class DevilsNest implements Blueprint {
 
 	@Override
 	public List<Chest> chests(Plot p) {
-		return List.of(new Chest(new BlockPos(1, 1, p.sizeZ() - 2), plot -> List.of(
-				new ItemStack(Items.GOLD_INGOT, 6 + plot.noise(1, 0, 0, 10)),
-				new ItemStack(Items.EMERALD, 2 + plot.noise(2, 0, 0, 6)),
-				new ItemStack(Items.GLASS_BOTTLE, 3 + plot.noise(3, 0, 0, 5)))));
+		return List.of(Chest.loot(new BlockPos(1, 1, p.sizeZ() - 2), "devils_nest"));
 	}
 
 	@Override

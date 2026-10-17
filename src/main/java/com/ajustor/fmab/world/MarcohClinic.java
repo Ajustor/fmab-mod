@@ -3,12 +3,9 @@ package com.ajustor.fmab.world;
 import com.ajustor.fmab.registry.FmabEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ajustor.fmab.world.Blueprints.*;
@@ -41,15 +38,7 @@ final class MarcohClinic implements Blueprint {
 
 	@Override
 	public List<Chest> chests(Plot p) {
-		return List.of(new Chest(new BlockPos(p.sizeX() - 2, 1, 2), MarcohClinic::remedies));
-	}
-
-	private static List<ItemStack> remedies(Plot p) {
-		List<ItemStack> out = new ArrayList<>();
-		out.add(new ItemStack(Items.GLISTERING_MELON_SLICE, 1 + p.noise(1, 0, 0, 3)));
-		out.add(new ItemStack(Items.GLASS_BOTTLE, 2 + p.noise(2, 0, 0, 4)));
-		out.add(new ItemStack(Items.PAPER, 2 + p.noise(3, 0, 0, 5)));
-		return out;
+		return List.of(Chest.loot(new BlockPos(p.sizeX() - 2, 1, 2), "marcoh_clinic"));
 	}
 
 	@Override

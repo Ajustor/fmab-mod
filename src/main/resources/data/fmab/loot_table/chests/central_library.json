@@ -1,0 +1,302 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 3.0,
+                "max": 8.0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1.0,
+                "max": 4.0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.stone_and_metal",
+                  "glyphs": [
+                    "fmab:fer",
+                    "fmab:cuivre",
+                    "fmab:decomposer",
+                    "fmab:reparer"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.wood_and_fiber",
+                  "glyphs": [
+                    "fmab:bois",
+                    "fmab:fibre"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.living_matter",
+                  "glyphs": [
+                    "fmab:plante",
+                    "fmab:chair"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.carbon_and_crystal",
+                  "glyphs": [
+                    "fmab:carbone",
+                    "fmab:cristal"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.sulfur_and_lime",
+                  "glyphs": [
+                    "fmab:soufre",
+                    "fmab:chaux"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.planetary_metals",
+                  "glyphs": [
+                    "fmab:argent",
+                    "fmab:etain",
+                    "fmab:plomb",
+                    "fmab:mercure"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.deep_metals",
+                  "glyphs": [
+                    "fmab:zinc",
+                    "fmab:nickel",
+                    "fmab:aluminium",
+                    "fmab:netherite"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.forms",
+                  "glyphs": [
+                    "fmab:recomposer",
+                    "fmab:direction",
+                    "fmab:intensite"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.flame",
+                  "glyphs": [
+                    "fmab:feu",
+                    "fmab:air"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemical_ink",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1.0,
+                "max": 2.0
+              }
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fmab:ciphered_notes",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:cipher": 0
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:ciphered_notes",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:cipher": 1
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:ciphered_notes",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:cipher": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "fmab:ciphered_notes",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "fmab:cipher": 3
+              }
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.34
+        }
+      ]
+    }
+  ],
+  "random_sequence": "fmab:chests/central_library"
+}

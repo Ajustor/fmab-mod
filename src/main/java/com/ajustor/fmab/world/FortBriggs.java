@@ -2,12 +2,9 @@ package com.ajustor.fmab.world;
 
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
-import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.LadderBlock;
@@ -16,7 +13,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.SlabType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ajustor.fmab.world.Blueprints.*;
@@ -300,30 +296,9 @@ final class FortBriggs implements Blueprint {
 	@Override
 	public List<Chest> chests(Plot p) {
 		return List.of(
-				new Chest(new BlockPos(6, 1, KEEP_Z1 - 2), FortBriggs::armory),
-				new Chest(new BlockPos(SIZE_X - 7, 1, KEEP_Z1 - 2), FortBriggs::armory),
-				new Chest(new BlockPos(MID, 7, KEEP_Z1 - 2), FortBriggs::stores));
-	}
-
-	private static List<ItemStack> armory(Plot p) {
-		List<ItemStack> out = new ArrayList<>();
-		out.add(new ItemStack(Items.IRON_INGOT, 3 + p.noise(1, 0, 0, 6)));
-		out.add(new ItemStack(Items.ARROW, 6 + p.noise(2, 0, 0, 10)));
-		if (p.noise(3, 0, 0, 3) == 0) {
-			out.add(new ItemStack(FmabItems.BRIGGS_SABRE));
-		}
-		if (p.noise(4, 0, 0, 4) == 0) {
-			out.add(new ItemStack(p.noise(5, 0, 0, 2) == 0 ? FmabItems.BRIGGS_AUTOMAIL_ARM : FmabItems.BRIGGS_AUTOMAIL_LEG));
-		}
-		return out;
-	}
-
-	private static List<ItemStack> stores(Plot p) {
-		List<ItemStack> out = new ArrayList<>();
-		out.add(new ItemStack(Items.BREAD, 4 + p.noise(6, 0, 0, 6)));
-		out.add(new ItemStack(Items.COAL, 6 + p.noise(7, 0, 0, 10)));
-		out.add(new ItemStack(Items.LEATHER, 2 + p.noise(8, 0, 0, 4)));
-		return out;
+				Chest.loot(new BlockPos(6, 1, KEEP_Z1 - 2), "fort_briggs_armory"),
+				Chest.loot(new BlockPos(SIZE_X - 7, 1, KEEP_Z1 - 2), "fort_briggs_armory"),
+				Chest.loot(new BlockPos(MID, 7, KEEP_Z1 - 2), "fort_briggs_stores"));
 	}
 
 	@Override

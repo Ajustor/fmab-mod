@@ -1,5 +1,7 @@
 package com.ajustor.fmab.world;
 
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -9,7 +11,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.npc.villager.Villager;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
@@ -147,7 +148,7 @@ public class ProceduralPiece extends StructurePiece {
 		for (Blueprint.Chest chest : chests) {
 			BlockPos at = toWorld(chest.local());
 			if (chunkBB.isInside(at)) {
-				fill(level, at, chest.contents().apply(plot));
+				fill(level, at, chest.table());
 			}
 		}
 		for (Blueprint.Spawn spawn : spawns) {
@@ -158,14 +159,12 @@ public class ProceduralPiece extends StructurePiece {
 		}
 	}
 
-	/** Pose le coffre (tourné vers l'avant du bâtiment) et range son contenu. */
-	private void fill(WorldGenLevel level, BlockPos at, List<ItemStack> contents) {
+	/** Pose le coffre (tourné vers l'avant du bâtiment) ; sa table de butin le remplira à l'ouverture. */
+	private void fill(WorldGenLevel level, BlockPos at, ResourceKey<LootTable> table) {
 		level.setBlock(at, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.NORTH).rotate(rotation),
 				2);
 		if (level.getBlockEntity(at) instanceof ChestBlockEntity chest) {
-			for (int i = 0; i < contents.size() && i < chest.getContainerSize(); i++) {
-				chest.setItem(i, contents.get(i));
-			}
+			chest.setLootTable(table, seed ^ at.asLong());
 		}
 	}
 

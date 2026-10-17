@@ -2,12 +2,9 @@ package com.ajustor.fmab.world;
 
 import com.ajustor.fmab.registry.FmabEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ajustor.fmab.world.Blueprints.*;
@@ -45,16 +42,7 @@ final class CurtisButcher implements Blueprint {
 
 	@Override
 	public List<Chest> chests(Plot p) {
-		return List.of(new Chest(new BlockPos(1, 1, p.sizeZ() - 2), CurtisButcher::stock));
-	}
-
-	private static List<ItemStack> stock(Plot p) {
-		List<ItemStack> out = new ArrayList<>();
-		out.add(new ItemStack(Items.BEEF, 3 + p.noise(1, 0, 0, 5)));
-		out.add(new ItemStack(Items.PORKCHOP, 2 + p.noise(2, 0, 0, 5)));
-		out.add(new ItemStack(Items.MUTTON, 2 + p.noise(3, 0, 0, 4)));
-		out.add(new ItemStack(Items.BONE, 2 + p.noise(4, 0, 0, 4)));
-		return out;
+		return List.of(Chest.loot(new BlockPos(1, 1, p.sizeZ() - 2), "curtis_butcher"));
 	}
 
 	@Override
