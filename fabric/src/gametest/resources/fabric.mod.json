@@ -33,7 +33,9 @@
 			"com.ajustor.fmab.gametest.StoneCostScenes",
 			"com.ajustor.fmab.gametest.GloveStageScenes",
 			"com.ajustor.fmab.gametest.TreatiseCatalogueScenes",
-			"com.ajustor.fmab.gametest.MidgameScenes"
+			"com.ajustor.fmab.gametest.MidgameScenes",
+			"com.ajustor.fmab.gametest.GoldScenes",
+			"com.ajustor.fmab.gametest.AlliesScenes"
 		]
 	},
 	"depends": {

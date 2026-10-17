@@ -313,6 +313,7 @@
   "knowledge.fmab.life.chimera_vigor.desc": "Your chimeras are half again as sturdy.",
   "effect.fmab.chimera": "Chimera",
   "transmutation.fmab.chimera_made": "The two beasts come apart and stitch themselves into one. It looks at you, and obeys. Shou Tucker would be proud; no one else would.",
+  "transmutation.fmab.chimera_limit": "You already hold %s chimeras: flesh will bear no more.",
   "knowledge.fmab.fire.docile_flame": "Docile flame",
   "knowledge.fmab.fire.docile_flame.desc": "Each Fire effect costs 1 less concentration.",
   "knowledge.fmab.fire.long_reach": "Long breath",

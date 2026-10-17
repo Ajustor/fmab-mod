@@ -1,5 +1,8 @@
 package com.ajustor.fmab.transmutation;
 
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import net.minecraft.core.BlockPos;
@@ -91,6 +94,22 @@ public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame fram
 	/** Des dégâts à la mesure du cercle. */
 	public float damage(float base) {
 		return (float) (base * power);
+	}
+
+	/** L'effet épargne-t-il cette créature ? L'auteur et ses alliés (voir {@link Allies}). */
+	public boolean spares(Entity target) {
+		return caster != null && Allies.spares(caster, target);
+	}
+
+	/** Des dégâts d'alchimie portés par l'alchimiste : ses victimes lui sont créditées, on lui riposte. */
+	public DamageSource magic() {
+		return caster == null ? level.damageSources().magic() : level.damageSources().indirectMagic(caster, caster);
+	}
+
+	/** Des brûlures portées par l'alchimiste. */
+	public DamageSource fire() {
+		return caster == null ? level.damageSources().inFire()
+				: new DamageSource(level.damageSources().damageTypes.getOrThrow(DamageTypes.IN_FIRE), caster);
 	}
 
 	/** Ce que les satellites d'infusion ajoutent à une créature touchée par l'effet. */

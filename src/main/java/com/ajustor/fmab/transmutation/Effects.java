@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import net.minecraft.world.item.Item;
 import com.ajustor.fmab.alchemy.exchange.Family;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
@@ -348,8 +349,8 @@ public final class Effects {
 					level.setBlockAndUpdate(p, BaseFireBlock.getState(level, p));
 				}
 				for (Entity e : level.getEntities((Entity) null, new AABB(p).expandTowards(0, 1, 0), Entity::isAlive)) {
-					if (e != ctx.caster() && e instanceof LivingEntity living) {
-						living.hurtServer(level, level.damageSources().inFire(), damage);
+					if (!ctx.spares(e) && e instanceof LivingEntity living) {
+						living.hurtServer(level, ctx.fire(), damage);
 						living.igniteForSeconds(4);
 						ctx.afflict(living);
 					}
@@ -368,7 +369,7 @@ public final class Effects {
 		AABB area = new AABB(Vec3.atCenterOf(start), Vec3.atCenterOf(end)).inflate(1.5, 1.5, 1.5);
 		int pushed = 0;
 		for (Entity e : level.getEntities((Entity) null, area, Entity::isAlive)) {
-			if (e == ctx.caster()) {
+			if (e == ctx.caster() || ctx.spares(e)) {
 				continue;
 			}
 			e.push(d.getStepX() * 1.6, 0.4, d.getStepZ() * 1.6);
@@ -606,11 +607,48 @@ public final class Effects {
 		if (state.isAir() || state.hasBlockEntity() || state.getDestroySpeed(level, charge) < 0) {
 			return Result.NO_MATERIAL;
 		}
+		// L'explosif se fait avec du soufre : une pincée par détonation.
+		if (!takeOne(ctx, FmabTags.elementItems("sulfur"))) {
+			return Result.NO_MATERIAL;
+		}
 		level.removeBlock(charge, false);
 		float power = ctx.damage(BLAST_POWER + (float) ctx.perk("blast_power"));
 		Vec3 c = Vec3.atCenterOf(charge);
 		level.explode(ctx.caster(), c.x, c.y, c.z, power, Level.ExplosionInteraction.MOB);
 		return Result.DONE;
+	}
+
+	/**
+	 * Prend un objet de ce tag : dans la matière de l'étage précédent, sur le cercle, puis dans
+	 * l'inventaire de l'alchimiste (un gant n'a pas de cercle où poser quoi que ce soit).
+	 */
+	static boolean takeOne(EffectContext ctx, TagKey<Item> tag) {
+		for (ItemStack stack : ctx.flow()) {
+			if (stack.is(tag) && !stack.isEmpty()) {
+				stack.shrink(1);
+				return true;
+			}
+		}
+		for (ItemEntity entity : ctx.level().getEntitiesOfClass(ItemEntity.class, ctx.onCircle())) {
+			if (entity.getItem().is(tag)) {
+				entity.getItem().shrink(1);
+				return true;
+			}
+		}
+		ServerPlayer caster = ctx.caster();
+		if (caster == null) {
+			return false;
+		}
+		if (caster.isCreative()) {
+			return true;
+		}
+		for (ItemStack stack : caster.getInventory()) {
+			if (stack.is(tag) && !stack.isEmpty()) {
+				stack.shrink(1);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static Optional<ItemStack> cooked(ServerLevel level, ItemStack stack) {
@@ -685,8 +723,9 @@ public final class Effects {
 				if (up == Direction.UP) {
 					e.setPos(e.getX(), tip.y, e.getZ());
 				}
-				if (damage > 0 && e instanceof LivingEntity living) {
-					living.hurtServer(level, level.damageSources().magic(), damage);
+				// L'ouvrage soulève tout le monde, mais ne blesse que ceux que l'alchimiste n'épargne pas.
+				if (damage > 0 && e instanceof LivingEntity living && !ctx.spares(living)) {
+					living.hurtServer(level, ctx.magic(), damage);
 					living.setDeltaMovement(living.getDeltaMovement().add(up.getStepX() * 0.8,
 							up == Direction.DOWN ? -0.4 : 0.8, up.getStepZ() * 0.8));
 					EntityCompat.syncVelocity(living);

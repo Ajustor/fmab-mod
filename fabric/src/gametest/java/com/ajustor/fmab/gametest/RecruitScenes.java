@@ -39,10 +39,7 @@ public class RecruitScenes implements FabricClientGameTest {
 				// Insensible aux coups, mais toujours une cible (un joueur invulnérable n'en est plus une).
 				p.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 20 * 600, 4, false, false));
 				FmabAttachments.RECRUITMENT.set(p, Recruitment.ACCEPTED);
-				Mob mob = FmabEntities.GLUTTONY.create(p.level(), EntitySpawnReason.COMMAND);
-				mob.snapTo(p.getX() + 4, p.getY(), p.getZ(), 90, 0);
-				p.level().addFreshEntity(mob);
-				return mob;
+				return spawn(p);
 			});
 			context.waitTicks(60);
 			check(server(sp, p -> gluttony.getTarget() != p), "Gluttony ne devrait pas s'en prendre à une recrue");
@@ -53,20 +50,32 @@ public class RecruitScenes implements FabricClientGameTest {
 			});
 			check(targets(context, sp, gluttony), "qui a refusé l'offre est une proie");
 
-			// Recrue de nouveau, mais qui frappe : il riposte.
+			// Recrue de nouveau, mais qui frappe : il riposte. Gluttony a pu l'avaler entre-temps (son
+			// estomac est ailleurs) : on repart d'un joueur ramené au point de départ et d'un Gluttony neuf.
 			server(sp, p -> {
-				gluttony.setTarget(null);
+				gluttony.discard();
 				FmabAttachments.RECRUITMENT.set(p, Recruitment.ACCEPTED);
 				return null;
 			});
+			sp.getServer().runCommand("execute in minecraft:overworld run tp @p 0.5 %d 0.5 0 0".formatted(Y));
+			context.waitTicks(5);
+			Mob fresh = server(sp, p -> spawn(p));
 			context.waitTicks(40);
-			check(server(sp, p -> gluttony.getTarget() != p), "recrue de nouveau, elle est épargnée");
+			check(server(sp, p -> fresh.getTarget() != p), "recrue de nouveau, elle est épargnée");
 			server(sp, p -> {
-				gluttony.hurtServer(p.level(), p.damageSources().playerAttack(p), 1);
+				fresh.hurtServer(p.level(), p.damageSources().playerAttack(p), 1);
 				return null;
 			});
-			check(targets(context, sp, gluttony), "une recrue qui frappe se fait frapper");
+			check(targets(context, sp, fresh), "une recrue qui frappe se fait frapper");
 		}
+	}
+
+	/** Un Gluttony, à quatre blocs du joueur. */
+	private static Mob spawn(ServerPlayer p) {
+		Mob mob = FmabEntities.GLUTTONY.create(p.level(), EntitySpawnReason.COMMAND);
+		mob.snapTo(p.getX() + 4, p.getY(), p.getZ(), 90, 0);
+		p.level().addFreshEntity(mob);
+		return mob;
 	}
 
 	/** Gluttony vise-t-il le joueur dans les trois secondes ? (Sans attendre qu'il l'avale.) */
