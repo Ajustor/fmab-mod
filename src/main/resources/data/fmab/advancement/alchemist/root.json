@@ -23,7 +23,7 @@
     },
     "frame": "task",
     "background": "fmab:gui/advancements/backgrounds/alchemy",
-    "show_toast": false,
+    "show_toast": true,
     "announce_to_chat": false
   },
   "requirements": [

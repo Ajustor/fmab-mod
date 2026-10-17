@@ -36,6 +36,7 @@ public final class ItemHints {
 			lines.add(hint("item.fmab.philosopher_stone_core.hint", Restoration.CORES_PER_STONE, Restoration.STONE_SOULS));
 		} else if (stack.is(FmabItems.CRYSTALLIZED_BLOOD)) {
 			lines.add(hint("item.fmab.crystallized_blood.hint", Restoration.CORES_PER_STONE));
+			lines.add(hint("item.fmab.crystallized_blood.where"));
 		} else if (stack.is(FmabItems.ALCHEMICAL_THREAD)) {
 			lines.add(hint("item.fmab.alchemical_thread.hint"));
 		} else if (stack.is(FmabItems.ALCHEMICAL_INK)) {

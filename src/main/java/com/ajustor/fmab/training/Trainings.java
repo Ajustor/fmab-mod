@@ -16,10 +16,15 @@ import net.minecraft.sounds.SoundSource;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import com.ajustor.fmab.compat.EntityCompat;
 
 /** Constater les épreuves réussies et les récompenser. */
 public final class Trainings {
+	/** Les épreuves déjà signalées comme ne comptant pas encore, par joueur (le temps d'une session). */
+	private static final Set<String> UNCOUNTED = ConcurrentHashMap.newKeySet();
+
 	private Trainings() {
 	}
 
@@ -43,7 +48,14 @@ public final class Trainings {
 	/** Une épreuve est réussie ; elle ne compte qu'une fois le joueur présenté à Izumi. */
 	public static void achieve(ServerPlayer player, Trial trial) {
 		Training training = FmabAttachments.TRAINING.getOrCreate(player);
-		if (!training.met() || training.achieved().contains(trial.id())) {
+		if (!training.met()) {
+			// Qu'il sache pourquoi rien ne se passe : une fois par épreuve et par session.
+			if (UNCOUNTED.add(player.getUUID() + "/" + trial.id())) {
+				player.sendSystemMessage(Component.translatable("trial.fmab.not_student"));
+			}
+			return;
+		}
+		if (training.achieved().contains(trial.id())) {
 			return;
 		}
 		FmabAttachments.TRAINING.set(player, training.achieve(trial.id()));

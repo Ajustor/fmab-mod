@@ -1,6 +1,8 @@
 package com.ajustor.fmab;
 
 import com.ajustor.fmab.arts.ScarArm;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 import com.ajustor.fmab.block.AlchemistTableBlock;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Notebooks;
@@ -147,6 +149,13 @@ public final class Fmab {
 				EntityCompat.drop(player, stack);
 			}
 		}
+		player.sendSystemMessage(welcome());
+	}
+
+	/** Le mot d'accueil : où apprendre, et les deux touches qui guident. */
+	public static Component welcome() {
+		return Component.translatable("welcome.fmab.greeting", Component.keybind("key.fmab.notebook"),
+				Component.keybind("key.advancements")).withStyle(ChatFormatting.GOLD);
 	}
 
 	public static Identifier id(String path) {
