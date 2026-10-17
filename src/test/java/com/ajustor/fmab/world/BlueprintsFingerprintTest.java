@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class BlueprintsFingerprintTest {
 	/** L'empreinte des plans après les personnages de l'histoire (FMAB-59). */
-	private static final String EXPECTED = "effa89b6deea55bc5a0c58912ac21c5c65a161206693194412bfa38ee3fe45cf";
+	private static final String EXPECTED = "b31c73d975dbe33dcd6e6dcfdb511b4bb0b2bced053c8683ea8c1177ff44089c";
 
 	@BeforeAll
 	static void bootstrap() {

@@ -1,0 +1,29 @@
+{
+  "parent": "fmab:alchemist/visit_central",
+  "criteria": {
+    "nina": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "nina"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:chimera_beast_spawn_egg"
+    },
+    "title": {
+      "translate": "advancements.fmab.nina.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.nina.description"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "nina"
+    ]
+  ]
+}

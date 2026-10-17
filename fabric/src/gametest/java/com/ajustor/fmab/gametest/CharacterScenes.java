@@ -60,6 +60,21 @@ public class CharacterScenes implements FabricClientGameTest {
 			context.runOnClient(client -> client.gui.hud.getChat().clearMessages(false));
 			context.waitTicks(20);
 			context.takeScreenshot("characters_lineup");
+
+			// Tucker, à sa dernière réplique : le récit de Nina, puis l'armée l'emmène.
+			String tucker = sp.getServer().computeOnServer(server -> {
+				var p = server.getPlayerList().getPlayers().getFirst();
+				StoryCharacterEntity npc = p.level().getEntitiesOfClass(StoryCharacterEntity.class,
+						p.getBoundingBox().inflate(16), e -> e.character() == StoryCharacters.TUCKER).getFirst();
+				npc.interact(p, InteractionHand.MAIN_HAND, npc.position());
+				npc.interact(p, InteractionHand.MAIN_HAND, npc.position());
+				var nina = server.getAdvancements().get(com.ajustor.fmab.Fmab.id("alchemist/nina"));
+				return "parti=" + npc.isRemoved() + " progrès="
+						+ (nina != null && p.getAdvancements().getOrStartProgress(nina).isDone());
+			});
+			check(tucker.equals("parti=true progrès=true"), "Tucker démasqué devrait être emmené : " + tucker);
+			context.waitTicks(150);
+			context.takeScreenshot("characters_nina");
 		}
 	}
 }

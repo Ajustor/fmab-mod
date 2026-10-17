@@ -24,7 +24,7 @@ class ChestLootTest {
 			"father_lair", "yock_island", "blood_crest", "resembool_house", "dublith_house");
 	/** Les boss, et leur table de butin. */
 	private static final List<String> BOSSES = List.of("lust", "gluttony", "envy", "greed", "sloth", "wrath", "pride",
-			"father", "barry");
+			"father", "barry", "kimblee", "slicer");
 
 	@BeforeAll
 	static void bootstrap() {

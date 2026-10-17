@@ -277,6 +277,8 @@ final class Laboratory5 implements Blueprint {
 				// Barry le Boucher rôde dans le bâtiment abandonné, près du puits.
 				new Spawn(FmabEntities.BARRY, new BlockPos(10, 0, 11)),
 				new Spawn(FmabEntities.LUST, new BlockPos(sx / 2 + 3, HALL_FLOOR + 1, 12)),
+				// Les frères Slicer gardent le hall, Numéro 48.
+				new Spawn(FmabEntities.SLICER, new BlockPos(sx / 2 - 3, HALL_FLOOR + 1, 12)),
 				new Spawn(FmabEntities.GLUTTONY, new BlockPos(sx / 2 - 4, HALL_FLOOR + 1, 10)),
 				new Spawn(FmabEntities.HAUNTED_ARMOR, new BlockPos(4, HALL_FLOOR + 1, 6)),
 				new Spawn(FmabEntities.HAUNTED_ARMOR, new BlockPos(sx - 5, HALL_FLOOR + 1, 6)),

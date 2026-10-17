@@ -177,6 +177,10 @@ public final class FmabItems {
 		return out;
 	}
 
+	public static final Item SLICER_SPAWN_EGG = register("slicer_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.SLICER));
+	public static final Item KIMBLEE_SPAWN_EGG = register("kimblee_spawn_egg", SpawnEggItem::new,
+			new Item.Properties().spawnEgg(FmabEntities.KIMBLEE));
 	public static final Item MAY_CHANG_SPAWN_EGG = register("may_chang_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.MAY_CHANG));
 
@@ -370,6 +374,8 @@ public final class FmabItems {
 					output.accept(CIPHERED_NOTES);
 					output.accept(MARCOH_SPAWN_EGG);
 					CHARACTER_EGGS.values().forEach(output::accept);
+					output.accept(SLICER_SPAWN_EGG);
+					output.accept(KIMBLEE_SPAWN_EGG);
 				})
 				.build());
 	}

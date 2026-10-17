@@ -81,7 +81,11 @@ public class StoryCharacterEntity extends PathfinderMob implements Merchant {
 	/** Une réplique, la suivante à chaque rencontre. */
 	protected void talk(ServerPlayer player) {
 		player.sendSystemMessage(Component.translatable(character.lineKey(line)));
+		boolean last = line == character.lines() - 1;
 		line = (line + 1) % character.lines();
+		if (last && character.ending() != null) {
+			character.ending().play(this, player);
+		}
 	}
 
 	@Override
