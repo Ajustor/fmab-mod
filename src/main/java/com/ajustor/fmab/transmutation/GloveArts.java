@@ -15,6 +15,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -101,7 +102,10 @@ public final class GloveArts {
 			}
 			// La terre se soulève d'un bloc : la pique, faite du sol même.
 			BlockState ground = level.getBlockState(top);
-			if (!ground.is(FmabTags.elementBlocks("earth")) || !level.getBlockState(top.above()).isAir()) {
+			// La terre au sens large : celle de l'alchimie, et l'herbe ou la terre qu'on frappe d'ordinaire.
+			boolean earth = ground.is(FmabTags.elementBlocks("earth")) || ground.is(BlockTags.DIRT)
+					|| ground.is(Blocks.GRASS_BLOCK);
+			if (!earth || ground.hasBlockEntity() || !level.getBlockState(top.above()).isAir()) {
 				continue;
 			}
 			level.setBlockAndUpdate(top.above(), ground);
