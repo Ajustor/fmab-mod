@@ -1,5 +1,6 @@
 package com.ajustor.fmab.alchemy.circle;
 
+import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.Primitive;
 import com.ajustor.fmab.alchemy.drawing.Vec2;
@@ -91,6 +92,10 @@ public final class CircleParser {
 		int[] capacity = new int[n];
 		int[] intensity = new int[n];
 		Double[] direction = new Double[n];
+		List<List<Glyph>> modifiers = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			modifiers.add(new ArrayList<>());
+		}
 		List<List<Vec2>> vertices = new ArrayList<>();
 		List<List<PlacedGlyph>> glyphs = new ArrayList<>();
 		List<List<Satellite>> satellites = new ArrayList<>();
@@ -195,6 +200,11 @@ public final class CircleParser {
 					direction[ring] = at.sub(Drawing.CENTER_POINT).angle();
 					continue;
 				}
+				// Forme, durée, cibles : posés sur l'anneau, ils règlent l'effet de l'étage.
+				if (modifier.isPresent()) {
+					modifiers.get(ring).add(modifier.get().glyph());
+					continue;
+				}
 			}
 			Optional<GlyphRecognizer.Match> match = recognizer.recognize(group)
 					.filter(m -> m.glyph().layer() != GlyphLayer.MODIFIER);
@@ -217,7 +227,7 @@ public final class CircleParser {
 			stages.add(new Stage(i, rings.get(i), Math.max(sides[i], hexagram ? 6 : 0), hexagram, polygons[i],
 					capacity[i], glyphs.get(i), intensity[i],
 					direction[i] == null ? OptionalDouble.empty() : OptionalDouble.of(direction[i]),
-					links[i], satellites.get(i)));
+					links[i], satellites.get(i), modifiers.get(i)));
 		}
 		return new ParsedCircle(stages, issues);
 	}

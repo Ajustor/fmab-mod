@@ -1,5 +1,6 @@
 package com.ajustor.fmab;
 
+import com.ajustor.fmab.transmutation.CopperCircuits;
 import com.ajustor.fmab.promised.PromisedDay;
 import com.ajustor.fmab.arts.ScarArm;
 import net.minecraft.network.chat.Component;
@@ -88,6 +89,7 @@ public final class Fmab {
 		TransmutationLightning.register();
 		HumanTransmutation.register();
 		GoldTransmutation.register();
+		CopperCircuits.register();
 		PromisedDay.register();
 		Transmutation.register();
 		ItemCompositions.register();

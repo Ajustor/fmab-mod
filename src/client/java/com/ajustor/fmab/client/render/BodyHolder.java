@@ -33,6 +33,15 @@ public interface BodyHolder {
 
 	void fmab$setSkeleton(Map<BodyPart, PartPose> skeleton);
 
+	/** Une pièce portée sur le corps : son calque ({@code textures/entity/worn/}) et le membre qui la porte. */
+	record Worn(String texture, BodyPart part) {
+	}
+
+	/** Ses gants et ses tatouages. */
+	java.util.List<Worn> fmab$worn();
+
+	void fmab$setWorn(java.util.List<Worn> worn);
+
 	/** Ce que font ses bras autour d'un fauteuil roulant. */
 	WheelchairPose fmab$wheelchair();
 

@@ -1,0 +1,54 @@
+{
+  "id": "fmab:forme_cone",
+  "layer": "modifier",
+  "modifier": "shape_cone",
+  "primitives": [
+    {
+      "type": "line",
+      "from": [
+        0.0,
+        0.7
+      ],
+      "to": [
+        -0.8,
+        -0.6
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        0.0,
+        0.7
+      ],
+      "to": [
+        0.0,
+        -0.7
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        0.0,
+        0.7
+      ],
+      "to": [
+        0.8,
+        -0.6
+      ]
+    }
+  ],
+  "complexity": 1,
+  "concentration": 2,
+  "rank": "alchemist",
+  "tolerance": {
+    "rotation_deg": 180,
+    "position": 0.1,
+    "scale": [
+      0.7,
+      1.4
+    ]
+  },
+  "name_key": "glyph.fmab.forme_cone",
+  "description_key": "glyph.fmab.forme_cone.desc",
+  "since": "1.9"
+}

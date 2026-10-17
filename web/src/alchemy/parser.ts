@@ -75,6 +75,8 @@ export interface Stage {
   readonly direction: number | null;
   readonly link: LinkKind;
   readonly satellites: Satellite[];
+  /** Les autres modificateurs posés sur l'anneau : forme, durée, cibles. */
+  readonly modifiers: Glyph[];
 }
 
 export interface ParsedCircle {
@@ -133,6 +135,7 @@ export class CircleParser {
     const capacity = new Array<number>(n).fill(0);
     const intensity = new Array<number>(n).fill(0);
     const direction = new Array<number | null>(n).fill(null);
+    const modifiers: Glyph[][] = Array.from({ length: n }, () => []);
     const vertices: Vec2[][] = Array.from({ length: n }, () => []);
     const glyphs: PlacedGlyph[][] = Array.from({ length: n }, () => []);
     const satellites: Satellite[][] = Array.from({ length: n }, () => []);
@@ -225,6 +228,10 @@ export class CircleParser {
           direction[ring] = angle(sub(at, CENTER_POINT));
           continue;
         }
+        if (modifier !== null) {
+          modifiers[ring].push(modifier.glyph);
+          continue;
+        }
       }
       const m = this.recognizer.recognize(g);
       if (m === null || m.glyph.layer === "modifier") {
@@ -254,6 +261,7 @@ export class CircleParser {
         direction: direction[i],
         link: links[i],
         satellites: satellites[i],
+        modifiers: modifiers[i],
       });
     }
     return { stages, issues };

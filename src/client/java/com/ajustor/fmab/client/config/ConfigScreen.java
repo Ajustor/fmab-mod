@@ -98,6 +98,8 @@ public class ConfigScreen extends Screen {
 		graphics.centeredText(font, title, width / 2, 14, 0xFFFFFFFF);
 		int x = (width - BUTTON_WIDTH) / 2;
 		graphics.text(font, Component.translatable("config.fmab.section.interface"), x, interfaceTop, HEADER, true);
-		graphics.text(font, Component.translatable("config.fmab.section.world"), x, worldTop, HEADER, true);
+		boolean remote = minecraft.level != null && minecraft.getSingleplayerServer() == null;
+		graphics.text(font, Component.translatable(remote ? "config.fmab.section.world.remote" : "config.fmab.section.world"),
+				x, worldTop, HEADER, true);
 	}
 }

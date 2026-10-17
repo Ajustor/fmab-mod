@@ -302,6 +302,11 @@ public final class FmabItems {
 					output.accept(ALCHEMICAL_THREAD);
 					output.accept(ALCHEMICAL_INK);
 					output.accept(ENGRAVED_WATCH);
+					output.accept(STATE_WATCH);
+					output.accept(STONE_LANCE);
+					output.accept(ARM_BLADE);
+					output.accept(SOUL_CHESTPLATE);
+					output.accept(FATHER_SEAL);
 					output.accept(CLOTH_GLOVES);
 					output.accept(LEATHER_GLOVES);
 					output.accept(SPARK_GLOVES);

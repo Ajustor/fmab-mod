@@ -92,7 +92,11 @@
                   "glyphs": [
                     "fmab:recomposer",
                     "fmab:direction",
-                    "fmab:intensite"
+                    "fmab:intensite",
+                    "fmab:forme_cercle",
+                    "fmab:forme_cone",
+                    "fmab:duree",
+                    "fmab:cibles"
                   ]
                 }
               }

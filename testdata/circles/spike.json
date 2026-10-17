@@ -102,7 +102,7 @@
   "expected": {
     "outcome": "works",
     "complexity": 3,
-    "concentration": 6,
+    "concentration": 9,
     "stability": 1.667,
     "required_rank": "apprentice",
     "rebound": 0.0,

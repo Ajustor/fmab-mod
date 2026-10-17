@@ -1,5 +1,7 @@
 package com.ajustor.fmab.transmutation;
 
+import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import com.ajustor.fmab.alchemy.exchange.Family;
 import com.ajustor.fmab.gate.Automails;
@@ -97,6 +99,9 @@ public final class Effects {
 	private static final float BLAST_POWER = 2;
 	/** Une lance de pierre demande deux blocs. */
 	private static final int LANCE_BLOCKS = 2;
+	/** La brume : son rayon de base, et sa durée de base en ticks. */
+	private static final float MIST_RADIUS = 2.5f;
+	private static final int MIST_TICKS = 20 * 8;
 	/**
 	 * La lame-bras et la lance de pierre sont des savoirs : sans eux, Fer ou Terre + Recomposer ne
 	 * fait que copier un modèle.
@@ -120,11 +125,11 @@ public final class Effects {
 		register("fmab:stone_lance", Effects::stoneLance);
 		register("fmab:arm_blade", Effects::armBlade);
 		register("fmab:ice_spike", Effects::iceSpike);
-		register("fmab:ice_wall", Effects::iceWall);
+		register("fmab:mist", Effects::mist);
 		register("fmab:detonate", Effects::detonate);
 		register("fmab:recompose", Recomposition::recompose);
 		register("fmab:dismantle", Recomposition::dismantleEffect);
-		for (String grows : new String[]{"fmab:wall", "fmab:spike", "fmab:ice_spike", "fmab:ice_wall"}) {
+		for (String grows : new String[]{"fmab:wall", "fmab:spike", "fmab:ice_spike"}) {
 			CHANNELS.put(grows, Channel.GROW);
 		}
 		for (String repeats : new String[]{"fmab:flame_jet", "fmab:flame_burst", "fmab:gust"}) {
@@ -214,16 +219,70 @@ public final class Effects {
 			}
 		}
 		int raised = raise(ctx, quarry, column, Direction.UP, earth, ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE));
+		// Les glyphes de cibles : une pique de plus sous chacune des créatures les plus proches.
+		if (ctx.stage().targets() > 0) {
+			List<LivingEntity> prey = level.getEntitiesOfClass(LivingEntity.class,
+					new AABB(ctx.origin()).inflate(ctx.range() * 2.0), e -> e.isAlive() && !ctx.spares(e));
+			prey.sort(java.util.Comparator.comparingDouble(e -> e.distanceToSqr(Vec3.atCenterOf(ctx.origin()))));
+			for (LivingEntity target : prey.subList(0, Math.min(ctx.stage().targets(), prey.size()))) {
+				BlockPos under = surface(level, target.blockPosition());
+				if (under != null) {
+					List<BlockPos> around = new ArrayList<>();
+					for (Direction s : Direction.Plane.HORIZONTAL) {
+						around.add(under.relative(s).below());
+					}
+					raised += raise(ctx, around, under, Direction.UP, earth, ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE));
+				}
+			}
+		}
 		return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
 	}
 
-	/** Fer + Projeter : une lame de fer, forgée avec le fer posé sur le cercle ou porté. */
+	/**
+	 * Les cases que couvre un effet dirigé, selon la forme de l'étage : en ligne (large de
+	 * {@code 2 × halfWidth + 1}), en cône qui s'évase d'un bloc tous les deux, ou tout autour du cercle.
+	 */
+	static List<BlockPos> area(EffectContext ctx, int halfWidth) {
+		BlockPos o = ctx.origin();
+		int range = ctx.range();
+		List<BlockPos> out = new ArrayList<>();
+		if (ctx.stage().shape().equals("circle")) {
+			for (int dx = -range; dx <= range; dx++) {
+				for (int dz = -range; dz <= range; dz++) {
+					double r = Math.sqrt(dx * dx + dz * dz);
+					if (r >= 1 && r <= range + 0.5) {
+						out.add(o.offset(dx, 0, dz));
+					}
+				}
+			}
+			return out;
+		}
+		Direction d = ctx.direction();
+		Direction side = d.getAxis().isHorizontal() ? d.getClockWise() : ctx.frame().pageRight();
+		boolean cone = ctx.stage().shape().equals("cone");
+		for (int i = 1; i <= range; i++) {
+			int half = cone ? halfWidth + i / 2 : halfWidth;
+			for (int w = -half; w <= half; w++) {
+				out.add(o.relative(d, i).relative(side, w));
+			}
+		}
+		return out;
+	}
+
+	/**
+	 * Fer + Projeter : une lame de fer, forgée avec le fer posé sur le cercle ou porté. L'alchimie
+	 * l'affûte et la renforce : elle vaut mieux qu'une épée de forge.
+	 */
 	private static Result blade(EffectContext ctx) {
 		MaterialPool pool = MaterialPool.collect(ctx, "iron", Family.METAL);
 		if (!pool.consume(BLADE_MASS)) {
 			return Result.NO_MATERIAL;
 		}
 		ItemStack sword = new ItemStack(Items.IRON_SWORD);
+		var enchantments = ctx.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+		sword.enchant(enchantments.getOrThrow(Enchantments.SHARPNESS), 1);
+		sword.enchant(enchantments.getOrThrow(Enchantments.UNBREAKING), 1);
+		sword.set(DataComponents.CUSTOM_NAME, Component.translatable("item.fmab.transmuted_blade"));
 		if (ctx.stage().infused("fire")) {
 			sword.enchant(ctx.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
 					.getOrThrow(Enchantments.FIRE_ASPECT), 1);
@@ -335,25 +394,22 @@ public final class Effects {
 			return Result.NO_MATERIAL;
 		}
 		ServerLevel level = ctx.level();
-		Direction d = ctx.direction();
-		Direction side = d.getAxis().isHorizontal() ? d.getClockWise() : ctx.frame().pageRight();
-		for (int i = 1; i <= ctx.range(); i++) {
-			for (int w = -halfWidth; w <= halfWidth; w++) {
-				BlockPos p = surface(level, ctx.origin().relative(d, i).relative(side, w));
-				if (p == null) {
-					continue;
-				}
-				level.sendParticles(ParticleTypes.FLAME, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
-						6, 0.3, 0.3, 0.3, 0.02);
-				if (level.getBlockState(p).isAir() && i > 1) {
-					level.setBlockAndUpdate(p, BaseFireBlock.getState(level, p));
-				}
-				for (Entity e : level.getEntities((Entity) null, new AABB(p).expandTowards(0, 1, 0), Entity::isAlive)) {
-					if (!ctx.spares(e) && e instanceof LivingEntity living) {
-						living.hurtServer(level, ctx.fire(), damage);
-						living.igniteForSeconds(4);
-						ctx.afflict(living);
-					}
+		for (BlockPos cell : area(ctx, halfWidth)) {
+			int i = (int) Math.round(Math.sqrt(cell.distSqr(ctx.origin())));
+			BlockPos p = surface(level, cell);
+			if (p == null) {
+				continue;
+			}
+			level.sendParticles(ParticleTypes.FLAME, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
+					6, 0.3, 0.3, 0.3, 0.02);
+			if (level.getBlockState(p).isAir() && i > 1) {
+				level.setBlockAndUpdate(p, BaseFireBlock.getState(level, p));
+			}
+			for (Entity e : level.getEntities((Entity) null, new AABB(p).expandTowards(0, 1, 0), Entity::isAlive)) {
+				if (!ctx.spares(e) && e instanceof LivingEntity living) {
+					living.hurtServer(level, ctx.fire(), damage);
+					living.igniteForSeconds(ctx.lasting(4));
+					ctx.afflict(living);
 				}
 			}
 		}
@@ -366,13 +422,24 @@ public final class Effects {
 		Direction d = ctx.direction();
 		BlockPos start = ctx.origin();
 		BlockPos end = start.relative(d, ctx.range());
-		AABB area = new AABB(Vec3.atCenterOf(start), Vec3.atCenterOf(end)).inflate(1.5, 1.5, 1.5);
+		String shape = ctx.stage().shape();
+		AABB area = shape.equals("circle")
+				? new AABB(start).inflate(ctx.range(), 1.5, ctx.range())
+				: new AABB(Vec3.atCenterOf(start), Vec3.atCenterOf(end))
+						.inflate(shape.equals("cone") ? 1.5 + ctx.range() / 2.0 : 1.5, 1.5,
+								shape.equals("cone") ? 1.5 + ctx.range() / 2.0 : 1.5);
 		int pushed = 0;
 		for (Entity e : level.getEntities((Entity) null, area, Entity::isAlive)) {
 			if (e == ctx.caster() || ctx.spares(e)) {
 				continue;
 			}
-			e.push(d.getStepX() * 1.6, 0.4, d.getStepZ() * 1.6);
+			if (shape.equals("circle")) {
+				// Tout autour : on repousse en s'éloignant du cercle.
+				Vec3 away = e.position().subtract(Vec3.atCenterOf(start)).multiply(1, 0, 1).normalize();
+				e.push(away.x * 1.6, 0.4, away.z * 1.6);
+			} else {
+				e.push(d.getStepX() * 1.6, 0.4, d.getStepZ() * 1.6);
+			}
 			EntityCompat.syncVelocity(e);
 			if (e instanceof LivingEntity living) {
 				ctx.afflict(living);
@@ -464,17 +531,26 @@ public final class Effects {
 			if (fromFlow == null) {
 				break;
 			}
+			if (!taken.isEmpty() && !fromFlow.is(taken.getFirst().getBlock())) {
+				// Une autre sorte de terre : elle retourne d'où elle vient.
+				ctx.flow().add(new ItemStack(fromFlow.getBlock()));
+				break;
+			}
 			taken.add(fromFlow);
 		}
 		List<BlockPos> dug = new ArrayList<>();
 		BlockPos below = ctx.origin().below();
 		for (Direction side : Direction.Plane.HORIZONTAL) {
-			if (taken.size() + dug.size() >= LANCE_BLOCKS) {
+			// Les blocs creusés comptent déjà dans « taken » : ne pas les compter deux fois.
+			if (taken.size() >= LANCE_BLOCKS) {
 				break;
 			}
 			BlockPos p = below.relative(side);
 			BlockState state = level.getBlockState(p);
-			if (state.is(earth) && !state.hasBlockEntity()) {
+			// La lance rend en se défaisant les blocs qu'elle a pris : tous de la même sorte, sans quoi
+			// elle changerait de la terre en pierre (ou en deepslate).
+			boolean same = taken.isEmpty() || state.is(taken.getFirst().getBlock());
+			if (state.is(earth) && !state.hasBlockEntity() && same) {
 				dug.add(p);
 				taken.add(state);
 			}
@@ -572,24 +648,24 @@ public final class Effects {
 	}
 
 	/**
-	 * Eau + Air + Fixer : un mur de glace se lève devant le cercle, fait de l'eau alentour. L'Air
-	 * porte l'humidité jusqu'au mur.
+	 * Eau + Air + Fixer : une brume épaisse se lève devant le cercle et aveugle ceux qu'elle
+	 * enveloppe. Plus le cercle porte loin, plus elle est large et longue.
 	 */
-	private static Result iceWall(EffectContext ctx) {
+	private static Result mist(EffectContext ctx) {
 		ServerLevel level = ctx.level();
-		Direction d = ctx.horizontalDirection();
-		Direction along = d.getClockWise();
-		BlockPos center = ctx.origin().relative(d, 2);
-		List<BlockPos> water = waterAround(level, ctx.origin(), ctx.range() * 2 + ICE_REACH);
-		int moved = 0;
-		for (int i = -ctx.range(); i <= ctx.range(); i++) {
-			BlockPos column = surface(level, center.relative(along, i));
-			if (column != null) {
-				moved += raise(ctx, water, column, Direction.UP, FmabTags.elementBlocks("water"), ctx.grown(WALL_HEIGHT), 0,
-						Effects::frozen);
-			}
+		BlockPos at = ctx.origin().relative(ctx.horizontalDirection(), ctx.range() + 2);
+		AreaEffectCloud cloud = new AreaEffectCloud(level, at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+		cloud.setRadius(MIST_RADIUS + ctx.range());
+		cloud.setDuration(ctx.lasting(MIST_TICKS + 40 * ctx.range()));
+		cloud.setWaitTime(0);
+		cloud.setRadiusPerTick(0);
+		cloud.setCustomParticle(ParticleTypes.CLOUD);
+		cloud.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60));
+		if (ctx.caster() != null) {
+			cloud.setOwner(ctx.caster());
 		}
-		return moved > 0 ? Result.DONE : Result.NO_MATERIAL;
+		level.addFreshEntity(cloud);
+		return Result.DONE;
 	}
 
 	/**

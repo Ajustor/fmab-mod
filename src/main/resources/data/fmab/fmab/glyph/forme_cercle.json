@@ -1,0 +1,41 @@
+{
+  "id": "fmab:forme_cercle",
+  "layer": "modifier",
+  "modifier": "shape_circle",
+  "primitives": [
+    {
+      "type": "arc",
+      "center": [
+        0.0,
+        0.0
+      ],
+      "radius": 0.8,
+      "start_deg": 30,
+      "sweep_deg": 120
+    },
+    {
+      "type": "arc",
+      "center": [
+        0.0,
+        0.0
+      ],
+      "radius": 0.8,
+      "start_deg": 210,
+      "sweep_deg": 120
+    }
+  ],
+  "complexity": 1,
+  "concentration": 2,
+  "rank": "alchemist",
+  "tolerance": {
+    "rotation_deg": 180,
+    "position": 0.1,
+    "scale": [
+      0.7,
+      1.4
+    ]
+  },
+  "name_key": "glyph.fmab.forme_cercle",
+  "description_key": "glyph.fmab.forme_cercle.desc",
+  "since": "1.9"
+}

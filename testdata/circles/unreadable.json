@@ -93,7 +93,7 @@
   "expected": {
     "outcome": "rebound",
     "complexity": 2,
-    "concentration": 5,
+    "concentration": 6,
     "stability": 2.5,
     "required_rank": "apprentice",
     "rebound": 0.3,

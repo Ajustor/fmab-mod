@@ -103,7 +103,11 @@ public final class FmabNetwork {
 		network.receive(RemoveGlovePayload.TYPE,
 				(payload, player) -> removeGlove(player, payload.left()));
 		network.receive(ShellKeyPayload.TYPE,
-				(payload, player) -> Shells.press(player));
+				(payload, player) -> {
+					if (Shells.KEY.pass(player.getUUID(), player.level().getGameTime())) {
+						Shells.press(player);
+					}
+				});
 		network.receive(SoulOfferAnswerPayload.TYPE, (payload, player) -> SoulOffering.answer(player, payload));
 		network.receive(SoulGiftAnswerPayload.TYPE, (payload, player) -> SoulGifts.answer(player, payload));
 		network.receive(StoneChosenPayload.TYPE,
