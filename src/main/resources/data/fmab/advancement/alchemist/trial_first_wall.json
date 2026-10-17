@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/izumi_met",
+  "criteria": {
+    "trial_first_wall": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "trial_first_wall"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:mutton"
+    },
+    "title": {
+      "translate": "trial.fmab.first_wall"
+    },
+    "description": {
+      "translate": "advancements.fmab.trial.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "trial_first_wall"
+    ]
+  ]
+}

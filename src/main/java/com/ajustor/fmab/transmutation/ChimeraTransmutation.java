@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.entity.ChimeraBeastEntity;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.stone.Karma;
@@ -68,6 +69,7 @@ public final class ChimeraTransmutation {
 			Karma.add(caster, KARMA);
 		}
 		caster.sendSystemMessage(Component.translatable("transmutation.fmab.chimera_made").withStyle(ChatFormatting.DARK_RED));
+		Milestones.reach(caster, "chimera");
 		return Effects.Result.DONE;
 	}
 }

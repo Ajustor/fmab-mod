@@ -289,6 +289,22 @@ public final class Transmutation {
 		return Result.NOTHING;
 	}
 
+	/** Un Apprenti devient Alchimiste dès que sa maîtrise le permet, d'où qu'elle vienne. */
+	public static AlchemistData promote(ServerPlayer player, AlchemistData data) {
+		if (!promotes(data.rank(), data.mastery().values().stream().mapToInt(Integer::intValue).sum())) {
+			return data;
+		}
+		player.sendSystemMessage(Component.translatable("knowledge.fmab.promoted",
+				Component.translatable(Rank.ALCHEMIST.translationKey())));
+		player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1, 1);
+		return data.withRank(Rank.ALCHEMIST);
+	}
+
+	/** La maîtrise totale fait-elle d'un Apprenti un Alchimiste ? */
+	static boolean promotes(Rank rank, int totalMastery) {
+		return rank == Rank.APPRENTICE && totalMastery >= Knowledge.ALCHEMIST_MASTERY;
+	}
+
 	/**
 	 * Une transmutation qu'on prolonge en gardant la main sur le cercle.
 	 *
@@ -434,14 +450,7 @@ public final class Transmutation {
 						Component.translatable(node.nameKey())));
 			}
 		}
-		if (data.rank() == Rank.APPRENTICE && after.totalMastery() >= Knowledge.ALCHEMIST_MASTERY) {
-			data = data.withRank(Rank.ALCHEMIST);
-			caster.sendSystemMessage(Component.translatable("knowledge.fmab.promoted",
-					Component.translatable(Rank.ALCHEMIST.translationKey())));
-			caster.level().playSound(null, caster.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS,
-					1, 1);
-		}
-		FmabAttachments.ALCHEMIST.set(caster, data);
+		FmabAttachments.ALCHEMIST.set(caster, promote(caster, data));
 	}
 
 	/**

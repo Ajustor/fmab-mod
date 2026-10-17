@@ -1,0 +1,32 @@
+{
+  "parent": "fmab:alchemist/rank_state",
+  "criteria": {
+    "state_watch": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "fmab:state_watch"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fmab:state_watch"
+    },
+    "title": {
+      "translate": "advancements.fmab.state_watch.title"
+    },
+    "description": {
+      "translate": "advancements.fmab.state_watch.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "state_watch"
+    ]
+  ]
+}

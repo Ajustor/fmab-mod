@@ -84,4 +84,19 @@ class NotebookTest {
 		assertSame(notebook, notebook.moved(2, 1));
 		assertEquals(1, notebook.indexOf(ForbiddenCircles.HUMAN_TRANSMUTATION));
 	}
+
+	/** Le progrès « Premier dessin » : un cercle neuf enregistré, pas une page rangée ou effacée. */
+	@Test
+	void savingANewCircleCountsAsDrawingOne() {
+		NotebookContents.Page blank = new NotebookContents.Page("a", Drawing.EMPTY);
+		NotebookContents.Page human = new NotebookContents.Page("b", ForbiddenCircles.HUMAN_TRANSMUTATION);
+		NotebookContents before = new NotebookContents(List.of(blank), 0);
+		NotebookContents drawn = new NotebookContents(List.of(blank, human), 1);
+		assertTrue(com.ajustor.fmab.data.Notebooks.drewNew(before, drawn));
+		assertFalse(com.ajustor.fmab.data.Notebooks.drewNew(drawn, drawn.moved(1, -1)), "ranger n'est pas dessiner");
+		assertFalse(com.ajustor.fmab.data.Notebooks.drewNew(drawn, before), "effacer n'est pas dessiner");
+		assertFalse(com.ajustor.fmab.data.Notebooks.drewNew(before,
+				new NotebookContents(List.of(blank, new NotebookContents.Page("c", Drawing.EMPTY)), 0)),
+				"une page blanche n'est pas un cercle");
+	}
 }

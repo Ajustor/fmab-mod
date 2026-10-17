@@ -1,0 +1,28 @@
+{
+  "parent": "fmab:alchemist/izumi_met",
+  "criteria": {
+    "trial_gloves": {
+      "trigger": "fmab:milestone",
+      "conditions": {
+        "milestone": "trial_gloves"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:mutton"
+    },
+    "title": {
+      "translate": "trial.fmab.gloves"
+    },
+    "description": {
+      "translate": "advancements.fmab.trial.description"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "trial_gloves"
+    ]
+  ]
+}

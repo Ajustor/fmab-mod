@@ -1,5 +1,6 @@
 package com.ajustor.fmab.network;
 
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.data.Gloves;
@@ -87,7 +88,12 @@ public final class FmabNetwork {
 		network.receive(ChooseDesignPayload.TYPE,
 				(payload, player) -> Recomposition.choose(player, payload.item()));
 		network.receive(SaveNotebookPayload.TYPE,
-				(payload, player) -> Notebooks.set(player, payload.contents()));
+				(payload, player) -> {
+					if (Notebooks.drewNew(Notebooks.of(player), payload.contents())) {
+						Milestones.reach(player, "notebook_circle");
+					}
+					Notebooks.set(player, payload.contents());
+				});
 		network.receive(SelectCirclePayload.TYPE,
 				(payload, player) -> selectCircle(player, payload));
 		network.receive(OpenBodyPayload.TYPE,

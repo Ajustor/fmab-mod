@@ -31,4 +31,13 @@ class ChannelGrowthTest {
 		}
 		assertEquals(3, paid, "un ouvrage tenu jusqu'au bout : trois âmes");
 	}
+
+	/** La maîtrise fait l'Alchimiste, d'où qu'elle vienne (transmutation ou récompense d'Izumi). */
+	@Test
+	void anApprenticeIsPromotedAsSoonAsMasteryAllows() {
+		int needed = com.ajustor.fmab.alchemy.knowledge.Knowledge.ALCHEMIST_MASTERY;
+		assertTrue(Transmutation.promotes(com.ajustor.fmab.alchemy.glyph.Rank.APPRENTICE, needed));
+		assertTrue(!Transmutation.promotes(com.ajustor.fmab.alchemy.glyph.Rank.APPRENTICE, needed - 1));
+		assertTrue(!Transmutation.promotes(com.ajustor.fmab.alchemy.glyph.Rank.STATE, needed * 10), "on ne redescend pas");
+	}
 }

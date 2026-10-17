@@ -93,6 +93,12 @@ public final class Notebooks {
 	 * Un joueur sans carnet (nouveau venu, ou monde d'avant la touche du carnet) en reçoit un qui
 	 * contient déjà quelques cercles simples, prêts à tracer à la craie.
 	 */
+	/** Le carnet enregistré porte-t-il un cercle qui n'y était pas : un dessin du joueur ? */
+	public static boolean drewNew(NotebookContents before, NotebookContents after) {
+		return after.pages().stream().anyMatch(page -> !page.drawing().primitives().isEmpty()
+				&& before.indexOf(page.drawing()) < 0);
+	}
+
 	public static void ensure(ServerPlayer player) {
 		if (FmabAttachments.NOTEBOOK.has(player)) {
 			return;

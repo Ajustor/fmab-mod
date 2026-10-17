@@ -1,5 +1,6 @@
 package com.ajustor.fmab.item;
 
+import com.ajustor.fmab.progress.Milestones;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Tome;
@@ -55,6 +56,9 @@ public class TomeItem extends Item {
 			learned++;
 			player.sendSystemMessage(Component.translatable("tome.fmab.learned",
 					Component.translatable(glyph.nameKey())));
+		}
+		if (learned > 0 && player instanceof ServerPlayer reader) {
+			Milestones.reach(reader, "tome_read");
 		}
 		if (learned == 0) {
 			player.sendOverlayMessage(Component.translatable("tome.fmab.nothing_new"));
