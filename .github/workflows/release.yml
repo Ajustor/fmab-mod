@@ -42,6 +42,14 @@ jobs:
           args: --latest --strip header
         env:
           OUTPUT: RELEASE.fr.md
+      - name: jars to publish
+        # action-gh-release ne comprend pas les motifs « ! » : les jars de sources partaient avec la release.
+        run: |
+          mkdir -p dist
+          for jar in build/libs/fmab-*.jar; do
+            case "$jar" in *-sources.jar) ;; *) cp "$jar" dist/ ;; esac
+          done
+          ls dist
       - name: release notes
         run: |
           {
@@ -51,7 +59,7 @@ jobs:
             echo "## English"
             sed '1d' RELEASE.en.md
             echo
-            versions=$(ls build/libs/fmab-*.jar | grep -v -- '-sources\.jar$' | sed -E 's/.*\+([0-9.]+)\.jar$/\1/' | sort -uV | paste -sd ',' | sed 's/,/, /g')
+            versions=$(ls dist/fmab-*.jar | sed -E 's/.*\+([0-9.]+)\.jar$/\1/' | sort -uV | paste -sd ',' | sed 's/,/, /g')
             echo "Minecraft $versions · Fabric Loader ≥ 0.19.3 · Fabric API · Java 25"
             echo
             echo "Un jar par version de Minecraft : prendre \`fmab-fabric-<version>+<minecraft>.jar\`."
@@ -62,9 +70,7 @@ jobs:
           name: FMAB ${{ github.ref_name }}
           body_path: RELEASE.md
           prerelease: ${{ contains(github.ref_name, '-') }}
-          files: |
-            build/libs/fmab-*.jar
-            !build/libs/*-sources.jar
+          files: dist/fmab-*.jar
       - name: back to master
         run: |
           git fetch origin master
