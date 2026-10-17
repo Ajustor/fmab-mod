@@ -4,31 +4,37 @@
   "modifier": "shape_cone",
   "primitives": [
     {
-      "type": "polyline",
-      "points": [
-        [
-          -0.8,
-          -0.6
-        ],
-        [
-          0.0,
-          0.7
-        ],
-        [
-          0.8,
-          -0.6
-        ]
-      ]
-    },
-    {
-      "type": "arc",
-      "center": [
+      "type": "line",
+      "from": [
         0.0,
         0.7
       ],
-      "radius": 1.6,
-      "start_deg": 240,
-      "sweep_deg": 60
+      "to": [
+        -0.8,
+        -0.6
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        0.0,
+        0.7
+      ],
+      "to": [
+        0.0,
+        -0.7
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        0.0,
+        0.7
+      ],
+      "to": [
+        0.8,
+        -0.6
+      ]
     }
   ],
   "complexity": 1,

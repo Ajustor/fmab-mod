@@ -102,12 +102,12 @@
     }
   ],
   "expected": {
-    "outcome": "rebound",
+    "outcome": "works",
     "complexity": 4,
     "concentration": 7,
     "stability": 1.25,
     "required_rank": "apprentice",
-    "rebound": 0.5,
+    "rebound": 0.0,
     "stages": [
       {
         "sides": 4,
@@ -123,9 +123,9 @@
         "satellites": 0
       }
     ],
-    "effects": [],
-    "issues": [
-      "unknown_combination"
-    ]
+    "effects": [
+      "fmab:redstone_cut"
+    ],
+    "issues": []
   }
 }
