@@ -1,14 +1,9 @@
 package com.ajustor.fmab.world;
 
-import com.ajustor.fmab.item.CipheredNotesItem;
-import com.ajustor.fmab.item.Tomes;
 import com.ajustor.fmab.registry.FmabEntities;
-import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.LadderBlock;
@@ -17,7 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.SlabType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ajustor.fmab.world.Blueprints.*;
@@ -272,40 +266,8 @@ final class Laboratory5 implements Blueprint {
 	@Override
 	public List<Chest> chests(Plot p) {
 		return List.of(
-				new Chest(new BlockPos(2, HALL_FLOOR + 1, 2), Laboratory5::research),
-				new Chest(new BlockPos(p.sizeX() - 3, HALL_FLOOR + 1, 2), Laboratory5::archives));
-	}
-
-	/** Le second coffre garde parfois ce que l'armée a lu de plus interdit. */
-	private static List<ItemStack> archives(Plot p) {
-		List<ItemStack> out = research(p);
-		if (p.noise(16, 0, 0, 12) == 0) {
-			out.add(new ItemStack(FmabItems.HUMAN_TRANSMUTATION_NOTES));
-		}
-		return out;
-	}
-
-	/** Les restes des recherches de l'armée sur la Pierre. */
-	private static List<ItemStack> research(Plot p) {
-		List<ItemStack> out = new ArrayList<>();
-		out.add(new ItemStack(Items.PAPER, 2 + p.noise(7, 0, 0, 6)));
-		out.add(new ItemStack(Items.REDSTONE, 3 + p.noise(8, 0, 0, 8)));
-		out.add(new ItemStack(Items.GOLD_INGOT, 1 + p.noise(9, 0, 0, 3)));
-		out.add(new ItemStack(FmabItems.ALCHEMICAL_INK, 1 + p.noise(10, 0, 0, 2)));
-		if (p.noise(11, 0, 0, 2) == 0) {
-			out.add(Tomes.stack(Tomes.FORMS));
-		}
-		if (p.noise(13, 0, 0, 5) == 0) {
-			out.add(Tomes.stack(Tomes.GOLD));
-		}
-		if (p.noise(14, 0, 0, 3) == 0) {
-			out.add(CipheredNotesItem.of(FmabItems.CIPHERED_NOTES, p.noise(15, 0, 0, 4)));
-		}
-		// Kimblee y a fait ses recherches avant sa prison.
-		if (p.noise(12, 0, 0, 4) == 0) {
-			out.add(new ItemStack(FmabItems.CRIMSON_SEALS));
-		}
-		return out;
+				Chest.loot(new BlockPos(2, HALL_FLOOR + 1, 2), "laboratory_5_research"),
+				Chest.loot(new BlockPos(p.sizeX() - 3, HALL_FLOOR + 1, 2), "laboratory_5_archives"));
 	}
 
 	@Override

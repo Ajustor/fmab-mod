@@ -1,16 +1,10 @@
 package com.ajustor.fmab.world;
 
-import com.ajustor.fmab.item.Tomes;
-import com.ajustor.fmab.item.XerxesMuralItem;
 import com.ajustor.fmab.registry.FmabEntities;
-import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ajustor.fmab.world.Blueprints.*;
@@ -51,30 +45,8 @@ final class XerxesRuins implements Blueprint {
 	@Override
 	public List<Chest> chests(Plot p) {
 		int c = p.sizeX() / 2;
-		return List.of(new Chest(new BlockPos(c - 4, 1, c), XerxesRuins::murals),
-				new Chest(new BlockPos(c + 4, 1, c), XerxesRuins::sanctum));
-	}
-
-	/** Xerxès est mort d'une transmutation humaine : ses alchimistes en avaient laissé des notes. */
-	private static List<ItemStack> sanctum(Plot p) {
-		List<ItemStack> out = murals(p);
-		if (p.noise(17, 0, 0, 20) == 0) {
-			out.add(new ItemStack(FmabItems.HUMAN_TRANSMUTATION_NOTES));
-		}
-		return out;
-	}
-
-	/** Deux fragments de fresque, et l'or d'un royaume disparu. */
-	private static List<ItemStack> murals(Plot p) {
-		List<ItemStack> out = new ArrayList<>();
-		int first = 1 + p.noise(4, 0, 0, XerxesMuralItem.COUNT);
-		out.add(XerxesMuralItem.of(FmabItems.XERXES_MURAL, first));
-		out.add(XerxesMuralItem.of(FmabItems.XERXES_MURAL, 1 + first % XerxesMuralItem.COUNT));
-		out.add(new ItemStack(Items.GOLD_NUGGET, 4 + p.noise(5, 0, 0, 10)));
-		if (p.noise(6, 0, 0, 2) == 0) {
-			out.add(Tomes.stack(Tomes.GOLD));
-		}
-		return out;
+		return List.of(Chest.loot(new BlockPos(c - 4, 1, c), "xerxes_murals"),
+				Chest.loot(new BlockPos(c + 4, 1, c), "xerxes_sanctum"));
 	}
 
 	@Override

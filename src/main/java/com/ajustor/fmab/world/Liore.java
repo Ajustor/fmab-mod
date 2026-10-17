@@ -2,13 +2,10 @@ package com.ajustor.fmab.world;
 
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
-import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -333,17 +330,7 @@ final class Liore implements Blueprint {
 
 	@Override
 	public List<Chest> chests(Plot p) {
-		return List.of(new Chest(new BlockPos(C + 4, 1, 3), Liore::offerings));
-	}
-
-	private static List<ItemStack> offerings(Plot p) {
-		List<ItemStack> out = new ArrayList<>();
-		out.add(new ItemStack(Items.GOLD_INGOT, 2 + p.noise(1, 0, 0, 5)));
-		out.add(new ItemStack(Items.CANDLE, 3 + p.noise(2, 0, 0, 4)));
-		if (p.noise(3, 0, 0, 2) == 0) {
-			out.add(new ItemStack(FmabItems.RED_STONE_SHARD));
-		}
-		return out;
+		return List.of(Chest.loot(new BlockPos(C + 4, 1, 3), "liore"));
 	}
 
 	@Override

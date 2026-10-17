@@ -2,16 +2,11 @@ package com.ajustor.fmab.world;
 
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
-import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ajustor.fmab.world.Blueprints.*;
@@ -45,20 +40,7 @@ final class Workshop implements Blueprint {
 
 	@Override
 	public List<Chest> chests(Plot p) {
-		return List.of(new Chest(new BlockPos(1, 1, p.sizeZ() - 2), Workshop::stock));
-	}
-
-	/** Des pièces de rechange, du fer, et parfois un automail complet. */
-	private static List<ItemStack> stock(Plot p) {
-		Item[] parts = {FmabItems.RUSH_VALLEY_AUTOMAIL_ARM, FmabItems.RUSH_VALLEY_AUTOMAIL_LEG,
-				FmabItems.IRON_AUTOMAIL_ARM, FmabItems.IRON_AUTOMAIL_LEG};
-		List<ItemStack> out = new ArrayList<>();
-		out.add(new ItemStack(Items.IRON_INGOT, 2 + p.noise(3, 0, 0, 6)));
-		out.add(new ItemStack(Items.REDSTONE, 1 + p.noise(4, 0, 0, 4)));
-		if (p.noise(5, 0, 0, 3) == 0) {
-			out.add(new ItemStack(parts[p.noise(6, 0, 0, parts.length)]));
-		}
-		return out;
+		return List.of(Chest.loot(new BlockPos(1, 1, p.sizeZ() - 2), "rush_valley_workshop"));
 	}
 
 	@Override

@@ -1,16 +1,11 @@
 package com.ajustor.fmab.world;
 
-import com.ajustor.fmab.item.CipheredNotesItem;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
-import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ajustor.fmab.world.Blueprints.*;
@@ -56,18 +51,7 @@ final class IshvalRuins implements Blueprint {
 	@Override
 	public List<Chest> chests(Plot p) {
 		int c = p.sizeX() / 2;
-		return List.of(new Chest(new BlockPos(c + 3, 1, c - 3), IshvalRuins::remains));
-	}
-
-	private static List<ItemStack> remains(Plot p) {
-		List<ItemStack> out = new ArrayList<>();
-		out.add(new ItemStack(Items.BONE, 3 + p.noise(1, 0, 0, 5)));
-		out.add(new ItemStack(Items.CLAY_BALL, 2 + p.noise(2, 0, 0, 4)));
-		out.add(new ItemStack(Items.PAPER, 1 + p.noise(3, 0, 0, 3)));
-		if (p.noise(4, 0, 0, 2) == 0) {
-			out.add(CipheredNotesItem.of(FmabItems.CIPHERED_NOTES, p.noise(5, 0, 0, 4)));
-		}
-		return out;
+		return List.of(Chest.loot(new BlockPos(c + 3, 1, c - 3), "ishval_ruins"));
 	}
 
 	@Override

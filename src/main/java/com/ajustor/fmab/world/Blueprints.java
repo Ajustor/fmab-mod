@@ -1,18 +1,8 @@
 package com.ajustor.fmab.world;
 
-import com.ajustor.fmab.item.CipheredNotesItem;
-import com.ajustor.fmab.item.Tomes;
-import com.ajustor.fmab.item.XerxesMuralItem;
 import com.ajustor.fmab.registry.FmabBlocks;
-import com.ajustor.fmab.registry.FmabEntities;
-import com.ajustor.fmab.registry.FmabItems;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -22,19 +12,13 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.LanternBlock;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.RotatedPillarBlock;
-import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraft.world.level.block.state.properties.SlabType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,10 +53,10 @@ public final class Blueprints {
 		out.put("central_walls", new CityWalls());
 		out.put("central_roads", CityPlans::cityRoads);
 		out.put("central_fountain", CityPlans::fountain);
-		out.put("central_house", new Home(CITY_PALETTES, true));
-		out.put("central_library", CityPlans::library);
+		out.put("central_house", Blueprint.withChest(new Home(CITY_PALETTES, true), 1, "house"));
+		out.put("central_library", Blueprint.withChest(CityPlans::library, 0, "central_library"));
 		out.put("central_hq", new Headquarters());
-		out.put("resembool_house", new Home(RURAL_PALETTES, false));
+		out.put("resembool_house", Blueprint.withChest(new Home(RURAL_PALETTES, false), 1, "house"));
 		out.put("rockbell_house", new RockbellHouse());
 		out.put("resembool_field", Blueprints::field);
 		out.put("elric_house", new ElricHouse());
@@ -81,20 +65,20 @@ public final class Blueprints {
 		out.put("rush_valley_square", Blueprints::square);
 		out.put("laboratory_5", new Laboratory5());
 		out.put("devils_nest", new DevilsNest());
-		out.put("bradley_residence", new BradleyResidence());
-		out.put("sloth_tunnel", new SlothTunnel());
-		out.put("father_lair", new FatherLair());
+		out.put("bradley_residence", Blueprint.withChest(new BradleyResidence(), 1, "bradley_residence"));
+		out.put("sloth_tunnel", Blueprint.withChest(new SlothTunnel(), SlothTunnel.FLOOR + 1, "sloth_tunnel"));
+		out.put("father_lair", Blueprint.withChest(new FatherLair(), FatherLair.ROOM_FLOOR + 1, "father_lair"));
 		out.put("xing_pavilion", new XingPavilion());
 		out.put("fort_briggs", new FortBriggs());
-		out.put("blood_crest", Blueprints::bloodCrest);
+		out.put("blood_crest", Blueprint.withChest(Blueprints::bloodCrest, 1, "blood_crest"));
 		out.put("liore", new Liore());
 		out.put("dublith_square", Blueprints::dublithSquare);
-		out.put("dublith_house", new Home(DUBLITH_PALETTES, true));
+		out.put("dublith_house", Blueprint.withChest(new Home(DUBLITH_PALETTES, true), 1, "house"));
 		out.put("curtis_butcher", new CurtisButcher());
 		out.put("marcoh_clinic", new MarcohClinic());
 		out.put("ishval_ruins", new IshvalRuins());
 		out.put("xerxes_ruins", new XerxesRuins());
-		out.put("yock_island", new YockIsland());
+		out.put("yock_island", Blueprint.withChest(new YockIsland(), 2, "yock_island"));
 		// Les mêmes maisons, avec leurs abords (avant-toits, volets, jardinières, massifs) : les lieux
 		// les posent sur une parcelle plus large de deux blocs.
 		out.put("central_house_dressed", new Dressing(out.get("central_house"), Dressing.TOWN));

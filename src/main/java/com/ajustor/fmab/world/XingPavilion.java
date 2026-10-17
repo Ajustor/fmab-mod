@@ -2,17 +2,13 @@ package com.ajustor.fmab.world;
 
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
-import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ajustor.fmab.world.Blueprints.*;
@@ -137,19 +133,7 @@ final class XingPavilion implements Blueprint {
 
 	@Override
 	public List<Chest> chests(Plot p) {
-		return List.of(new Chest(new BlockPos(P1 - 2, 2, Z1 - 2), XingPavilion::stock));
-	}
-
-	private static List<ItemStack> stock(Plot p) {
-		List<ItemStack> out = new ArrayList<>();
-		out.add(new ItemStack(FmabItems.KUNAI, 3 + p.noise(1, 0, 0, 5)));
-		out.add(new ItemStack(Items.EMERALD, 2 + p.noise(2, 0, 0, 4)));
-		out.add(new ItemStack(Items.BAMBOO, 4 + p.noise(3, 0, 0, 8)));
-		out.add(new ItemStack(Items.PAPER, 2 + p.noise(4, 0, 0, 4)));
-		if (p.noise(5, 0, 0, 2) == 0) {
-			out.add(new ItemStack(FmabItems.XING_SWORD));
-		}
-		return out;
+		return List.of(Chest.loot(new BlockPos(P1 - 2, 2, Z1 - 2), "xing_pavilion"));
 	}
 
 	@Override

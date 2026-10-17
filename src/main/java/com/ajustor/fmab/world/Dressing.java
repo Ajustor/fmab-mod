@@ -1,6 +1,5 @@
 package com.ajustor.fmab.world;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -184,7 +183,7 @@ final class Dressing implements Blueprint {
 	@Override
 	public List<Chest> chests(Plot p) {
 		return inner.chests(inner(p)).stream()
-				.map(c -> new Chest(c.local().offset(MARGIN, 0, MARGIN), plot -> c.contents().apply(inner(plot))))
+				.map(c -> new Chest(c.local().offset(MARGIN, 0, MARGIN), c.table()))
 				.toList();
 	}
 

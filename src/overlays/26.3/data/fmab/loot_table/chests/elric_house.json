@@ -1,0 +1,91 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "modifier": [
+            {
+              "type": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.hohenheim",
+                  "glyphs": [
+                    "fmab:humain"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fmab:alchemy_tome",
+          "modifier": [
+            {
+              "type": "minecraft:set_components",
+              "components": {
+                "fmab:tome": {
+                  "title": "tome.fmab.rudiments",
+                  "glyphs": [
+                    "fmab:terre",
+                    "fmab:eau",
+                    "fmab:fixer",
+                    "fmab:projeter"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "modifier": [
+            {
+              "type": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 3,
+                "max": 7
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bone_meal",
+          "modifier": [
+            {
+              "type": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 5
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "fmab:chests/elric_house"
+}

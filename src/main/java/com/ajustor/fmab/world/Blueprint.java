@@ -1,12 +1,14 @@
 package com.ajustor.fmab.world;
 
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import com.ajustor.fmab.Fmab;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Plan d'un bâtiment ou d'un ouvrage : quel bloc mettre à chaque position locale. Une fonction
@@ -61,7 +63,51 @@ public interface Blueprint {
 	record Spawn(EntityType<?> type, BlockPos local) {
 	}
 
-	/** Un coffre et ce qu'il contient ; il fait face à l'avant du bâtiment. */
-	record Chest(BlockPos local, Function<Plot, List<ItemStack>> contents) {
+	/**
+	 * Un coffre et sa table de butin ({@code data/fmab/loot_table/chests}), qu'un pack de données peut
+	 * changer ; il fait face à l'avant du bâtiment, et se remplit à sa première ouverture.
+	 */
+	record Chest(BlockPos local, ResourceKey<LootTable> table) {
+		static Chest loot(BlockPos local, String table) {
+			return new Chest(local, ResourceKey.create(Registries.LOOT_TABLE, Fmab.id("chests/" + table)));
+		}
+	}
+
+	/**
+	 * Une place pour un coffre : de l'air posé sur du plein, sous de l'air, à cette hauteur, en partant
+	 * du fond du plan (loin de la porte). Le plan étant une fonction pure, on la trouve sans le monde.
+	 */
+	static java.util.Optional<BlockPos> freeSpot(Blueprint plan, Plot p, int y) {
+		for (int z = p.sizeZ() - 2; z >= 1; z--) {
+			for (int x = 1; x < p.sizeX() - 1; x++) {
+				BlockState here = plan.at(x, y, z, p), below = plan.at(x, y - 1, z, p), above = plan.at(x, y + 1, z, p);
+				if (here != null && here.isAir() && below != null && below.isSolid() && above != null && above.isAir()) {
+					return java.util.Optional.of(new BlockPos(x, y, z));
+				}
+			}
+		}
+		return java.util.Optional.empty();
+	}
+
+	/** Ce plan, plus un coffre à cette hauteur (à la première place libre, voir {@link #freeSpot}). */
+	static Blueprint withChest(Blueprint plan, int y, String table) {
+		return new Blueprint() {
+			@Override
+			public BlockState at(int x, int yy, int z, Plot p) {
+				return plan.at(x, yy, z, p);
+			}
+
+			@Override
+			public List<Chest> chests(Plot p) {
+				List<Chest> out = new java.util.ArrayList<>(plan.chests(p));
+				freeSpot(plan, p, y).ifPresent(at -> out.add(Chest.loot(at, table)));
+				return out;
+			}
+
+			@Override
+			public List<Spawn> spawns(Plot p) {
+				return plan.spawns(p);
+			}
+		};
 	}
 }
