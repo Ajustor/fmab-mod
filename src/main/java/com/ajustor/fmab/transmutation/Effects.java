@@ -349,8 +349,8 @@ public final class Effects {
 					level.setBlockAndUpdate(p, BaseFireBlock.getState(level, p));
 				}
 				for (Entity e : level.getEntities((Entity) null, new AABB(p).expandTowards(0, 1, 0), Entity::isAlive)) {
-					if (e != ctx.caster() && e instanceof LivingEntity living) {
-						living.hurtServer(level, level.damageSources().inFire(), damage);
+					if (!ctx.spares(e) && e instanceof LivingEntity living) {
+						living.hurtServer(level, ctx.fire(), damage);
 						living.igniteForSeconds(4);
 						ctx.afflict(living);
 					}
@@ -369,7 +369,7 @@ public final class Effects {
 		AABB area = new AABB(Vec3.atCenterOf(start), Vec3.atCenterOf(end)).inflate(1.5, 1.5, 1.5);
 		int pushed = 0;
 		for (Entity e : level.getEntities((Entity) null, area, Entity::isAlive)) {
-			if (e == ctx.caster()) {
+			if (e == ctx.caster() || ctx.spares(e)) {
 				continue;
 			}
 			e.push(d.getStepX() * 1.6, 0.4, d.getStepZ() * 1.6);
@@ -723,8 +723,9 @@ public final class Effects {
 				if (up == Direction.UP) {
 					e.setPos(e.getX(), tip.y, e.getZ());
 				}
-				if (damage > 0 && e instanceof LivingEntity living) {
-					living.hurtServer(level, level.damageSources().magic(), damage);
+				// L'ouvrage soulève tout le monde, mais ne blesse que ceux que l'alchimiste n'épargne pas.
+				if (damage > 0 && e instanceof LivingEntity living && !ctx.spares(living)) {
+					living.hurtServer(level, ctx.magic(), damage);
 					living.setDeltaMovement(living.getDeltaMovement().add(up.getStepX() * 0.8,
 							up == Direction.DOWN ? -0.4 : 0.8, up.getStepZ() * 0.8));
 					EntityCompat.syncVelocity(living);

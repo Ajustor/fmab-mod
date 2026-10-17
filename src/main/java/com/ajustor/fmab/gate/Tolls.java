@@ -163,12 +163,23 @@ public final class Tolls {
 		return !part.limb() || !Automails.working(player, part);
 	}
 
+	/**
+	 * La vue que la Vérité a prise, comme le voile du client la montre : une armure d'âme voit par son
+	 * heaume, un homme de chair par ses yeux. Le voile s'efface avec un pack de ressources ; ceci non.
+	 */
+	public static boolean sightless(GateState gate, boolean helmetless) {
+		return gate.soulBound() ? gate.inArmor() && helmetless : gate.lost(BodyPart.SIGHT);
+	}
+
 	private static void tick(ServerPlayer player) {
 		GateState gate = FmabAttachments.GATE.get(player);
 		if (gate == null) {
 			return;
 		}
 		dropFromLostHands(player, gate);
+		if (sightless(gate, player.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) && player.isSprinting()) {
+			player.setSprinting(false);
+		}
 		legs(player);
 		organs(player);
 		soulLimbs(player, gate);
