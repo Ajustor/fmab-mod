@@ -2,6 +2,7 @@ package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.drawing.SoulSeal;
+import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.NotebookContents;
 import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.registry.FmabComponents;
@@ -15,6 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -141,6 +143,18 @@ public final class SoulArmor {
 		ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
 		return chest.is(FmabItems.SOUL_CHESTPLATE)
 				&& sealOf(chest).filter(player.getUUID()::equals).isPresent();
+	}
+
+	/**
+	 * Les jambes d'une âme en armure sont ses jambières : sans elles, elle n'en a pas plus qu'un
+	 * joueur qui les a laissées à la Porte.
+	 */
+	public static boolean legsMissing(boolean inArmor, boolean leggings) {
+		return inArmor && !leggings;
+	}
+
+	public static boolean legsMissing(Player player, GateState gate) {
+		return legsMissing(gate.inArmor(), fits(EquipmentSlot.LEGS, player.getItemBySlot(EquipmentSlot.LEGS)));
 	}
 
 	/** Une pièce d'armure qui peut servir de corps à cet emplacement. */

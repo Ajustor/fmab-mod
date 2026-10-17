@@ -22,7 +22,8 @@
 			"com.ajustor.fmab.gametest.ShellScenes",
 			"com.ajustor.fmab.gametest.OutfitScenes",
 			"com.ajustor.fmab.gametest.ConfigScenes",
-			"com.ajustor.fmab.gametest.DataScenes"
+			"com.ajustor.fmab.gametest.DataScenes",
+			"com.ajustor.fmab.gametest.SoulLegsScenes"
 		]
 	},
 	"depends": {
