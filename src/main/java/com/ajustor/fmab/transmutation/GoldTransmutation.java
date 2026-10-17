@@ -32,6 +32,14 @@ public final class GoldTransmutation {
 			Items.IRON_BLOCK, Items.GOLD_BLOCK,
 			Items.RAW_IRON, Items.RAW_GOLD);
 	private static final int KARMA = -10;
+	/** Ce que vaut chaque forme du fer, en pépites. */
+	private static final Map<Item, Integer> NUGGETS = Map.of(
+			Items.IRON_NUGGET, 1,
+			Items.IRON_INGOT, 9,
+			Items.RAW_IRON, 9,
+			Items.IRON_BLOCK, 81);
+	/** Une transmutation ne change pas plus d'un bloc de fer en or : le reste demeure du fer. */
+	static final int MAX_NUGGETS = 81;
 	/** La traque dure dix minutes. */
 	private static final int WANTED = 20 * 60 * 10;
 	private static final double ALERT = 32;
@@ -50,11 +58,18 @@ public final class GoldTransmutation {
 			sources.add(entity.getItem());
 		}
 		List<ItemStack> gold = new ArrayList<>();
+		int budget = MAX_NUGGETS;
 		for (ItemStack stack : sources) {
 			Item into = GOLD.get(stack.getItem());
-			if (into != null && !stack.isEmpty()) {
-				gold.add(new ItemStack(into, stack.getCount()));
-				stack.setCount(0);
+			if (into == null || stack.isEmpty()) {
+				continue;
+			}
+			int unit = NUGGETS.get(stack.getItem());
+			int taken = convertible(stack.getCount(), unit, budget);
+			if (taken > 0) {
+				gold.add(new ItemStack(into, taken));
+				stack.shrink(taken);
+				budget -= taken * unit;
 			}
 		}
 		if (gold.isEmpty()) {
@@ -69,14 +84,24 @@ public final class GoldTransmutation {
 			Milestones.reach(caster, "gold");
 		}
 		if (caster != null && !caster.isCreative()) {
-			punish(level, caster);
+			punish(level, caster, karma(MAX_NUGGETS - budget));
 		}
 		return Effects.Result.DONE;
 	}
 
+	/** Combien d'objets de ce tas (chacun valant {@code unit} pépites) tiennent dans ce qui reste. */
+	static int convertible(int count, int unit, int budget) {
+		return Math.max(0, Math.min(count, budget / unit));
+	}
+
+	/** Le karma perdu : dix, plus un par lingot d'or fait. */
+	static int karma(int nuggets) {
+		return KARMA - nuggets / 9;
+	}
+
 	/** La loi d'État ne pardonne pas : karma, avis de recherche, et la garde qui accourt. */
-	private static void punish(ServerLevel level, ServerPlayer caster) {
-		Karma.add(caster, KARMA);
+	private static void punish(ServerLevel level, ServerPlayer caster, int karma) {
+		Karma.add(caster, karma);
 		FmabAttachments.WANTED.set(caster, level.getGameTime() + WANTED);
 		caster.sendSystemMessage(Component.translatable("transmutation.fmab.gold_forbidden").withStyle(ChatFormatting.RED));
 		for (AmestrianSoldierEntity soldier : level.getEntitiesOfClass(AmestrianSoldierEntity.class,

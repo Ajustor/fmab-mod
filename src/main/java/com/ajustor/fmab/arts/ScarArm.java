@@ -1,5 +1,9 @@
 package com.ajustor.fmab.arts;
 
+import java.util.UUID;
+import java.util.Map;
+import java.util.HashMap;
+import com.ajustor.fmab.util.PlayerMaps;
 import com.ajustor.fmab.alchemy.knowledge.Knowledge;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -34,6 +38,11 @@ public final class ScarArm {
 	/** L'école de savoir que le bras fait progresser. */
 	private static final String SCHOOL = "destruction";
 	private static final float BLOCK_COST = 1;
+	/** Un point de concentration de plus par tranche de dureté : l'obsidienne coûte six fois la pierre. */
+	private static final float HARDNESS_PER_POINT = 10;
+	/** La Destruction progresse d'un point tous les cinq usages du bras. */
+	static final int USES_PER_MASTERY = 5;
+	private static final Map<UUID, Integer> USES = PlayerMaps.track(new HashMap<>());
 	private static final float ENTITY_COST = 2;
 	private static final float ENTITY_DAMAGE = 7;
 	private static final Throttle READY = new Throttle(8);
@@ -85,7 +94,7 @@ public final class ScarArm {
 		if (state.isAir() || state.getDestroySpeed(level, pos) < 0 || !ready(player, level)) {
 			return;
 		}
-		if (!pay(player, BLOCK_COST)) {
+		if (!pay(player, blockCost(state.getDestroySpeed(level, pos)))) {
 			return;
 		}
 		level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state), pos.getX() + 0.5, pos.getY() + 0.5,
@@ -120,7 +129,20 @@ public final class ScarArm {
 			}
 			Concentration.set(player, concentration - cost);
 		}
-		FmabAttachments.ALCHEMIST.set(player, data.addMastery(SCHOOL, 1));
+		int uses = USES.merge(player.getUUID(), 1, Integer::sum);
+		if (masteryDue(uses)) {
+			FmabAttachments.ALCHEMIST.set(player, data.addMastery(SCHOOL, 1));
+		}
 		return true;
+	}
+
+	/** Ce que coûte un bloc, selon sa dureté (la pierre : un peu plus d'un point). */
+	static float blockCost(float hardness) {
+		return BLOCK_COST + Math.max(0, hardness) / HARDNESS_PER_POINT;
+	}
+
+	/** Cet usage du bras (compté à partir de 1) fait-il progresser la Destruction ? */
+	static boolean masteryDue(int uses) {
+		return uses % USES_PER_MASTERY == 0;
 	}
 }

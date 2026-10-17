@@ -313,6 +313,7 @@
   "knowledge.fmab.life.chimera_vigor.desc": "Vos chimères sont moitié plus robustes.",
   "effect.fmab.chimera": "Chimère",
   "transmutation.fmab.chimera_made": "Les deux bêtes se défont et se recousent en une seule. Elle vous regarde, et vous obéit. Shou Tucker serait fier ; personne d'autre.",
+  "transmutation.fmab.chimera_limit": "Vous tenez déjà %s chimères : la chair n'en supporte pas davantage.",
   "knowledge.fmab.fire.docile_flame": "Flamme docile",
   "knowledge.fmab.fire.docile_flame.desc": "Chaque effet du Feu coûte 1 de concentration en moins.",
   "knowledge.fmab.fire.long_reach": "Souffle long",

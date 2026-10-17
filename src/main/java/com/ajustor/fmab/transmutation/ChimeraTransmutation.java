@@ -26,6 +26,8 @@ import java.util.List;
  */
 public final class ChimeraTransmutation {
 	private static final int KARMA = -15;
+	/** Pas plus de chimères liées à un même alchimiste. */
+	static final int MAX_BOUND = 3;
 	private static final DustParticleOptions FLESH = new DustParticleOptions(0x9A3040, 1.2f);
 
 	private ChimeraTransmutation() {
@@ -42,6 +44,13 @@ public final class ChimeraTransmutation {
 				a -> a.isAlive() && !a.isBaby() && !(a instanceof OwnableEntity o && o.getOwnerReference() != null)
 						&& !a.hasCustomName() && !a.isLeashed() && !a.isVehicle());
 		if (beasts.size() < 2) {
+			return Effects.Result.NO_TARGET;
+		}
+		java.util.UUID creator = ctx.caster().getUUID();
+		int bound = level.getEntities(FmabEntities.CHIMERA_BEAST,
+				c -> c.isAlive() && c.master().map(creator::equals).orElse(false)).size();
+		if (bound >= MAX_BOUND && !ctx.caster().isCreative()) {
+			ctx.caster().sendSystemMessage(Component.translatable("transmutation.fmab.chimera_limit", MAX_BOUND));
 			return Effects.Result.NO_TARGET;
 		}
 		ChimeraBeastEntity chimera = FmabEntities.CHIMERA_BEAST.create(level, EntitySpawnReason.MOB_SUMMONED);

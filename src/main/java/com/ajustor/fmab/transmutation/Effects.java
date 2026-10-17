@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import net.minecraft.world.item.Item;
 import com.ajustor.fmab.alchemy.exchange.Family;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
@@ -606,11 +607,48 @@ public final class Effects {
 		if (state.isAir() || state.hasBlockEntity() || state.getDestroySpeed(level, charge) < 0) {
 			return Result.NO_MATERIAL;
 		}
+		// L'explosif se fait avec du soufre : une pincée par détonation.
+		if (!takeOne(ctx, FmabTags.elementItems("sulfur"))) {
+			return Result.NO_MATERIAL;
+		}
 		level.removeBlock(charge, false);
 		float power = ctx.damage(BLAST_POWER + (float) ctx.perk("blast_power"));
 		Vec3 c = Vec3.atCenterOf(charge);
 		level.explode(ctx.caster(), c.x, c.y, c.z, power, Level.ExplosionInteraction.MOB);
 		return Result.DONE;
+	}
+
+	/**
+	 * Prend un objet de ce tag : dans la matière de l'étage précédent, sur le cercle, puis dans
+	 * l'inventaire de l'alchimiste (un gant n'a pas de cercle où poser quoi que ce soit).
+	 */
+	static boolean takeOne(EffectContext ctx, TagKey<Item> tag) {
+		for (ItemStack stack : ctx.flow()) {
+			if (stack.is(tag) && !stack.isEmpty()) {
+				stack.shrink(1);
+				return true;
+			}
+		}
+		for (ItemEntity entity : ctx.level().getEntitiesOfClass(ItemEntity.class, ctx.onCircle())) {
+			if (entity.getItem().is(tag)) {
+				entity.getItem().shrink(1);
+				return true;
+			}
+		}
+		ServerPlayer caster = ctx.caster();
+		if (caster == null) {
+			return false;
+		}
+		if (caster.isCreative()) {
+			return true;
+		}
+		for (ItemStack stack : caster.getInventory()) {
+			if (stack.is(tag) && !stack.isEmpty()) {
+				stack.shrink(1);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static Optional<ItemStack> cooked(ServerLevel level, ItemStack stack) {
