@@ -91,6 +91,11 @@ public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame fram
 		return base + growth;
 	}
 
+	/** Une durée allongée par les glyphes de durée : une fois la base de plus par glyphe. */
+	public int lasting(int base) {
+		return base * (1 + stage.duration());
+	}
+
 	/** Des dégâts à la mesure du cercle. */
 	public float damage(float base) {
 		return (float) (base * power);

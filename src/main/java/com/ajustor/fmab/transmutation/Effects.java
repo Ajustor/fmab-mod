@@ -219,7 +219,54 @@ public final class Effects {
 			}
 		}
 		int raised = raise(ctx, quarry, column, Direction.UP, earth, ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE));
+		// Les glyphes de cibles : une pique de plus sous chacune des créatures les plus proches.
+		if (ctx.stage().targets() > 0) {
+			List<LivingEntity> prey = level.getEntitiesOfClass(LivingEntity.class,
+					new AABB(ctx.origin()).inflate(ctx.range() * 2.0), e -> e.isAlive() && !ctx.spares(e));
+			prey.sort(java.util.Comparator.comparingDouble(e -> e.distanceToSqr(Vec3.atCenterOf(ctx.origin()))));
+			for (LivingEntity target : prey.subList(0, Math.min(ctx.stage().targets(), prey.size()))) {
+				BlockPos under = surface(level, target.blockPosition());
+				if (under != null) {
+					List<BlockPos> around = new ArrayList<>();
+					for (Direction s : Direction.Plane.HORIZONTAL) {
+						around.add(under.relative(s).below());
+					}
+					raised += raise(ctx, around, under, Direction.UP, earth, ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE));
+				}
+			}
+		}
 		return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
+	}
+
+	/**
+	 * Les cases que couvre un effet dirigé, selon la forme de l'étage : en ligne (large de
+	 * {@code 2 × halfWidth + 1}), en cône qui s'évase d'un bloc tous les deux, ou tout autour du cercle.
+	 */
+	static List<BlockPos> area(EffectContext ctx, int halfWidth) {
+		BlockPos o = ctx.origin();
+		int range = ctx.range();
+		List<BlockPos> out = new ArrayList<>();
+		if (ctx.stage().shape().equals("circle")) {
+			for (int dx = -range; dx <= range; dx++) {
+				for (int dz = -range; dz <= range; dz++) {
+					double r = Math.sqrt(dx * dx + dz * dz);
+					if (r >= 1 && r <= range + 0.5) {
+						out.add(o.offset(dx, 0, dz));
+					}
+				}
+			}
+			return out;
+		}
+		Direction d = ctx.direction();
+		Direction side = d.getAxis().isHorizontal() ? d.getClockWise() : ctx.frame().pageRight();
+		boolean cone = ctx.stage().shape().equals("cone");
+		for (int i = 1; i <= range; i++) {
+			int half = cone ? halfWidth + i / 2 : halfWidth;
+			for (int w = -half; w <= half; w++) {
+				out.add(o.relative(d, i).relative(side, w));
+			}
+		}
+		return out;
 	}
 
 	/**
@@ -347,25 +394,22 @@ public final class Effects {
 			return Result.NO_MATERIAL;
 		}
 		ServerLevel level = ctx.level();
-		Direction d = ctx.direction();
-		Direction side = d.getAxis().isHorizontal() ? d.getClockWise() : ctx.frame().pageRight();
-		for (int i = 1; i <= ctx.range(); i++) {
-			for (int w = -halfWidth; w <= halfWidth; w++) {
-				BlockPos p = surface(level, ctx.origin().relative(d, i).relative(side, w));
-				if (p == null) {
-					continue;
-				}
-				level.sendParticles(ParticleTypes.FLAME, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
-						6, 0.3, 0.3, 0.3, 0.02);
-				if (level.getBlockState(p).isAir() && i > 1) {
-					level.setBlockAndUpdate(p, BaseFireBlock.getState(level, p));
-				}
-				for (Entity e : level.getEntities((Entity) null, new AABB(p).expandTowards(0, 1, 0), Entity::isAlive)) {
-					if (!ctx.spares(e) && e instanceof LivingEntity living) {
-						living.hurtServer(level, ctx.fire(), damage);
-						living.igniteForSeconds(4);
-						ctx.afflict(living);
-					}
+		for (BlockPos cell : area(ctx, halfWidth)) {
+			int i = (int) Math.round(Math.sqrt(cell.distSqr(ctx.origin())));
+			BlockPos p = surface(level, cell);
+			if (p == null) {
+				continue;
+			}
+			level.sendParticles(ParticleTypes.FLAME, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
+					6, 0.3, 0.3, 0.3, 0.02);
+			if (level.getBlockState(p).isAir() && i > 1) {
+				level.setBlockAndUpdate(p, BaseFireBlock.getState(level, p));
+			}
+			for (Entity e : level.getEntities((Entity) null, new AABB(p).expandTowards(0, 1, 0), Entity::isAlive)) {
+				if (!ctx.spares(e) && e instanceof LivingEntity living) {
+					living.hurtServer(level, ctx.fire(), damage);
+					living.igniteForSeconds(ctx.lasting(4));
+					ctx.afflict(living);
 				}
 			}
 		}
@@ -378,13 +422,24 @@ public final class Effects {
 		Direction d = ctx.direction();
 		BlockPos start = ctx.origin();
 		BlockPos end = start.relative(d, ctx.range());
-		AABB area = new AABB(Vec3.atCenterOf(start), Vec3.atCenterOf(end)).inflate(1.5, 1.5, 1.5);
+		String shape = ctx.stage().shape();
+		AABB area = shape.equals("circle")
+				? new AABB(start).inflate(ctx.range(), 1.5, ctx.range())
+				: new AABB(Vec3.atCenterOf(start), Vec3.atCenterOf(end))
+						.inflate(shape.equals("cone") ? 1.5 + ctx.range() / 2.0 : 1.5, 1.5,
+								shape.equals("cone") ? 1.5 + ctx.range() / 2.0 : 1.5);
 		int pushed = 0;
 		for (Entity e : level.getEntities((Entity) null, area, Entity::isAlive)) {
 			if (e == ctx.caster() || ctx.spares(e)) {
 				continue;
 			}
-			e.push(d.getStepX() * 1.6, 0.4, d.getStepZ() * 1.6);
+			if (shape.equals("circle")) {
+				// Tout autour : on repousse en s'éloignant du cercle.
+				Vec3 away = e.position().subtract(Vec3.atCenterOf(start)).multiply(1, 0, 1).normalize();
+				e.push(away.x * 1.6, 0.4, away.z * 1.6);
+			} else {
+				e.push(d.getStepX() * 1.6, 0.4, d.getStepZ() * 1.6);
+			}
 			EntityCompat.syncVelocity(e);
 			if (e instanceof LivingEntity living) {
 				ctx.afflict(living);
@@ -601,7 +656,7 @@ public final class Effects {
 		BlockPos at = ctx.origin().relative(ctx.horizontalDirection(), ctx.range() + 2);
 		AreaEffectCloud cloud = new AreaEffectCloud(level, at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
 		cloud.setRadius(MIST_RADIUS + ctx.range());
-		cloud.setDuration(MIST_TICKS + 40 * ctx.range());
+		cloud.setDuration(ctx.lasting(MIST_TICKS + 40 * ctx.range()));
 		cloud.setWaitTime(0);
 		cloud.setRadiusPerTick(0);
 		cloud.setCustomParticle(ParticleTypes.CLOUD);

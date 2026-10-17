@@ -53,9 +53,13 @@ public record Analysis(
 	 * @param direction  angle (radians, y vers le bas) donné par la flèche, NaN sans flèche
 	 * @param infusions  éléments apportés par les satellites d'infusion ({@code fire}...)
 	 * @param link       liaison qui relie l'étage au précédent
+	 * @param shape      la forme de l'effet : {@code line}, {@code circle} ou {@code cone}
+	 * @param duration   glyphes de durée : chacun ajoute une fois la durée de base
+	 * @param targets    glyphes de cibles : chacun ajoute une cible
 	 */
 	public record StageEffect(int stage, int satellite, Combination combination, double range, int intensity,
-			Vec2 origin, double direction, Set<String> infusions, LinkKind link) {
+			Vec2 origin, double direction, Set<String> infusions, LinkKind link, String shape, int duration,
+			int targets) {
 		public StageEffect {
 			infusions = Set.copyOf(infusions);
 		}

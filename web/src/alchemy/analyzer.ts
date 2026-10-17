@@ -121,6 +121,7 @@ export class CircleAnalyzer {
       for (const s of stage.satellites) written.push(...s.glyphs.map((g) => g.glyph));
       for (let i = 0; i < stage.intensity; i++) if (this.intensityGlyph) written.push(this.intensityGlyph);
       if (stage.direction !== null && this.directionGlyph) written.push(this.directionGlyph);
+      written.push(...stage.modifiers);
       satelliteCount += stage.satellites.length;
 
       let load = 0;

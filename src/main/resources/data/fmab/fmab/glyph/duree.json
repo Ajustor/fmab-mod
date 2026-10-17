@@ -1,0 +1,55 @@
+{
+  "id": "fmab:duree",
+  "layer": "modifier",
+  "modifier": "duration",
+  "primitives": [
+    {
+      "type": "polygon",
+      "points": [
+        [
+          -0.6,
+          -0.8
+        ],
+        [
+          0.6,
+          -0.8
+        ],
+        [
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [
+          -0.6,
+          0.8
+        ],
+        [
+          0.6,
+          0.8
+        ],
+        [
+          0.0,
+          0.0
+        ]
+      ]
+    }
+  ],
+  "complexity": 1,
+  "concentration": 2,
+  "rank": "alchemist",
+  "tolerance": {
+    "rotation_deg": 180,
+    "position": 0.1,
+    "scale": [
+      0.7,
+      1.4
+    ]
+  },
+  "name_key": "glyph.fmab.duree",
+  "description_key": "glyph.fmab.duree.desc",
+  "since": "1.9"
+}

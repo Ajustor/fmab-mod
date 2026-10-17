@@ -106,6 +106,28 @@ class CircleTest {
 		assertEquals(0, a.effects().getFirst().direction(), 0.05);
 	}
 
+	/** Les modificateurs posés sur l'anneau règlent l'étage : forme, durée, nombre de cibles. */
+	@Test
+	void modifiersOnTheRingShapeTheStage() {
+		List<Primitive> strokes = new ArrayList<>(glyph("terre", TOP));
+		strokes.addAll(glyph("projeter", BOTTOM));
+		strokes.addAll(TestGlyphs.drawn("forme_cone", new Vec2(26, 26), 1.5, 0));
+		strokes.addAll(TestGlyphs.drawn("duree", new Vec2(6, 26), 1.5, 0));
+		strokes.addAll(TestGlyphs.drawn("cibles", new Vec2(6, 6), 1.5, 0));
+		strokes.addAll(TestGlyphs.drawn("cibles", new Vec2(26, 6), 1.5, 0));
+		var stage = parser.parse(circle(4, strokes)).stages().getFirst();
+		assertEquals("cone", stage.shape());
+		assertEquals(1, stage.duration());
+		assertEquals(2, stage.targets());
+		Analysis a = analyze(circle(4, strokes));
+		assertTrue(a.issues().stream().noneMatch(i -> i.kind() == CircleIssue.Kind.UNKNOWN_GLYPH), () -> a.issues().toString());
+		assertEquals("cone", a.effects().getFirst().shape());
+		assertEquals(2, a.effects().getFirst().targets());
+		// Chaque modificateur se paie, comme la flèche ou les points d'intensité.
+		Analysis bare = analyze(circle(4, glyph("terre", TOP), glyph("projeter", BOTTOM)));
+		assertTrue(a.concentration() > bare.concentration());
+	}
+
 	@Test
 	void aGlyphNotYetUnderstoodStillWorksButMayRebound() {
 		Drawing d = circle(3, glyph("terre", TOP), glyph("fixer", BOTTOM));

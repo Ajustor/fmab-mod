@@ -59,7 +59,7 @@ public final class CopperCircuits {
 			return Effects.Result.NO_TARGET;
 		}
 		level.setBlockAndUpdate(at, Blocks.REDSTONE_BLOCK.defaultBlockState());
-		CHARGES.add(new Charge(level.dimension(), at.immutable(), level.getGameTime() + CHARGE));
+		CHARGES.add(new Charge(level.dimension(), at.immutable(), level.getGameTime() + ctx.lasting(CHARGE)));
 		level.sendParticles(SPARK, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, 20, 0.4, 0.4, 0.4, 0);
 		return Effects.Result.DONE;
 	}

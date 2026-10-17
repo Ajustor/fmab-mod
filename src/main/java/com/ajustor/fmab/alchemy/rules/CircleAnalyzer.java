@@ -110,6 +110,7 @@ public final class CircleAnalyzer {
 			if (stage.direction().isPresent()) {
 				directionGlyph.ifPresent(written::add);
 			}
+			written.addAll(stage.modifiers());
 			satelliteCount += stage.satellites().size();
 
 			int load = 0;
@@ -219,7 +220,8 @@ public final class CircleAnalyzer {
 		combination(stage.layer(GlyphLayer.ELEMENT), stage.layer(GlyphLayer.ACTION), stage.hexagram(), issues, knowledge)
 				.filter(c -> formulaComplete(c, infusions, issues))
 				.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), -1, c, range(c, stage.intensity(), knowledge),
-						stage.intensity(), Vec2.ZERO, direction, infusions, stage.link())));
+						stage.intensity(), Vec2.ZERO, direction, infusions, stage.link(), stage.shape(),
+						stage.duration(), stage.targets())));
 
 		for (int i = 0; i < stage.satellites().size(); i++) {
 			Satellite s = stage.satellites().get(i);
@@ -231,7 +233,7 @@ public final class CircleAnalyzer {
 			combination(s.layer(GlyphLayer.ELEMENT), s.layer(GlyphLayer.ACTION), false, issues, knowledge)
 					.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), index, c, range(c, 0, knowledge), 0,
 							s.center(), Double.isNaN(direction) ? s.center().angle() : direction, Set.of(),
-							stage.link())));
+							stage.link(), "line", 0, 0)));
 		}
 		return out;
 	}
