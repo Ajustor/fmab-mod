@@ -59,17 +59,21 @@ public class GloveArtsScenes implements FabricClientGameTest {
 				}
 				FmabAttachments.GLOVES.set(p, Gloves.NONE.with(false, new ItemStack(FmabItems.IRON_GAUNTLETS)));
 				Concentration.set(p, Concentration.max(p));
+				float before = Concentration.of(p);
 				// Face au sud : on frappe le sol juste devant soi.
 				GloveCasting.strike(p, new BlockPos(0, -61, 1), Direction.UP);
+				String seen = " (payé=" + (Concentration.of(p) < before) + " main=" + p.getMainHandItem()
+						+ " face=" + p.getDirection() + " sol=" + p.level().getBlockState(new BlockPos(0, -61, 2))
+						+ " au-dessus=" + p.level().getBlockState(new BlockPos(0, -60, 2)) + ")";
 				int spikes = 0;
 				for (int z = 2; z <= 6; z++) {
 					if (!p.level().getBlockState(new BlockPos(0, -60, z)).isAir()) {
 						spikes++;
 					}
 				}
-				return "piques=" + spikes;
+				return "piques=" + spikes + (spikes == 5 ? "" : seen);
 			});
-			check(punch.equals("piques=5"), "le coup de poing devrait soulever cinq piques : " + punch);
+			check(punch.startsWith("piques=5"), "le coup de poing devrait soulever cinq piques : " + punch);
 		}
 	}
 }
