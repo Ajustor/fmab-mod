@@ -84,6 +84,11 @@ public final class Blueprints {
 		out.put("ishval_ruins", new IshvalRuins());
 		out.put("xerxes_ruins", new XerxesRuins());
 		out.put("yock_island", Blueprint.withChest(new YockIsland(), 2, "yock_island"));
+		out.put("drachma_camp", new DrachmaCamp());
+		out.put("xing_grounds", new XingGrounds());
+		out.put("xing_shrine", new XingHall(true));
+		out.put("xing_house", new XingHall(false));
+		out.put("drachma_fort", new DrachmaFort());
 		// Les mêmes maisons, avec leurs abords (avant-toits, volets, jardinières, massifs) : les lieux
 		// les posent sur une parcelle plus large de deux blocs.
 		out.put("central_house_dressed", new Dressing(out.get("central_house"), Dressing.TOWN));

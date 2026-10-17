@@ -18,6 +18,10 @@ import java.util.Optional;
 public class XingStructure extends Structure {
 	public static final MapCodec<XingStructure> CODEC = simpleCodec(XingStructure::new);
 	static final int SIZE = 23;
+	/** Le domaine dont le biome devient celui de Xing. */
+	static final int GROUNDS = 71;
+	/** Le temple et les maisons. */
+	static final int HALL = 9;
 
 	public XingStructure(StructureSettings settings) {
 		super(settings);
@@ -40,8 +44,20 @@ public class XingStructure extends Structure {
 		BlockPos corner = new BlockPos(cx - SIZE / 2, y, cz - SIZE / 2);
 		Rotation rotation = Rotation.values()[context.random().nextInt(4)];
 		long seed = context.random().nextLong();
-		return Optional.of(new GenerationStub(new BlockPos(cx, y, cz), builder -> builder.addPiece(
-				new ProceduralPiece("xing_pavilion", corner, SIZE, 12, SIZE, 0, rotation, seed))));
+		return Optional.of(new GenerationStub(new BlockPos(cx, y, cz), builder -> {
+			builder.addPiece(new ProceduralPiece("xing_grounds", new BlockPos(cx - GROUNDS / 2, y, cz - GROUNDS / 2),
+					GROUNDS, 1, GROUNDS, 0, Rotation.NONE, seed));
+			builder.addPiece(new ProceduralPiece("xing_pavilion", corner, SIZE, 12, SIZE, 0, rotation, seed));
+			// Autour du pavillon : le temple d'un côté, deux maisons des autres.
+			int[][] halls = {{SIZE / 2 + 5, -HALL / 2}, {-SIZE / 2 - 5 - HALL, -HALL / 2}, {-HALL / 2, SIZE / 2 + 5}};
+			for (int i = 0; i < halls.length; i++) {
+				int hx = cx + halls[i][0], hz = cz + halls[i][1];
+				int hy = context.chunkGenerator().getFirstFreeHeight(hx + HALL / 2, hz + HALL / 2,
+						Heightmap.Types.WORLD_SURFACE_WG, context.heightAccessor(), context.randomState());
+				builder.addPiece(new ProceduralPiece(i == 0 ? "xing_shrine" : "xing_house", new BlockPos(hx, hy - 1, hz),
+						HALL, 8, HALL, 1, Rotation.values()[(i + 1) % 4], seed ^ i));
+			}
+		}));
 	}
 
 	@Override

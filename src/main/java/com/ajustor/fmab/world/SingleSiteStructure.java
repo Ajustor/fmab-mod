@@ -30,7 +30,8 @@ public class SingleSiteStructure extends Structure {
 			Codec.INT.fieldOf("height").forGetter(s -> s.height),
 			Codec.INT.optionalFieldOf("ground", 0).forGetter(s -> s.ground),
 			ResourceKey.codec(Registries.STRUCTURE_SET).listOf().optionalFieldOf("avoid", List.of())
-					.forGetter(s -> s.avoid)
+					.forGetter(s -> s.avoid),
+			Codec.BOOL.optionalFieldOf("unique", true).forGetter(s -> s.unique)
 	).apply(i, SingleSiteStructure::new));
 
 	/** Distance minimale, en chunks, aux emplacements des lieux à éviter. */
@@ -41,20 +42,23 @@ public class SingleSiteStructure extends Structure {
 	private final int height;
 	private final int ground;
 	private final List<ResourceKey<StructureSet>> avoid;
+	/** Un seul par monde (un lieu de l'histoire), ou autant que le placement en pose (un camp). */
+	private final boolean unique;
 
 	public SingleSiteStructure(StructureSettings settings, String piece, int size, int height, int ground,
-			List<ResourceKey<StructureSet>> avoid) {
+			List<ResourceKey<StructureSet>> avoid, boolean unique) {
 		super(settings);
 		this.piece = piece;
 		this.size = size;
 		this.height = height;
 		this.ground = ground;
 		this.avoid = List.copyOf(avoid);
+		this.unique = unique;
 	}
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return unique ? UniqueSite.only(this, context, this::at) : at(context, context.chunkPos());
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */

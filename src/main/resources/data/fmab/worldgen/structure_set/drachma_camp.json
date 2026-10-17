@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 552901733,
+    "separation": 12,
+    "spacing": 32,
+    "exclusion_zone": {
+      "other_set": "fmab:fort_briggs",
+      "chunk_count": 6
+    }
+  },
+  "structures": [
+    {
+      "structure": "fmab:drachma_camp",
+      "weight": 1
+    }
+  ]
+}

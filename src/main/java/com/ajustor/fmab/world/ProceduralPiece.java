@@ -1,5 +1,7 @@
 package com.ajustor.fmab.world;
 
+import net.minecraft.core.registries.Registries;
+import com.ajustor.fmab.compat.WorldgenCompat;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
@@ -112,6 +114,9 @@ public class ProceduralPiece extends StructurePiece {
 		int maxZ = Math.min(boundingBox.maxZ(), chunkBB.maxZ());
 		int minY = Math.max(boundingBox.minY(), chunkBB.minY());
 		int maxY = Math.min(boundingBox.maxY(), chunkBB.maxY());
+		blueprint.biome().ifPresent(key -> WorldgenCompat.paint(level.getChunk(chunkPos.x(), chunkPos.z()),
+				level.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(key),
+				(x, z) -> x >= minX && x <= maxX && z >= minZ && z <= maxZ));
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		List<BlockPos> connected = new ArrayList<>();
 		for (int wx = minX; wx <= maxX; wx++) {
