@@ -74,6 +74,11 @@ public final class GloveCasting {
 		boolean right = hasCircle(player, false);
 		boolean left = hasCircle(player, true);
 		if (!right && !left) {
+			// Sans cercle, les gants de Mustang claquent quand même : une gerbe de feu au loin.
+			if (GloveArts.bare(player, GloveItem.Kind.SPARK)) {
+				GloveArts.snap(player);
+				return;
+			}
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.no_glove_circle"));
 			return;
 		}
@@ -180,10 +185,15 @@ public final class GloveCasting {
 			return;
 		}
 		player.getCooldowns().addCooldown(glove, STRIKE_COOLDOWN);
+		if (!inscribed(glove)) {
+			// Sans cercle gravé, les gantelets d'Armstrong font jaillir une ligne de piques.
+			GloveArts.punch(player, pos);
+			return;
+		}
 		castWith(player, gloves, left, pos, face);
 	}
 
-	/** Main du gantelet gravé (vrai pour la gauche), ou null s'il n'y en a pas ou que la main est prise. */
+	/** Main du gantelet (vrai pour la gauche), gravé ou non, ou null s'il n'y en a pas ou que la main est prise. */
 	private static Boolean strikingHand(Player player) {
 		if (!player.getMainHandItem().isEmpty()) {
 			return null;
@@ -194,7 +204,7 @@ public final class GloveCasting {
 		}
 		for (boolean left : new boolean[]{false, true}) {
 			ItemStack glove = gloves.get(left);
-			if (glove.getItem() instanceof GloveItem item && item.kind().striking() && inscribed(glove)) {
+			if (glove.getItem() instanceof GloveItem item && item.kind().striking()) {
 				return left;
 			}
 		}

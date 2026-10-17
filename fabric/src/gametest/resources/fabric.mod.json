@@ -43,7 +43,8 @@
 			"com.ajustor.fmab.gametest.DrachmaScenes",
 			"com.ajustor.fmab.gametest.XingScenes",
 			"com.ajustor.fmab.gametest.AlchemyBalanceScenes",
-			"com.ajustor.fmab.gametest.CopperMistScenes"
+			"com.ajustor.fmab.gametest.CopperMistScenes",
+			"com.ajustor.fmab.gametest.GloveArtsScenes"
 		]
 	},
 	"depends": {
