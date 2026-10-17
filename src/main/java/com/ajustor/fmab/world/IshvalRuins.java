@@ -1,5 +1,6 @@
 package com.ajustor.fmab.world;
 
+import com.ajustor.fmab.entity.character.StoryCharacters;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
 import net.minecraft.core.BlockPos;
@@ -57,6 +58,9 @@ final class IshvalRuins implements Blueprint {
 	@Override
 	public List<Spawn> spawns(Plot p) {
 		int c = p.sizeX() / 2;
-		return List.of(new Spawn(FmabEntities.SCAR, new BlockPos(c - 2, 1, c + 2)));
+		// Les Alchimistes d'État de la guerre d'extermination y montent encore la garde.
+		return List.of(new Spawn(FmabEntities.SCAR, new BlockPos(c - 2, 1, c + 2)),
+				new Spawn(FmabEntities.character(StoryCharacters.BASQUE_GRAND), new BlockPos(c + 2, 1, c + 2)),
+				new Spawn(FmabEntities.character(StoryCharacters.MCDOUGAL), new BlockPos(c + 2, 1, c + 3)));
 	}
 }

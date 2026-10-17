@@ -167,6 +167,16 @@ public final class FmabItems {
 
 	/** Le kunaï d'alkahestry : cinq plantés en cercle soignent ou piègent, même chez Père. */
 	public static final Item KUNAI = register("kunai", KunaiItem::new, new Item.Properties().stacksTo(16));
+	/** Un œuf par personnage de l'histoire. */
+	public static final java.util.Map<String, Item> CHARACTER_EGGS = characterEggs();
+
+	private static java.util.Map<String, Item> characterEggs() {
+		java.util.Map<String, Item> out = new java.util.LinkedHashMap<>();
+		FmabEntities.CHARACTERS.forEach((id, type) -> out.put(id, register(id + "_spawn_egg", SpawnEggItem::new,
+				new Item.Properties().spawnEgg(type))));
+		return out;
+	}
+
 	public static final Item MAY_CHANG_SPAWN_EGG = register("may_chang_spawn_egg", SpawnEggItem::new,
 			new Item.Properties().spawnEgg(FmabEntities.MAY_CHANG));
 
@@ -359,6 +369,7 @@ public final class FmabItems {
 					output.accept(HOHENHEIM_SPAWN_EGG);
 					output.accept(CIPHERED_NOTES);
 					output.accept(MARCOH_SPAWN_EGG);
+					CHARACTER_EGGS.values().forEach(output::accept);
 				})
 				.build());
 	}

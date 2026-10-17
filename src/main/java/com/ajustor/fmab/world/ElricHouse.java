@@ -1,5 +1,7 @@
 package com.ajustor.fmab.world;
 
+import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.entity.character.StoryCharacters;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,6 +31,13 @@ final class ElricHouse implements Blueprint {
 			return b(Blocks.LECTERN);
 		}
 		return shell;
+	}
+
+	@Override
+	public List<Spawn> spawns(Plot p) {
+		// Alphonse, dans son armure, garde la maison où tout a commencé.
+		return List.of(new Spawn(FmabEntities.character(StoryCharacters.ALPHONSE),
+				new BlockPos(p.sizeX() / 2, 1, p.sizeZ() / 2)));
 	}
 
 	@Override

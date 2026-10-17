@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "fmab:item/lan_fan_spawn_egg"
+  }
+}

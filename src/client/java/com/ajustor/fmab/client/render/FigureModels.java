@@ -114,6 +114,11 @@ public final class FigureModels {
 		return bakeWide(mesh);
 	}
 
+	/** Une silhouette de joueur, sans volume de plus : la peau dit tout. */
+	public static ModelPart plain(boolean slim) {
+		return bake(mesh(slim));
+	}
+
 	/** Une femme : la poitrine, sous la surcouche de la veste. */
 	public static ModelPart woman(boolean slim) {
 		MeshDefinition mesh = mesh(slim);

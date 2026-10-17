@@ -1,5 +1,6 @@
 package com.ajustor.fmab.world;
 
+import com.ajustor.fmab.entity.character.StoryCharacters;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
 import net.minecraft.core.BlockPos;
@@ -138,6 +139,8 @@ final class XingPavilion implements Blueprint {
 
 	@Override
 	public List<Spawn> spawns(Plot p) {
-		return List.of(new Spawn(FmabEntities.MAY_CHANG, new BlockPos((P0 + P1) / 2, 2, Z0 + 3)));
+		return List.of(new Spawn(FmabEntities.MAY_CHANG, new BlockPos((P0 + P1) / 2, 2, Z0 + 3)),
+				new Spawn(FmabEntities.character(StoryCharacters.LING), new BlockPos((P0 + P1) / 2 - 2, 2, Z0 + 3)),
+				new Spawn(FmabEntities.character(StoryCharacters.LAN_FAN), new BlockPos((P0 + P1) / 2 + 2, 2, Z0 + 3)));
 	}
 }

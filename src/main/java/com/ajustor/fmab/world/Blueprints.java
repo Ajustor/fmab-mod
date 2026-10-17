@@ -1,5 +1,7 @@
 package com.ajustor.fmab.world;
 
+import com.ajustor.fmab.registry.FmabEntities;
+import com.ajustor.fmab.entity.character.StoryCharacters;
 import com.ajustor.fmab.registry.FmabBlocks;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.DyeColor;
@@ -54,7 +56,10 @@ public final class Blueprints {
 		out.put("central_roads", CityPlans::cityRoads);
 		out.put("central_fountain", CityPlans::fountain);
 		out.put("central_house", Blueprint.withChest(new Home(CITY_PALETTES, true), 1, "house"));
-		out.put("central_library", Blueprint.withChest(CityPlans::library, 0, "central_library"));
+		// Shou Tucker y fait ses recherches, entre les rayonnages.
+		out.put("central_library", Blueprint.withSpawns(Blueprint.withChest(CityPlans::library, 0, "central_library"),
+				p -> java.util.List.of(new Blueprint.Spawn(FmabEntities.character(StoryCharacters.TUCKER),
+						new net.minecraft.core.BlockPos(p.sizeX() / 2, 0, p.sizeZ() - 5)))));
 		out.put("central_hq", new Headquarters());
 		out.put("resembool_house", Blueprint.withChest(new Home(RURAL_PALETTES, false), 1, "house"));
 		out.put("rockbell_house", new RockbellHouse());
