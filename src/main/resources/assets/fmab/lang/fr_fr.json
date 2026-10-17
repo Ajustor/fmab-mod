@@ -369,6 +369,7 @@
   "treatise.fmab.ch4.p9": "Les supports.\n\nLa craie trace partout mais s'efface sous la pluie. La peinture alchimique tient. Le burin grave pour toujours, mais seulement la pierre et le métal.\n\nOn inscrit au sol, sur un mur ou au plafond. Sur un mur ou un plafond, l'effet part droit devant la surface : une pique jaillit du mur, un mur se lève en face de lui.",
   "treatise.fmab.ch4.p10": "Les gants.\n\nÀ la table d'alchimiste, un gant en main, on y brode le cercle sélectionné dans votre carnet (fil alchimique) ou on le grave sur un gantelet (burin). Utilisez le gant pour l'enfiler.\n\nG lance son cercle sur la surface visée, main libre ; Maj+G joint les mains et lance les deux. Les gants à silex agissent à distance, les gantelets en frappant.",
   "item.fmab.state_watch": "Montre d'Alchimiste d'État",
+  "item.fmab.transmuted_blade": "Lame transmutée",
   "item.fmab.engraved_watch": "Montre gravée de Hohenheim",
   "item.fmab.engraved_watch.engraving": "À l'intérieur du couvercle : « N'oublie pas. »",
   "item.fmab.state_examiner_spawn_egg": "Œuf d'apparition d'examinateur",

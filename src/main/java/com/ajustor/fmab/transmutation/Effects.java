@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import com.ajustor.fmab.alchemy.exchange.Family;
 import com.ajustor.fmab.gate.Automails;
@@ -217,13 +218,20 @@ public final class Effects {
 		return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
 	}
 
-	/** Fer + Projeter : une lame de fer, forgée avec le fer posé sur le cercle ou porté. */
+	/**
+	 * Fer + Projeter : une lame de fer, forgée avec le fer posé sur le cercle ou porté. L'alchimie
+	 * l'affûte et la renforce : elle vaut mieux qu'une épée de forge.
+	 */
 	private static Result blade(EffectContext ctx) {
 		MaterialPool pool = MaterialPool.collect(ctx, "iron", Family.METAL);
 		if (!pool.consume(BLADE_MASS)) {
 			return Result.NO_MATERIAL;
 		}
 		ItemStack sword = new ItemStack(Items.IRON_SWORD);
+		var enchantments = ctx.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+		sword.enchant(enchantments.getOrThrow(Enchantments.SHARPNESS), 1);
+		sword.enchant(enchantments.getOrThrow(Enchantments.UNBREAKING), 1);
+		sword.set(DataComponents.CUSTOM_NAME, Component.translatable("item.fmab.transmuted_blade"));
 		if (ctx.stage().infused("fire")) {
 			sword.enchant(ctx.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
 					.getOrThrow(Enchantments.FIRE_ASPECT), 1);
@@ -464,17 +472,26 @@ public final class Effects {
 			if (fromFlow == null) {
 				break;
 			}
+			if (!taken.isEmpty() && !fromFlow.is(taken.getFirst().getBlock())) {
+				// Une autre sorte de terre : elle retourne d'où elle vient.
+				ctx.flow().add(new ItemStack(fromFlow.getBlock()));
+				break;
+			}
 			taken.add(fromFlow);
 		}
 		List<BlockPos> dug = new ArrayList<>();
 		BlockPos below = ctx.origin().below();
 		for (Direction side : Direction.Plane.HORIZONTAL) {
-			if (taken.size() + dug.size() >= LANCE_BLOCKS) {
+			// Les blocs creusés comptent déjà dans « taken » : ne pas les compter deux fois.
+			if (taken.size() >= LANCE_BLOCKS) {
 				break;
 			}
 			BlockPos p = below.relative(side);
 			BlockState state = level.getBlockState(p);
-			if (state.is(earth) && !state.hasBlockEntity()) {
+			// La lance rend en se défaisant les blocs qu'elle a pris : tous de la même sorte, sans quoi
+			// elle changerait de la terre en pierre (ou en deepslate).
+			boolean same = taken.isEmpty() || state.is(taken.getFirst().getBlock());
+			if (state.is(earth) && !state.hasBlockEntity() && same) {
 				dug.add(p);
 				taken.add(state);
 			}

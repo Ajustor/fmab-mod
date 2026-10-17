@@ -369,6 +369,7 @@
   "treatise.fmab.ch4.p9": "Surfaces.\n\nChalk draws anywhere but washes away in the rain. Alchemical paint lasts. The chisel engraves forever, but only stone and metal.\n\nCircles go on floors, walls or ceilings. On a wall or a ceiling, the effect goes straight out from the surface: a spike bursts from the wall, a wall rises in front of it.",
   "treatise.fmab.ch4.p10": "Gloves.\n\nAt an alchemist's table, glove in hand, embroider the circle selected in your notebook (alchemical thread) or engrave it on a gauntlet (chisel). Use the glove to put it on.\n\nG casts its circle on the surface you aim at, hand free; Shift+G joins hands and casts both. Spark gloves act at range, gauntlets when striking.",
   "item.fmab.state_watch": "State Alchemist's Watch",
+  "item.fmab.transmuted_blade": "Transmuted Blade",
   "item.fmab.engraved_watch": "Hohenheim's Engraved Watch",
   "item.fmab.engraved_watch.engraving": "Inside the lid: \"Don't forget.\"",
   "item.fmab.state_examiner_spawn_egg": "Examiner Spawn Egg",

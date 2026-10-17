@@ -47,6 +47,8 @@ export interface Analysis {
 const BARE_RING_CAPACITY = 2;
 const SYMMETRY_BONUS = 1.25;
 const INTENSITY_STEP = 0.5;
+/** Le surcoût par bloc de portée au-delà du premier. */
+const RANGE_COST = 0.25;
 const MIRROR_TOLERANCE = 1.5;
 const UNKNOWN_COMBINATION_SEVERITY = 0.5;
 const UNKNOWN_GLYPH_SEVERITY = 0.3;
@@ -146,6 +148,9 @@ export class CircleAnalyzer {
       effects.push(...this.effectsOf(stage, issues));
     }
     concentration *= Math.max(1, parsed.stages.length);
+    // La portée coûte : complexité × portée × étages (même règle que CircleAnalyzer.reach).
+    const far = effects.reduce((m, e) => Math.max(m, e.range), 1);
+    concentration = Math.round(concentration * (1 + RANGE_COST * Math.max(0, far - 1)));
     for (const id of unlearned) issues.push(issue("glyph_not_learned", null, id));
     const risk = Math.min(MAX_UNLEARNED_RISK, UNLEARNED_RISK * unlearned.size);
     required = Math.max(required, glyphRank);

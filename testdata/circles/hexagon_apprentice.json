@@ -90,7 +90,7 @@
   "expected": {
     "outcome": "works",
     "complexity": 2,
-    "concentration": 5,
+    "concentration": 6,
     "stability": 1.913,
     "required_rank": "alchemist",
     "rebound": 0.0,

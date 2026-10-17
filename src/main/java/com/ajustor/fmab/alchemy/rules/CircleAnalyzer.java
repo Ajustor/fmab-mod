@@ -46,6 +46,8 @@ public final class CircleAnalyzer {
 	private static final int BARE_RING_CAPACITY = 2;
 	private static final double SYMMETRY_BONUS = 1.25;
 	private static final double INTENSITY_STEP = 0.5;
+	/** Le surcoût par bloc de portée au-delà du premier. */
+	public static final double RANGE_COST = 0.25;
 	/** Distance (cases) sous laquelle deux glyphes sont l'image l'un de l'autre. */
 	private static final double MIRROR_TOLERANCE = 1.5;
 	private static final double UNKNOWN_COMBINATION_SEVERITY = 0.5;
@@ -138,6 +140,8 @@ public final class CircleAnalyzer {
 			effects.addAll(effects(stage, issues, knowledge));
 		}
 		concentration *= Math.max(1, parsed.stages().size());
+		// La portée coûte : complexité × portée × étages, comme le dit le BRIEF.
+		concentration = (int) Math.round(concentration * reach(effects));
 		if (knowledge != null) {
 			double discount = 0;
 			double practice = 0;
@@ -278,6 +282,18 @@ public final class CircleAnalyzer {
 		}
 		issues.add(new CircleIssue(Kind.INCOMPLETE_FORMULA, null, String.join("+", missing)));
 		return false;
+	}
+
+	/**
+	 * Ce que la portée ajoute au coût : un quart de plus par bloc au-delà du premier, pour l'effet qui
+	 * porte le plus loin. La portée de base (combinaison et intensité), sans les bonus du savoir : la
+	 * pratique n'a pas à coûter plus cher.
+	 */
+	public static double reach(List<Analysis.StageEffect> effects) {
+		double far = effects.stream()
+				.mapToDouble(e -> e.combination().range() * (1 + INTENSITY_STEP * e.intensity()))
+				.max().orElse(1);
+		return 1 + RANGE_COST * Math.max(0, far - 1);
 	}
 
 	private static double range(Combination c, int intensity, Knowledge knowledge) {

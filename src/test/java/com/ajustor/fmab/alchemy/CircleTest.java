@@ -30,12 +30,21 @@ class CircleTest {
 	private final CircleAnalyzer analyzer = new CircleAnalyzer(TestGlyphs.combinations(), TestGlyphs.all().values());
 
 	@Test
+	void theFartherItReachesTheMoreItCosts() {
+		Analysis wall = analyze(circle(3, glyph("terre", TOP), glyph("fixer", BOTTOM)));
+		double far = wall.effects().getFirst().combination().range();
+		assertEquals(1 + CircleAnalyzer.RANGE_COST * (far - 1), CircleAnalyzer.reach(wall.effects()), 1e-9);
+		assertEquals(1, CircleAnalyzer.reach(java.util.List.of()), 1e-9, "sans effet, pas de surcoût");
+	}
+
+	@Test
 	void earthAndSaltInATriangleRaiseAWall() {
 		Analysis a = analyze(circle(3, glyph("terre", TOP), glyph("fixer", BOTTOM)));
 		assertEquals(Outcome.WORKS, a.outcome(), () -> a.issues().toString());
 		assertEquals("fmab:wall", a.effects().getFirst().combination().effect());
 		assertEquals(2, a.complexity());
-		assertEquals(5, a.concentration());
+		// Terre (2) + Fixer (3), un mur de portée 2 : un quart de plus pour le bloc au-delà du premier.
+		assertEquals(6, a.concentration());
 		// Triangle (3) chargé à 2, glyphes alignés sur l'axe vertical : 3 × 1,25 / 2.
 		assertEquals(1.875, a.stability(), 1e-9);
 	}
