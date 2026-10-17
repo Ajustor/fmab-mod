@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import com.ajustor.fmab.alchemy.exchange.Family;
@@ -98,6 +99,9 @@ public final class Effects {
 	private static final float BLAST_POWER = 2;
 	/** Une lance de pierre demande deux blocs. */
 	private static final int LANCE_BLOCKS = 2;
+	/** La brume : son rayon de base, et sa durée de base en ticks. */
+	private static final float MIST_RADIUS = 2.5f;
+	private static final int MIST_TICKS = 20 * 8;
 	/**
 	 * La lame-bras et la lance de pierre sont des savoirs : sans eux, Fer ou Terre + Recomposer ne
 	 * fait que copier un modèle.
@@ -121,11 +125,11 @@ public final class Effects {
 		register("fmab:stone_lance", Effects::stoneLance);
 		register("fmab:arm_blade", Effects::armBlade);
 		register("fmab:ice_spike", Effects::iceSpike);
-		register("fmab:ice_wall", Effects::iceWall);
+		register("fmab:mist", Effects::mist);
 		register("fmab:detonate", Effects::detonate);
 		register("fmab:recompose", Recomposition::recompose);
 		register("fmab:dismantle", Recomposition::dismantleEffect);
-		for (String grows : new String[]{"fmab:wall", "fmab:spike", "fmab:ice_spike", "fmab:ice_wall"}) {
+		for (String grows : new String[]{"fmab:wall", "fmab:spike", "fmab:ice_spike"}) {
 			CHANNELS.put(grows, Channel.GROW);
 		}
 		for (String repeats : new String[]{"fmab:flame_jet", "fmab:flame_burst", "fmab:gust"}) {
@@ -589,24 +593,24 @@ public final class Effects {
 	}
 
 	/**
-	 * Eau + Air + Fixer : un mur de glace se lève devant le cercle, fait de l'eau alentour. L'Air
-	 * porte l'humidité jusqu'au mur.
+	 * Eau + Air + Fixer : une brume épaisse se lève devant le cercle et aveugle ceux qu'elle
+	 * enveloppe. Plus le cercle porte loin, plus elle est large et longue.
 	 */
-	private static Result iceWall(EffectContext ctx) {
+	private static Result mist(EffectContext ctx) {
 		ServerLevel level = ctx.level();
-		Direction d = ctx.horizontalDirection();
-		Direction along = d.getClockWise();
-		BlockPos center = ctx.origin().relative(d, 2);
-		List<BlockPos> water = waterAround(level, ctx.origin(), ctx.range() * 2 + ICE_REACH);
-		int moved = 0;
-		for (int i = -ctx.range(); i <= ctx.range(); i++) {
-			BlockPos column = surface(level, center.relative(along, i));
-			if (column != null) {
-				moved += raise(ctx, water, column, Direction.UP, FmabTags.elementBlocks("water"), ctx.grown(WALL_HEIGHT), 0,
-						Effects::frozen);
-			}
+		BlockPos at = ctx.origin().relative(ctx.horizontalDirection(), ctx.range() + 2);
+		AreaEffectCloud cloud = new AreaEffectCloud(level, at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+		cloud.setRadius(MIST_RADIUS + ctx.range());
+		cloud.setDuration(MIST_TICKS + 40 * ctx.range());
+		cloud.setWaitTime(0);
+		cloud.setRadiusPerTick(0);
+		cloud.setCustomParticle(ParticleTypes.CLOUD);
+		cloud.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60));
+		if (ctx.caster() != null) {
+			cloud.setOwner(ctx.caster());
 		}
-		return moved > 0 ? Result.DONE : Result.NO_MATERIAL;
+		level.addFreshEntity(cloud);
+		return Result.DONE;
 	}
 
 	/**
