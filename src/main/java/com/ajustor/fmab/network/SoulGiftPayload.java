@@ -16,13 +16,14 @@ import java.util.List;
  *                   (l'allié accepte ou refuse) ou {@link #CONFIRM} (le donneur qui donne son âme confirme)
  * @param other      le nom de l'autre joueur
  * @param part       la partie rendue (vide au premier choix)
- * @param payment    {@code own_soul} ou {@code stone} (vide au premier choix)
+ * @param payment    {@code own_soul}, {@code stone} ou {@code gate} (vide au premier choix)
  * @param parts      ce que l'allié a perdu (au premier choix)
  * @param stoneSouls les âmes de la Pierre que tient le donneur (0 sans Pierre)
  * @param ownSoul    le donneur a encore une âme à donner (un corps)
+ * @param gate       le donneur a encore sa Porte à donner (pour un corps entier)
  */
 public record SoulGiftPayload(int step, String other, String part, String payment, List<String> parts, int stoneSouls,
-		boolean ownSoul) implements CustomPacketPayload {
+		boolean ownSoul, boolean gate) implements CustomPacketPayload {
 	public static final int CHOOSE = 0;
 	public static final int PROPOSE = 1;
 	public static final int CONFIRM = 2;
@@ -36,6 +37,7 @@ public record SoulGiftPayload(int step, String other, String part, String paymen
 			ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(8)), SoulGiftPayload::parts,
 			ByteBufCodecs.VAR_INT, SoulGiftPayload::stoneSouls,
 			ByteBufCodecs.BOOL, SoulGiftPayload::ownSoul,
+			ByteBufCodecs.BOOL, SoulGiftPayload::gate,
 			SoulGiftPayload::new);
 
 	@Override

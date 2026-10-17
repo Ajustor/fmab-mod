@@ -4,7 +4,11 @@ import com.ajustor.fmab.client.screen.SoulGiftScreen;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.SoulGift;
 import com.ajustor.fmab.gate.BodyPart;
+import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.gate.SoulArmor;
 import com.ajustor.fmab.gate.SoulGifts;
+import com.ajustor.fmab.transmutation.CircleFrame;
+import com.ajustor.fmab.transmutation.Transmutation;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.network.SoulGiftAnswerPayload;
 import com.ajustor.fmab.network.SoulGiftPayload;
@@ -17,6 +21,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -34,7 +39,8 @@ import static com.ajustor.fmab.gametest.GametestAsserts.check;
  * tient une Pierre ; Winry (un faux joueur) a perdu une jambe et un bras et se tient dans le cercle.
  * Une offre refusée ne coûte rien ; avec la Pierre, sa jambe lui revient pour vingt âmes, une seule
  * fois ; puis le joueur donne sa propre âme pour son bras, confirme une seconde fois, et se réveille
- * dans une armure. Lancer avec {@code ./gradlew :fabric:26.2:runClientGameTest -PfmabGametest=soul_gift}.
+ * dans une armure. Enfin Al, une âme dans une armure, se tient dans le cercle : on ne lui rend que son
+ * corps, et le joueur paie de sa Porte, comme Edward ; l'alchimie ne lui répond plus. Lancer avec {@code ./gradlew :fabric:26.2:runClientGameTest -PfmabGametest=soul_gift}.
  */
 public class SoulGiftScenes implements FabricClientGameTest {
 	private static final int Y = -60;
@@ -116,9 +122,44 @@ public class SoulGiftScenes implements FabricClientGameTest {
 			choose(context, sp, winry, false);
 			check(stage(sp) == null, "rien à rendre, pas de rituel");
 
+			// 5. Al, une âme dans une armure (une jambe perdue avant son corps), se tient dans le cercle : on ne
+			// lui rend que son corps. Le joueur, déjà une âme, ne peut plus donner la sienne ; il donne sa Porte.
+			FakePlayer al = server(sp, p -> {
+				FakePlayer fake = FakePlayer.get(p.level(), new GameProfile(UUID.nameUUIDFromBytes("al".getBytes()), "Al"));
+				fake.snapTo(CIRCLE.getX() + 0.5, CIRCLE.getY(), CIRCLE.getZ() + 0.5, 180, 0);
+				FmabAttachments.GATE.set(fake, GateState.NONE.pay(BodyPart.LEFT_LEG).pay(BodyPart.BODY));
+				SoulArmor.bindFirstTime(fake);
+				return fake;
+			});
+			choose(context, sp, al);
+			check(context.computeOnClient(mc -> ((SoulGiftScreen) mc.gui.screen()).offers()).equals(List.of("body")),
+					"à une âme en armure, on ne rend que son corps");
+			context.takeScreenshot("soul_gift_4_body");
+			// (Son bouton est grisé ; un paquet forgé ne passe pas davantage.)
+			server(sp, p -> {
+				SoulGifts.answer(p, new SoulGiftAnswerPayload(SoulGiftPayload.CHOOSE, "body", "own_soul", true));
+				return null;
+			});
+			check(stage(sp) == SoulGift.Stage.CHOOSING, "une âme n'a plus d'âme à donner");
+			pressScreen(context, "body", "gate", true);
+			answerAs(sp, al, true);
+			check(stage(sp) == SoulGift.Stage.CONFIRMING, "donner sa Porte se confirme une seconde fois");
+			context.waitFor(mc -> mc.gui.screen() instanceof SoulGiftScreen, 100);
+			context.takeScreenshot("soul_gift_5_confirm_gate");
+			pressScreen(context, "", "", true);
+			context.waitTicks(5);
+			check(server(sp, p -> !FmabAttachments.GATE.getOrCreate(al).soulBound()), "Al devrait retrouver son corps");
+			check(server(sp, p -> FmabAttachments.GATE.getOrCreate(al).lost(BodyPart.LEFT_LEG)),
+					"la jambe perdue avant le corps reste perdue");
+			check(server(sp, Transmutation::gateless), "le donneur a donné sa Porte");
+			check(server(sp, p -> Transmutation.activate(p.level(), CIRCLE, CircleFrame.forFace(Direction.UP, Direction.NORTH),
+					Drawing.EMPTY, p, true, 9) == Transmutation.Result.INERT), "sans Porte, aucune transmutation ne répond");
+			check(server(sp, SoulGiftScenes::stoneSouls) == souls - 20, "sa Porte, pas les âmes de la Pierre");
+			context.takeScreenshot("soul_gift_6_gate_given");
+
 			// Ce que voit l'allié sollicité (montré ici au joueur, pour la capture).
 			context.runOnClient(mc -> mc.gui.setScreen(new SoulGiftScreen(new SoulGiftPayload(SoulGiftPayload.PROPOSE,
-					"Edward", "right_arm", "own_soul", List.of(), 0, true))));
+					"Edward", "right_arm", "own_soul", List.of(), 0, true, true))));
 			context.waitTicks(5);
 			context.takeScreenshot("soul_gift_3_propose");
 			context.runOnClient(mc -> mc.gui.setScreen(null));

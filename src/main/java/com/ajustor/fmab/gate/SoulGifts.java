@@ -10,6 +10,7 @@ import com.ajustor.fmab.platform.event.PlayerEvents;
 import com.ajustor.fmab.platform.event.ServerEvents;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.stone.PhilosopherStones;
+import com.ajustor.fmab.transmutation.Transmutation;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.util.PlayerMaps;
 import net.minecraft.core.BlockPos;
@@ -35,11 +36,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Rendre à un allié ce que la Porte lui a pris, en payant d'une âme : un alchimiste qui a déjà vu sa
- * Porte trace une transmutation humaine, l'allié debout dans le cercle. Il choisit ce qu'il rend et ce
- * qu'il paie : sa propre âme (la Vérité prend tout son corps ; il se réveille dans une armure, comme
- * Alphonse), ou des âmes de la Pierre qu'il tient, au prix de {@link Restoration#cost}. L'allié
- * accepte ; le donneur qui donne son âme confirme une seconde fois.
+ * Rendre à un allié ce que la Porte lui a pris : un alchimiste qui a déjà vu sa Porte trace une
+ * transmutation humaine, l'allié debout dans le cercle. Il choisit ce qu'il rend et ce qu'il paie : sa
+ * propre âme (la Vérité prend tout son corps ; il se réveille dans une armure, comme Alphonse), des âmes
+ * de la Pierre qu'il tient, au prix de {@link Restoration#cost}, ou, pour le corps entier d'une âme en
+ * armure, sa Porte (comme Edward pour Alphonse : il ne pratiquera plus jamais l'alchimie). L'allié
+ * accepte ; le donneur qui donne son âme ou sa Porte confirme une seconde fois.
  *
  * <p>Tout est revérifié au moment de payer, et le paiement n'a lieu qu'une fois ({@link SoulGift}). Rien
  * n'est gardé au-delà d'une minute par étape, ni d'un redémarrage : un rituel interrompu ne coûte rien.
@@ -109,8 +111,8 @@ public final class SoulGifts {
 		PENDING.put(donor.getUUID(), new Pending(SoulGift.start(), ally, level.dimension(), circle.immutable(),
 				now(level.getServer())));
 		FmabNetwork.send(donor, new SoulGiftPayload(SoulGiftPayload.CHOOSE, ally.getName().getString(), "", "",
-				restorable.stream().map(SoulOffering::id).toList(), stoneSouls(donor),
-				!FmabAttachments.GATE.getOrCreate(donor).soulBound()));
+				restorable.stream().map(BodyPart::id).toList(), stoneSouls(donor),
+				!FmabAttachments.GATE.getOrCreate(donor).soulBound(), !Transmutation.gateless(donor)));
 	}
 
 	/** Ce qu'un joueur répond, donneur ou allié. */
@@ -143,8 +145,8 @@ public final class SoulGifts {
 					PENDING.put(donor.getUUID(), pending.with(answered, now(server)));
 					player.sendOverlayMessage(Component.translatable("gate.fmab.offer.waiting_donor"));
 					FmabNetwork.send(donor, new SoulGiftPayload(SoulGiftPayload.CONFIRM, player.getName().getString(),
-							SoulOffering.id(answered.part().orElseThrow()), id(answered.payment().orElseThrow()), List.of(),
-							0, true));
+							answered.part().orElseThrow().id(), id(answered.payment().orElseThrow()), List.of(), 0, true,
+							true));
 				} else {
 					settle(server, donor, pending.with(answered, now(server)));
 				}
@@ -158,20 +160,20 @@ public final class SoulGifts {
 	}
 
 	private static void choose(MinecraftServer server, ServerPlayer donor, Pending pending, SoulGiftAnswerPayload answer) {
-		Optional<BodyPart> part = SoulOffering.byId(answer.part());
+		Optional<BodyPart> part = BodyPart.byId(answer.part());
 		Optional<SoulGift.Payment> payment = payment(answer.payment());
 		if (!answer.accept() || part.isEmpty() || payment.isEmpty()) {
 			cancel(donor, "gate.fmab.gift.withdrawn");
 			return;
 		}
 		SoulGift chosen = pending.gift().choose(part.get(), payment.get(), FmabAttachments.GATE.getOrCreate(pending.ally()),
-				FmabAttachments.GATE.getOrCreate(donor), stoneSouls(donor));
+				FmabAttachments.GATE.getOrCreate(donor), stoneSouls(donor), Transmutation.gateless(donor));
 		if (chosen == pending.gift()) {
 			return;
 		}
 		PENDING.put(donor.getUUID(), pending.with(chosen, now(server)));
 		FmabNetwork.send(pending.ally(), new SoulGiftPayload(SoulGiftPayload.PROPOSE, donor.getName().getString(),
-				SoulOffering.id(part.get()), id(payment.get()), List.of(), 0, true));
+				part.get().id(), id(payment.get()), List.of(), 0, true, true));
 		donor.sendOverlayMessage(Component.translatable("gate.fmab.gift.asking", pending.ally().getDisplayName()));
 	}
 
@@ -197,7 +199,7 @@ public final class SoulGifts {
 				|| level.dimension() != pending.dimension() || ally.level().dimension() != pending.dimension()
 				|| donor.position().distanceTo(circle) > REACH || ally.position().distanceTo(circle) > REACH
 				|| !SoulGift.restorable(allyGate).contains(part)
-				|| !SoulGift.affordable(payment, part, donorGate, stoneSouls(donor))) {
+				|| !SoulGift.affordable(payment, part, donorGate, stoneSouls(donor), Transmutation.gateless(donor))) {
 			donor.sendOverlayMessage(Component.translatable("gate.fmab.offer.failed"));
 			ally.sendOverlayMessage(Component.translatable("gate.fmab.offer.failed"));
 			return;
@@ -206,9 +208,8 @@ public final class SoulGifts {
 			PhilosopherStones.drain(donor, stone.orElseThrow(), Restoration.cost(part));
 		}
 		PhilosopherStoneItem.restore(ally, allyGate, new Restoration.Plan(EnumSet.of(part), Restoration.cost(part)), false);
-		Component what = Component.translatable("gate.fmab.offer.part." + SoulOffering.id(part));
-		ally.sendSystemMessage(Component.translatable(payment == SoulGift.Payment.STONE
-				? "gate.fmab.gift.restored_stone" : "gate.fmab.gift.restored_soul", donor.getDisplayName(), what));
+		Component what = Component.translatable("gate.fmab.offer.part." + part.id());
+		ally.sendSystemMessage(Component.translatable("gate.fmab.gift.restored_" + id(payment), donor.getDisplayName(), what));
 		TransmutationLightning.discharge(level, pending.circle(), 1.5, 2);
 		if (payment == SoulGift.Payment.OWN_SOUL) {
 			// Comme Alphonse : la Vérité prend tout le corps, l'âme se réveille dans une armure de fer.
@@ -218,6 +219,11 @@ public final class SoulGifts {
 			donor.sendSystemMessage(Component.translatable("gate.fmab.gift.gave_soul", ally.getDisplayName(), what));
 			donor.sendSystemMessage(Component.translatable("gate.fmab.soul.first_armor"));
 			SoulArmor.giveNotes(donor);
+		} else if (payment == SoulGift.Payment.GATE) {
+			// Comme Edward : la Porte donnée, l'alchimie ne lui répond plus jamais.
+			FmabAttachments.GATELESS.set(donor, true);
+			level.playSound(null, pending.circle(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 1.2f, 0.5f);
+			donor.sendSystemMessage(Component.translatable("gate.fmab.gift.gave_gate", ally.getDisplayName()));
 		} else {
 			donor.sendSystemMessage(Component.translatable("gate.fmab.gift.gave_stone", ally.getDisplayName(), what,
 					Restoration.cost(part)));

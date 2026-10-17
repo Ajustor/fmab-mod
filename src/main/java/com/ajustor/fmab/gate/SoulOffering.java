@@ -26,7 +26,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -281,10 +280,11 @@ public final class SoulOffering {
 	}
 
 	public static String id(BodyPart part) {
-		return part.name().toLowerCase(Locale.ROOT);
+		return part.id();
 	}
 
+	/** Une partie qu'on peut offrir, d'après son nom. */
 	public static Optional<BodyPart> byId(String id) {
-		return SoulOffer.OFFERABLE.stream().filter(p -> id(p).equals(id)).findFirst();
+		return BodyPart.byId(id).filter(SoulOffer.OFFERABLE::contains);
 	}
 }
