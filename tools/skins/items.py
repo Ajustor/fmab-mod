@@ -346,6 +346,42 @@ def state_watch():
     return img
 
 
+@item("engraved_watch")
+def engraved_watch():
+    """La montre de Hohenheim : un boîtier de laiton patiné, ouvert sur un cadran pâle aux deux
+    aiguilles, l'intérieur du couvercle rayé d'une inscription, la bélière et la chaîne."""
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    cx, cy, r = 7.5, 9.5, 6.0
+    for y in range(16):
+        for x in range(16):
+            d = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
+            if d > r + 0.4:
+                continue
+            if d > r - 0.6:
+                img.putpixel((x, y), rgb("#5a4320"))
+                continue
+            if d > r - 1.8:
+                # Le laiton : clair en haut à gauche, patiné en bas à droite.
+                t = ((x - cx) + (y - cy)) / (2 * r)
+                img.putpixel((x, y), mix(rgb("#f0d27a"), rgb("#9a7432"), min(1.0, max(0.0, t + 0.5))))
+                continue
+            # Le cadran, couleur d'os, plus sombre vers le bord.
+            img.putpixel((x, y), shade(rgb("#efe6cf"), 1.0 - 0.12 * d / r))
+    # Les douze heures, en points, et les deux aiguilles.
+    for dx, dy in ((0, -3), (3, 0), (0, 3), (-3, 0)):
+        img.putpixel((int(cx + 0.5) + dx, int(cy) + dy), rgb("#6b5a3a"))
+    for x, y in ((8, 9), (8, 8), (8, 7), (9, 9), (10, 9)):
+        img.putpixel((x, y), rgb("#2b2418"))
+    # La bélière et son anneau, en laiton.
+    for x, y, c in ((7, 3, "#b8913f"), (8, 3, "#e8c66e"), (7, 2, "#e8c66e"), (8, 2, "#a07a35"),
+                    (6, 1, "#5a4320"), (7, 0, "#e8c66e"), (8, 0, "#e8c66e"), (9, 1, "#5a4320")):
+        img.putpixel((x, y), rgb(c))
+    # La chaîne, qui retombe à gauche.
+    for k, (x, y) in enumerate(((5, 1), (4, 1), (3, 2), (2, 3), (2, 4), (1, 5), (1, 6))):
+        img.putpixel((x, y), rgb("#e8c66e" if k % 2 == 0 else "#8a6a2e"))
+    return img
+
+
 # --- les fournitures de l'alchimiste --------------------------------------------------------------
 GLASS = dict(G="#a9c6d6", H="#f2fbff", g="#6f8fa2")
 

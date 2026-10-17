@@ -1,5 +1,6 @@
 package com.ajustor.fmab.entity;
 
+import net.minecraft.ChatFormatting;
 import com.ajustor.fmab.homunculus.AntiAlchemy;
 import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.promised.NationalCircle;
@@ -338,6 +339,10 @@ public class FatherEntity extends HomunculusEntity {
 			}
 			for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(48))) {
 				CinematicPayload.play(p, CinematicPayload.FATHER_FALL, 90);
+			}
+			for (ServerPlayer p : level.getServer().getPlayerList().getPlayers()) {
+				p.sendSystemMessage(Component.translatable("promised.fmab.see_hohenheim")
+						.withStyle(ChatFormatting.GOLD));
 			}
 		}
 		super.die(source);

@@ -80,6 +80,9 @@ public final class FmabItems {
 	/** Montre d'Alchimiste d'État : portée et concentration améliorées pour son titulaire. */
 	public static final Item STATE_WATCH = register("state_watch", Item::new,
 			new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
+	/** La montre de Hohenheim, gravée à l'intérieur : la récompense de la fin, un souvenir. */
+	public static final Item ENGRAVED_WATCH = register("engraved_watch", Item::new,
+			new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
 
 	/** Lance de pierre : les réglages de la lance de pierre vanilla, mais peu de durabilité. */
 	public static final Item STONE_LANCE = register("stone_lance", TransmutedWeaponItem::new,
@@ -282,6 +285,7 @@ public final class FmabItems {
 					output.accept(ALCHEMIST_TABLE);
 					output.accept(ALCHEMICAL_THREAD);
 					output.accept(ALCHEMICAL_INK);
+					output.accept(ENGRAVED_WATCH);
 					output.accept(CLOTH_GLOVES);
 					output.accept(LEATHER_GLOVES);
 					output.accept(SPARK_GLOVES);
