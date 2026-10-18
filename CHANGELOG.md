@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.9.0 — 2026-10-18
+
+### New features
+
+- The more you practise a school of alchemy, the less concentration its transmutations cost (down to half).
+- New players are welcomed: a greeting, a "First steps" page in the Treatise, the State exam and crystallized blood explained, and Izumi pointed out early.
+- The Treatise's glyph catalogue now fills in as you learn: an unknown glyph stays a "???" page telling which tome teaches it and where to find it.
+- New mid-game advancements (notebook, tomes, knowledge, gloves, tattoo, State watch, each of Izumi's trials, chimera, gold), and the Alchemist rank is granted as soon as mastery allows.
+- A real ending: the Promised Day raises immortal soldiers and weakens alchemy away from sealed blood crests; after Father's fall, Hohenheim says farewell, an epilogue tells what comes next, and his engraved watch goes to the player along with "The End" advancement.
+- Bosses now drop real loot (Stone shards, crystallized blood, fitting items), and places have chests filled by data-pack loot tables, including Central's library, the Bradley residence, Sloth's tunnel, Father's lair, Yock Island, blood crests and houses.
+- Twelve story characters join the world, with their lines and shops: Mustang, Hawkeye, Armstrong, Hughes, Ling, Lan Fan, Alphonse, Pinako, Basque Grand, McDougal, the Rush Valley tattooist and Shou Tucker.
+- Two bosses: Kimblee in Ishval (explosive marks) and the Slicer brothers in Laboratory 5 (two seals to erase); and Shou Tucker's secret, told in a cinematic.
+- Ishvalans live in the Ishval ruins and trade their knowledge and goods; the Gate of Truth now stands as a monument in the White Space.
+- Drachma gets its places: pillager camps in the snow, and a fort guarded by the Drachman General, a new boss.
+- Xing gets its own biome (bamboo, vivid grass, turquoise water) around the pavilion, plus a temple and two houses.
+- Water + Air + Fix raises a blinding mist (instead of the ice wall), and copper works with redstone: Fix powers a circuit, Project cuts it.
+- Without a circle, spark gloves snap a burst of fire at range and gauntlets raise a line of spikes, like Mustang and Armstrong.
+- Four modifier glyphs to place on the ring: circle or cone shape, duration and number of targets (taught by the Forms tome).
+- Polish: gloves and tattoos visible on players, one sound per alchemy school, ambience for the White Space and the Belly, completed creative tab and recipe book, and the shell key limited to one press per second.
+- A Philosopher's Stone can give a Gate back to a player who gave theirs away: 100 souls by default, configurable, and they start over.
+
+### Fixes
+
+- Story places (Central and Father's lair, Resembool, Briggs, Xing…) now exist only once per world; maps and /locate lead to them.
+- Homunculi now spare Father's recruits, unless they strike first.
+- The advancement tree now follows the game's actual order: no more advancements shown out of reach right after earning them.
+- The Philosopher's Stone now costs souls on every use (rebounds, empty attempts and prolongations included), and the living Stone no longer skips cooldowns or costs.
+- Glove tooltips now tell how many stages your rank holds before the circle loses stability (State gloves hold only three for a State Alchemist).
+- Balance: gold is capped at one block per transmutation, detonation consumes sulfur, Scar's arm costs by hardness, and chimeras need Life knowledge (three at most).
+- Alchemy no longer hurts its caster or their allies (pets, chimeras, teammates, villagers), its kills are credited to the player, and lost sight prevents sprinting.
+- Circle cost now scales with range, the transmuted blade comes sharpened and reinforced, and the stone lance no longer turns dirt into deepslate (and can be drawn from the ground again).
 ## 1.8.0 — 2026-10-17
 
 ### New features

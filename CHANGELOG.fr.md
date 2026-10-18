@@ -1,5 +1,36 @@
 # Journal des modifications
 
+## 1.9.0 — 2026-10-18
+
+### Nouveautés
+
+- Plus on pratique une école d'alchimie, moins ses transmutations coûtent de concentration (jusqu'à moitié prix).
+- Accueil des nouveaux joueurs : mot de bienvenue, page « Premiers pas » dans le Traité, examen d'État et sang cristallisé expliqués, et Izumi signalée tôt.
+- Le catalogue des glyphes du Traité se complète au fil du savoir : un glyphe inconnu reste une page « ??? » qui dit quel tome l'enseigne et où le trouver.
+- Nouveaux progrès de milieu de partie (carnet, tomes, savoir, gants, tatouage, montre d'État, chaque épreuve d'Izumi, chimère, or), et le rang d'Alchimiste tombe dès que la maîtrise le permet.
+- Une vraie fin : le Jour promis fait sortir des soldats immortels et affaiblit l'alchimie loin des points de sang scellés ; après la chute de Père, Hohenheim fait ses adieux, un épilogue raconte la suite, et sa montre gravée revient au joueur avec le progrès « Fin ».
+- Les boss laissent un vrai butin (éclats de Pierre, sang cristallisé, objets à leur image), et les lieux ont des coffres remplis par des tables de butin modifiables, y compris la bibliothèque de Central, la résidence Bradley, le tunnel de Sloth, le repaire de Père, l'île de Yock, les points de sang et les maisons.
+- Douze personnages de l'histoire rejoignent le monde, avec leurs répliques et leurs boutiques : Mustang, Hawkeye, Armstrong, Hughes, Ling, Lan Fan, Alphonse, Pinako, Basque Grand, McDougal, le tatoueur de Rush Valley et Shou Tucker.
+- Deux boss : Kimblee à Ishval (marques explosives) et les frères Slicer au Laboratoire 5 (deux sceaux à effacer) ; et le secret de Shou Tucker, raconté en cinématique.
+- Des Ishvaliens vivent dans les ruines d'Ishval et échangent leur savoir et leurs objets ; la Porte de la Vérité a désormais son monument dans l'Espace blanc.
+- Drachma a ses lieux : des camps de pillards dans les neiges, et un fort gardé par le général de Drachma, un nouveau boss.
+- Xing a son biome (bambous, herbe vive, eau turquoise) autour du pavillon, et s'agrandit d'un temple et de deux maisons.
+- Eau + Air + Fixer lève une brume aveuglante (à la place du mur de glace), et le cuivre touche à la redstone : Fixer alimente un circuit, Projeter le coupe.
+- Sans cercle, les gants à étincelles claquent une gerbe de feu au loin et les gantelets font jaillir une ligne de piques, comme Mustang et Armstrong.
+- Quatre glyphes modificateurs à poser sur l'anneau : forme en cercle ou en cône, durée et nombre de cibles (enseignés par le tome des Formes).
+- Finitions : gants et tatouages visibles sur les joueurs, un son par école d'alchimie, une ambiance pour l'Espace blanc et le Ventre, l'onglet créatif et le livre de recettes complétés, et la touche de la coquille limitée à un appui par seconde.
+- Une Pierre philosophale peut rendre sa Porte à un joueur qui l'a donnée : 100 âmes par défaut, réglable, et il repart de zéro.
+
+### Corrections
+
+- Les lieux de l'histoire (Central et le repaire de Père, Resembool, Briggs, Xing…) n'existent plus qu'une fois par monde ; les cartes et /locate y mènent.
+- Les homonculus épargnent les recrues de Père, sauf celles qui les attaquent.
+- L'arbre des progrès suit l'ordre réel du jeu : plus de progrès affiché hors de portée alors qu'on vient de l'obtenir.
+- La Pierre philosophale coûte des âmes à chaque usage (rebonds, essais à vide et prolongations compris), et la Pierre vivante n'échappe plus aux délais ni aux coûts.
+- L'infobulle des gants dit au-delà de combien d'étages votre rang fait perdre de la stabilité (les gants d'État n'en tiennent que trois pour un Alchimiste d'État).
+- Équilibrage : l'or est plafonné à un bloc par transmutation, la détonation consume du soufre, le bras de Scar coûte selon la dureté, et les chimères demandent un savoir de la Vie (trois au plus).
+- L'alchimie ne blesse plus son auteur ni ses alliés (bêtes, chimères, coéquipiers, villageois), ses victimes sont créditées au joueur, et la vue perdue empêche de courir.
+- Le coût des cercles suit leur portée, la lame transmutée est affûtée et renforcée, et la lance de pierre ne change plus la terre en deepslate (et se tire de nouveau du sol).
 ## 1.8.0 — 2026-10-17
 
 ### Nouveautés
