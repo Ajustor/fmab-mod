@@ -1,7 +1,11 @@
 package com.ajustor.fmab.gate;
 
+import com.ajustor.fmab.FmabConfig;
+import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.data.ExamProgress;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.SoulGift;
+import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.network.FmabNetwork;
 import com.ajustor.fmab.network.SoulGiftAnswerPayload;
@@ -41,7 +45,10 @@ import java.util.UUID;
  * propre âme (la Vérité prend tout son corps ; il se réveille dans une armure, comme Alphonse), des âmes
  * de la Pierre qu'il tient, au prix de {@link Restoration#cost}, ou, pour le corps entier d'une âme en
  * armure, sa Porte (comme Edward pour Alphonse : il ne pratiquera plus jamais l'alchimie). L'allié
- * accepte ; le donneur qui donne son âme ou sa Porte confirme une seconde fois.
+ * accepte ; le donneur qui donne son âme ou sa Porte confirme une seconde fois. À un allié qui a donné
+ * sa Porte, on peut aussi la rendre : seule la Pierre paie, au prix le plus haut
+ * ({@link FmabConfig#gateRestorationCost}), et l'allié repart de zéro (rang, glyphes, maîtrise,
+ * épreuves).
  *
  * <p>Tout est revérifié au moment de payer, et le paiement n'a lieu qu'une fois ({@link SoulGift}). Rien
  * n'est gardé au-delà d'une minute par étape, ni d'un redémarrage : un rituel interrompu ne coûte rien.
@@ -83,7 +90,8 @@ public final class SoulGifts {
 
 	/**
 	 * La transmutation humaine s'éveille : est-ce ce rituel-là ? Il faut avoir déjà ouvert sa Porte, et
-	 * qu'un autre joueur, à qui la Porte a pris quelque chose, se tienne dans le cercle.
+	 * qu'un autre joueur, à qui la Porte a pris quelque chose (ou qui a donné la sienne), se tienne dans
+	 * le cercle.
 	 */
 	public static boolean tryRitual(ServerPlayer caster, BlockPos circle) {
 		if (FmabAttachments.GATE.getOrCreate(caster).openings() == 0) {
@@ -91,7 +99,7 @@ public final class SoulGifts {
 		}
 		AABB area = new AABB(circle).inflate(INSIDE, 1, INSIDE);
 		Optional<ServerPlayer> ally = caster.level().getEntitiesOfClass(ServerPlayer.class, area,
-				p -> p != caster && p.isAlive() && !SoulGift.restorable(FmabAttachments.GATE.getOrCreate(p)).isEmpty())
+				p -> p != caster && p.isAlive() && !offers(p).isEmpty())
 				.stream().findFirst();
 		if (ally.isEmpty()) {
 			return false;
@@ -102,8 +110,8 @@ public final class SoulGifts {
 
 	/** Le rituel commence : le donneur choisit ce qu'il rend à cet allié, et ce qu'il paie. */
 	public static void start(ServerPlayer donor, BlockPos circle, ServerPlayer ally) {
-		List<BodyPart> restorable = SoulGift.restorable(FmabAttachments.GATE.getOrCreate(ally));
-		if (restorable.isEmpty()) {
+		List<String> offers = offers(ally);
+		if (offers.isEmpty()) {
 			donor.sendOverlayMessage(Component.translatable("gate.fmab.gift.nothing_lost"));
 			return;
 		}
@@ -111,8 +119,23 @@ public final class SoulGifts {
 		PENDING.put(donor.getUUID(), new Pending(SoulGift.start(), ally, level.dimension(), circle.immutable(),
 				now(level.getServer())));
 		FmabNetwork.send(donor, new SoulGiftPayload(SoulGiftPayload.CHOOSE, ally.getName().getString(), "", "",
-				restorable.stream().map(BodyPart::id).toList(), stoneSouls(donor),
-				!FmabAttachments.GATE.getOrCreate(donor).soulBound(), !Transmutation.gateless(donor)));
+				offers, stoneSouls(donor), !FmabAttachments.GATE.getOrCreate(donor).soulBound(),
+				!Transmutation.gateless(donor), gateCost()));
+	}
+
+	/** Ce qu'on peut rendre à cet allié : ce que la Porte lui a pris, et sa Porte s'il l'a donnée. */
+	public static List<String> offers(ServerPlayer ally) {
+		List<String> offers = new ArrayList<>(SoulGift.restorable(FmabAttachments.GATE.getOrCreate(ally)).stream()
+				.map(BodyPart::id).toList());
+		if (Transmutation.gateless(ally)) {
+			offers.add(SoulGift.GATE_ID);
+		}
+		return offers;
+	}
+
+	/** Le prix d'une Porte rendue, réglé sur le serveur. */
+	public static int gateCost() {
+		return FmabConfig.get().gateRestorationCost();
 	}
 
 	/** Ce qu'un joueur répond, donneur ou allié. */
@@ -146,7 +169,7 @@ public final class SoulGifts {
 					player.sendOverlayMessage(Component.translatable("gate.fmab.offer.waiting_donor"));
 					FmabNetwork.send(donor, new SoulGiftPayload(SoulGiftPayload.CONFIRM, player.getName().getString(),
 							answered.part().orElseThrow().id(), id(answered.payment().orElseThrow()), List.of(), 0, true,
-							true));
+							true, 0));
 				} else {
 					settle(server, donor, pending.with(answered, now(server)));
 				}
@@ -160,20 +183,29 @@ public final class SoulGifts {
 	}
 
 	private static void choose(MinecraftServer server, ServerPlayer donor, Pending pending, SoulGiftAnswerPayload answer) {
+		boolean gate = SoulGift.GATE_ID.equals(answer.part());
 		Optional<BodyPart> part = BodyPart.byId(answer.part());
 		Optional<SoulGift.Payment> payment = payment(answer.payment());
-		if (!answer.accept() || part.isEmpty() || payment.isEmpty()) {
+		if (!answer.accept() || (part.isEmpty() && !gate) || payment.isEmpty()) {
 			cancel(donor, "gate.fmab.gift.withdrawn");
 			return;
 		}
-		SoulGift chosen = pending.gift().choose(part.get(), payment.get(), FmabAttachments.GATE.getOrCreate(pending.ally()),
-				FmabAttachments.GATE.getOrCreate(donor), stoneSouls(donor), Transmutation.gateless(donor));
+		SoulGift chosen;
+		if (gate) {
+			// La Porte ne se paie qu'avec la Pierre.
+			chosen = payment.get() == SoulGift.Payment.STONE
+					? pending.gift().chooseGate(Transmutation.gateless(pending.ally()), stoneSouls(donor), gateCost())
+					: pending.gift();
+		} else {
+			chosen = pending.gift().choose(part.get(), payment.get(), FmabAttachments.GATE.getOrCreate(pending.ally()),
+					FmabAttachments.GATE.getOrCreate(donor), stoneSouls(donor), Transmutation.gateless(donor));
+		}
 		if (chosen == pending.gift()) {
 			return;
 		}
 		PENDING.put(donor.getUUID(), pending.with(chosen, now(server)));
 		FmabNetwork.send(pending.ally(), new SoulGiftPayload(SoulGiftPayload.PROPOSE, donor.getName().getString(),
-				part.get().id(), id(payment.get()), List.of(), 0, true, true));
+				answer.part(), id(payment.get()), List.of(), 0, true, true, gateCost()));
 		donor.sendOverlayMessage(Component.translatable("gate.fmab.gift.asking", pending.ally().getDisplayName()));
 	}
 
@@ -187,6 +219,10 @@ public final class SoulGifts {
 			return;
 		}
 		PENDING.remove(donor.getUUID());
+		if (gift.gate()) {
+			settleGate(donor, pending);
+			return;
+		}
 		ServerLevel level = donor.level();
 		ServerPlayer ally = pending.ally();
 		BodyPart part = gift.part().orElseThrow();
@@ -228,6 +264,35 @@ public final class SoulGifts {
 			donor.sendSystemMessage(Component.translatable("gate.fmab.gift.gave_stone", ally.getDisplayName(), what,
 					Restoration.cost(part)));
 		}
+	}
+
+	/**
+	 * La Porte rendue : tout est revérifié, la Pierre paie, et l'allié peut de nouveau transmuter, mais
+	 * il repart de zéro (rang, glyphes, maîtrise, épreuves) : ce qu'il savait, il l'a donné avec elle.
+	 */
+	private static void settleGate(ServerPlayer donor, Pending pending) {
+		ServerLevel level = donor.level();
+		ServerPlayer ally = pending.ally();
+		int cost = gateCost();
+		Optional<ItemStack> stone = PhilosopherStones.held(donor);
+		Vec3 circle = Vec3.atCenterOf(pending.circle());
+		if (!donor.isAlive() || !ally.isAlive() || ally.isRemoved()
+				|| level.dimension() != pending.dimension() || ally.level().dimension() != pending.dimension()
+				|| donor.position().distanceTo(circle) > REACH || ally.position().distanceTo(circle) > REACH
+				|| !Transmutation.gateless(ally) || stone.isEmpty() || stoneSouls(donor) < cost) {
+			donor.sendOverlayMessage(Component.translatable("gate.fmab.offer.failed"));
+			ally.sendOverlayMessage(Component.translatable("gate.fmab.offer.failed"));
+			return;
+		}
+		PhilosopherStones.drain(donor, stone.get(), cost);
+		FmabAttachments.GATELESS.set(ally, false);
+		FmabAttachments.ALCHEMIST.set(ally, AlchemistData.NEW);
+		FmabAttachments.TRAINING.set(ally, Training.NONE);
+		FmabAttachments.EXAM.set(ally, ExamProgress.NONE);
+		TransmutationLightning.discharge(level, pending.circle(), 1.5, 2);
+		level.playSound(null, pending.circle(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.2f, 0.7f);
+		ally.sendSystemMessage(Component.translatable("gate.fmab.gift.restored_gate_back", donor.getDisplayName()));
+		donor.sendSystemMessage(Component.translatable("gate.fmab.gift.gave_stone_gate", ally.getDisplayName(), cost));
 	}
 
 	private static void cancel(ServerPlayer donor, String reason) {

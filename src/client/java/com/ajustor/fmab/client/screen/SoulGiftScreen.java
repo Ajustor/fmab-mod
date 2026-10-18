@@ -1,5 +1,6 @@
 package com.ajustor.fmab.client.screen;
 
+import com.ajustor.fmab.data.SoulGift;
 import com.ajustor.fmab.gate.Restoration;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.network.SoulGiftAnswerPayload;
@@ -59,6 +60,14 @@ public class SoulGiftScreen extends Screen {
 				for (int i = 0; i < state.parts().size(); i++) {
 					String part = state.parts().get(i);
 					int ry = top + ROWS_TOP + i * ROW;
+					if (SoulGift.GATE_ID.equals(part)) {
+						// Sa Porte : seule la Pierre la rend, au plus haut prix.
+						Button stone = addRenderableWidget(Button.builder(
+								Component.translatable("gate.fmab.gift.pay.stone", state.gateCost()),
+								b -> answer(part, "stone", true)).bounds(left + 248, ry, 64, 20).build());
+						stone.active = state.stoneSouls() >= state.gateCost();
+						continue;
+					}
 					Button own = addRenderableWidget(Button.builder(Component.translatable("gate.fmab.gift.pay.own_soul"),
 							b -> answer(part, "own_soul", true)).bounds(left + 104, ry, 68, 20).build());
 					own.active = state.ownSoul();
@@ -121,8 +130,8 @@ public class SoulGiftScreen extends Screen {
 		graphics.centeredText(font, title, left + WIDTH / 2, top + 8, INK);
 		Component part = Component.translatable("gate.fmab.offer.part." + state.part());
 		Component price = switch (state.payment()) {
-			case "stone" -> Component.translatable("gate.fmab.gift.price.stone",
-					BodyPart.byId(state.part()).map(Restoration::cost).orElse(0));
+			case "stone" -> Component.translatable("gate.fmab.gift.price.stone", SoulGift.GATE_ID.equals(state.part())
+					? state.gateCost() : BodyPart.byId(state.part()).map(Restoration::cost).orElse(0));
 			case "gate" -> Component.translatable("gate.fmab.gift.price.gate");
 			default -> Component.translatable("gate.fmab.gift.price.own_soul");
 		};

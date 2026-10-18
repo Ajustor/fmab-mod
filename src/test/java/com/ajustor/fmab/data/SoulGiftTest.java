@@ -58,6 +58,22 @@ class SoulGiftTest {
 	}
 
 	@Test
+	void onlyAStoneGivesAGateBackAndOnlyToWhoGaveIt() {
+		assertEquals(SoulGift.start(), SoulGift.start().chooseGate(false, 100, 100), "qui a sa Porte n'a rien à retrouver");
+		assertEquals(SoulGift.start(), SoulGift.start().chooseGate(true, 99, 100), "la Pierre doit tenir tout le prix");
+		SoulGift asked = SoulGift.start().chooseGate(true, 100, 100);
+		assertEquals(SoulGift.Stage.ASKING, asked.stage());
+		assertTrue(asked.gate());
+		assertTrue(asked.part().isEmpty());
+		assertEquals(STONE, asked.payment().orElseThrow());
+		assertEquals(SoulGift.Stage.DONE, asked.answer(true).stage(), "avec la Pierre, l'accord de l'allié suffit");
+		assertTrue(asked.answer(true).gate());
+		assertEquals(SoulGift.Stage.CANCELLED, asked.answer(false).stage());
+		assertEquals(asked, asked.chooseGate(true, 100, 100), "on ne choisit qu'une fois");
+		assertFalse(SoulGift.start().choose(BodyPart.LEFT_LEG, STONE, ALLY, DONOR, 100, false).gate());
+	}
+
+	@Test
 	void givingOnesSoulOrGateIsConfirmedTwiceAndPaidOnce() {
 		for (SoulGift.Payment by : List.of(OWN_SOUL, GATE)) {
 			SoulGift accepted = SoulGift.start().choose(BodyPart.BODY, by, AL, DONOR, 0, false).answer(true);

@@ -75,6 +75,18 @@ public class ConfigScreen extends Screen {
 				.withTooltip(on -> Tooltip.create(Component.translatable("config.fmab.soul_binding_requires_sacrifice.tooltip")))
 				.create(x, y, BUTTON_WIDTH, 20, Component.translatable("config.fmab.soul_binding_requires_sacrifice"),
 						(button, on) -> world = world.withSoulBindingRequiresSacrifice(on)));
+		y += ROW;
+		List<Integer> costs = new ArrayList<>(List.of(60, 70, 80, 90, 100));
+		if (!costs.contains(world.gateRestorationCost())) {
+			costs.add(world.gateRestorationCost());
+			costs.sort(null);
+		}
+		addRenderableWidget(CycleButton.<Integer>builder(cost -> Component.literal(String.valueOf(cost)),
+						world.gateRestorationCost())
+				.withValues(costs)
+				.withTooltip(cost -> Tooltip.create(Component.translatable("config.fmab.gate_restoration_cost.tooltip")))
+				.create(x, y, BUTTON_WIDTH, 20, Component.translatable("config.fmab.gate_restoration_cost"),
+						(button, cost) -> world = world.withGateRestorationCost(cost)));
 
 		addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> onClose())
 				.bounds((width - 200) / 2, height - 28, 200, 20).build());

@@ -87,7 +87,9 @@ d'État à Central, la Porte, les homonculus, puis Père.
   deux bras pour faire tourner ses roues, qui prennent alors les mains. Un autre joueur peut le pousser
   (clic droit dessus, accroupi pour lâcher), ou un villageois contre une émeraude.
 - **Pierre philosophale** : devant la Porte, elle rachète à la Vérité ce qu'elle a pris ; elle anime
-  l'être d'une transmutation humaine, amplifie les transmutations, se fabrique par sacrifice.
+  l'être d'une transmutation humaine, amplifie les transmutations, se fabrique par sacrifice. Un
+  alchimiste qui a vu sa Porte rend à un allié debout dans son cercle ce que la Porte lui a pris, et
+  même sa Porte s'il l'a donnée : seule une Pierre la paie, au plus haut prix, et il repart de zéro.
   **Karma**, **éclipse** tous les huit jours, **Pierre vivante** : elle transmute sans attendre, et les
   projectiles qui la visent se défont en matière dans ses poches.
 - **Homonculus** qui se reconstituent tant que leur Pierre a des âmes : Lust, Gluttony (et son Ventre),
@@ -137,6 +139,8 @@ toute sa progression d'alchimiste ; à `false`, elle ne retrouve que son corps.
 `soul_binding_requires_sacrifice` (par défaut `true`) : lier l'âme d'un autre joueur à une armure coûte
 un membre (transmutation humaine sous l'armure, après avoir vu sa Porte) ; à `false`, le cercle d'âme
 l'appelle gratuitement.
+`gate_restoration_cost` (par défaut `100`, de 1 à 100) : les âmes de Pierre que coûte de rendre sa Porte
+à un joueur qui l'a donnée ; une Pierre en tient 100 au plus.
 
 Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab forget_all`,
 `/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`, `/fmab karma [valeur]` (lire ou régler

@@ -1365,6 +1365,8 @@
   "gate.fmab.soul.needs_sacrifice": "Another's soul only comes back for a piece of yourself: draw a human transmutation under the armour.",
   "config.fmab.soul_binding_requires_sacrifice": "Binding a soul costs a limb",
   "config.fmab.soul_binding_requires_sacrifice.tooltip": "Binding another player's soul to an armour requires sacrificing a limb (human transmutation under the armour, after seeing one's Gate). Otherwise, the soul circle calls it for free.",
+  "config.fmab.gate_restoration_cost": "Giving a Gate back costs",
+  "config.fmab.gate_restoration_cost.tooltip": "The Philosopher's Stone souls it costs to give a Gate back to a player who gave theirs away (human transmutation, the ally in the circle). A Stone holds 100 at most. The player starts over: rank, glyphs, mastery, trials.",
 
   "gate.fmab.gift.choose.title": "Giving back what was taken",
   "gate.fmab.gift.choose.text": "The Gate took this from %1$s. What do you give back, and at what price? Your soul: the Truth will take your whole body and you will wake up in an armour. Or souls from your Stone (it holds %2$s).",
@@ -1385,13 +1387,16 @@
   "gate.fmab.gift.gave_soul": "You gave your soul: %1$s gets this back: %2$s.",
   "gate.fmab.gift.gave_stone": "%1$s gets this back: %2$s (%3$s souls from your Stone).",
   "gate.fmab.offer.part.body": "Their body",
+  "gate.fmab.offer.part.gate": "Their Gate",
   "gate.fmab.gift.pay.gate": "My Gate",
   "gate.fmab.gift.price.gate": "their Gate (they will never perform alchemy again)",
   "gate.fmab.gift.confirm_gate.text": "%1$s accepts. You give your Gate to give them back this: %2$s. You will never perform alchemy again: no circle, no gauntlet, no joined hands.",
   "gate.fmab.gift.give_gate": "Give my Gate",
   "gate.fmab.gift.restored_own_soul": "%1$s gave their soul: the Truth gives you back this: %2$s.",
   "gate.fmab.gift.restored_gate": "%1$s gave their Gate: the Truth gives you back this: %2$s.",
+  "gate.fmab.gift.restored_gate_back": "%1$s paid with their Stone: the Truth gives your Gate back. Alchemy answers you again, but everything must be learned anew.",
   "gate.fmab.gift.gave_gate": "You gave your Gate: %s gets their body back. Alchemy will no longer answer you.",
+  "gate.fmab.gift.gave_stone_gate": "%1$s gets their Gate back (%2$s souls from your Stone). They start over from nothing.",
   "transmutation.fmab.gateless": "You gave your Gate: alchemy no longer answers you.",
   "gate.fmab.gift.confirm_gate.title": "Your Gate"
 }

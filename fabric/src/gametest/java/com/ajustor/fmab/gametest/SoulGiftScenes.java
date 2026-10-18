@@ -159,7 +159,7 @@ public class SoulGiftScenes implements FabricClientGameTest {
 
 			// Ce que voit l'allié sollicité (montré ici au joueur, pour la capture).
 			context.runOnClient(mc -> mc.gui.setScreen(new SoulGiftScreen(new SoulGiftPayload(SoulGiftPayload.PROPOSE,
-					"Edward", "right_arm", "own_soul", List.of(), 0, true, true))));
+					"Edward", "right_arm", "own_soul", List.of(), 0, true, true, 0))));
 			context.waitTicks(5);
 			context.takeScreenshot("soul_gift_3_propose");
 			context.runOnClient(mc -> mc.gui.setScreen(null));
