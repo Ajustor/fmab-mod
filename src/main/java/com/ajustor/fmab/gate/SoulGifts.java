@@ -124,7 +124,7 @@ public final class SoulGifts {
 	}
 
 	/** Ce qu'on peut rendre à cet allié : ce que la Porte lui a pris, et sa Porte s'il l'a donnée. */
-	private static List<String> offers(ServerPlayer ally) {
+	public static List<String> offers(ServerPlayer ally) {
 		List<String> offers = new ArrayList<>(SoulGift.restorable(FmabAttachments.GATE.getOrCreate(ally)).stream()
 				.map(BodyPart::id).toList());
 		if (Transmutation.gateless(ally)) {

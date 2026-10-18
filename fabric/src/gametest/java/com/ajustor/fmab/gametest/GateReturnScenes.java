@@ -72,8 +72,14 @@ public class GateReturnScenes implements FabricClientGameTest {
 				return fake;
 			});
 
-			// 1. Edward dans le cercle : sa Porte est la seule chose à lui rendre.
-			check(server(sp, p -> SoulGifts.tryRitual(p, CIRCLE)), "un allié sans Porte dans le cercle éveille le rituel");
+			// 1. Edward dans le cercle : sa Porte est la seule chose à lui rendre. (Un faux joueur n'est pas dans
+			// le monde : on éveille le rituel à sa place, avec ce que le cercle lui offrirait.)
+			check(server(sp, p -> SoulGifts.offers(edward)).equals(List.of(SoulGift.GATE_ID)),
+					"un allié sans Porte éveille le rituel, pour sa Porte");
+			server(sp, p -> {
+				SoulGifts.start(p, CIRCLE, edward);
+				return null;
+			});
 			context.waitFor(mc -> mc.gui.screen() instanceof SoulGiftScreen, 100);
 			check(context.computeOnClient(mc -> ((SoulGiftScreen) mc.gui.screen()).offers()).equals(List.of(SoulGift.GATE_ID)),
 					"à qui a donné sa Porte, on rend sa Porte");
@@ -111,7 +117,13 @@ public class GateReturnScenes implements FabricClientGameTest {
 			context.takeScreenshot("gate_return_1_restored");
 
 			// 4. Edward n'a plus rien à retrouver : plus de rituel.
-			check(!server(sp, p -> SoulGifts.tryRitual(p, CIRCLE)), "rien à rendre, pas de rituel");
+			check(server(sp, p -> SoulGifts.offers(edward)).isEmpty(), "rien à rendre");
+			server(sp, p -> {
+				SoulGifts.start(p, CIRCLE, edward);
+				return null;
+			});
+			context.waitTicks(5);
+			check(stage(sp) == null, "rien à rendre, pas de rituel");
 		}
 	}
 
