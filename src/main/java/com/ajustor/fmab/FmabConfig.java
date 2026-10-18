@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import com.ajustor.fmab.gate.Restoration;
 import com.ajustor.fmab.platform.Platform;
 
 /**
@@ -20,16 +21,29 @@ import com.ajustor.fmab.platform.Platform;
  * @param soulBindingRequiresSacrifice lier l'âme d'un autre joueur à une armure coûte un membre
  *                                    (transmutation humaine, voir SoulOffering) ; sinon, le cercle
  *                                    d'âme l'appelle gratuitement
+ * @param gateRestorationCost         les âmes de Pierre que coûte de rendre sa Porte à un joueur qui
+ *                                    l'a donnée (voir SoulGifts), de 1 à {@link Restoration#STONE_SOULS}
+ *                                    (une Pierre n'en tient pas plus)
  */
-public record FmabConfig(boolean restartWipesProgress, boolean soulBindingRequiresSacrifice) {
-	public static final FmabConfig DEFAULT = new FmabConfig(true, true);
+public record FmabConfig(boolean restartWipesProgress, boolean soulBindingRequiresSacrifice, int gateRestorationCost) {
+	/** Par défaut, rendre une Porte coûte une Pierre pleine : plus que tout le reste. */
+	public static final int GATE_RESTORATION_COST = Restoration.STONE_SOULS;
+	public static final FmabConfig DEFAULT = new FmabConfig(true, true, GATE_RESTORATION_COST);
+
+	public FmabConfig {
+		gateRestorationCost = Math.clamp(gateRestorationCost, 1, Restoration.STONE_SOULS);
+	}
 
 	public FmabConfig withRestartWipesProgress(boolean value) {
-		return new FmabConfig(value, soulBindingRequiresSacrifice);
+		return new FmabConfig(value, soulBindingRequiresSacrifice, gateRestorationCost);
 	}
 
 	public FmabConfig withSoulBindingRequiresSacrifice(boolean value) {
-		return new FmabConfig(restartWipesProgress, value);
+		return new FmabConfig(restartWipesProgress, value, gateRestorationCost);
+	}
+
+	public FmabConfig withGateRestorationCost(int value) {
+		return new FmabConfig(restartWipesProgress, soulBindingRequiresSacrifice, value);
 	}
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static FmabConfig current = DEFAULT;
@@ -42,18 +56,24 @@ public record FmabConfig(boolean restartWipesProgress, boolean soulBindingRequir
 		Path file = file();
 		try {
 			if (Files.exists(file)) {
-				JsonObject json = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
-				current = new FmabConfig(
-						json.has("restart_wipes_progress")
-								? json.get("restart_wipes_progress").getAsBoolean() : DEFAULT.restartWipesProgress(),
-						json.has("soul_binding_requires_sacrifice")
-								? json.get("soul_binding_requires_sacrifice").getAsBoolean() : DEFAULT.soulBindingRequiresSacrifice());
+				current = fromJson(JsonParser.parseString(Files.readString(file)).getAsJsonObject());
 			}
 		} catch (IOException | RuntimeException e) {
 			Fmab.LOGGER.error("Configuration {} illisible : valeurs par défaut", file, e);
 			current = DEFAULT;
 		}
 		save(current);
+	}
+
+	/** Les réglages d'un fichier : une clé absente reprend sa valeur par défaut. */
+	public static FmabConfig fromJson(JsonObject json) {
+		return new FmabConfig(
+				json.has("restart_wipes_progress")
+						? json.get("restart_wipes_progress").getAsBoolean() : DEFAULT.restartWipesProgress(),
+				json.has("soul_binding_requires_sacrifice")
+						? json.get("soul_binding_requires_sacrifice").getAsBoolean() : DEFAULT.soulBindingRequiresSacrifice(),
+				json.has("gate_restoration_cost")
+						? json.get("gate_restoration_cost").getAsInt() : DEFAULT.gateRestorationCost());
 	}
 
 	/**
@@ -67,6 +87,7 @@ public record FmabConfig(boolean restartWipesProgress, boolean soulBindingRequir
 			JsonObject out = new JsonObject();
 			out.addProperty("restart_wipes_progress", config.restartWipesProgress());
 			out.addProperty("soul_binding_requires_sacrifice", config.soulBindingRequiresSacrifice());
+			out.addProperty("gate_restoration_cost", config.gateRestorationCost());
 			Files.createDirectories(file.getParent());
 			Files.writeString(file, GSON.toJson(out));
 		} catch (IOException e) {

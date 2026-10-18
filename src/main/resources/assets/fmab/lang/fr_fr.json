@@ -1365,6 +1365,8 @@
   "gate.fmab.soul.needs_sacrifice": "L'âme d'un autre ne revient qu'au prix d'un morceau de soi : tracez une transmutation humaine sous l'armure.",
   "config.fmab.soul_binding_requires_sacrifice": "Lier une âme coûte un membre",
   "config.fmab.soul_binding_requires_sacrifice.tooltip": "Lier l'âme d'un autre joueur à une armure demande de sacrifier un membre (transmutation humaine sous l'armure, après avoir vu sa Porte). Sinon, le cercle d'âme l'appelle gratuitement.",
+  "config.fmab.gate_restoration_cost": "Rendre une Porte coûte",
+  "config.fmab.gate_restoration_cost.tooltip": "Les âmes de Pierre philosophale que coûte de rendre sa Porte à un joueur qui l'a donnée (transmutation humaine, l'allié dans le cercle). Une Pierre en tient 100 au plus. Le joueur repart de zéro : rang, glyphes, maîtrise, épreuves.",
 
   "gate.fmab.gift.choose.title": "Rendre ce qui fut pris",
   "gate.fmab.gift.choose.text": "La Porte a pris ceci à %1$s. Que lui rendez-vous, et au prix de quoi ? Votre âme : la Vérité prendra tout votre corps et vous vous réveillerez dans une armure. Ou des âmes de votre Pierre (elle en garde %2$s).",
@@ -1385,13 +1387,16 @@
   "gate.fmab.gift.gave_soul": "Vous avez donné votre âme : %1$s retrouve ceci : %2$s.",
   "gate.fmab.gift.gave_stone": "%1$s retrouve ceci : %2$s (%3$s âmes de votre Pierre).",
   "gate.fmab.offer.part.body": "Son corps",
+  "gate.fmab.offer.part.gate": "Sa Porte",
   "gate.fmab.gift.pay.gate": "Ma Porte",
   "gate.fmab.gift.price.gate": "sa Porte (il ne pratiquera plus jamais l'alchimie)",
   "gate.fmab.gift.confirm_gate.text": "%1$s accepte. Vous donnez votre Porte pour lui rendre ceci : %2$s. Vous ne pratiquerez plus jamais l'alchimie : ni cercle, ni gantelet, ni mains jointes.",
   "gate.fmab.gift.give_gate": "Donner ma Porte",
   "gate.fmab.gift.restored_own_soul": "%1$s a donné son âme : la Vérité vous rend ceci : %2$s.",
   "gate.fmab.gift.restored_gate": "%1$s a donné sa Porte : la Vérité vous rend ceci : %2$s.",
+  "gate.fmab.gift.restored_gate_back": "%1$s a payé de sa Pierre : la Vérité vous rend votre Porte. L'alchimie vous répond de nouveau, mais tout est à réapprendre.",
   "gate.fmab.gift.gave_gate": "Vous avez donné votre Porte : %s retrouve son corps. L'alchimie ne vous répondra plus.",
+  "gate.fmab.gift.gave_stone_gate": "%1$s retrouve sa Porte (%2$s âmes de votre Pierre). Il repart de zéro.",
   "transmutation.fmab.gateless": "Vous avez donné votre Porte : l'alchimie ne vous répond plus.",
   "gate.fmab.gift.confirm_gate.title": "Votre Porte"
 }

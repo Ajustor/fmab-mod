@@ -13,9 +13,15 @@ import java.util.Optional;
  *
  * <p>Comme dans l'histoire des Elric : à un allié de chair, on rend un membre, la vue ou ses organes ;
  * à une âme fixée dans une armure (Alphonse), seulement son corps, que paient la Porte du donneur
- * (Edward, qui y perd l'alchimie), son âme (Hohenheim) ou les âmes d'une Pierre.
+ * (Edward, qui y perd l'alchimie), son âme (Hohenheim) ou les âmes d'une Pierre. À qui a donné sa Porte,
+ * on peut la rendre ({@code gate}) : seule une Pierre la paie, au plus haut prix.
+ *
+ * @param gate le don rend sa Porte à l'allié (alors {@code part} est vide)
  */
-public record SoulGift(Stage stage, Optional<BodyPart> part, Optional<Payment> payment) {
+public record SoulGift(Stage stage, Optional<BodyPart> part, boolean gate, Optional<Payment> payment) {
+	/** L'identifiant de la Porte parmi ce qu'on peut rendre (à côté de ceux des {@link BodyPart}). */
+	public static final String GATE_ID = "gate";
+
 	/** Ce qu'on peut rendre à un allié de chair : un membre, la vue, les organes. */
 	public static final List<BodyPart> RESTORABLE = SoulOffer.OFFERABLE;
 
@@ -46,7 +52,7 @@ public record SoulGift(Stage stage, Optional<BodyPart> part, Optional<Payment> p
 	}
 
 	public static SoulGift start() {
-		return new SoulGift(Stage.CHOOSING, Optional.empty(), Optional.empty());
+		return new SoulGift(Stage.CHOOSING, Optional.empty(), false, Optional.empty());
 	}
 
 	/**
@@ -83,7 +89,19 @@ public record SoulGift(Stage stage, Optional<BodyPart> part, Optional<Payment> p
 				|| !affordable(by, value, donor, stoneSouls, gateless)) {
 			return this;
 		}
-		return new SoulGift(Stage.ASKING, Optional.of(value), Optional.of(by));
+		return new SoulGift(Stage.ASKING, Optional.of(value), false, Optional.of(by));
+	}
+
+	/**
+	 * Rendre sa Porte à l'allié qui l'a donnée : seule la Pierre paie, et il lui faut {@code cost} âmes.
+	 *
+	 * @param allyGateless l'allié a donné sa Porte
+	 */
+	public SoulGift chooseGate(boolean allyGateless, int stoneSouls, int cost) {
+		if (stage != Stage.CHOOSING || !allyGateless || stoneSouls < cost) {
+			return this;
+		}
+		return new SoulGift(Stage.ASKING, Optional.empty(), true, Optional.of(Payment.STONE));
 	}
 
 	/**
@@ -95,17 +113,17 @@ public record SoulGift(Stage stage, Optional<BodyPart> part, Optional<Payment> p
 			return this;
 		}
 		if (!accepted) {
-			return new SoulGift(Stage.CANCELLED, part, payment);
+			return new SoulGift(Stage.CANCELLED, part, gate, payment);
 		}
-		return new SoulGift(payment.orElseThrow() == Payment.STONE ? Stage.DONE : Stage.CONFIRMING, part, payment);
+		return new SoulGift(payment.orElseThrow() == Payment.STONE ? Stage.DONE : Stage.CONFIRMING, part, gate, payment);
 	}
 
 	/** La seconde confirmation du donneur qui donne son âme ou sa Porte. */
 	public SoulGift confirm() {
-		return stage == Stage.CONFIRMING ? new SoulGift(Stage.DONE, part, payment) : this;
+		return stage == Stage.CONFIRMING ? new SoulGift(Stage.DONE, part, gate, payment) : this;
 	}
 
 	public SoulGift cancel() {
-		return open() ? new SoulGift(Stage.CANCELLED, part, payment) : this;
+		return open() ? new SoulGift(Stage.CANCELLED, part, gate, payment) : this;
 	}
 }
