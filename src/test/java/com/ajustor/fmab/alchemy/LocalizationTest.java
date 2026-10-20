@@ -91,6 +91,10 @@ class LocalizationTest {
 		Treatise treatise = TreatiseTest.load();
 		for (Treatise.Chapter c : treatise.chapters()) {
 			needed.add(c.titleKey());
+			if (!c.unlock().equals(Treatise.Unlock.ALWAYS)) {
+				needed.add("treatise.fmab.sealed.rank");
+				needed.add("treatise.fmab.sealed.mastery");
+			}
 			for (Treatise.Page p : c.pages()) {
 				switch (p) {
 					case Treatise.TextPage t -> needed.add(t.textKey());
