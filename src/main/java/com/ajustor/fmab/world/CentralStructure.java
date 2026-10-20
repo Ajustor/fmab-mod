@@ -77,8 +77,9 @@ public class CentralStructure extends Structure {
 		builder.addPiece(new ProceduralPiece("central_library", new BlockPos(cx + 18, y, cz + 6), 21, 11, 15, 1,
 				Rotation.NONE, seed));
 		// La résidence Bradley borde l'avenue ouest ; sa porte donne sur l'avenue, au nord.
-		builder.addPiece(new ProceduralPiece("bradley_residence", new BlockPos(cx - 33, y, cz + 11), 15,
-				Blueprints.houseHeight(2, 11), 11, 1, Rotation.NONE, seed));
+		int m = Dressing.MARGIN;
+		builder.addPiece(new ProceduralPiece("bradley_residence_dressed", new BlockPos(cx - 33 - m, y, cz + 11 - m),
+				15 + 2 * m, Blueprints.houseHeight(2, 11), 11 + 2 * m, 1, Rotation.NONE, seed));
 		// Sous la ville, le tunnel de Sloth ; on y descend par un puits au milieu de l'avenue sud.
 		int depth = -SlothTunnel.FLOOR;
 		builder.addPiece(new ProceduralPiece("sloth_tunnel", new BlockPos(cx - R, y, cz + 30), size, depth + 1, 7, depth,
@@ -108,7 +109,8 @@ public class CentralStructure extends Structure {
 		// boulevard, tournées vers lui.
 		for (int[] band : new int[][]{{24, -1}, {39, 1}, {59, -1}}) {
 			int r = band[0];
-			double step = 12.0 / r;
+			// Une maison tous les seize blocs de couronne : de quoi laisser passer une ruelle entre deux.
+			double step = 16.0 / r;
 			double start = random.nextDouble() * step;
 			for (double a = start; a < Math.PI * 2 + start - step / 2; a += step) {
 				house(builder, taken, cx, y, cz, r, a, band[1], random);
@@ -143,10 +145,18 @@ public class CentralStructure extends Structure {
 
 	/** Le quartier général, la bibliothèque, la résidence Bradley et la fontaine. */
 	private static final List<Rect> MONUMENTS = List.of(new Rect(-15, -44, 15, -22), new Rect(18, 6, 38, 20),
-			new Rect(-33, 11, -19, 21), new Rect(-4, -4, 4, 4));
+			new Rect(-34, 10, -18, 22), new Rect(-4, -4, 4, 4));
+
+	/** Ce qui sépare une maison de ses voisines : une ruelle. */
+	private static final int HOUSE_GAP = 3;
 
 	/** Une parcelle libre : ni sur la voirie, ni sur la place, ni contre la muraille, ni sur un voisin. */
 	private static boolean free(Rect rect, List<Rect> taken) {
+		return free(rect, taken, 1);
+	}
+
+	/** Une parcelle libre, à {@code gap} blocs au moins de ses voisines. */
+	private static boolean free(Rect rect, List<Rect> taken, int gap) {
 		if (rect.far() > Blueprints.WALL_INNER - 2 || rect.near() < Blueprints.PLAZA + 2) {
 			return false;
 		}
@@ -157,7 +167,7 @@ public class CentralStructure extends Structure {
 		if (rect.far() >= Blueprints.RING_INNER - 1 && rect.near() <= Blueprints.RING_OUTER + 1) {
 			return false;
 		}
-		return taken.stream().noneMatch(o -> o.overlaps(rect, 1));
+		return taken.stream().noneMatch(o -> o.overlaps(rect, gap));
 	}
 
 	/** Un arbre de 5 sur 5 dont le tronc est en (dx, dz), s'il y a la place. */
@@ -188,7 +198,7 @@ public class CentralStructure extends Structure {
 		int wx = turned ? pz : px, wz = turned ? px : pz;
 		int x0 = (int) Math.round(Math.cos(a) * r) - wx / 2, z0 = (int) Math.round(Math.sin(a) * r) - wz / 2;
 		Rect rect = new Rect(x0, z0, x0 + wx - 1, z0 + wz - 1);
-		if (!free(rect, taken)) {
+		if (!free(rect, taken, HOUSE_GAP)) {
 			return;
 		}
 		taken.add(rect);

@@ -17,6 +17,9 @@ import java.util.Optional;
 public class ResemboolStructure extends Structure {
 	public static final MapCodec<ResemboolStructure> CODEC = simpleCodec(ResemboolStructure::new);
 
+	/** Un village de campagne : les maisons s'écartent entre les champs. */
+	private static final double SPREAD = 1.15;
+
 	private static final Spot[] LAYOUT = {
 			new Spot(-4, -4, "rockbell_house_dressed", 11, 9, 2, Rotation.NONE),
 			new Spot(-22, 4, "resembool_house_dressed", 9, 7, 1, Rotation.CLOCKWISE_90),
@@ -55,7 +58,7 @@ public class ResemboolStructure extends Structure {
 		}
 		BlockPos center = new BlockPos(cx, y, cz);
 		return Optional.of(new GenerationStub(center, builder -> Hamlet.build(builder, context, center, LAYOUT,
-				PathPiece.Style.RESEMBOOL)));
+				PathPiece.Style.RESEMBOOL, SPREAD)));
 	}
 
 	@Override

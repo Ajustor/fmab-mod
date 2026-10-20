@@ -18,6 +18,9 @@ import java.util.Optional;
 public class DublithStructure extends Structure {
 	public static final MapCodec<DublithStructure> CODEC = simpleCodec(DublithStructure::new);
 
+	/** Une petite ville, mais aérée : de la place entre les maisons. */
+	private static final double SPREAD = 1.45;
+
 	private static final Spot[] LAYOUT = {
 			new Spot(-6, -6, "dublith_square", 13, 13, 0, Rotation.NONE),
 			new Spot(-4, -4, "market_stall", 3, 3, 0, Rotation.NONE),
@@ -57,7 +60,7 @@ public class DublithStructure extends Structure {
 		}
 		BlockPos center = new BlockPos(cx, y, cz);
 		return Optional.of(new GenerationStub(center, builder -> Hamlet.build(builder, context, center, LAYOUT,
-				PathPiece.Style.DUBLITH)));
+				PathPiece.Style.DUBLITH, SPREAD)));
 	}
 
 	@Override

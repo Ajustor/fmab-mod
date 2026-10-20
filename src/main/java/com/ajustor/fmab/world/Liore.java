@@ -4,6 +4,7 @@ import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.BedBlock;
@@ -19,16 +20,18 @@ import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Liore, ville du désert, dans son enceinte de grès percée de trois portes. Au nord, le temple de
  * Leto, colonnes et dôme d'or, où le père Cornello fait ses « miracles » ; l'allée bordée de
  * lanternes et de palmiers qui y mène ; au centre, la place, sa fontaine et ses étals ; à l'est, le
- * marché couvert de toile. Tout autour, une vingtaine de maisons à toit plat, d'un à trois étages,
- * chacune avec son échelle jusqu'à la terrasse. Sous l'autel, la pierre rouge ; sur l'allée, le
+ * marché couvert de toile. Tout autour, seize maisons à toit plat, d'un à trois étages, chacune
+ * avec son échelle jusqu'à la terrasse, et une cour plantée d'un palmier dans chaque quartier. Sous l'autel, la pierre rouge ; sur l'allée, le
  * point de sang de l'émeute.
  *
  * <p>Le plan est dessiné pour une parcelle de 49 sur 49 (voir {@code worldgen/structure/liore.json}) :
@@ -122,15 +125,14 @@ final class Liore implements Blueprint {
 	private static final Object[][] HOUSES = {
 			// Nord-ouest, entre l'enceinte et le temple.
 			{2, 2, 7, 6, 2, Direction.SOUTH}, {10, 2, 6, 7, 1, Direction.SOUTH}, {2, 10, 6, 7, 3, Direction.EAST},
-			{10, 11, 6, 6, 2, Direction.EAST}, {2, 19, 7, 6, 1, Direction.SOUTH}, {10, 19, 6, 6, 2, Direction.SOUTH},
+			{2, 19, 7, 6, 1, Direction.SOUTH}, {10, 19, 6, 6, 2, Direction.SOUTH},
 			// Nord-est, au-dessus du marché.
-			{33, 2, 6, 7, 1, Direction.SOUTH}, {40, 2, 7, 6, 2, Direction.SOUTH}, {33, 11, 6, 6, 2, Direction.WEST},
-			{41, 10, 6, 7, 3, Direction.WEST},
+			{33, 2, 6, 7, 1, Direction.SOUTH}, {40, 2, 7, 6, 2, Direction.SOUTH}, {41, 10, 6, 7, 3, Direction.WEST},
 			// Sud-ouest.
-			{2, 31, 7, 6, 2, Direction.NORTH}, {10, 31, 5, 6, 1, Direction.NORTH}, {2, 39, 6, 7, 1, Direction.NORTH},
+			{2, 31, 7, 6, 2, Direction.NORTH}, {2, 39, 6, 7, 1, Direction.NORTH},
 			{9, 39, 6, 7, 3, Direction.NORTH}, {16, 38, 6, 6, 2, Direction.EAST},
 			// Sud-est.
-			{34, 31, 6, 6, 1, Direction.NORTH}, {41, 31, 6, 7, 2, Direction.NORTH}, {34, 39, 7, 7, 2, Direction.NORTH},
+			{41, 31, 6, 7, 2, Direction.NORTH}, {34, 39, 7, 7, 2, Direction.NORTH},
 			{42, 40, 5, 6, 1, Direction.NORTH}, {27, 38, 6, 6, 3, Direction.WEST},
 	};
 
@@ -156,8 +158,10 @@ final class Liore implements Blueprint {
 		for (int x = 35; x <= 43; x += 4) {
 			out.add(new Lot(x, 20, 3, 3, 5, Direction.SOUTH, STALL, salt++));
 		}
-		// Les palmiers : deux de part et d'autre de l'allée, quatre autour de la fontaine.
-		for (int[] at : new int[][]{{19, 17}, {29, 17}, {21, 23}, {27, 23}, {21, 33}, {27, 33}}) {
+		// Les palmiers : deux de part et d'autre de l'allée, quatre autour de la fontaine, et un dans
+		// chaque cour, là où les quartiers s'ouvrent pour laisser respirer la ville.
+		for (int[] at : new int[][]{{19, 17}, {29, 17}, {21, 23}, {27, 23}, {21, 33}, {27, 33},
+				{13, 14}, {36, 14}, {12, 34}, {37, 34}}) {
 			out.add(new Lot(at[0] - 2, at[1] - 2, 5, 5, 10, Direction.NORTH, PALM, salt++));
 		}
 		return List.copyOf(out);
@@ -326,6 +330,12 @@ final class Liore implements Blueprint {
 		double d = Math.hypot(x - C, (z - (z0 + z1) / 2.0) * 1.2);
 		double r = 6 - (y - 8) * 1.2;
 		return r > 0 && d <= r && d > r - 1.2 ? b(Blocks.GOLD_BLOCK) : AIR;
+	}
+
+	/** Les tonneaux des maisons, des terrasses et des étals : les provisions de la ville. */
+	@Override
+	public Optional<ResourceKey<LootTable>> barrels() {
+		return Optional.of(Blueprint.loot("liore_barrel"));
 	}
 
 	@Override

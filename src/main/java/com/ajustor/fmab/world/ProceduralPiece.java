@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -119,6 +120,7 @@ public class ProceduralPiece extends StructurePiece {
 				(x, z) -> x >= minX && x <= maxX && z >= minZ && z <= maxZ));
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		List<BlockPos> connected = new ArrayList<>();
+		List<BlockPos> barrels = new ArrayList<>();
 		for (int wx = minX; wx <= maxX; wx++) {
 			for (int wz = minZ; wz <= maxZ; wz++) {
 				// Sans tableau par colonne : la génération appelle ceci pour chaque colonne de chaque chunk.
@@ -137,6 +139,9 @@ public class ProceduralPiece extends StructurePiece {
 					if (placed.getBlock() instanceof CrossCollisionBlock || placed.getBlock() instanceof WallBlock) {
 						connected.add(pos.immutable());
 					}
+					if (placed.is(Blocks.BARREL)) {
+						barrels.add(pos.immutable());
+					}
 				}
 			}
 		}
@@ -145,6 +150,12 @@ public class ProceduralPiece extends StructurePiece {
 			BlockState shaped = Block.updateFromNeighbourShapes(level.getBlockState(at), level, at);
 			level.setBlock(at, shaped, 2);
 		}
+		// Les tonneaux du plan se remplissent à leur première ouverture, comme ses coffres.
+		blueprint.barrels().ifPresent(table -> barrels.forEach(at -> {
+			if (level.getBlockEntity(at) instanceof BarrelBlockEntity barrel) {
+				barrel.setLootTable(table, seed ^ at.asLong());
+			}
+		}));
 		if (chests == null) {
 			// Coffres et créatures se calculent une fois par pièce, pas à chaque chunk qu'elle traverse.
 			chests = blueprint.chests(plot);

@@ -99,6 +99,7 @@ public final class Blueprints {
 		out.put("rush_valley_shop_dressed", new Dressing(out.get("rush_valley_shop"), Dressing.DESERT));
 		out.put("dublith_house_dressed", new Dressing(out.get("dublith_house"), Dressing.TOWN));
 		out.put("curtis_butcher_dressed", new Dressing(out.get("curtis_butcher"), Dressing.TOWN));
+		out.put("bradley_residence_dressed", new Dressing(out.get("bradley_residence"), Dressing.TOWN));
 		out.put("town_tree", Townscape.tree(Blocks.OAK_LOG, Blocks.OAK_LEAVES, Blocks.GRASS_BLOCK));
 		out.put("birch_tree", Townscape.tree(Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES, Blocks.GRASS_BLOCK));
 		out.put("acacia_tree", Townscape.tree(Blocks.ACACIA_LOG, Blocks.ACACIA_LEAVES, Blocks.COARSE_DIRT));

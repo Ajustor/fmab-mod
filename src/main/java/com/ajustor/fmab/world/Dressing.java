@@ -1,6 +1,7 @@
 package com.ajustor.fmab.world;
 
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
@@ -9,14 +10,16 @@ import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Les abords d'une maison : son plan, entouré d'une marge d'un bloc où l'on pose ce qui déborde
  * des murs. Le toit dépasse en avant-toit et sur les pignons, des volets encadrent les fenêtres,
  * des jardinières fleurissent celles de l'étage ; au pied des murs, des massifs, un chemin jusqu'à
- * la porte et un réverbère à côté.
+ * la porte, une marche pour monter au seuil et un réverbère à côté.
  */
 final class Dressing implements Blueprint {
 	/** La marge autour du plan d'origine, de chaque côté. */
@@ -29,8 +32,10 @@ final class Dressing implements Blueprint {
 	 * @param path    le chemin devant la porte
 	 * @param shutter les volets et les jardinières
 	 * @param plants  ce qui pousse au pied des murs et dans les jardinières
+	 * @param step    la marche devant la porte : le plancher est un bloc plus haut que le sol
 	 */
-	record Style(BlockState soil, BlockState path, Block shutter, List<BlockState> plants, List<BlockState> pots) {
+	record Style(BlockState soil, BlockState path, Block shutter, List<BlockState> plants, List<BlockState> pots,
+			Block step) {
 	}
 
 	private static BlockState leaves(Block block) {
@@ -41,17 +46,18 @@ final class Dressing implements Blueprint {
 			Blocks.DARK_OAK_TRAPDOOR, List.of(leaves(Blocks.AZALEA_LEAVES), Blocks.ALLIUM.defaultBlockState(),
 					Blocks.POPPY.defaultBlockState(), Blocks.AZURE_BLUET.defaultBlockState(), leaves(Blocks.OAK_LEAVES)),
 			List.of(Blocks.POTTED_RED_TULIP.defaultBlockState(), Blocks.POTTED_WHITE_TULIP.defaultBlockState(),
-					Blocks.POTTED_AZURE_BLUET.defaultBlockState()));
+					Blocks.POTTED_AZURE_BLUET.defaultBlockState()), Blocks.POLISHED_ANDESITE_STAIRS);
 	static final Style RURAL = new Style(Blocks.GRASS_BLOCK.defaultBlockState(), Blocks.DIRT_PATH.defaultBlockState(),
 			Blocks.SPRUCE_TRAPDOOR, List.of(leaves(Blocks.OAK_LEAVES), Blocks.DANDELION.defaultBlockState(),
 					Blocks.SHORT_GRASS.defaultBlockState(), Blocks.OXEYE_DAISY.defaultBlockState(),
 					leaves(Blocks.FLOWERING_AZALEA_LEAVES), Blocks.CORNFLOWER.defaultBlockState()),
 			List.of(Blocks.POTTED_DANDELION.defaultBlockState(), Blocks.POTTED_POPPY.defaultBlockState(),
-					Blocks.POTTED_OXEYE_DAISY.defaultBlockState()));
+					Blocks.POTTED_OXEYE_DAISY.defaultBlockState()), Blocks.COBBLESTONE_STAIRS);
 	static final Style DESERT = new Style(Blocks.COARSE_DIRT.defaultBlockState(), Blocks.SMOOTH_SANDSTONE.defaultBlockState(),
 			Blocks.JUNGLE_TRAPDOOR, List.of(Blocks.DEAD_BUSH.defaultBlockState(), Blocks.BARREL.defaultBlockState(),
 					Blocks.DECORATED_POT.defaultBlockState()),
-			List.of(Blocks.POTTED_CACTUS.defaultBlockState(), Blocks.POTTED_DEAD_BUSH.defaultBlockState()));
+			List.of(Blocks.POTTED_CACTUS.defaultBlockState(), Blocks.POTTED_DEAD_BUSH.defaultBlockState()),
+			Blocks.SMOOTH_SANDSTONE_STAIRS);
 
 	private final Blueprint inner;
 	private final Style style;
@@ -155,10 +161,11 @@ final class Dressing implements Blueprint {
 		return y <= 3 ? AIR : null;
 	}
 
-	/** Au pied des murs : le seuil devant la porte, un poteau de réverbère, des massifs çà et là. */
+	/** Au pied des murs : la marche du seuil, un poteau de réverbère, des massifs çà et là. */
 	private BlockState yard(int cx, int cz, boolean outX, boolean outZ, boolean front, Plot in, Plot p, int x, int z) {
 		if (front && !outX && inner.at(cx, 1, 0, in) instanceof BlockState d && d.getBlock() instanceof DoorBlock) {
-			return AIR;
+			// La porte s'ouvre sur le plancher, un bloc au-dessus du sol : on y monte par une marche.
+			return style.step().defaultBlockState().setValue(StairBlock.FACING, Direction.SOUTH);
 		}
 		if (front && !outX && cx == in.sizeX() / 2 + 2 && hasDoor(in)) {
 			return Blocks.DARK_OAK_FENCE.defaultBlockState();
@@ -185,6 +192,11 @@ final class Dressing implements Blueprint {
 		return inner.chests(inner(p)).stream()
 				.map(c -> new Chest(c.local().offset(MARGIN, 0, MARGIN), c.table()))
 				.toList();
+	}
+
+	@Override
+	public Optional<ResourceKey<LootTable>> barrels() {
+		return inner.barrels();
 	}
 
 	@Override

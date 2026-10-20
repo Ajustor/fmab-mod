@@ -49,6 +49,8 @@ class BlueprintsTest {
 		put(out, "central_hq", 31, 14, 23, 1);
 		put(out, "central_library", 21, 11, 15, 1);
 		put(out, "bradley_residence", 15, Blueprints.houseHeight(2, 11), 11, 1);
+		put(out, "bradley_residence_dressed", 15 + 2 * Dressing.MARGIN, Blueprints.houseHeight(2, 11),
+				11 + 2 * Dressing.MARGIN, 1);
 		int depth = -SlothTunnel.FLOOR;
 		put(out, "sloth_tunnel", city, depth + 1, 7, depth);
 		put(out, "father_lair", 33, 1, 41, -FatherLair.ROOM_FLOOR);
@@ -154,5 +156,54 @@ class BlueprintsTest {
 
 	private static boolean inside(int x, int y, int z, Blueprint.Plot plot) {
 		return x >= 0 && x < plot.sizeX() && z >= 0 && z < plot.sizeZ() && y >= -plot.ground() && y < plot.sizeY();
+	}
+
+	/**
+	 * Le plancher d'une maison est un bloc au-dessus du sol : devant chaque porte qui s'ouvre sur lui,
+	 * une marche, tournée vers la maison, pour qu'on (et les villageois) y entrent sans sauter.
+	 */
+	@Test
+	void everyRaisedDoorHasAStep() throws IOException {
+		int doors = 0;
+		for (Map.Entry<String, List<Blueprint.Plot>> entry : plots().entrySet()) {
+			if (!entry.getKey().endsWith("_dressed")) {
+				continue;
+			}
+			Blueprint plan = Blueprints.get(entry.getKey());
+			for (Blueprint.Plot plot : entry.getValue()) {
+				for (int x = 0; x < plot.sizeX(); x++) {
+					if (plan.at(x, 1, Dressing.MARGIN, plot) instanceof net.minecraft.world.level.block.state.BlockState d
+							&& d.getBlock() instanceof net.minecraft.world.level.block.DoorBlock) {
+						var step = plan.at(x, 0, Dressing.MARGIN - 1, plot);
+						assertTrue(step != null && step.getBlock() instanceof net.minecraft.world.level.block.StairBlock
+								&& step.getValue(net.minecraft.world.level.block.StairBlock.FACING)
+								== net.minecraft.core.Direction.SOUTH, entry.getKey() + " : pas de marche devant la porte");
+						doors++;
+					}
+				}
+			}
+		}
+		assertTrue(doors > 0, "aucune porte trouvée");
+	}
+
+	/** À Liore, les tonneaux des maisons et des étals ont leurs provisions. */
+	@Test
+	void lioreBarrelsAreStocked() {
+		assertEquals(java.util.Optional.of(Blueprint.loot("liore_barrel")), Blueprints.get("liore").barrels());
+		assertTrue(Files.exists(Path.of("src/main/resources/data/fmab/loot_table/chests/liore_barrel.json")));
+	}
+
+	/** Un bourg aéré : maisons et arbres s'écartent du centre, la place et ses étals restent au milieu. */
+	@Test
+	void hamletsSpreadAroundTheirSquare() {
+		var square = new Hamlet.Spot(-6, -6, "dublith_square", 13, 13, 0, net.minecraft.world.level.block.Rotation.NONE);
+		assertEquals(square, Hamlet.spread(square, 1.5));
+		var house = new Hamlet.Spot(10, -7, "dublith_house_dressed", 9, 7, 2,
+				net.minecraft.world.level.block.Rotation.COUNTERCLOCKWISE_90);
+		var spread = Hamlet.spread(house, 1.5);
+		// Tournée d'un quart, elle occupe 7 sur 9 : son milieu (13,5 ; −2,5) passe à (20,25 ; −3,75).
+		assertEquals(17, spread.dx());
+		assertEquals(-8, spread.dz());
+		assertEquals(house.kind(), spread.kind());
 	}
 }

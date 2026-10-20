@@ -14,7 +14,8 @@ import java.util.List;
  * Un bourg posé sur le relief : une liste d'emplacements autour du centre, chacun bâti à la hauteur
  * du sol en son milieu. Une maison habillée ({@code *_dressed}) prend une marge d'un bloc tout
  * autour de l'emprise donnée, pour ses abords. Un chemin relie chaque porte à la place (ou, sans
- * place, à la porte de la première maison).
+ * place, à la porte de la première maison). Le bourg s'étale d'un facteur donné autour de son
+ * centre : la place et ses étals restent au milieu, maisons, champs et arbres s'en écartent.
  */
 final class Hamlet {
 	private Hamlet() {
@@ -35,11 +36,27 @@ final class Hamlet {
 				context.heightAccessor(), context.randomState());
 	}
 
+	/**
+	 * L'emplacement écarté du centre : son milieu s'éloigne de {@code spread} fois sa distance, la place
+	 * et les étals ne bougent pas.
+	 */
+	static Spot spread(Spot s, double spread) {
+		if (s.kind().endsWith("_square") || s.kind().endsWith("_stall")) {
+			return s;
+		}
+		boolean turned = s.rotation() == Rotation.CLOCKWISE_90 || s.rotation() == Rotation.COUNTERCLOCKWISE_90;
+		int wx = turned ? s.sz() : s.sx(), wz = turned ? s.sx() : s.sz();
+		int dx = (int) Math.round((s.dx() + wx / 2.0) * spread - wx / 2.0);
+		int dz = (int) Math.round((s.dz() + wz / 2.0) * spread - wz / 2.0);
+		return new Spot(dx, dz, s.kind(), s.sx(), s.sz(), s.floors(), s.rotation());
+	}
+
 	static void build(StructurePiecesBuilder builder, Structure.GenerationContext context, BlockPos center,
-			Spot[] layout, PathPiece.Style paths) {
+			Spot[] layout, PathPiece.Style paths, double spread) {
 		List<ProceduralPiece> pieces = new ArrayList<>();
 		List<BlockPos> doors = new ArrayList<>();
-		for (Spot s : layout) {
+		for (Spot laid : layout) {
+			Spot s = spread(laid, spread);
 			int m = s.kind().endsWith("_dressed") ? Dressing.MARGIN : 0;
 			boolean turned = s.rotation() == Rotation.CLOCKWISE_90 || s.rotation() == Rotation.COUNTERCLOCKWISE_90;
 			int x = center.getX() + s.dx() - m, z = center.getZ() + s.dz() - m;
