@@ -1,6 +1,923 @@
 {
  "chapters": [
   {
+   "title": "treatise.fmab.start.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.start.welcome"
+    },
+    {
+     "text": "treatise.fmab.start.kit"
+    },
+    {
+     "text": "treatise.fmab.start.choose"
+    },
+    {
+     "text": "treatise.fmab.start.draw"
+    },
+    {
+     "text": "treatise.fmab.start.palm"
+    },
+    {
+     "text": "treatise.fmab.start.trouble"
+    },
+    {
+     "text": "treatise.fmab.start.practice"
+    },
+    {
+     "text": "treatise.fmab.start.next"
+    },
+    {
+     "text": "treatise.fmab.ch1.path"
+    }
+   ]
+  },
+  {
+   "title": "treatise.fmab.everyday.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.everyday.p1"
+    },
+    {
+     "text": "treatise.fmab.everyday.night"
+    },
+    {
+     "text": "treatise.fmab.everyday.river",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         28,
+         23
+        ],
+        [
+         4,
+         23
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.5,
+         9.0
+        ],
+        [
+         18.5,
+         9.0
+        ],
+        [
+         16.0,
+         13.5
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        20.0
+       ],
+       "radius": 2.0
+      },
+      {
+       "type": "line",
+       "from": [
+        14.0,
+        20.0
+       ],
+       "to": [
+        18.0,
+        20.0
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.everyday.mine",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.6,
+         9.2
+        ],
+        [
+         18.4,
+         9.2
+        ],
+        [
+         16.0,
+         13.4
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.35,
+        11.6
+       ],
+       "to": [
+        17.65,
+        11.6
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.32,
+        20.5
+       ],
+       "to": [
+        17.68,
+        20.5
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        18.82
+       ],
+       "to": [
+        16.0,
+        22.18
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        18.24,
+        20.5
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "circle",
+       "center": [
+        13.76,
+        20.5
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        22.74
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        18.26
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "dot",
+       "at": [
+        2,
+        16
+       ]
+      },
+      {
+       "type": "dot",
+       "at": [
+        30,
+        16
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.everyday.switch",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         28,
+         23
+        ],
+        [
+         4,
+         23
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        10.46
+       ],
+       "radius": 1.17
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        11.63
+       ],
+       "to": [
+        16.0,
+        13.97
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        15.22,
+        12.8
+       ],
+       "to": [
+        16.78,
+        12.8
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        19.5
+       ],
+       "radius": 1.82
+      },
+      {
+       "type": "line",
+       "from": [
+        14.18,
+        19.5
+       ],
+       "to": [
+        17.82,
+        19.5
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.everyday.repair",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        15.5,
+        11.5
+       ],
+       "radius": 1.5
+      },
+      {
+       "type": "line",
+       "from": [
+        16.5,
+        10.5
+       ],
+       "to": [
+        18.0,
+        9.0
+       ]
+      },
+      {
+       "type": "polyline",
+       "points": [
+        [
+         17.0,
+         9.0
+        ],
+        [
+         18.0,
+         9.0
+        ],
+        [
+         18.0,
+         10.0
+        ]
+       ]
+      },
+      {
+       "type": "arc",
+       "center": [
+        16.0,
+        20.0
+       ],
+       "radius": 2.0,
+       "start_deg": 20,
+       "sweep_deg": 320
+      },
+      {
+       "type": "circle",
+       "center": [
+        18.0,
+        20.0
+       ],
+       "radius": 0.5
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.everyday.recycling",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        13.7
+       ],
+       "to": [
+        16.0,
+        10.7
+       ]
+      },
+      {
+       "type": "polyline",
+       "points": [
+        [
+         14.2,
+         8.6
+        ],
+        [
+         16.0,
+         10.7
+        ],
+        [
+         17.8,
+         8.6
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.65,
+        13.7
+       ],
+       "to": [
+        17.35,
+        13.7
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.32,
+        20.5
+       ],
+       "to": [
+        17.68,
+        20.5
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        18.82
+       ],
+       "to": [
+        16.0,
+        22.18
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        18.24,
+        20.5
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "circle",
+       "center": [
+        13.76,
+        20.5
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        22.74
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        18.26
+       ],
+       "radius": 0.56
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.everyday.furnace",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.6,
+         12.8
+        ],
+        [
+         18.4,
+         12.8
+        ],
+        [
+         16.0,
+         8.6
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.32,
+        20.5
+       ],
+       "to": [
+        17.68,
+        20.5
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        18.82
+       ],
+       "to": [
+        16.0,
+        22.18
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        18.24,
+        20.5
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "circle",
+       "center": [
+        13.76,
+        20.5
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        22.74
+       ],
+       "radius": 0.56
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        18.26
+       ],
+       "radius": 0.56
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.everyday.trap",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.6,
+         9.2
+        ],
+        [
+         18.4,
+         9.2
+        ],
+        [
+         16.0,
+         13.4
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.35,
+        11.6
+       ],
+       "to": [
+        17.65,
+        11.6
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         14.5,
+         20.0
+        ],
+        [
+         17.5,
+         20.0
+        ],
+        [
+         16.0,
+         17.6
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        20.0
+       ],
+       "to": [
+        16.0,
+        22.7
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.95,
+        21.35
+       ],
+       "to": [
+        17.05,
+        21.35
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        25.06,
+        5.12
+       ],
+       "to": [
+        25.06,
+        7.08
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        25.9,
+        5.12
+       ],
+       "to": [
+        25.9,
+        7.08
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        26.74,
+        5.12
+       ],
+       "to": [
+        26.74,
+        7.08
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.everyday.firebreak",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16.0,
+         2.0
+        ],
+        [
+         28.12,
+         9.0
+        ],
+        [
+         28.12,
+         23.0
+        ],
+        [
+         16.0,
+         30.0
+        ],
+        [
+         3.88,
+         23.0
+        ],
+        [
+         3.88,
+         9.0
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.6,
+         12.3
+        ],
+        [
+         18.4,
+         12.3
+        ],
+        [
+         16.0,
+         8.1
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.35,
+        9.9
+       ],
+       "to": [
+        17.65,
+        9.9
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         14.5,
+         20.0
+        ],
+        [
+         17.5,
+         20.0
+        ],
+        [
+         16.0,
+         17.6
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        20.0
+       ],
+       "to": [
+        16.0,
+        22.7
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.95,
+        21.35
+       ],
+       "to": [
+        17.05,
+        21.35
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        30.0,
+        16.98
+       ],
+       "to": [
+        28.88,
+        15.16
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        30.0,
+        16.98
+       ],
+       "to": [
+        30.0,
+        15.02
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        30.0,
+        16.98
+       ],
+       "to": [
+        31.12,
+        15.16
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.everyday.habits"
+    }
+   ]
+  },
+  {
    "title": "treatise.fmab.ch1.title",
    "pages": [
     {
@@ -14,9 +931,6 @@
     },
     {
      "text": "treatise.fmab.ch1.places"
-    },
-    {
-     "text": "treatise.fmab.ch1.path"
     }
    ]
   },

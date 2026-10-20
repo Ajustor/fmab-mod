@@ -42,7 +42,8 @@ jeu va dans le cœur ; il ne parle au loader que par ses ports (`com.ajustor.fma
   ```
 
   Scènes : `showcase`, `blocks`, `towns`, `figures`, `items`, `automail_blade`, `animations`,
-  `gestures`, `gate`, `stonegate`, `wheelchair`, `recomposition`. Pour tout ce qui se voit en jeu
+  `gestures`, `gate`, `stonegate`, `wheelchair`, `recomposition`, `treatise_catalogue`,
+  `treatise_guide` (le Traité page par page, en français et en anglais, et ses cercles du quotidien à l'œuvre). Pour tout ce qui se voit en jeu
   (modèle, texture, animation, lieu), regarder les captures avant et après ; ajouter une scène si
   aucune ne montre ce qu'on a changé. Chaque scène vérifie ce qu'elle montre, en plus de le
   photographier, avec `GametestAsserts.check` : une règle qui ne tient pas fait échouer le gametest.

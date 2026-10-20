@@ -41,7 +41,8 @@ import com.ajustor.fmab.platform.client.ClientPlatform;
  */
 public class TreatiseScreen extends Screen {
 	private static final int BOOK_WIDTH = 320;
-	private static final int BOOK_HEIGHT = 200;
+	/** Assez haut pour un sommaire de vingt titres sur deux lignes, assez bas pour la plus petite interface (240). */
+	private static final int BOOK_HEIGHT = 232;
 	private static final int PAPER = 0xFFEDE3C8;
 	private static final int EDGE = 0xFF6B4F2A;
 	private static final int INK = 0xFF2B2B40;
@@ -65,14 +66,22 @@ public class TreatiseScreen extends Screen {
 	private static final int LINK_HEIGHT = 20;
 	private final List<Link> links = new ArrayList<>();
 
-	/** Une page affichée : son chapitre et ce qu'elle montre. */
-	private record Entry(int chapter, Treatise.Page page, Glyph glyph) {
+	/**
+	 * Une page affichée : son chapitre, ce qu'elle montre, et les lignes de son texte une fois coupé
+	 * à sa largeur ({@code null} pour un glyphe). Un texte trop long se poursuit sur les pages
+	 * suivantes, en pleine largeur.
+	 */
+	private record Entry(int chapter, Treatise.Page page, Glyph glyph, List<FormattedCharSequence> lines) {
 	}
+
+	/** Les lignes qui tiennent sous le titre du chapitre, au-dessus du numéro de page. */
+	private static final int LINES = (BOOK_HEIGHT - 66) / 10;
 
 	private final List<Entry> entries = new ArrayList<>();
 	private Treatise treatise = new Treatise(List.of());
 	/** −1 : sommaire. */
 	private int index = -1;
+	private boolean opened;
 	private int left;
 	private int top;
 	private Button actionButton;
@@ -87,6 +96,13 @@ public class TreatiseScreen extends Screen {
 	@Override
 	protected void init() {
 		load();
+		// Un nouveau venu, qui n'a encore rien transmuté, ouvre le Traité à sa première page : les premiers pas.
+		if (!opened) {
+			opened = true;
+			if (totalMastery(alchemist()) == 0 && !entries.isEmpty()) {
+				index = 0;
+			}
+		}
 		left = (width - BOOK_WIDTH) / 2;
 		top = (height - BOOK_HEIGHT) / 2;
 		addRenderableWidget(Button.builder(Component.literal("<"), b -> go(index - 1))
@@ -113,8 +129,8 @@ public class TreatiseScreen extends Screen {
 			int x = left + 10 + (c / rows) * (column + 4);
 			Treatise.Chapter chapter = treatise.chapters().get(c);
 			boolean open = unlocked(chapter);
-			List<FormattedCharSequence> lines = font.split(open ? Component.translatable(chapter.titleKey())
-					: sealedHint(chapter), column - 6);
+			List<FormattedCharSequence> lines = font.split(numbered(c, open ? Component.translatable(chapter.titleKey())
+					: Component.literal("???")), column - 6);
 			links.add(new Link(c, open, x, top + 26 + (c % rows) * row, column, row, lines));
 		}
 		go(index);
@@ -137,16 +153,55 @@ public class TreatiseScreen extends Screen {
 			if (!unlocked(treatise.chapters().get(c))) {
 				continue;
 			}
+			int chapter = c;
 			for (Treatise.Page page : treatise.chapters().get(c).pages()) {
-				if (page instanceof Treatise.GlyphCatalogue) {
-					for (Glyph g : glyphs) {
-						entries.add(new Entry(c, page, g));
-					}
-				} else {
-					entries.add(new Entry(c, page, null));
+				switch (page) {
+					case Treatise.GlyphCatalogue catalogue -> glyphs.forEach(g -> entries.add(new Entry(chapter, page, g, null)));
+					case Treatise.TextPage text -> addText(chapter, page, text.textKey(), false);
+					case Treatise.ExamplePage example -> addText(chapter, page, example.textKey(), true);
+					case Treatise.SealPage seal -> addText(chapter, page, seal.textKey(), true);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Coupe le texte d'une page en lignes, à côté de l'image s'il y en a une. Ce qui ne tient pas passe,
+	 * paragraphe par paragraphe, sur des pages de texte qui suivent, en pleine largeur.
+	 */
+	private void addText(int chapter, Treatise.Page page, String textKey, boolean image) {
+		Treatise.Page shown = page;
+		int width = image ? BOOK_WIDTH - IMAGE - 36 : BOOK_WIDTH - 24;
+		List<FormattedCharSequence> lines = new ArrayList<>();
+		for (String paragraph : Component.translatable(textKey).getString().split("\n", -1)) {
+			if (paragraph.isEmpty() && lines.isEmpty() && shown != page) {
+				continue;
+			}
+			List<FormattedCharSequence> split = split(paragraph, width);
+			if (!lines.isEmpty() && lines.size() + split.size() > LINES) {
+				entries.add(new Entry(chapter, shown, null, lines));
+				lines = new ArrayList<>();
+				shown = new Treatise.TextPage(textKey);
+				width = BOOK_WIDTH - 24;
+				if (paragraph.isEmpty()) {
+					continue;
+				}
+				split = split(paragraph, width);
+			}
+			for (FormattedCharSequence line : split) {
+				if (lines.size() == LINES) {
+					entries.add(new Entry(chapter, shown, null, lines));
+					lines = new ArrayList<>();
+					shown = new Treatise.TextPage(textKey);
+				}
+				lines.add(line);
+			}
+		}
+		entries.add(new Entry(chapter, shown, null, lines));
+	}
+
+	private List<FormattedCharSequence> split(String paragraph, int width) {
+		return paragraph.isEmpty() ? List.of(FormattedCharSequence.EMPTY) : font.split(Component.literal(paragraph), width);
 	}
 
 	@Override
@@ -180,6 +235,50 @@ public class TreatiseScreen extends Screen {
 				return;
 			}
 		}
+	}
+
+	/** Tourne la page, comme la flèche du bas. */
+	public void nextPage() {
+		go(index + 1);
+	}
+
+	/** Ouvre le Traité au sommaire. */
+	public void showContents() {
+		go(-1);
+	}
+
+	/** Ouvre le Traité à la première page de ce texte ; rend faux s'il n'y est pas (chapitre scellé). */
+	public boolean goToPage(String textKey) {
+		for (int i = 0; i < entries.size(); i++) {
+			if (entries.get(i).page() instanceof Treatise.TextPage t && t.textKey().equals(textKey)
+					|| entries.get(i).page() instanceof Treatise.ExamplePage x && x.textKey().equals(textKey)) {
+				go(i);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Le texte de la page ouverte, et si c'en est la suite ; {@code null} au sommaire ou sur un glyphe.
+	 */
+	public String currentText() {
+		Entry e = current();
+		if (e == null || e.glyph() != null) {
+			return null;
+		}
+		String key = textOf(e);
+		boolean continued = index > 0 && entries.get(index - 1).glyph() == null && key.equals(textOf(entries.get(index - 1)));
+		return continued ? key + " (suite)" : key;
+	}
+
+	private static String textOf(Entry e) {
+		return switch (e.page()) {
+			case Treatise.TextPage t -> t.textKey();
+			case Treatise.ExamplePage x -> x.textKey();
+			case Treatise.SealPage seal -> seal.textKey();
+			case Treatise.GlyphCatalogue g -> "";
+		};
 	}
 
 	/** Ce chapitre est-il ouvert au lecteur (ses pages sont-elles dans le Traité) ? */
@@ -285,6 +384,11 @@ public class TreatiseScreen extends Screen {
 			graphics.centeredText(font, title, left + BOOK_WIDTH / 2, top + 12, INK);
 			for (Link link : links) {
 				boolean hovered = link.open() && link.contains(mouseX, mouseY);
+				if (!link.open() && link.contains(mouseX, mouseY)) {
+					// Ce qui manque pour lire un chapitre scellé, au pied du sommaire.
+					graphics.centeredText(font, sealedHint(treatise.chapters().get(link.chapter())), left + BOOK_WIDTH / 2,
+							top + BOOK_HEIGHT - 36, FADED);
+				}
 				if (hovered) {
 					graphics.fill(link.x() - 2, link.y() - 1, link.x() + link.width(), link.y() + link.height() - 1, HOVER);
 				}
@@ -295,20 +399,24 @@ public class TreatiseScreen extends Screen {
 				}
 			}
 		} else {
-			Component chapter = Component.translatable(treatise.chapters().get(e.chapter()).titleKey());
+			Component chapter = numbered(e.chapter(),
+					Component.translatable(treatise.chapters().get(e.chapter()).titleKey()));
 			graphics.centeredText(font, chapter, left + BOOK_WIDTH / 2, top + 10, FADED);
 			graphics.text(font, Component.literal((index + 1) + " / " + entries.size()),
 					left + BOOK_WIDTH / 2 - 10, top + BOOK_HEIGHT - 36, FADED, false);
 			if (e.glyph() != null) {
 				drawGlyph(graphics, e.glyph());
-			} else if (e.page() instanceof Treatise.ExamplePage example) {
-				drawImage(graphics, example.drawing());
-				drawText(graphics, Component.translatable(example.textKey()), BOOK_WIDTH - IMAGE - 36);
-			} else if (e.page() instanceof Treatise.SealPage seal) {
-				drawImage(graphics, mySeal());
-				drawText(graphics, Component.translatable(seal.textKey()), BOOK_WIDTH - IMAGE - 36);
-			} else if (e.page() instanceof Treatise.TextPage text) {
-				drawText(graphics, Component.translatable(text.textKey()), BOOK_WIDTH - 24);
+			} else {
+				if (e.page() instanceof Treatise.ExamplePage example) {
+					drawImage(graphics, example.drawing());
+				} else if (e.page() instanceof Treatise.SealPage) {
+					drawImage(graphics, mySeal());
+				}
+				int y = top + 26;
+				for (FormattedCharSequence line : e.lines()) {
+					graphics.text(font, line, left + 12, y, INK, false);
+					y += 10;
+				}
 			}
 		}
 		super.extractRenderState(graphics, mouseX, mouseY, a);
@@ -345,13 +453,18 @@ public class TreatiseScreen extends Screen {
 		}
 	}
 
+	/** « IV. Composer un cercle » : le numéro suit la place du chapitre dans le plan. */
+	private static Component numbered(int chapter, Component title) {
+		return Component.literal(Treatise.numeral(chapter + 1) + ". ").append(title);
+	}
+
 	/** Le lecteur a-t-il assez progressé pour lire ce chapitre ? */
 	private boolean unlocked(Treatise.Chapter chapter) {
 		AlchemistData me = alchemist();
 		return chapter.unlock().met(me.rank(), totalMastery(me));
 	}
 
-	/** Un chapitre scellé au sommaire : sans titre, avec ce qui manque (le rang d'abord, puis la maîtrise). */
+	/** Ce qui manque pour lire un chapitre scellé : le rang d'abord, puis la maîtrise. */
 	private Component sealedHint(Treatise.Chapter chapter) {
 		AlchemistData me = alchemist();
 		return me.rank().atLeast(chapter.unlock().rank())
@@ -406,17 +519,6 @@ public class TreatiseScreen extends Screen {
 		}
 		return Component.translatable("treatise.fmab.not_understood", me.uses(g.id()), AlchemistData.USES_TO_LEARN)
 				.withStyle(s -> s.withColor(0xA8321E));
-	}
-
-	private void drawText(GuiGraphicsExtractor graphics, Component text, int width) {
-		int y = top + 26;
-		for (FormattedCharSequence seq : font.split(text, width)) {
-			if (y > top + BOOK_HEIGHT - 40) {
-				break;
-			}
-			graphics.text(font, seq, left + 12, y, INK, false);
-			y += 10;
-		}
 	}
 
 	private void drawImage(GuiGraphicsExtractor graphics, Drawing d) {

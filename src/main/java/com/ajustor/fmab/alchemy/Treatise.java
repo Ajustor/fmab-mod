@@ -63,6 +63,22 @@ public record Treatise(List<Chapter> chapters) {
 		return known.contains(glyph) || uses > 0;
 	}
 
+	/**
+	 * Le numéro d'un chapitre, en chiffres romains : il suit sa place dans le plan, pour qu'en ajouter
+	 * un ne demande pas de renuméroter les titres. Les renvois entre chapitres les nomment.
+	 */
+	public static String numeral(int n) {
+		int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+		String[] digits = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+		StringBuilder out = new StringBuilder();
+		for (int i = 0; i < values.length; i++) {
+			for (; n >= values[i]; n -= values[i]) {
+				out.append(digits[i]);
+			}
+		}
+		return out.toString();
+	}
+
 	public static Treatise parse(JsonObject json) {
 		List<Chapter> chapters = new ArrayList<>();
 		for (JsonElement c : json.getAsJsonArray("chapters")) {

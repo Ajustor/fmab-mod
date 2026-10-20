@@ -73,7 +73,8 @@ class TreatiseTest {
 				.filter(c -> c.unlock().met(Rank.APPRENTICE, 0))
 				.map(Treatise.Chapter::titleKey)
 				.toList();
-		for (String chapter : new String[]{"treatise.fmab.ch1.title", "treatise.fmab.ch2.title",
+		for (String chapter : new String[]{"treatise.fmab.start.title", "treatise.fmab.everyday.title",
+				"treatise.fmab.ch1.title", "treatise.fmab.ch2.title",
 				"treatise.fmab.ch3.title", "treatise.fmab.ch4.title", "treatise.fmab.ch5.title",
 				"treatise.fmab.ch6.title", "treatise.fmab.design.title"}) {
 			assertTrue(open.contains(chapter), chapter + " devrait s'ouvrir au nouveau venu");
@@ -93,6 +94,31 @@ class TreatiseTest {
 		Treatise.Unlock taboos = chapter(chapters, "treatise.fmab.ch7.title").unlock();
 		assertTrue(!taboos.met(Rank.APPRENTICE, taboos.mastery() - 1) && taboos.met(Rank.APPRENTICE, taboos.mastery()));
 		assertTrue(taboos.mastery() < com.ajustor.fmab.alchemy.knowledge.Knowledge.ALCHEMIST_MASTERY);
+	}
+
+	/**
+	 * Le Traité prend le débutant par la main : il s'ouvre sur les premiers pas, puis les cercles de
+	 * tous les jours, et ses chapitres se numérotent d'eux-mêmes (les titres n'en portent pas).
+	 */
+	@Test
+	void theTreatiseOpensOnFirstStepsAndNumbersItsChapters() throws IOException {
+		List<Treatise.Chapter> chapters = load().chapters();
+		assertEquals("treatise.fmab.start.title", chapters.get(0).titleKey());
+		assertEquals("treatise.fmab.everyday.title", chapters.get(1).titleKey());
+		assertEquals("I", Treatise.numeral(1));
+		assertEquals("IV", Treatise.numeral(4));
+		assertEquals("XIX", Treatise.numeral(19));
+		for (String lang : new String[]{"fr_fr", "en_us"}) {
+			var texts = JsonParser.parseString(Files.readString(
+					TestGlyphs.resources().resolve("assets/fmab/lang/" + lang + ".json"))).getAsJsonObject();
+			for (Treatise.Chapter c : chapters) {
+				String title = texts.get(c.titleKey()).getAsString();
+				assertTrue(!title.matches("^[IVXL]+\\. .*"), lang + " : " + title + " ne doit pas porter son numéro");
+			}
+			// Les renvois nomment les chapitres : leur numéro change dès qu'on en ajoute un.
+			texts.entrySet().forEach(t -> assertTrue(!t.getValue().getAsString().matches("(?s).*[Cc]hap(itre|ter) [IVXL]+\\b.*"),
+					lang + " : " + t.getKey() + " renvoie à un chapitre par son numéro"));
+		}
 	}
 
 	/** Un chapitre conçu pour un rang ne montre pas d'exemple qu'il ne tienne pas. */
