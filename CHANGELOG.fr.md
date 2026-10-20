@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 1.10.0 — 2026-10-20
+
+### Nouveautés
+
+- Les chapitres du Traité se dévoilent au fil des progrès (rang ou maîtrise), et trois nouveaux chapitres apprennent à concevoir ses cercles : Penser son cercle, Penser en étages, Cercles de maître.
+- Le Traité prend les débutants par la main : un chapitre Premiers pas pour la première transmutation, des Cercles du quotidien pour miner, traverser, se défendre et faire marcher la redstone, et les textes longs se poursuivent page suivante au lieu d'être coupés.
+
+### Corrections
+
+- Les maisons des villes ont une marche devant leur porte, Dublith, Rush Valley, Resembool et Central sont plus aérées, Liore gagne quatre cours plantées, et ses tonneaux ne sont plus vides.
 ## 1.9.1 — 2026-10-20
 
 ### Corrections

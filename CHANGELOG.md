@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.10.0 — 2026-10-20
+
+### New features
+
+- The Treatise's chapters unveil themselves as you progress (rank or mastery), and three new chapters teach how to design your own circles: Thinking a circle through, Thinking in stages, Master circles.
+- The Treatise takes beginners by the hand: a First steps chapter for the first transmutation, Everyday circles to mine, cross, defend and run redstone, and long texts carry on to the next page instead of being cut off.
+
+### Fixes
+
+- Town houses get a step in front of their door, Dublith, Rush Valley, Resembool and Central are roomier, Liore gains four planted courtyards, and its barrels are no longer empty.
 ## 1.9.1 — 2026-10-20
 
 ### Fixes
