@@ -34,6 +34,14 @@ public interface Blueprint {
 		return List.of();
 	}
 
+	/**
+	 * La table de butin des tonneaux que pose le plan ({@code data/fmab/loot_table/chests}), ou
+	 * aucune : ses tonneaux restent vides, simple décor.
+	 */
+	default java.util.Optional<ResourceKey<LootTable>> barrels() {
+		return java.util.Optional.empty();
+	}
+
 	/** Le biome que la pièce peint sur toute son emprise (Xing), ou aucun. */
 	default java.util.Optional<ResourceKey<Biome>> biome() {
 		return java.util.Optional.empty();
@@ -75,8 +83,13 @@ public interface Blueprint {
 	 */
 	record Chest(BlockPos local, ResourceKey<LootTable> table) {
 		static Chest loot(BlockPos local, String table) {
-			return new Chest(local, ResourceKey.create(Registries.LOOT_TABLE, Fmab.id("chests/" + table)));
+			return new Chest(local, Blueprint.loot(table));
 		}
+	}
+
+	/** Une table de butin des coffres du mod : {@code data/fmab/loot_table/chests/<name>.json}. */
+	static ResourceKey<LootTable> loot(String name) {
+		return ResourceKey.create(Registries.LOOT_TABLE, Fmab.id("chests/" + name));
 	}
 
 	/**
@@ -109,6 +122,11 @@ public interface Blueprint {
 			}
 
 			@Override
+			public java.util.Optional<ResourceKey<LootTable>> barrels() {
+				return plan.barrels();
+			}
+
+			@Override
 			public List<Spawn> spawns(Plot p) {
 				List<Spawn> out = new java.util.ArrayList<>(plan.spawns(p));
 				out.addAll(more.apply(p));
@@ -130,6 +148,11 @@ public interface Blueprint {
 				List<Chest> out = new java.util.ArrayList<>(plan.chests(p));
 				freeSpot(plan, p, y).ifPresent(at -> out.add(Chest.loot(at, table)));
 				return out;
+			}
+
+			@Override
+			public java.util.Optional<ResourceKey<LootTable>> barrels() {
+				return plan.barrels();
 			}
 
 			@Override

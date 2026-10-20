@@ -13,6 +13,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.entity.BarrelBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 import java.util.List;
 import java.util.Locale;
@@ -151,6 +157,67 @@ public class TownScenes implements FabricClientGameTest {
 		return null;
 	}
 
+	/** Les lieux bâtis de maisons habillées : chaque porte y a sa marche. */
+	private static final List<String> TOWNS = List.of("central", "resembool", "rush_valley", "dublith", "liore");
+
+	/**
+	 * Une marche de seuil, vue de quatre pas : rend la position des yeux et l'orientation, ou
+	 * {@code null}. Dans une ville, une porte devant laquelle il n'y a que du vide (le plancher est un
+	 * bloc au-dessus du sol) fait échouer la scène.
+	 */
+	private static double[] doorStep(MinecraftServer server, Footprint f, String id) {
+		ServerLevel level = server.overworld();
+		int r = (int) f.half();
+		double[] found = null;
+		for (int dx = -r; dx <= r; dx++) {
+			for (int dz = -r; dz <= r; dz++) {
+				for (int y = GROUND; y <= GROUND + 3; y++) {
+					BlockPos at = new BlockPos((int) f.x() + dx, y, (int) f.z() + dz);
+					BlockState state = level.getBlockState(at);
+					if (!(state.getBlock() instanceof DoorBlock) || state.getValue(DoorBlock.HALF) != DoubleBlockHalf.LOWER) {
+						continue;
+					}
+					Direction out = state.getValue(DoorBlock.FACING);
+					BlockState under = level.getBlockState(at.relative(out).below());
+					if (TOWNS.contains(id)) {
+						GametestAsserts.check(!under.isAir(), id + " : une porte sans marche en " + at);
+					}
+					boolean clear = true;
+					for (int k = 1; k <= 4 && clear; k++) {
+						clear = level.getBlockState(at.relative(out, k)).isAir()
+								&& level.getBlockState(at.relative(out, k).above()).isAir();
+					}
+					if (found == null && clear && under.getBlock() instanceof StairBlock) {
+						BlockPos eye = at.relative(out, 4);
+						found = new double[]{eye.getX() + 0.5, eye.getY() + 0.6, eye.getZ() + 0.5,
+								out.getOpposite().toYRot()};
+					}
+				}
+			}
+		}
+		return found;
+	}
+
+	/** Les tonneaux du lieu, et combien ont une table de butin : {total, garnis}. */
+	private static int[] barrels(MinecraftServer server, Footprint f) {
+		ServerLevel level = server.overworld();
+		int r = (int) f.half(), total = 0, stocked = 0;
+		for (int dx = -r; dx <= r; dx++) {
+			for (int dz = -r; dz <= r; dz++) {
+				for (int y = GROUND; y <= GROUND + 16; y++) {
+					BlockPos at = new BlockPos((int) f.x() + dx, y, (int) f.z() + dz);
+					if (level.getBlockEntity(at) instanceof BarrelBlockEntity barrel) {
+						total++;
+						if (barrel.getLootTable() != null) {
+							stocked++;
+						}
+					}
+				}
+			}
+		}
+		return new int[]{total, stocked};
+	}
+
 	@Override
 	public void runTest(ClientGameTestContext context) {
 		if (!RenderShowcase.selected("towns")) {
@@ -204,6 +271,18 @@ public class TownScenes implements FabricClientGameTest {
 					tp(sp, eye[0], eye[1], eye[2], 180, 4);
 					settle(context);
 					context.takeScreenshot("town_%s_2_street".formatted(id));
+				}
+				// Devant une porte : la marche du seuil.
+				double[] door = sp.getServer().computeOnServer(server -> doorStep(server, f, id));
+				if (door != null) {
+					tp(sp, door[0], door[1], door[2], (float) door[3], 20);
+					settle(context);
+					context.takeScreenshot("town_%s_3_door".formatted(id));
+				}
+				if (id.equals("liore")) {
+					int[] barrels = sp.getServer().computeOnServer(server -> barrels(server, f));
+					GametestAsserts.check(barrels[0] > 0 && barrels[0] == barrels[1],
+							"les tonneaux de Liore devraient tous avoir leurs provisions : " + barrels[1] + " sur " + barrels[0]);
 				}
 			}
 		}

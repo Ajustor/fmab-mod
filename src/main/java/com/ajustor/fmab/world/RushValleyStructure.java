@@ -18,6 +18,9 @@ import java.util.Optional;
 public class RushValleyStructure extends Structure {
 	public static final MapCodec<RushValleyStructure> CODEC = simpleCodec(RushValleyStructure::new);
 
+	/** Une petite ville, mais aérée : de la place entre les ateliers. */
+	private static final double SPREAD = 1.45;
+
 	private static final Spot[] LAYOUT = {
 			new Spot(-6, -6, "rush_valley_square", 13, 13, 0, Rotation.NONE),
 			new Spot(-4, -4, "desert_stall", 3, 3, 0, Rotation.NONE),
@@ -57,7 +60,7 @@ public class RushValleyStructure extends Structure {
 		}
 		BlockPos center = new BlockPos(cx, y, cz);
 		return Optional.of(new GenerationStub(center, builder -> Hamlet.build(builder, context, center, LAYOUT,
-				PathPiece.Style.RUSH_VALLEY)));
+				PathPiece.Style.RUSH_VALLEY, SPREAD)));
 	}
 
 	@Override
