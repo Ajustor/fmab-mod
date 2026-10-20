@@ -2,6 +2,7 @@ package com.ajustor.fmab.client.screen;
 
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.alchemy.knowledge.Knowledge;
+import com.ajustor.fmab.alchemy.knowledge.KnowledgeLayout;
 import com.ajustor.fmab.alchemy.knowledge.KnowledgeNode;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,7 +22,8 @@ import java.util.Map;
 
 /**
  * Arbre de savoir : la maîtrise de chaque école et les nœuds qu'elle débloque. On progresse en
- * pratiquant ; cet écran ne fait que montrer où l'on en est.
+ * pratiquant ; cet écran ne fait que montrer où l'on en est. Les écoles se rangent en grille à la
+ * largeur de l'écran ; ce qui dépasse en hauteur défile à la molette.
  */
 public class KnowledgeScreen extends Screen {
 	private static final int PAPER = 0xFFEDE3C8;
@@ -28,11 +31,16 @@ public class KnowledgeScreen extends Screen {
 	private static final int INK = 0xFF2B2B40;
 	private static final int FADED = 0xFF8A7A60;
 	private static final int DONE = 0xFF2E7D32;
-	private static final int COLUMN = 150;
-	private static final int ROW = 12;
+	private static final int ROW = KnowledgeLayout.ROW;
+	/** Le contenu commence sous le titre, le rang et le karma. */
+	private static final int HEADER = 40;
 
 	private final Screen parent;
 	private final List<Hover> hovers = new ArrayList<>();
+	private int scroll;
+	private int maxScroll;
+	/** Faux si, au dernier rendu, le livre ou une école sortait de l'écran. */
+	private boolean fits = true;
 
 	/** Zone d'un nœud à l'écran, pour afficher sa description au survol. */
 	private record Hover(int x0, int y0, int x1, int y1, KnowledgeNode node) {
@@ -61,8 +69,9 @@ public class KnowledgeScreen extends Screen {
 				.sorted(Comparator.comparing(KnowledgeNode::school).thenComparingInt(KnowledgeNode::mastery))
 				.forEach(n -> schools.computeIfAbsent(n.school(), s -> new ArrayList<>()).add(n));
 
-		int bookWidth = Math.max(2, schools.size()) * COLUMN + 20;
-		int left = (width - bookWidth) / 2;
+		KnowledgeLayout layout = KnowledgeLayout.of(width, schools.values().stream().map(List::size).toList());
+		int left = layout.left();
+		int bookWidth = layout.width();
 		int top = 20;
 		int bottom = height - 36;
 		graphics.fill(left - 3, top - 3, left + bookWidth + 3, bottom + 3, EDGE);
@@ -77,26 +86,51 @@ public class KnowledgeScreen extends Screen {
 		graphics.centeredText(font, status, width / 2, top + 18, FADED);
 		graphics.text(font, karmaLine(), left + 8, top + 6, FADED, false);
 
+		// Ce qui ne tient pas en hauteur défile, coupé aux bords de la page.
+		int viewTop = top + HEADER;
+		int viewBottom = bottom - 4;
+		maxScroll = layout.maxScroll(viewBottom - viewTop);
+		scroll = Mth.clamp(scroll, 0, maxScroll);
+		int columnWidth = layout.columnWidth();
+		int textWidth = columnWidth - 10;
+		fits = left - 3 >= 0 && left + bookWidth + 3 <= width;
+
 		hovers.clear();
-		int x = left + 10;
+		graphics.enableScissor(left, viewTop, left + bookWidth, viewBottom);
+		int index = 0;
 		for (Map.Entry<String, List<KnowledgeNode>> school : schools.entrySet()) {
-			int y = top + 40;
-			graphics.text(font, Component.translatable("knowledge.fmab.school." + school.getKey())
-					.withStyle(s -> s.withBold(true)), x, y, INK, false);
+			KnowledgeLayout.Cell cell = layout.cells().get(index++);
+			int x = cell.x();
+			int y = viewTop + cell.y() - scroll;
+			fits &= x >= left && x + columnWidth <= left + bookWidth;
+			graphics.text(font, fit(Component.translatable("knowledge.fmab.school." + school.getKey())
+					.withStyle(s -> s.withBold(true)), textWidth), x, y, INK, false);
 			y += ROW;
-			graphics.text(font, Component.translatable("knowledge.fmab.mastery", knowledge.mastery(school.getKey())),
-					x, y, FADED, false);
+			graphics.text(font, fit(Component.translatable("knowledge.fmab.mastery",
+					knowledge.mastery(school.getKey())), textWidth), x, y, FADED, false);
 			y += ROW + 4;
 			for (KnowledgeNode node : school.getValue()) {
 				boolean has = knowledge.has(node.id());
 				Component line = Component.literal(has ? "✔ " : "◻ ")
 						.append(Component.translatable(node.nameKey()))
 						.append(has ? "" : " (" + node.mastery() + ")");
-				graphics.text(font, line, x + (node.parent().isPresent() ? 8 : 0), y, has ? DONE : INK, false);
-				hovers.add(new Hover(x, y - 1, x + COLUMN - 10, y + ROW - 2, node));
+				int indent = node.parent().isPresent() ? 8 : 0;
+				graphics.text(font, fit(line, textWidth - indent), x + indent, y, has ? DONE : INK, false);
+				// Un nœud caché par le défilement ne répond pas au survol.
+				if (y - 1 >= viewTop && y + ROW - 2 <= viewBottom) {
+					hovers.add(new Hover(x, y - 1, x + textWidth, y + ROW - 2, node));
+				}
 				y += ROW;
 			}
-			x += COLUMN;
+		}
+		graphics.disableScissor();
+		if (maxScroll > 0) {
+			// Un ascenseur discret au bord droit de la page.
+			int track = viewBottom - viewTop;
+			int thumb = Math.max(10, track * track / (track + maxScroll));
+			int thumbTop = viewTop + (track - thumb) * scroll / maxScroll;
+			graphics.fill(left + bookWidth - 5, viewTop, left + bookWidth - 3, viewBottom, 0x30000000);
+			graphics.fill(left + bookWidth - 5, thumbTop, left + bookWidth - 3, thumbTop + thumb, EDGE);
 		}
 		super.extractRenderState(graphics, mouseX, mouseY, a);
 
@@ -106,6 +140,26 @@ public class KnowledgeScreen extends Screen {
 				graphics.setTooltipForNextFrame(lines, mouseX, mouseY);
 			}
 		}
+	}
+
+	@Override
+	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+		if (maxScroll > 0 && scrollY != 0) {
+			scroll = Mth.clamp(scroll - (int) Math.round(scrollY * ROW * 2), 0, maxScroll);
+			return true;
+		}
+		return super.mouseScrolled(x, y, scrollX, scrollY);
+	}
+
+	/** Vrai si, au dernier rendu, le livre et toutes les écoles tenaient dans la largeur de l'écran. */
+	public boolean fitsOnScreen() {
+		return fits;
+	}
+
+	/** La première ligne du texte à cette largeur : le survol garde la description complète. */
+	private FormattedCharSequence fit(Component text, int maxWidth) {
+		List<FormattedCharSequence> lines = font.split(text, Math.max(1, maxWidth));
+		return lines.isEmpty() ? FormattedCharSequence.EMPTY : lines.get(0);
 	}
 
 	private AlchemistData alchemist() {
