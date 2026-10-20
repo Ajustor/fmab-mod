@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.9.1 — 2026-10-20
+
+### Corrections
+
+- L'arbre de savoir ne déborde plus de l'écran : les écoles se rangent en grille et la liste défile à la molette.
 ## 1.9.0 — 2026-10-18
 
 ### Nouveautés

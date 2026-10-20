@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.1 — 2026-10-20
+
+### Fixes
+
+- The knowledge tree no longer overflows the screen: schools are laid out in a grid and the list scrolls with the mouse wheel.
 ## 1.9.0 — 2026-10-18
 
 ### New features
