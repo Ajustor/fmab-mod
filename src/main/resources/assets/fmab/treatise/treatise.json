@@ -1872,7 +1872,676 @@
    ]
   },
   {
+   "title": "treatise.fmab.design.title",
+   "pages": [
+    {
+     "text": "treatise.fmab.design.p1"
+    },
+    {
+     "text": "treatise.fmab.design.p2"
+    },
+    {
+     "text": "treatise.fmab.design.p3"
+    },
+    {
+     "text": "treatise.fmab.design.p4"
+    },
+    {
+     "text": "treatise.fmab.design.p5"
+    },
+    {
+     "text": "treatise.fmab.design.ice_bridge",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.6,
+         9.2
+        ],
+        [
+         18.4,
+         9.2
+        ],
+        [
+         16.0,
+         13.4
+        ]
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        20.0
+       ],
+       "radius": 1.96
+      },
+      {
+       "type": "line",
+       "from": [
+        14.04,
+        20.0
+       ],
+       "to": [
+        17.96,
+        20.0
+       ]
+      },
+      {
+       "type": "dot",
+       "at": [
+        2,
+        16
+       ]
+      },
+      {
+       "type": "dot",
+       "at": [
+        30,
+        16
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.design.aimed_spike",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         25.9,
+         6.1
+        ],
+        [
+         25.9,
+         25.9
+        ],
+        [
+         6.1,
+         25.9
+        ],
+        [
+         6.1,
+         6.1
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.6,
+         9.2
+        ],
+        [
+         18.4,
+         9.2
+        ],
+        [
+         16.0,
+         13.4
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.35,
+        11.6
+       ],
+       "to": [
+        17.65,
+        11.6
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         14.5,
+         20.0
+        ],
+        [
+         17.5,
+         20.0
+        ],
+        [
+         16.0,
+         17.6
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        20.0
+       ],
+       "to": [
+        16.0,
+        22.7
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.95,
+        21.35
+       ],
+       "to": [
+        17.05,
+        21.35
+       ]
+      },
+      {
+       "type": "dot",
+       "at": [
+        2,
+        16
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        28.72,
+        16.0
+       ],
+       "to": [
+        31.28,
+        16.0
+       ]
+      },
+      {
+       "type": "polyline",
+       "points": [
+        [
+         30.64,
+         15.36
+        ],
+        [
+         31.28,
+         16.0
+        ],
+        [
+         30.64,
+         16.64
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.design.p6"
+    }
+   ]
+  },
+  {
+   "title": "treatise.fmab.stages.title",
+   "unlock": {
+    "rank": "alchemist"
+   },
+   "pages": [
+    {
+     "text": "treatise.fmab.stages.p1"
+    },
+    {
+     "text": "treatise.fmab.stages.p2"
+    },
+    {
+     "text": "treatise.fmab.stages.p3"
+    },
+    {
+     "text": "treatise.fmab.stages.bristling_rampart",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 6
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16.0,
+         10.0
+        ],
+        [
+         22.0,
+         16.0
+        ],
+        [
+         16.0,
+         22.0
+        ],
+        [
+         10.0,
+         16.0
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         14.56,
+         12.42
+        ],
+        [
+         17.44,
+         12.42
+        ],
+        [
+         16.0,
+         14.94
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        15.01,
+        13.86
+       ],
+       "to": [
+        16.99,
+        13.86
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16.0,
+        18.5
+       ],
+       "radius": 1.26
+      },
+      {
+       "type": "line",
+       "from": [
+        14.74,
+        18.5
+       ],
+       "to": [
+        17.26,
+        18.5
+       ]
+      },
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 12
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16.0,
+         4.0
+        ],
+        [
+         26.39,
+         10.0
+        ],
+        [
+         26.39,
+         22.0
+        ],
+        [
+         16.0,
+         28.0
+        ],
+        [
+         5.61,
+         22.0
+        ],
+        [
+         5.61,
+         10.0
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         14.56,
+         5.92
+        ],
+        [
+         17.44,
+         5.92
+        ],
+        [
+         16.0,
+         8.44
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        15.01,
+        7.36
+       ],
+       "to": [
+        16.99,
+        7.36
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         15.1,
+         25.0
+        ],
+        [
+         16.9,
+         25.0
+        ],
+        [
+         16.0,
+         23.56
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        25.0
+       ],
+       "to": [
+        16.0,
+        26.62
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        15.37,
+        25.81
+       ],
+       "to": [
+        16.63,
+        25.81
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        12,
+        21
+       ],
+       "to": [
+        8,
+        25
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        11,
+        20
+       ],
+       "to": [
+        7,
+        24
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.stages.p4"
+    },
+    {
+     "text": "treatise.fmab.stages.p5"
+    },
+    {
+     "text": "treatise.fmab.stages.hunting_spikes",
+     "example": [
+      {
+       "type": "circle",
+       "center": [
+        16,
+        16
+       ],
+       "radius": 14
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         16,
+         2
+        ],
+        [
+         30,
+         16
+        ],
+        [
+         16,
+         30
+        ],
+        [
+         2,
+         16
+        ]
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         13.6,
+         9.2
+        ],
+        [
+         18.4,
+         9.2
+        ],
+        [
+         16.0,
+         13.4
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.35,
+        11.6
+       ],
+       "to": [
+        17.65,
+        11.6
+       ]
+      },
+      {
+       "type": "polygon",
+       "points": [
+        [
+         14.5,
+         20.0
+        ],
+        [
+         17.5,
+         20.0
+        ],
+        [
+         16.0,
+         17.6
+        ]
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        16.0,
+        20.0
+       ],
+       "to": [
+        16.0,
+        22.7
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        14.95,
+        21.35
+       ],
+       "to": [
+        17.05,
+        21.35
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        25.06,
+        5.12
+       ],
+       "to": [
+        25.06,
+        7.08
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        25.9,
+        5.12
+       ],
+       "to": [
+        25.9,
+        7.08
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        26.74,
+        5.12
+       ],
+       "to": [
+        26.74,
+        7.08
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        5.26,
+        5.12
+       ],
+       "to": [
+        5.26,
+        7.08
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        6.1,
+        5.12
+       ],
+       "to": [
+        6.1,
+        7.08
+       ]
+      },
+      {
+       "type": "line",
+       "from": [
+        6.94,
+        5.12
+       ],
+       "to": [
+        6.94,
+        7.08
+       ]
+      }
+     ]
+    },
+    {
+     "text": "treatise.fmab.stages.p6"
+    }
+   ]
+  },
+  {
+   "title": "treatise.fmab.mastery.title",
+   "unlock": {
+    "rank": "state"
+   },
+   "pages": [
+    {
+     "text": "treatise.fmab.mastery.p1"
+    },
+    {
+     "text": "treatise.fmab.mastery.p2"
+    },
+    {
+     "text": "treatise.fmab.mastery.p3"
+    },
+    {
+     "text": "treatise.fmab.mastery.p4"
+    },
+    {
+     "text": "treatise.fmab.mastery.p5"
+    }
+   ]
+  },
+  {
    "title": "treatise.fmab.ch7.title",
+   "unlock": {
+    "mastery": 20
+   },
    "pages": [
     {
      "text": "treatise.fmab.ch7.p1"
@@ -1884,6 +2553,9 @@
   },
   {
    "title": "treatise.fmab.ch8.title",
+   "unlock": {
+    "rank": "alchemist"
+   },
    "pages": [
     {
      "text": "treatise.fmab.ch8.p1"
@@ -2019,6 +2691,9 @@
   },
   {
    "title": "treatise.fmab.ch9.title",
+   "unlock": {
+    "rank": "alchemist"
+   },
    "pages": [
     {
      "text": "treatise.fmab.ch9.p1"
@@ -2045,6 +2720,9 @@
   },
   {
    "title": "treatise.fmab.ch10.title",
+   "unlock": {
+    "rank": "state"
+   },
    "pages": [
     {
      "text": "treatise.fmab.ch10.p1"
@@ -2068,6 +2746,9 @@
   },
   {
    "title": "treatise.fmab.ch11.title",
+   "unlock": {
+    "rank": "state"
+   },
    "pages": [
     {
      "text": "treatise.fmab.ch11.p1"
@@ -2105,6 +2786,9 @@
   },
   {
    "title": "treatise.fmab.ch13.title",
+   "unlock": {
+    "mastery": 20
+   },
    "pages": [
     {
      "text": "treatise.fmab.ch13.p1"

@@ -3,6 +3,7 @@ package com.ajustor.fmab.alchemy;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.Primitive;
 import com.ajustor.fmab.alchemy.glyph.GlyphJson;
+import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -13,9 +14,28 @@ import java.util.Set;
 /**
  * Plan du Traité d'alchimie, lu depuis {@code assets/fmab/treatise/treatise.json} : des chapitres
  * faits de pages de texte (clés de traduction), du catalogue des glyphes et de cercles d'exemple.
+ * Certains chapitres ne se dévoilent qu'au fil des progrès du lecteur.
  */
 public record Treatise(List<Chapter> chapters) {
-	public record Chapter(String titleKey, List<Page> pages) {
+	public record Chapter(String titleKey, List<Page> pages, Unlock unlock) {
+	}
+
+	/**
+	 * Ce qu'il faut pour lire un chapitre : un rang, et des points de maîtrise (toutes écoles
+	 * confondues). Les deux doivent être atteints ; {@code "unlock": {"rank": "alchemist"}} dans le
+	 * plan.
+	 */
+	public record Unlock(Rank rank, int mastery) {
+		public static final Unlock ALWAYS = new Unlock(Rank.APPRENTICE, 0);
+
+		public boolean met(Rank reader, int totalMastery) {
+			return reader.atLeast(rank) && totalMastery >= mastery;
+		}
+
+		static Unlock parse(JsonObject json) {
+			return new Unlock(json.has("rank") ? Rank.fromSerializedName(json.get("rank").getAsString()) : Rank.APPRENTICE,
+					json.has("mastery") ? json.get("mastery").getAsInt() : 0);
+		}
 	}
 
 	public sealed interface Page {
@@ -62,7 +82,8 @@ public record Treatise(List<Chapter> chapters) {
 					pages.add(new TextPage(page.get("text").getAsString()));
 				}
 			}
-			chapters.add(new Chapter(chapter.get("title").getAsString(), pages));
+			chapters.add(new Chapter(chapter.get("title").getAsString(), pages,
+					chapter.has("unlock") ? Unlock.parse(chapter.getAsJsonObject("unlock")) : Unlock.ALWAYS));
 		}
 		return new Treatise(chapters);
 	}

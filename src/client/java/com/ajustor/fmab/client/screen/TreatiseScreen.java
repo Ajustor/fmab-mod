@@ -36,7 +36,8 @@ import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Le Traité d'alchimie : sommaire, chapitres de texte, catalogue des glyphes (on y étudie chaque
- * glyphe pour le comprendre) et cercles d'exemple à recopier.
+ * glyphe pour le comprendre) et cercles d'exemple à recopier. Un chapitre encore scellé paraît au
+ * sommaire sans titre, avec ce qu'il faut pour le lire ; ses pages n'y sont pas.
  */
 public class TreatiseScreen extends Screen {
 	private static final int BOOK_WIDTH = 320;
@@ -49,9 +50,12 @@ public class TreatiseScreen extends Screen {
 	/** Le fond d'un titre du sommaire survolé. */
 	private static final int HOVER = 0x336B4F2A;
 
-	/** Une page affichée : son chapitre et ce qu'elle montre. */
-	/** Un titre du sommaire : sa place, et ses lignes une fois coupé à la largeur de la colonne. */
-	private record Link(int chapter, int x, int y, int width, int height, List<FormattedCharSequence> lines) {
+	/**
+	 * Un titre du sommaire : sa place, et ses lignes une fois coupé à la largeur de la colonne ; un
+	 * chapitre scellé ne s'ouvre pas.
+	 */
+	private record Link(int chapter, boolean open, int x, int y, int width, int height,
+			List<FormattedCharSequence> lines) {
 		boolean contains(double mouseX, double mouseY) {
 			return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
 		}
@@ -61,6 +65,7 @@ public class TreatiseScreen extends Screen {
 	private static final int LINK_HEIGHT = 20;
 	private final List<Link> links = new ArrayList<>();
 
+	/** Une page affichée : son chapitre et ce qu'elle montre. */
 	private record Entry(int chapter, Treatise.Page page, Glyph glyph) {
 	}
 
@@ -103,12 +108,14 @@ public class TreatiseScreen extends Screen {
 		links.clear();
 		int rows = (treatise.chapters().size() + 1) / 2;
 		int column = (BOOK_WIDTH - 24) / 2;
-		int row = rows == 0 ? LINK_HEIGHT : Math.min(LINK_HEIGHT, (BOOK_HEIGHT - 58) / rows);
+		int row = rows == 0 ? LINK_HEIGHT : Math.min(LINK_HEIGHT, (BOOK_HEIGHT - 52) / rows);
 		for (int c = 0; c < treatise.chapters().size(); c++) {
 			int x = left + 10 + (c / rows) * (column + 4);
-			List<FormattedCharSequence> lines = font.split(Component.translatable(treatise.chapters().get(c).titleKey()),
-					column - 6);
-			links.add(new Link(c, x, top + 26 + (c % rows) * row, column, row, lines));
+			Treatise.Chapter chapter = treatise.chapters().get(c);
+			boolean open = unlocked(chapter);
+			List<FormattedCharSequence> lines = font.split(open ? Component.translatable(chapter.titleKey())
+					: sealedHint(chapter), column - 6);
+			links.add(new Link(c, open, x, top + 26 + (c % rows) * row, column, row, lines));
 		}
 		go(index);
 	}
@@ -127,6 +134,9 @@ public class TreatiseScreen extends Screen {
 				: new ArrayList<>();
 		glyphs.sort(Comparator.comparing(Glyph::rank).thenComparing(Glyph::layer).thenComparing(Glyph::id));
 		for (int c = 0; c < treatise.chapters().size(); c++) {
+			if (!unlocked(treatise.chapters().get(c))) {
+				continue;
+			}
 			for (Treatise.Page page : treatise.chapters().get(c).pages()) {
 				if (page instanceof Treatise.GlyphCatalogue) {
 					for (Glyph g : glyphs) {
@@ -143,7 +153,7 @@ public class TreatiseScreen extends Screen {
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		if (index < 0 && event.button() == 0) {
 			for (Link link : links) {
-				if (link.contains(event.x(), event.y())) {
+				if (link.open() && link.contains(event.x(), event.y())) {
 					minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
 					go(firstPageOf(link.chapter()));
 					return true;
@@ -170,6 +180,11 @@ public class TreatiseScreen extends Screen {
 				return;
 			}
 		}
+	}
+
+	/** Ce chapitre est-il ouvert au lecteur (ses pages sont-elles dans le Traité) ? */
+	public boolean opens(String titleKey) {
+		return entries.stream().anyMatch(e -> treatise.chapters().get(e.chapter()).titleKey().equals(titleKey));
 	}
 
 	/** La page ouverte est-elle celle d'un glyphe que le lecteur voit en entier ? */
@@ -269,13 +284,13 @@ public class TreatiseScreen extends Screen {
 		if (e == null) {
 			graphics.centeredText(font, title, left + BOOK_WIDTH / 2, top + 12, INK);
 			for (Link link : links) {
-				boolean hovered = link.contains(mouseX, mouseY);
+				boolean hovered = link.open() && link.contains(mouseX, mouseY);
 				if (hovered) {
 					graphics.fill(link.x() - 2, link.y() - 1, link.x() + link.width(), link.y() + link.height() - 1, HOVER);
 				}
 				int lineY = link.y() + (link.height() - Math.min(2, link.lines().size()) * 9) / 2;
 				for (FormattedCharSequence line : link.lines().subList(0, Math.min(2, link.lines().size()))) {
-					graphics.text(font, line, link.x() + 2, lineY, hovered ? EDGE : INK, false);
+					graphics.text(font, line, link.x() + 2, lineY, !link.open() ? FADED : hovered ? EDGE : INK, false);
 					lineY += 9;
 				}
 			}
@@ -328,6 +343,25 @@ public class TreatiseScreen extends Screen {
 				y += 10;
 			}
 		}
+	}
+
+	/** Le lecteur a-t-il assez progressé pour lire ce chapitre ? */
+	private boolean unlocked(Treatise.Chapter chapter) {
+		AlchemistData me = alchemist();
+		return chapter.unlock().met(me.rank(), totalMastery(me));
+	}
+
+	/** Un chapitre scellé au sommaire : sans titre, avec ce qui manque (le rang d'abord, puis la maîtrise). */
+	private Component sealedHint(Treatise.Chapter chapter) {
+		AlchemistData me = alchemist();
+		return me.rank().atLeast(chapter.unlock().rank())
+				? Component.translatable("treatise.fmab.sealed.mastery", totalMastery(me), chapter.unlock().mastery())
+				: Component.translatable("treatise.fmab.sealed.rank",
+						Component.translatable(chapter.unlock().rank().translationKey()));
+	}
+
+	private static int totalMastery(AlchemistData me) {
+		return me.mastery().values().stream().mapToInt(Integer::intValue).sum();
 	}
 
 	private boolean revealed(Glyph g) {

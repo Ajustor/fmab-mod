@@ -45,8 +45,9 @@ Dans l'inventaire de survie, l'onglet **Corps** montre les membres, les automail
 Chaque joueur commence avec le **Traité d'alchimie**, le tome des **Rudiments** et de la **craie** ;
 son **carnet** contient déjà un mur, une pique et une plateforme de glace. Choisissez un cercle (N ou
 R), tracez-le au sol à la craie (clic droit), puis posez la paume dessus (clic droit, main vide). Le
-Traité explique le reste, et les progrès (touche L) tracent le chemin : Izumi à Dublith, l'examen
-d'État à Central, la Porte, les homonculus, puis Père.
+Traité explique le reste, et apprend à concevoir ses propres cercles ; ses chapitres se dévoilent à
+mesure que l'alchimiste progresse. Les progrès (touche L) tracent le chemin : Izumi à Dublith,
+l'examen d'État à Central, la Porte, les homonculus, puis Père.
 
 ### Contenu
 
@@ -227,7 +228,8 @@ In the survival inventory, the **Body** tab shows limbs, automail and gloves.
 Every player starts with the **Alchemy Treatise**, the **Rudiments** tome and **chalk**; their
 **notebook** already holds a wall, a spike and an ice platform. Pick a circle (N or R), draw it on
 the ground with chalk (right-click), then lay your palm on it (right-click, empty hand). The Treatise
-explains the rest, and advancements (L key) trace the path: Izumi in Dublith, the State exam in
+explains the rest and teaches how to design your own circles; its chapters unveil themselves as the
+alchemist progresses. Advancements (L key) trace the path: Izumi in Dublith, the State exam in
 Central, the Gate, the homunculi, then Father.
 
 ### Content
