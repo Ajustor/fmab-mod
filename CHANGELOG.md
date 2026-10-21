@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.10.3 — 2026-10-21
+
+### Fixes
+
+- Cartographers no longer freeze the server while preparing their maps to the mod's places (Dublith, Resembool…); those maps, like the characters' ones, lead to the place without searching the world.
 ## 1.10.2 — 2026-10-21
 
 ### New features

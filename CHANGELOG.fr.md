@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.10.3 — 2026-10-21
+
+### Corrections
+
+- Les cartographes ne figent plus le serveur en préparant leurs cartes vers les lieux du mod (Dublith, Resembool…) ; ces cartes, comme celles des personnages, mènent au lieu sans fouiller le monde.
 ## 1.10.2 — 2026-10-21
 
 ### Nouveautés
