@@ -14,7 +14,7 @@ import java.util.Optional;
  * Resembool : un petit hameau de campagne. Quelques fermes, la maison des Rockbell et son atelier
  * d'automail, la maison des Elric et le bureau de Hohenheim, des champs de blé. Chaque bâtiment suit le relief à son emplacement.
  */
-public class ResemboolStructure extends Structure {
+public class ResemboolStructure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<ResemboolStructure> CODEC = simpleCodec(ResemboolStructure::new);
 
 	/** Un village de campagne : les maisons s'écartent entre les champs. */
@@ -45,11 +45,12 @@ public class ResemboolStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return UniqueSite.only(this, context, this::siteAt);
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		int cx = chunk.getMiddleBlockX();
 		int cz = chunk.getMiddleBlockZ();
 		int y = Hamlet.height(context, cx, cz);

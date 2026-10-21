@@ -6,8 +6,7 @@
     {
       "decoration": "minecraft:red_x",
       "destination": "fmab:on_laboratory_5_maps",
-      "function": "minecraft:exploration_map",
-      "search_radius": 100
+      "function": "fmab:site_map"
     },
     {
       "function": "minecraft:set_name",

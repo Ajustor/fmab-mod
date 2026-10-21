@@ -1,7 +1,11 @@
 package com.ajustor.fmab.world;
 
 import com.ajustor.fmab.compat.WorldgenCompat;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
@@ -35,6 +39,16 @@ final class UniqueSite {
 		Optional<Structure.GenerationStub> at(Structure.GenerationContext context, ChunkPos chunk);
 	}
 
+	/** Un lieu unique : il dit s'il se bâtirait sur un chunk donné, si le terrain s'y prête. */
+	interface Sited {
+		Optional<Structure.GenerationStub> siteAt(Structure.GenerationContext context, ChunkPos chunk);
+
+		/** Faux pour un lieu qui se répète (un {@link SingleSiteStructure} non unique). */
+		default boolean unique() {
+			return true;
+		}
+	}
+
 	/** Le choix de chaque lieu, par graine de monde. */
 	private static final Map<Structure, Map<Long, Optional<ChunkPos>>> CHOSEN = new WeakHashMap<>();
 
@@ -51,6 +65,30 @@ final class UniqueSite {
 			return Optional.empty();
 		}
 		return attempt.at(context, context.chunkPos());
+	}
+
+	/**
+	 * Où se tient ce lieu dans ce monde, sans rien générer ni rien lire du disque : la place que la
+	 * génération choisit (le même calcul, gardé une fois fait), puis le lieu sur ce chunk. Vide si ce
+	 * n'est pas un lieu unique, si ce monde ne le place pas, ou si aucune place ne lui convient.
+	 *
+	 * <p>Les cartes passent par ici : chercher un lieu unique comme le jeu cherche un monument (anneau
+	 * par anneau, chaque chunk lu sur le disque) pouvait figer le serveur de longues minutes.
+	 */
+	static Optional<BlockPos> locate(ServerLevel level, Holder<Structure> holder) {
+		if (!(holder.value() instanceof Sited sited) || !sited.unique()) {
+			return Optional.empty();
+		}
+		ServerChunkCache chunks = level.getChunkSource();
+		// Le choix est gardé par graine : seul le générateur qui place ce lieu doit le calculer.
+		if (chunks.getGeneratorState().getPlacementsForStructure(holder).isEmpty()) {
+			return Optional.empty();
+		}
+		Structure structure = holder.value();
+		Structure.GenerationContext context = WorldgenCompat.context(level, ChunkPos.ZERO, structure.biomes()::contains);
+		return chosen(structure, context, sited::siteAt)
+				.flatMap(chunk -> sited.siteAt(context, chunk))
+				.map(Structure.GenerationStub::position);
 	}
 
 	/** La place choisie pour ce lieu dans ce monde, ou rien si aucune ne convient. */

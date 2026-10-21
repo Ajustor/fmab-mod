@@ -22,7 +22,7 @@ import java.util.Optional;
  * d'Ishval et de Xerxès en sont. Il ne se pose jamais dans Central, ni près des emplacements des
  * lieux listés dans {@code "avoid"}.
  */
-public class SingleSiteStructure extends Structure {
+public class SingleSiteStructure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<SingleSiteStructure> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			settingsCodec(i),
 			Codec.STRING.fieldOf("piece").forGetter(s -> s.piece),
@@ -58,11 +58,17 @@ public class SingleSiteStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return unique ? UniqueSite.only(this, context, this::at) : at(context, context.chunkPos());
+		return unique ? UniqueSite.only(this, context, this::siteAt) : siteAt(context, context.chunkPos());
+	}
+
+	@Override
+	public boolean unique() {
+		return unique;
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		if (Clearance.nearCentral(context, chunk) || avoid.stream().anyMatch(s -> Clearance.near(context, chunk, s, AVOID_CHUNKS))) {
 			return Optional.empty();
 		}

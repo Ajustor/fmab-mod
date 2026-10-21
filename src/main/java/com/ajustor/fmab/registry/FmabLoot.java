@@ -1,5 +1,10 @@
 package com.ajustor.fmab.registry;
 
+import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.platform.Platform;
+import com.ajustor.fmab.world.SiteMapFunction;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -20,6 +25,10 @@ public final class FmabLoot {
 	private static final Map<ResourceKey<LootTable>, Float> HUMAN_TRANSMUTATION_NOTES = Map.of(
 			BuiltInLootTables.STRONGHOLD_LIBRARY, 0.02f,
 			BuiltInLootTables.ANCIENT_CITY, 0.01f);
+
+	/** Les cartes des cartographes vers les lieux du mod (voir {@link SiteMapFunction}). */
+	public static final MapCodec<SiteMapFunction> SITE_MAP = Platform.get().content().register(
+			BuiltInRegistries.LOOT_FUNCTION_TYPE, Fmab.id("site_map"), SiteMapFunction.MAP_CODEC);
 
 	private FmabLoot() {
 	}

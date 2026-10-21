@@ -11,7 +11,7 @@ import net.minecraft.world.level.levelgen.structure.StructureType;
 import java.util.Optional;
 
 /** Le Devil's Nest : le bar où Greed tient sa cour, quelque part du côté de Dublith. */
-public class DevilsNestStructure extends Structure {
+public class DevilsNestStructure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<DevilsNestStructure> CODEC = simpleCodec(DevilsNestStructure::new);
 	static final int SIZE_X = 13;
 	static final int SIZE_Z = 9;
@@ -22,11 +22,12 @@ public class DevilsNestStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return UniqueSite.only(this, context, this::siteAt);
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		int cx = chunk.getMiddleBlockX();
 		int cz = chunk.getMiddleBlockZ();
 		int y = context.chunkGenerator().getFirstFreeHeight(cx + SIZE_X / 2, cz + SIZE_Z / 2,

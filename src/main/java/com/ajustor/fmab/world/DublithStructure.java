@@ -15,7 +15,7 @@ import java.util.Optional;
  * boucherie des Curtis, où Izumi accueille (ou chasse) les apprentis alchimistes. L'île de Yock, son
  * terrain d'épreuve, est quelque part en mer.
  */
-public class DublithStructure extends Structure {
+public class DublithStructure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<DublithStructure> CODEC = simpleCodec(DublithStructure::new);
 
 	/** Une petite ville, mais aérée : de la place entre les maisons. */
@@ -44,11 +44,12 @@ public class DublithStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return UniqueSite.only(this, context, this::siteAt);
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		if (Clearance.nearCentral(context, chunk)) {
 			return Optional.empty();
 		}

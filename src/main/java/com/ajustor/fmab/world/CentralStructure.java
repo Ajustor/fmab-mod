@@ -20,7 +20,7 @@ import java.util.Optional;
  * quartier général et son arène, à l'est la bibliothèque, à l'ouest la résidence Bradley ; des
  * maisons en couronnes, des arbres le long des avenues, un marché autour de la fontaine. Sous la ville, le tunnel de Sloth, et plus bas le repaire de Père.
  */
-public class CentralStructure extends Structure {
+public class CentralStructure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<CentralStructure> CODEC = simpleCodec(CentralStructure::new);
 
 	private static final int R = Blueprints.CITY_RADIUS;
@@ -33,11 +33,12 @@ public class CentralStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return UniqueSite.only(this, context, this::siteAt);
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		int cx = chunk.getMiddleBlockX();
 		int cz = chunk.getMiddleBlockZ();
 		int y = height(context, cx, cz);

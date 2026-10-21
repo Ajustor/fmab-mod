@@ -14,7 +14,7 @@ import java.util.Optional;
  * Le Laboratoire 5 : un complexe de l'armée à l'abandon, et sous lui la salle où l'armée fabriquait
  * des Pierres philosophales. Lust et Gluttony le gardent.
  */
-public class Laboratory5Structure extends Structure {
+public class Laboratory5Structure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<Laboratory5Structure> CODEC = simpleCodec(Laboratory5Structure::new);
 	static final int SIZE_X = 25;
 	static final int SIZE_Z = 21;
@@ -28,11 +28,12 @@ public class Laboratory5Structure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return UniqueSite.only(this, context, this::siteAt);
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		int cx = chunk.getMiddleBlockX();
 		int cz = chunk.getMiddleBlockZ();
 		int y = context.chunkGenerator().getFirstFreeHeight(cx + SIZE_X / 2, cz + SIZE_Z / 2,
