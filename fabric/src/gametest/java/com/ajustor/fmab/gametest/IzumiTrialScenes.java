@@ -30,8 +30,8 @@ import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Les épreuves d'Izumi, à la portée d'un Apprenti : il comprend le Feu à force de le tracer (cinq
- * cercles, qui rebondissent tous), et l'épreuve de la pratique est réussie. Chez Izumi, l'épreuve des
- * deux étages porte « (Alchimiste) », et survoler une épreuve dit comment la réussir. Lancer avec
+ * cercles, qui rebondissent tous), et l'épreuve de la pratique est réussie. Chez Izumi, survoler une
+ * épreuve dit comment la réussir. Lancer avec
  * {@code ./gradlew :fabric:26.2:runClientGameTest -PfmabGametest=izumi_trials}.
  */
 public class IzumiTrialScenes implements FabricClientGameTest {
@@ -76,13 +76,13 @@ public class IzumiTrialScenes implements FabricClientGameTest {
 			check(achieved.contains(Trial.PRACTICE.id()), "comprendre le Feu en le traçant devrait réussir l'épreuve : " + achieved);
 			sp.getConnection().waitForClientboundPackets();
 
-			// Chez Izumi : le mur et la pratique réussis, les deux étages marqués « (Alchimiste) ».
+			// Chez Izumi : le mur et la pratique réussis.
 			context.setScreen(() -> new IzumiScreen(new OpenIzumiPayload(0, achieved, List.of())));
 			context.waitTicks(2);
 			context.runOnClient(mc -> RenderShowcase.hideGui(mc, false));
 			context.takeScreenshot("izumi_trials_list");
-			hover(context, Trial.TWO_STAGES);
-			context.takeScreenshot("izumi_trials_hint_two_stages");
+			hover(context, Trial.GLOVES);
+			context.takeScreenshot("izumi_trials_hint_gloves");
 			hover(context, Trial.PRACTICE);
 			context.takeScreenshot("izumi_trials_hint_practice");
 			context.setScreen(() -> null);

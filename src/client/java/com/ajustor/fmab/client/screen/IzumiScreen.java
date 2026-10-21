@@ -1,9 +1,6 @@
 package com.ajustor.fmab.client.screen;
 
-import com.ajustor.fmab.alchemy.glyph.Rank;
-import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.network.IzumiActionPayload;
-import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.training.Trial;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -15,12 +12,10 @@ import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Dialogue avec Izumi : ses épreuves (à faire, réussies, récompensées) et le combat
- * d'entraînement. Survoler une épreuve dit comment la réussir ; une épreuve au-dessus du rang de
- * l'élève le dit aussi.
+ * d'entraînement. Survoler une épreuve dit comment la réussir.
  */
 public class IzumiScreen extends Screen {
 	private static final int WIDTH = 300;
-	/** Assez serré pour que sept épreuves tiennent dans la plus petite interface (240 de haut). */
 	private static final int ROW = 18;
 	private static final int PAPER = 0xFFEDE3C8;
 	private static final int EDGE = 0xFF6B4F2A;
@@ -79,19 +74,13 @@ public class IzumiScreen extends Screen {
 		for (Trial trial : Trial.values()) {
 			boolean achieved = state.achieved().contains(trial.id());
 			boolean rewarded = state.rewarded().contains(trial.id());
-			boolean early = !rank().atLeast(trial.rank()) && !achieved;
 			if (mouseX >= left + 4 && mouseX < left + WIDTH - 4 && mouseY >= y - 5 && mouseY < y + ROW - 5) {
 				hovered = trial;
 				graphics.fill(left + 4, y - 5, left + WIDTH - 4, y + ROW - 5, HOVER);
 			}
 			String mark = rewarded ? "★ " : achieved ? "✔ " : "◻ ";
-			Component line = Component.literal(mark).append(Component.translatable(trial.translationKey()));
-			if (early) {
-				// Pas encore à sa portée : Izumi le dit, sans la cacher.
-				line = line.copy().append(Component.literal(" (")).append(Component.translatable(trial.rank().translationKey()))
-						.append(")");
-			}
-			graphics.text(font, line, left + 10, y, rewarded || achieved ? DONE : early ? FADED : INK, false);
+			graphics.text(font, Component.literal(mark).append(Component.translatable(trial.translationKey())),
+					left + 10, y, rewarded || achieved ? DONE : INK, false);
 			y += ROW;
 		}
 		graphics.text(font, Component.translatable("entity.fmab.izumi.hover"), left + 10, y, FADED, false);
@@ -100,12 +89,6 @@ public class IzumiScreen extends Screen {
 			// Ce qu'Izumi dit de l'épreuve survolée : comment la réussir.
 			graphics.setTooltipForNextFrame(font.split(Component.translatable(hovered.hintKey()), 220), mouseX, mouseY);
 		}
-	}
-
-	private Rank rank() {
-		AlchemistData me = minecraft == null || minecraft.player == null ? null
-				: FmabAttachments.ALCHEMIST.get(minecraft.player);
-		return me == null ? Rank.APPRENTICE : me.rank();
 	}
 
 	@Override

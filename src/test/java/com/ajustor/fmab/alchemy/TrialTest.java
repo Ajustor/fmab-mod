@@ -15,16 +15,20 @@ import java.nio.file.Files;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Les épreuves d'Izumi : chacune à la portée du rang qu'elle annonce, et expliquée. */
+/**
+ * Les épreuves d'Izumi sont à la portée d'un Apprenti ; le cercle à deux étages, qu'il ne tient pas,
+ * est une épreuve de l'examen d'État.
+ */
 class TrialTest {
 	/**
 	 * Un Apprenti ne tient pas deux étages : même le plus simple cercle du Traité qui en a deux
-	 * (le plan B) rebondit entre ses mains, et coûte plus de concentration qu'il n'en a. L'épreuve
-	 * attend donc l'Alchimiste, qui le lance sans peine.
+	 * (le plan B) rebondit entre ses mains, et coûte plus de concentration qu'il n'en a. Un Alchimiste,
+	 * qui seul peut se présenter à l'examen d'État, le lance sans peine.
 	 */
 	@Test
-	void twoStagesWaitForTheAlchemist() {
-		assertEquals(Rank.ALCHEMIST, Trial.TWO_STAGES.rank());
+	void twoStagesBelongToTheStateExam() {
+		assertTrue(java.util.Arrays.stream(Trial.values()).noneMatch(t -> t.id().equals("two_stages")),
+				"Izumi ne devrait plus demander de cercle à deux étages");
 		var drawing = TreatiseTest.load().chapters().stream().flatMap(c -> c.pages().stream())
 				.filter(p -> p instanceof Treatise.ExamplePage e && e.textKey().equals("treatise.fmab.ch5.fallback_wall"))
 				.map(p -> ((Treatise.ExamplePage) p).drawing()).findFirst().orElseThrow();
@@ -39,14 +43,14 @@ class TrialTest {
 		assertTrue(alchemist.concentration() <= Rank.ALCHEMIST.maxConcentration());
 	}
 
-	/** Toutes les autres épreuves sont pour l'Apprenti, qui vient voir Izumi tôt. */
+	/** L'examen garde la preuve des deux étages, même dans une sauvegarde d'avant. */
 	@Test
-	void theOtherTrialsAreForTheApprentice() {
-		for (Trial trial : Trial.values()) {
-			if (trial != Trial.TWO_STAGES) {
-				assertEquals(Rank.APPRENTICE, trial.rank(), trial.id());
-			}
-		}
+	void theExamRemembersTheTwoStages() {
+		var old = com.ajustor.fmab.data.ExamProgress.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE,
+				JsonParser.parseString("{\"items_given\": false}")).getOrThrow();
+		assertTrue(!old.twoStages());
+		assertTrue(old.withTwoStages().twoStages() && !old.withTwoStages().itemsGiven());
+		assertTrue(old.withTwoStages().withItemsGiven().twoStages());
 	}
 
 	/** Chaque épreuve a son nom et ce qu'Izumi en dit au survol, en français et en anglais. */
