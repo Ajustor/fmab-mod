@@ -21,6 +21,7 @@ import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
 import com.ajustor.fmab.training.Trainings;
+import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.util.PlayerMaps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -482,6 +483,7 @@ public final class Transmutation {
 	 */
 	private static void practiceGlyphs(ServerPlayer caster, AlchemyRules rules, Analysis analysis) {
 		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(caster);
+		boolean understood = false;
 		for (CircleIssue issue : analysis.issues()) {
 			if (issue.kind() != CircleIssue.Kind.GLYPH_NOT_LEARNED) {
 				continue;
@@ -491,9 +493,13 @@ public final class Transmutation {
 			if (data.known().contains(id)) {
 				rules.glyph(id).ifPresent(g -> caster.sendSystemMessage(Component.translatable(
 						"transmutation.fmab.glyph_understood", Component.translatable(g.nameKey()))));
+				understood = true;
 			}
 		}
 		FmabAttachments.ALCHEMIST.set(caster, data);
+		if (understood) {
+			Trainings.achieve(caster, Trial.PRACTICE);
+		}
 	}
 
 	/** L'étage reçoit-il l'énergie, compte tenu de sa liaison et du sort de l'étage précédent ? */
