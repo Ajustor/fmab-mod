@@ -109,9 +109,20 @@ public class NotebookScreen extends Screen {
 	private int stampRotation;
 	/** Nombre de traits ajoutés par chaque geste, pour qu'Annuler défasse un tampon d'un coup. */
 	private final ArrayDeque<Integer> gestures = new ArrayDeque<>();
-	/** Ordonnée de la rangée « < page > » et haut du panneau d'analyse. */
-	private int navY;
+	/** Haut du panneau d'analyse. */
 	private int panelTop;
+	/** Le numéro de page : un clic ouvre le sommaire. */
+	private Button pageButton;
+	/** Le sommaire, ouvert à la place de la grille : toutes les pages par leur nom, à cliquer. */
+	private boolean contentsOpen;
+	private int contentsScroll;
+	/** Une seule colonne : les noms se lisent en entier. */
+	private static final int CONTENTS_COLUMNS = 1;
+	private static final int CONTENTS_ROW = 14;
+	private static final int CONTENTS_THUMB = 12;
+	private static final int CONTENTS_TOP = 16;
+	private static final int CONTENTS_HOVER = 0x30000000;
+	private static final int CONTENTS_CURRENT = 0x40E0B040;
 
 	/** Une ligne du panneau d'analyse et sa couleur. */
 	private record Line(Component text, int color) {
@@ -181,8 +192,10 @@ public class NotebookScreen extends Screen {
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.new_page"), b -> newPage())
 				.bounds(px + 128, y, 62, 18).build());
 		y += 20;
-		navY = y;
 		addRenderableWidget(Button.builder(Component.literal("<"), b -> turn(-1)).bounds(px, y, 20, 18).build());
+		pageButton = addRenderableWidget(Button.builder(pageLabel(), b -> toggleContents())
+				.tooltip(Tooltip.create(Component.translatable("notebook.fmab.contents.tooltip")))
+				.bounds(px + 22, y, 82, 18).build());
 		addRenderableWidget(Button.builder(Component.literal(">"), b -> turn(1)).bounds(px + 106, y, 20, 18).build());
 		addRenderableWidget(Button.builder(Component.translatable("notebook.fmab.delete_page"), b -> deletePage())
 				.bounds(px + 128, y, 62, 18).build());
@@ -212,6 +225,12 @@ public class NotebookScreen extends Screen {
 		int size = cell * Drawing.GRID;
 		graphics.fill(canvasX - 2, canvasY - 2, canvasX + size + 2, canvasY + size + 2, 0xFF8A7A5A);
 		graphics.fill(canvasX, canvasY, canvasX + size, canvasY + size, PAPER);
+		pageButton.setMessage(pageLabel());
+		if (contentsOpen) {
+			drawContents(graphics, mouseX, mouseY);
+			drawPanel(graphics);
+			return;
+		}
 		for (int i = 0; i <= Drawing.GRID; i++) {
 			int color = i == Drawing.GRID / 2 ? AXIS_LINE : GRID_LINE;
 			graphics.fill(canvasX + i * cell, canvasY, canvasX + i * cell + 1, canvasY + size, color);
@@ -257,11 +276,58 @@ public class NotebookScreen extends Screen {
 		drawPanel(graphics);
 	}
 
+	/** Le sommaire : chaque page, sa miniature et son nom ; la page ouverte est surlignée. */
+	private void drawContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		int size = cell * Drawing.GRID;
+		graphics.centeredText(font, Component.translatable("notebook.fmab.contents"), canvasX + size / 2, canvasY + 4,
+				INK);
+		contentsScroll = Math.clamp(contentsScroll, 0, maxContentsScroll());
+		int hovered = contentsEntryAt(mouseX, mouseY);
+		int columnWidth = size / CONTENTS_COLUMNS;
+		graphics.enableScissor(canvasX, canvasY + CONTENTS_TOP, canvasX + size, canvasY + size);
+		for (int i = 0; i < contents.pages().size(); i++) {
+			int x = canvasX + (i % CONTENTS_COLUMNS) * columnWidth;
+			int y = canvasY + CONTENTS_TOP + (i / CONTENTS_COLUMNS) * CONTENTS_ROW - contentsScroll;
+			if (y + CONTENTS_ROW < canvasY || y > canvasY + size) {
+				continue;
+			}
+			if (i == page) {
+				graphics.fill(x + 1, y, x + columnWidth - 1, y + CONTENTS_ROW - 1, CONTENTS_CURRENT);
+			} else if (i == hovered) {
+				graphics.fill(x + 1, y, x + columnWidth - 1, y + CONTENTS_ROW - 1, CONTENTS_HOVER);
+			}
+			NotebookContents.Page p = contents.pages().get(i);
+			if (!p.drawing().isEmpty()) {
+				graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(p.drawing(), INK), x + 3, y + 1, 0, 0,
+						CONTENTS_THUMB, CONTENTS_THUMB, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE,
+						CircleTextures.SIZE);
+			}
+			String name = (i + 1) + ". " + displayName(p.name());
+			graphics.text(font, font.plainSubstrByWidth(name, columnWidth - CONTENTS_THUMB - 10),
+					x + CONTENTS_THUMB + 6, y + (CONTENTS_ROW - 8) / 2 - 1, INK, false);
+		}
+		graphics.disableScissor();
+	}
+
+	/** La page du sommaire sous la souris, ou −1. */
+	private int contentsEntryAt(double x, double y) {
+		int size = cell * Drawing.GRID;
+		if (x < canvasX || x >= canvasX + size || y < canvasY + CONTENTS_TOP || y >= canvasY + size) {
+			return -1;
+		}
+		int column = (int) ((x - canvasX) / (size / CONTENTS_COLUMNS));
+		int row = (int) ((y - canvasY - CONTENTS_TOP + contentsScroll) / CONTENTS_ROW);
+		int index = row * CONTENTS_COLUMNS + Math.min(column, CONTENTS_COLUMNS - 1);
+		return index < contents.pages().size() ? index : -1;
+	}
+
+	private int maxContentsScroll() {
+		int rows = (contents.pages().size() + CONTENTS_COLUMNS - 1) / CONTENTS_COLUMNS;
+		return Math.max(0, rows * CONTENTS_ROW - (cell * Drawing.GRID - CONTENTS_TOP));
+	}
+
 	private void drawPanel(GuiGraphicsExtractor graphics) {
 		int px = canvasX + cell * Drawing.GRID + 10;
-		// Numéro de page entre les deux flèches.
-		graphics.centeredText(font, pageLabel(), px + 63, navY + 5, TEXT);
-
 		List<Line> lines = analysisLines();
 		if (!status.getString().isEmpty()) {
 			lines.add(new Line(status, STATUS));
@@ -414,6 +480,13 @@ public class NotebookScreen extends Screen {
 		if (super.mouseClicked(event, doubleClick)) {
 			return true;
 		}
+		if (contentsOpen) {
+			int index = contentsEntryAt(event.x(), event.y());
+			if (index >= 0 && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+				openPage(index);
+			}
+			return insideCanvas(event.x(), event.y());
+		}
 		if (!insideCanvas(event.x(), event.y())) {
 			return false;
 		}
@@ -500,6 +573,10 @@ public class NotebookScreen extends Screen {
 
 	@Override
 	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+		if (contentsOpen && insideCanvas(x, y) && scrollY != 0) {
+			contentsScroll = Math.clamp(contentsScroll - (int) Math.round(scrollY * CONTENTS_ROW), 0, maxContentsScroll());
+			return true;
+		}
 		if (tool == Tool.STAMP && insideCanvas(x, y) && scrollY != 0) {
 			stampRotation = Math.floorMod(stampRotation + (scrollY > 0 ? 15 : -15), 360);
 			refreshLabels();
@@ -730,6 +807,7 @@ public class NotebookScreen extends Screen {
 			return;
 		}
 		store();
+		contentsOpen = false;
 		page = contents.pages().size();
 		strokes = new ArrayList<>();
 		nameBox.setValue(defaultName(page));
@@ -743,11 +821,45 @@ public class NotebookScreen extends Screen {
 		if (count == 0) {
 			return;
 		}
-		page = Math.floorMod(page + delta, count);
+		openPage(Math.floorMod(page + delta, count));
+	}
+
+	/** Ouvre une page du carnet (le sommaire se referme) ; le tracé en cours est rangé dans la sienne. */
+	public void openPage(int index) {
+		if (index < 0 || index >= contents.pages().size()) {
+			return;
+		}
+		store();
+		contentsOpen = false;
+		page = index;
 		strokes = new ArrayList<>(contents.pages().get(page).drawing().primitives());
 		nameBox.setValue(currentName());
 		resetGesture();
 		forgetGestures();
+	}
+
+	/** Ouvre ou referme le sommaire, à la place de la grille. */
+	public void toggleContents() {
+		store();
+		resetGesture();
+		contentsOpen = !contentsOpen;
+		if (contentsOpen) {
+			// La page ouverte reste en vue.
+			contentsScroll = (page / CONTENTS_COLUMNS) * CONTENTS_ROW - (cell * Drawing.GRID - CONTENTS_TOP) / 2;
+		}
+	}
+
+	public boolean contentsOpen() {
+		return contentsOpen;
+	}
+
+	/** La page ouverte, et le nombre de pages du carnet tel que l'écran le tient. */
+	public int openedPage() {
+		return page;
+	}
+
+	public int pageCount() {
+		return contents.pages().size();
 	}
 
 	/** Avance ou recule la page d'un rang ; elle reste ouverte. */
@@ -764,6 +876,7 @@ public class NotebookScreen extends Screen {
 		if (page < contents.pages().size()) {
 			contents = contents.withoutPage(page);
 		}
+		contentsOpen = false;
 		page = Math.max(0, Math.min(page, contents.pages().size() - 1));
 		strokes = new ArrayList<>(contents.pages().isEmpty() ? List.of() : contents.pages().get(page).drawing().primitives());
 		forgetGestures();

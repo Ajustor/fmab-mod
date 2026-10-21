@@ -193,6 +193,8 @@
   "notebook.fmab.export": "Export",
   "notebook.fmab.import": "Import",
   "notebook.fmab.page": "Page %s / %s",
+  "notebook.fmab.contents": "Contents",
+  "notebook.fmab.contents.tooltip": "Every page of the notebook, by name: click one to open it.",
   "notebook.fmab.default_name": "Circle %s",
   "notebook.fmab.saved": "Notebook saved. This is the circle the chalk will draw.",
   "notebook.fmab.full": "The notebook is full.",
