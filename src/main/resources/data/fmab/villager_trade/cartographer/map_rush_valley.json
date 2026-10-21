@@ -6,8 +6,7 @@
     {
       "decoration": "minecraft:village_desert",
       "destination": "fmab:on_rush_valley_maps",
-      "function": "minecraft:exploration_map",
-      "search_radius": 100
+      "function": "fmab:site_map"
     },
     {
       "function": "minecraft:set_name",

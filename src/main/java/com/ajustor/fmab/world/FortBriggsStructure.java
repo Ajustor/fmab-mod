@@ -15,7 +15,7 @@ import java.util.Optional;
  * à Drachma, deux tours, et derrière, la caserne où la générale Armstrong tient garnison. Les
  * soldats de Drachma rôdent la nuit au pied du mur.
  */
-public class FortBriggsStructure extends Structure {
+public class FortBriggsStructure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<FortBriggsStructure> CODEC = simpleCodec(FortBriggsStructure::new);
 	/** Écart de hauteur toléré entre les coins de l'emprise. */
 	private static final int MAX_RELIEF = 14;
@@ -26,11 +26,12 @@ public class FortBriggsStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return UniqueSite.only(this, context, this::siteAt);
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		int cx = chunk.getMiddleBlockX();
 		int cz = chunk.getMiddleBlockZ();
 		int y = context.chunkGenerator().getFirstFreeHeight(cx, cz, Heightmap.Types.WORLD_SURFACE_WG,

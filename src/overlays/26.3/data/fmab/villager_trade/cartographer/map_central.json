@@ -5,9 +5,8 @@
   "given_item_modifier": [
     {
       "decoration": "minecraft:target_point",
-      "destination": "#fmab:on_central_maps",
-      "type": "minecraft:exploration_map",
-      "search_radius": 100
+      "destination": "fmab:on_central_maps",
+      "type": "fmab:site_map"
     },
     {
       "type": "minecraft:set_name",

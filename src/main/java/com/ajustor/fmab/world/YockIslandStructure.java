@@ -14,7 +14,7 @@ import java.util.Optional;
  * L'île de Yock, au large de Dublith : un îlot boisé surgi de la mer, une cabane, un feu de camp. Il
  * se bâtit depuis le fond jusqu'à la surface ; Izumi y abandonne ses élèves.
  */
-public class YockIslandStructure extends Structure {
+public class YockIslandStructure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<YockIslandStructure> CODEC = simpleCodec(YockIslandStructure::new);
 	static final int SIZE = 25;
 	private static final int MAX_DEPTH = 40;
@@ -25,11 +25,12 @@ public class YockIslandStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return UniqueSite.only(this, context, this::siteAt);
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		int cx = chunk.getMiddleBlockX();
 		int cz = chunk.getMiddleBlockZ();
 		int sea = context.chunkGenerator().getSeaLevel();

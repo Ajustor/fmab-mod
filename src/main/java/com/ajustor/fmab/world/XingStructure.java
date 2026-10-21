@@ -15,7 +15,7 @@ import java.util.Optional;
  * briques de boue, un pavillon aux piliers rouges et aux toits de tuiles en gradins. May Chang y
  * enseigne l'alkahestry.
  */
-public class XingStructure extends Structure {
+public class XingStructure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<XingStructure> CODEC = simpleCodec(XingStructure::new);
 	static final int SIZE = 23;
 	/** Le domaine dont le biome devient celui de Xing. */
@@ -29,11 +29,12 @@ public class XingStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return UniqueSite.only(this, context, this::siteAt);
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		int cx = chunk.getMiddleBlockX();
 		int cz = chunk.getMiddleBlockZ();
 		int y = context.chunkGenerator().getFirstFreeHeight(cx, cz, Heightmap.Types.WORLD_SURFACE_WG,

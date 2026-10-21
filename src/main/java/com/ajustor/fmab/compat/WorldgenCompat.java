@@ -4,8 +4,14 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.Structure;
+
+import java.util.function.Predicate;
 
 /**
  * La génération du monde, là où sa forme change d'une version de Minecraft à l'autre (voir
@@ -33,6 +39,25 @@ public final class WorldgenCompat {
 		/*return context.biomeResolver().getNoiseBiome(x, y, z);
 		*///?} else {
 		return context.biomeSource().getNoiseBiome(x, y, z, context.randomState().sampler());
+		//?}
+	}
+
+	/**
+	 * Le contexte dans lequel la génération pose les structures de ce monde, hors de toute génération :
+	 * pour savoir, sans rien bâtir, où un lieu se poserait.
+	 */
+	public static Structure.GenerationContext context(ServerLevel level, ChunkPos chunk, Predicate<Holder<Biome>> validBiome) {
+		ServerChunkCache chunks = level.getChunkSource();
+		ChunkGenerator generator = chunks.getGenerator();
+		//? if >=26.3 {
+		/*return new Structure.GenerationContext(level.registryAccess(), generator, generator.getBiomeSource(),
+				chunks.randomState().createClimateSampler(
+						net.minecraft.world.level.levelgen.densityfunction.SamplerContext.builder().enableCaches().build()),
+				chunks.randomState(), level.getStructureTemplateManager(), level.getSeed(),
+				chunk, level, validBiome);
+		*///?} else {
+		return new Structure.GenerationContext(level.registryAccess(), generator, generator.getBiomeSource(),
+				chunks.randomState(), level.getStructureManager(), level.getSeed(), chunk, level, validBiome);
 		//?}
 	}
 }

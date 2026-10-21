@@ -15,7 +15,7 @@ import java.util.Optional;
  * Des ateliers aux coffres pleins de pièces, et la boutique de Garfiel où travaille Winry. Chaque
  * bâtiment suit le relief à son emplacement.
  */
-public class RushValleyStructure extends Structure {
+public class RushValleyStructure extends Structure implements UniqueSite.Sited {
 	public static final MapCodec<RushValleyStructure> CODEC = simpleCodec(RushValleyStructure::new);
 
 	/** Une petite ville, mais aérée : de la place entre les ateliers. */
@@ -44,11 +44,12 @@ public class RushValleyStructure extends Structure {
 
 	@Override
 	public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
-		return UniqueSite.only(this, context, this::at);
+		return UniqueSite.only(this, context, this::siteAt);
 	}
 
 	/** Le lieu sur ce chunk-là, si le terrain s'y prête (voir {@link UniqueSite}). */
-	private Optional<GenerationStub> at(GenerationContext context, ChunkPos chunk) {
+	@Override
+	public Optional<GenerationStub> siteAt(GenerationContext context, ChunkPos chunk) {
 		if (Clearance.nearCentral(context, chunk)) {
 			return Optional.empty();
 		}
