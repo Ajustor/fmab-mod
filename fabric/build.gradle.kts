@@ -32,6 +32,11 @@ loom {
 repositories {
 	// Mod Menu : facultatif en jeu, seulement compilé contre son API (bouton de réglages du mod).
 	maven("https://maven.terraformersmc.com/releases/") { name = "TerraformersMC" }
+	// Distant Horizons : facultatif en jeu, seulement compilé contre son API (vue lointaine des dimensions du mod).
+	maven("https://api.modrinth.com/maven") {
+		name = "Modrinth"
+		content { includeGroup("maven.modrinth") }
+	}
 }
 
 dependencies {
@@ -39,6 +44,7 @@ dependencies {
 	implementation("net.fabricmc:fabric-loader:${sc.properties.get<String>("deps.fabric_loader")}")
 	implementation("net.fabricmc.fabric-api:fabric-api:${sc.properties.get<String>("deps.fabric_api")}")
 	"clientCompileOnly"("com.terraformersmc:modmenu:${sc.properties.get<String>("deps.modmenu")}")
+	compileOnly("maven.modrinth:distanthorizonsapi:${sc.properties.get<String>("deps.distanthorizons_api")}")
 
 	implementation(commonMain.output)
 	"clientImplementation"(commonClient.output)
