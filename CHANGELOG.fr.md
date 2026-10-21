@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 1.10.1 — 2026-10-21
+
+### Corrections
+
+- Izumi : l'épreuve du cercle à deux étages est annoncée pour l'Alchimiste, une nouvelle épreuve (comprendre un glyphe à force de le tracer) est à la portée de l'Apprenti, et survoler une épreuve dit comment la réussir.
+- L'épreuve du cercle à deux étages passe d'Izumi à l'examen d'État, où elle est demandée avant les objets ; les épreuves d'Izumi sont toutes à la portée d'un Apprenti.
 ## 1.10.0 — 2026-10-20
 
 ### Nouveautés

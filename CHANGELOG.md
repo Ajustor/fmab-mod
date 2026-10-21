@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.10.1 — 2026-10-21
+
+### Fixes
+
+- Izumi: the two-stage circle trial is marked for Alchemists, a new trial (understand a glyph by drawing it) is within an Apprentice's reach, and hovering over a trial tells you how to pass it.
+- The two-stage circle trial moves from Izumi to the State examination, where it is required before the items; Izumi's trials are all within an Apprentice's reach.
 ## 1.10.0 — 2026-10-20
 
 ### New features
