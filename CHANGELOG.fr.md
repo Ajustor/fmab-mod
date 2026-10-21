@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 1.10.2 — 2026-10-21
+
+### Nouveautés
+
+- Le carnet tient 32 cercles et gagne un sommaire (cliquez sur le numéro de page) ; au-delà de 16 cercles, la roue les range sur deux anneaux.
+
+### Corrections
+
+- Avec Distant Horizons, la vue lointaine des dimensions du mod ne fait plus tourner la génération du monde en tâche de fond, ce qui pouvait figer la sauvegarde.
 ## 1.10.1 — 2026-10-21
 
 ### Corrections

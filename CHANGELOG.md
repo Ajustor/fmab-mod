@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.10.2 — 2026-10-21
+
+### New features
+
+- The notebook holds 32 circles and gains a contents page (click the page number); past 16 circles, the wheel lays them out on two rings.
+
+### Fixes
+
+- With Distant Horizons, the distant view of the mod's dimensions no longer runs world generation in the background, which could freeze world saving.
 ## 1.10.1 — 2026-10-21
 
 ### Fixes
