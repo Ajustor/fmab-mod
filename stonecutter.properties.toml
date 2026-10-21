@@ -3,6 +3,8 @@
 deps.fabric_loader = "0.19.5"
 deps.mixin = "0.17.4+mixin.0.8.7"
 deps.mixinextras = "0.5.5"
+# L'API de Distant Horizons ne dépend pas de la version de Minecraft (DH 3.3.x l'embarque en 7.2).
+deps.distanthorizons_api = "7.2.0"
 
 ["26.2"]
 # La plage de versions écrite dans fabric.mod.json
