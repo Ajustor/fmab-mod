@@ -69,8 +69,9 @@ public class CircleWheelScreen extends Screen {
 		return contents.pages().size();
 	}
 
+	/** Deux anneaux prennent plus de place qu'un seul. */
 	private int radius() {
-		return Math.clamp(Math.min(width, height) * 32 / 100, 56, 110);
+		return Math.clamp(Math.min(width, height) * (twoRings() ? 40 : 32) / 100, 56, 110);
 	}
 
 	/** Au-delà, les cercles se partagent deux anneaux : l'extérieur d'abord, puis l'intérieur. */
