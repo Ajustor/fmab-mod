@@ -92,7 +92,7 @@ public final class SoulArmor {
 		pages.add(new NotebookContents.Page(Component.translatable("gate.fmab.page.seal",
 				player.getName().getString()).getString(), SoulSeal.of(player.getUUID())));
 		rules.combinations().stream()
-				.filter(c -> c.effect().equals("fmab:repair"))
+				.filter(c -> c.effect().equals("fmab:repair") && c.elements().contains("iron"))
 				.findFirst()
 				.flatMap(rules::simpleCircle)
 				.ifPresent(d -> pages.add(new NotebookContents.Page("@gate.fmab.page.repair", d)));

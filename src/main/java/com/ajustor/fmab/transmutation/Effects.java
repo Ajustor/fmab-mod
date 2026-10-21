@@ -3,7 +3,9 @@ package com.ajustor.fmab.transmutation;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
+import com.ajustor.fmab.alchemy.exchange.ExchangeValue;
 import com.ajustor.fmab.alchemy.exchange.Family;
+import com.ajustor.fmab.alchemy.exchange.RepairCost;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.item.TransmutedWeaponItem;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -27,6 +29,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Repairable;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -340,46 +343,66 @@ public final class Effects {
 		return broken + dismantled > 0 ? Result.DONE : Result.NO_TARGET;
 	}
 
-	/** Fer + Réparer : les objets en fer posés sur le cercle sont réparés avec du fer. */
+	/**
+	 * Élément + Réparer : ce qui est posé sur le cercle et se répare avec une matière de cet élément
+	 * (le fer pour le fer, les planches pour le bois, le diamant pour le carbone, le cuir pour la
+	 * fibre…) retrouve sa durabilité, payée en matière du même élément et de la même famille. Une âme
+	 * scellée dans une armure, debout sur le cercle, est réparée de même.
+	 */
 	private static Result repair(EffectContext ctx) {
 		ServerLevel level = ctx.level();
-		ItemStack ingot = new ItemStack(Items.IRON_INGOT);
+		String element = ctx.stage().combination().elements().iterator().next();
+		TagKey<Item> materials = FmabTags.elementItems(element);
 		List<ItemStack> damaged = new ArrayList<>();
 		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, ctx.onCircle())) {
-			ItemStack stack = entity.getItem();
-			if (stack.isDamaged() && stack.isValidRepairItem(ingot)) {
-				damaged.add(stack);
-			}
+			damaged.add(entity.getItem());
 		}
 		// Une âme scellée dans une armure, debout sur le cercle : on la répare comme Ed répare Al.
 		for (ServerPlayer soul : level.getEntitiesOfClass(ServerPlayer.class, ctx.onCircle().expandTowards(0, 1, 0),
 				p -> FmabAttachments.GATE.getOrCreate(p).soulBound())) {
 			for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS,
 					EquipmentSlot.FEET}) {
-				ItemStack piece = soul.getItemBySlot(slot);
-				if (piece.isDamaged() && piece.isValidRepairItem(ingot)) {
-					damaged.add(piece);
-				}
+				damaged.add(soul.getItemBySlot(slot));
 			}
 		}
-		if (damaged.isEmpty()) {
-			return Result.NO_TARGET;
-		}
-		MaterialPool pool = MaterialPool.collect(ctx, "iron", Family.METAL);
+		boolean target = false;
 		boolean repaired = false;
+		Map<Family, MaterialPool> pools = new HashMap<>();
 		for (ItemStack stack : damaged) {
+			Optional<ExchangeValue> unit = stack.isDamaged() ? repairUnit(level, stack, materials) : Optional.empty();
+			if (unit.isEmpty()) {
+				continue;
+			}
+			target = true;
+			MaterialPool pool = pools.computeIfAbsent(unit.get().family(),
+					family -> MaterialPool.collect(ctx, element, family));
 			int max = stack.getMaxDamage();
-			// Masse nécessaire pour tout réparer, arrondie au-dessus : un quart de durabilité par lingot.
-			int needed = (int) Math.ceil(stack.getDamageValue() * 4.0 * INGOT_MASS / max);
-			int used = Math.min(needed, pool.available());
+			int mass = unit.get().mass();
+			int used = Math.min(RepairCost.massFor(stack.getDamageValue(), max, mass), pool.available());
 			if (used <= 0 || !pool.consume(used)) {
 				continue;
 			}
-			int restored = (int) Math.floor(used * max / (4.0 * INGOT_MASS));
-			stack.setDamageValue(Math.max(0, stack.getDamageValue() - restored));
+			stack.setDamageValue(Math.max(0, stack.getDamageValue() - RepairCost.restored(used, max, mass)));
 			repaired = true;
 		}
-		return repaired ? Result.DONE : Result.NO_MATERIAL;
+		return repaired ? Result.DONE : target ? Result.NO_MATERIAL : Result.NO_TARGET;
+	}
+
+	/**
+	 * La matière de cet élément qui répare cet objet (son composant {@code repairable}, comme à
+	 * l'enclume), et sa valeur d'échange : la plus légère, si plusieurs conviennent.
+	 */
+	private static Optional<ExchangeValue> repairUnit(ServerLevel level, ItemStack stack, TagKey<Item> element) {
+		Repairable repairable = stack.get(DataComponents.REPAIRABLE);
+		if (repairable == null) {
+			return Optional.empty();
+		}
+		return repairable.items().stream()
+				.map(holder -> new ItemStack(holder.value()))
+				.filter(unit -> unit.is(element))
+				.map(unit -> MaterialPool.valueOf(level, unit))
+				.flatMap(Optional::stream)
+				.min(java.util.Comparator.comparingInt(ExchangeValue::mass));
 	}
 
 	/**
