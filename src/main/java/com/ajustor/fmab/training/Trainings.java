@@ -9,6 +9,7 @@ import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.CircleFrame;
+import com.ajustor.fmab.state.StateExam;
 import com.ajustor.fmab.transmutation.Transmutation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,7 +40,7 @@ public final class Trainings {
 			achieve(player, Trial.SURFACE);
 		}
 		if (analysis.parsed().stages().size() >= 2) {
-			achieve(player, Trial.TWO_STAGES);
+			StateExam.proveTwoStages(player);
 		}
 		if (!inscribed) {
 			achieve(player, Trial.GLOVES);

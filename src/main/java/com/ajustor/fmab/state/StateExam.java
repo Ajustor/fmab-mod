@@ -42,8 +42,8 @@ import java.util.Set;
 import com.ajustor.fmab.compat.EntityCompat;
 
 /**
- * L'examen d'Alchimiste d'État : remettre à l'examinateur des objets qui prouvent la maîtrise,
- * puis vaincre en arène un golem de pierre lié à son cercle.
+ * L'examen d'Alchimiste d'État : avoir réussi un cercle à deux étages, remettre à l'examinateur des
+ * objets qui prouvent la maîtrise, puis vaincre en arène un golem de pierre lié à son cercle.
  */
 public final class StateExam {
 	/**
@@ -71,6 +71,22 @@ public final class StateExam {
 				new Requirement("exam.fmab.req.fee", Set.of(Items.IRON_INGOT), 4));
 	}
 
+	/** La ligne de l'examen qui demande un cercle à deux étages réussi. */
+	public static final String TWO_STAGES = "exam.fmab.req.two_stages";
+
+	/**
+	 * Un cercle à deux étages a réussi : l'examen le retient (une fois). Un Apprenti n'en tient qu'un
+	 * étage ; c'est la preuve qu'on a le rang d'Alchimiste en main.
+	 */
+	public static void proveTwoStages(ServerPlayer player) {
+		ExamProgress exam = FmabAttachments.EXAM.getOrCreate(player);
+		if (exam.twoStages() || exam.passed()) {
+			return;
+		}
+		FmabAttachments.EXAM.set(player, exam.withTwoStages());
+		player.sendSystemMessage(Component.translatable("exam.fmab.two_stages_proven"));
+	}
+
 	/** Distance entre l'examinateur et le cercle du golem. */
 	private static final int ARENA_DISTANCE = 6;
 
@@ -82,6 +98,10 @@ public final class StateExam {
 		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		ExamProgress exam = FmabAttachments.EXAM.getOrCreate(player);
 		if (!me.rank().atLeast(Rank.ALCHEMIST) || exam.itemsGiven()) {
+			return false;
+		}
+		if (!exam.twoStages()) {
+			player.sendSystemMessage(Component.translatable("exam.fmab.missing", Component.translatable(TWO_STAGES)));
 			return false;
 		}
 		for (Requirement r : requirements()) {
@@ -100,7 +120,7 @@ public final class StateExam {
 				}
 			}
 		}
-		FmabAttachments.EXAM.set(player, new ExamProgress(true, false));
+		FmabAttachments.EXAM.set(player, exam.withItemsGiven());
 		player.sendSystemMessage(Component.translatable("exam.fmab.items_accepted"));
 		return true;
 	}
@@ -160,7 +180,7 @@ public final class StateExam {
 		if (exam.passed() || !exam.itemsGiven()) {
 			return;
 		}
-		FmabAttachments.EXAM.set(player, new ExamProgress(true, true));
+		FmabAttachments.EXAM.set(player, exam.withPassed());
 		AlchemistData me = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		if (!me.rank().atLeast(Rank.STATE)) {
 			FmabAttachments.ALCHEMIST.set(player, me.withRank(Rank.STATE));

@@ -12,11 +12,12 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Le serveur ouvre l'examen : le rang du candidat, son avancement et, pour chaque objet demandé,
- * combien il en porte.
+ * Le serveur ouvre l'examen : le rang du candidat, son avancement, le cercle à deux étages (réussi
+ * ou non) et, pour chaque objet demandé, combien il en porte.
  */
 public record OpenExamPayload(int entityId, boolean eligible, boolean itemsGiven, boolean passed, List<Row> rows)
 		implements CustomPacketPayload {
@@ -41,9 +42,9 @@ public record OpenExamPayload(int entityId, boolean eligible, boolean itemsGiven
 	public static OpenExamPayload of(Entity examiner, ServerPlayer player) {
 		ExamProgress exam = FmabAttachments.EXAM.getOrCreate(player);
 		boolean eligible = FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.ALCHEMIST);
-		List<Row> rows = StateExam.requirements().stream()
-				.map(r -> new Row(r.key(), r.held(player), r.count()))
-				.toList();
+		List<Row> rows = new ArrayList<>();
+		rows.add(new Row(StateExam.TWO_STAGES, exam.twoStages() ? 1 : 0, 1));
+		StateExam.requirements().forEach(r -> rows.add(new Row(r.key(), r.held(player), r.count())));
 		return new OpenExamPayload(examiner.getId(), eligible, exam.itemsGiven(), exam.passed(), rows);
 	}
 

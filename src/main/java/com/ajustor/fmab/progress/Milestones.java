@@ -95,7 +95,7 @@ public final class Milestones {
 		if (!FmabAttachments.TATTOOS.getOrCreate(p).slots().isEmpty()) {
 			reach(p, "tattoo");
 		}
-		if (training.rewarded().size() >= Trial.values().length) {
+		if (java.util.Arrays.stream(Trial.values()).allMatch(t -> training.rewarded().contains(t.id()))) {
 			reach(p, "izumi_done");
 		}
 		GateState gate = FmabAttachments.GATE.getOrCreate(p);

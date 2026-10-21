@@ -1,19 +1,19 @@
 {
   "parent": "fmab:alchemist/izumi_met",
   "criteria": {
-    "trial_two_stages": {
+    "trial_practice": {
       "trigger": "fmab:milestone",
       "conditions": {
-        "milestone": "trial_two_stages"
+        "milestone": "trial_practice"
       }
     }
   },
   "display": {
     "icon": {
-      "id": "minecraft:mutton"
+      "id": "minecraft:writable_book"
     },
     "title": {
-      "translate": "trial.fmab.two_stages"
+      "translate": "trial.fmab.practice"
     },
     "description": {
       "translate": "advancements.fmab.trial.description"
@@ -22,7 +22,7 @@
   },
   "requirements": [
     [
-      "trial_two_stages"
+      "trial_practice"
     ]
   ]
 }

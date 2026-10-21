@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Épreuves d'Izumi. Chacune se réussit en jouant (le serveur la constate), puis se récompense en
- * venant lui en rendre compte.
+ * Épreuves d'Izumi, dans l'ordre où elle les présente. Chacune se réussit en jouant (le serveur la
+ * constate), puis se récompense en venant lui en rendre compte. Toutes sont à la portée d'un
+ * Apprenti, qui vient la voir tôt : le cercle à deux étages, qu'il ne tient pas, est une épreuve de
+ * l'examen d'État ({@link com.ajustor.fmab.state.StateExam}).
  *
  * @param mastery maîtrise accordée, par école
  * @param nodes   nœuds de savoir accordés
@@ -21,8 +23,8 @@ public enum Trial {
 	FIRST_WALL(Map.of("earth", 10), List.of(), Tomes.STONE_AND_METAL),
 	/** Réussir un cercle sur un mur ou un plafond. */
 	SURFACE(Map.of(), List.of("fmab:earth/thick_wall"), null),
-	/** Réussir un cercle à deux étages. */
-	TWO_STAGES(Map.of("earth", 15, "metal", 15), List.of(), null),
+	/** Comprendre un glyphe à force de le tracer, sans tome. */
+	PRACTICE(Map.of("earth", 15, "metal", 15), List.of(), null),
 	/** Réussir une transmutation avec un gant, sans rien tracer. */
 	GLOVES(Map.of(), List.of("fmab:metal/docile_iron"), Tomes.FORMS),
 	/** Tenir tête à Izumi en combat d'entraînement. */
@@ -58,6 +60,11 @@ public enum Trial {
 
 	public String translationKey() {
 		return "trial.fmab." + id();
+	}
+
+	/** Comment la réussir : ce qu'Izumi en dit quand on la survole. */
+	public String hintKey() {
+		return translationKey() + ".hint";
 	}
 
 	public static Trial byId(String id) {

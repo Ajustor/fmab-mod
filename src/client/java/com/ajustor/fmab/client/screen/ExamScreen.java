@@ -15,7 +15,7 @@ import com.ajustor.fmab.platform.client.ClientPlatform;
  */
 public class ExamScreen extends Screen {
 	private static final int WIDTH = 300;
-	private static final int HEIGHT = 190;
+	private static final int HEIGHT = 204;
 	private static final int PAPER = 0xFFEDE3C8;
 	private static final int EDGE = 0xFF34466B;
 	private static final int INK = 0xFF2B2B40;
@@ -71,11 +71,16 @@ public class ExamScreen extends Screen {
 			y += 6;
 			for (OpenExamPayload.Row row : state.rows()) {
 				boolean ok = row.held() >= row.count();
-				Component line = Component.literal(ok ? "✔ " : "◻ ")
-						.append(Component.translatable(row.key()))
-						.append(" " + Math.min(row.held(), row.count()) + " / " + row.count());
-				graphics.text(font, line, left + 10, y, ok ? DONE : MISSING, false);
-				y += 14;
+				Component line = Component.literal(ok ? "✔ " : "◻ ").append(Component.translatable(row.key()));
+				if (row.count() > 1) {
+					line = line.copy().append(" " + Math.min(row.held(), row.count()) + " / " + row.count());
+				}
+				// Une ligne trop longue passe à la ligne plutôt que de déborder de la fenêtre.
+				for (FormattedCharSequence part : font.split(line, WIDTH - 20)) {
+					graphics.text(font, part, left + 10, y, ok ? DONE : MISSING, false);
+					y += 10;
+				}
+				y += 4;
 			}
 		}
 		super.extractRenderState(graphics, mouseX, mouseY, a);
