@@ -58,6 +58,19 @@ class CircleTest {
 		assertEffect("fer", "reparer", "fmab:repair");
 	}
 
+	/** Chaque matière de réparation de l'enclume a son cercle : son élément et Réparer. */
+	@Test
+	void everyRepairMaterialHasItsCircle() {
+		// L'Or et le Netherite ne se tracent qu'aux rangs élevés : un Alchimiste d'État les tient tous.
+		for (String element : new String[]{"fer", "cuivre", "bois", "terre", "carbone", "netherite", "or", "fibre",
+				"chair", "chaux"}) {
+			Analysis a = analyzer.analyze(parser.parse(circle(4, glyph(element, TOP), glyph("reparer", BOTTOM))),
+					Rank.STATE, null);
+			assertEquals(Outcome.WORKS, a.outcome(), () -> element + " et Réparer : " + a.issues());
+			assertEquals("fmab:repair", a.effects().getFirst().combination().effect(), element);
+		}
+	}
+
 	@Test
 	void noRingNoCircle() {
 		Analysis a = analyze(new Drawing(glyph("terre", TOP)));
