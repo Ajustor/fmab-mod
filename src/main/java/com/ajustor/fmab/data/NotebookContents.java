@@ -16,7 +16,7 @@ import java.util.List;
  * que la craie trace au sol et que les mains jointes lancent).
  */
 public record NotebookContents(List<Page> pages, int selected) {
-	public static final int MAX_PAGES = 16;
+	public static final int MAX_PAGES = 32;
 	public static final int MAX_NAME_LENGTH = 32;
 	public static final NotebookContents EMPTY = new NotebookContents(List.of(), 0);
 

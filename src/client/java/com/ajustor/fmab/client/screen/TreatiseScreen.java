@@ -320,6 +320,15 @@ public class TreatiseScreen extends Screen {
 				.map(d -> Map.entry("effect." + c.effect().replace(':', '.'), d)));
 	}
 
+	/** Appuie sur « Ajouter au carnet » de la page ouverte ; rend faux si la page n'a pas ce bouton. */
+	public boolean copyToNotebook() {
+		if (!notebookButton.visible || !notebookButton.active) {
+			return false;
+		}
+		addToNotebook();
+		return true;
+	}
+
 	/** Recopie dans le carnet le cercle de la page : il n'y a plus qu'à le tracer à la craie. */
 	private void addToNotebook() {
 		Entry e = current();

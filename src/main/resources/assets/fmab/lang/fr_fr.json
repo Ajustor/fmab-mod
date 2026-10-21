@@ -193,6 +193,8 @@
   "notebook.fmab.export": "Exporter",
   "notebook.fmab.import": "Importer",
   "notebook.fmab.page": "Page %s / %s",
+  "notebook.fmab.contents": "Sommaire",
+  "notebook.fmab.contents.tooltip": "Toutes les pages du carnet, par leur nom : cliquez-en une pour l'ouvrir.",
   "notebook.fmab.default_name": "Cercle %s",
   "notebook.fmab.saved": "Carnet enregistré. Ce cercle est celui que trace la craie.",
   "notebook.fmab.full": "Le carnet est plein.",

@@ -73,32 +73,63 @@ public class CircleWheelScreen extends Screen {
 		return Math.clamp(Math.min(width, height) * 32 / 100, 56, 110);
 	}
 
+	/** Au-delà, les cercles se partagent deux anneaux : l'extérieur d'abord, puis l'intérieur. */
+	private static final int ONE_RING = 16;
+	/** Rayon de l'anneau intérieur, en part du rayon extérieur. */
+	private static final double INNER = 0.6;
+
+	private boolean twoRings() {
+		return count() > ONE_RING;
+	}
+
+	/** Cercles de l'anneau extérieur : à case égale, l'intérieur en tient moins. */
+	private int outerCount() {
+		return twoRings() ? (int) Math.ceil(count() / (1 + INNER)) : count();
+	}
+
+	private boolean inner(int index) {
+		return index >= outerCount();
+	}
+
+	private int ringCount(boolean inner) {
+		return inner ? count() - outerCount() : outerCount();
+	}
+
+	private double ringRadius(boolean inner) {
+		return inner ? radius() * INNER : radius();
+	}
+
 	/** Côté d'une case : assez petit pour que les cases ne se touchent pas. */
 	private int slot() {
-		double arc = 2 * Math.PI * radius() / Math.max(count(), 3);
+		double arc = 2 * Math.PI * radius() / Math.max(outerCount(), 3);
 		return Math.clamp((int) (arc * 0.78), 20, 40);
 	}
 
 	private double angle(int index) {
-		return -Math.PI / 2 + 2 * Math.PI * index / count();
+		boolean in = inner(index);
+		int rank = in ? index - outerCount() : index;
+		return -Math.PI / 2 + 2 * Math.PI * rank / ringCount(in);
 	}
 
 	private int slotX(int index) {
-		return width / 2 + (int) Math.round(Math.cos(angle(index)) * radius());
+		return width / 2 + (int) Math.round(Math.cos(angle(index)) * ringRadius(inner(index)));
 	}
 
 	private int slotY(int index) {
-		return height / 2 + (int) Math.round(Math.sin(angle(index)) * radius());
+		return height / 2 + (int) Math.round(Math.sin(angle(index)) * ringRadius(inner(index)));
 	}
 
-	/** La case pointée par la souris : celle dont la direction est la plus proche. */
+	/** La case pointée par la souris : sur son anneau, celle dont la direction est la plus proche. */
 	private int pointed(double mouseX, double mouseY) {
 		double dx = mouseX - width / 2.0, dy = mouseY - height / 2.0;
-		if (Math.hypot(dx, dy) < DEAD_ZONE) {
+		double distance = Math.hypot(dx, dy);
+		if (distance < DEAD_ZONE) {
 			return -1;
 		}
-		double turn = (Math.atan2(dy, dx) + Math.PI / 2) / (2 * Math.PI) * count();
-		return Math.floorMod((int) Math.round(turn), count());
+		boolean in = twoRings() && distance < (ringRadius(true) + ringRadius(false)) / 2;
+		int n = ringCount(in);
+		double turn = (Math.atan2(dy, dx) + Math.PI / 2) / (2 * Math.PI) * n;
+		return (in ? outerCount() : 0) + Math.floorMod((int) Math.round(turn), n);
 	}
 
 	// ---- Rendu ---------------------------------------------------------------------------------
@@ -115,10 +146,13 @@ public class CircleWheelScreen extends Screen {
 		hovered = pointed(mouseX, mouseY);
 		int cx = width / 2, cy = height / 2, r = radius();
 		// L'anneau de la roue, en pointillés.
-		for (int k = 0; k < 96; k++) {
-			double t = 2 * Math.PI * k / 96;
-			int x = cx + (int) Math.round(Math.cos(t) * r), y = cy + (int) Math.round(Math.sin(t) * r);
-			graphics.fill(x, y, x + 1, y + 1, RING);
+		for (boolean in : twoRings() ? new boolean[]{false, true} : new boolean[]{false}) {
+			double ring = ringRadius(in);
+			for (int k = 0; k < 96; k++) {
+				double t = 2 * Math.PI * k / 96;
+				int x = cx + (int) Math.round(Math.cos(t) * ring), y = cy + (int) Math.round(Math.sin(t) * ring);
+				graphics.fill(x, y, x + 1, y + 1, RING);
+			}
 		}
 		int s = slot();
 		for (int i = 0; i < count(); i++) {
@@ -137,9 +171,13 @@ public class CircleWheelScreen extends Screen {
 			}
 		}
 		// Au centre, le nom du cercle pointé (ou du cercle sélectionné).
+		// Au centre de deux anneaux, le nom tient entre les cases de l'anneau intérieur.
 		int shown = hovered >= 0 ? hovered : contents.selected();
-		graphics.centeredText(font, Notebooks.pageName(contents.pages().get(shown)), cx, cy - 4,
-				hovered >= 0 ? TEXT : DIM);
+		String name = Notebooks.pageName(contents.pages().get(shown)).getString();
+		if (twoRings()) {
+			name = font.plainSubstrByWidth(name, Math.max(20, 2 * ((int) ringRadius(true) - s / 2) - 6));
+		}
+		graphics.centeredText(font, Component.literal(name), cx, cy - 4, hovered >= 0 ? TEXT : DIM);
 		graphics.centeredText(font, Component.translatable(gate ? "wheel.fmab.hint.gate" : "wheel.fmab.hint"),
 				cx, Math.min(height - 14, cy + r + s / 2 + 10), DIM);
 	}

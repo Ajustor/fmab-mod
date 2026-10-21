@@ -11,12 +11,14 @@ import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.alchemy.rules.CircleAnalyzer;
 import com.ajustor.fmab.data.NotebookContents;
+import com.mojang.serialization.JsonOps;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -98,5 +100,20 @@ class NotebookTest {
 		assertFalse(com.ajustor.fmab.data.Notebooks.drewNew(before,
 				new NotebookContents(List.of(blank, new NotebookContents.Page("c", Drawing.EMPTY)), 0)),
 				"une page blanche n'est pas un cercle");
+	}
+
+	/** Le carnet tient trente-deux cercles, et les garde tels quels à l'enregistrement. */
+	@Test
+	void theNotebookHoldsThirtyTwoCircles() {
+		List<NotebookContents.Page> pages = IntStream.range(0, 32)
+				.mapToObj(i -> new NotebookContents.Page("Cercle " + (i + 1),
+						new Drawing(List.of(new Primitive.Circle(Drawing.CENTER_POINT, 2 + i * 0.25)))))
+				.toList();
+		NotebookContents full = new NotebookContents(pages, 31);
+		var json = NotebookContents.CODEC.encodeStart(JsonOps.INSTANCE, full).getOrThrow();
+		NotebookContents read = NotebookContents.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow();
+		assertEquals(full, read);
+		assertEquals(31, read.selected());
+		assertTrue(NotebookContents.MAX_PAGES >= 32);
 	}
 }
