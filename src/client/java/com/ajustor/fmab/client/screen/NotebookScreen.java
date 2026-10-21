@@ -116,9 +116,10 @@ public class NotebookScreen extends Screen {
 	/** Le sommaire, ouvert à la place de la grille : toutes les pages par leur nom, à cliquer. */
 	private boolean contentsOpen;
 	private int contentsScroll;
-	private static final int CONTENTS_COLUMNS = 2;
-	private static final int CONTENTS_ROW = 20;
-	private static final int CONTENTS_THUMB = 16;
+	/** Une seule colonne : les noms se lisent en entier. */
+	private static final int CONTENTS_COLUMNS = 1;
+	private static final int CONTENTS_ROW = 14;
+	private static final int CONTENTS_THUMB = 12;
 	private static final int CONTENTS_TOP = 16;
 	private static final int CONTENTS_HOVER = 0x30000000;
 	private static final int CONTENTS_CURRENT = 0x40E0B040;
@@ -297,13 +298,13 @@ public class NotebookScreen extends Screen {
 			}
 			NotebookContents.Page p = contents.pages().get(i);
 			if (!p.drawing().isEmpty()) {
-				graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(p.drawing(), INK), x + 3, y + 2, 0, 0,
+				graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(p.drawing(), INK), x + 3, y + 1, 0, 0,
 						CONTENTS_THUMB, CONTENTS_THUMB, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE,
 						CircleTextures.SIZE);
 			}
 			String name = (i + 1) + ". " + displayName(p.name());
 			graphics.text(font, font.plainSubstrByWidth(name, columnWidth - CONTENTS_THUMB - 10),
-					x + CONTENTS_THUMB + 6, y + (CONTENTS_ROW - 8) / 2, INK, false);
+					x + CONTENTS_THUMB + 6, y + (CONTENTS_ROW - 8) / 2 - 1, INK, false);
 		}
 		graphics.disableScissor();
 	}

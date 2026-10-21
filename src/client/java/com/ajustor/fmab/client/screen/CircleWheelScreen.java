@@ -76,7 +76,7 @@ public class CircleWheelScreen extends Screen {
 	/** Au-delà, les cercles se partagent deux anneaux : l'extérieur d'abord, puis l'intérieur. */
 	private static final int ONE_RING = 16;
 	/** Rayon de l'anneau intérieur, en part du rayon extérieur. */
-	private static final double INNER = 0.6;
+	private static final double INNER = 0.55;
 
 	private boolean twoRings() {
 		return count() > ONE_RING;
@@ -99,10 +99,11 @@ public class CircleWheelScreen extends Screen {
 		return inner ? radius() * INNER : radius();
 	}
 
-	/** Côté d'une case : assez petit pour que les cases ne se touchent pas. */
+	/** Côté d'une case : assez petit pour que les cases ne se touchent pas, ni d'un anneau à l'autre. */
 	private int slot() {
 		double arc = 2 * Math.PI * radius() / Math.max(outerCount(), 3);
-		return Math.clamp((int) (arc * 0.78), 20, 40);
+		int side = Math.clamp((int) (arc * 0.78), 20, 40);
+		return twoRings() ? Math.min(side, Math.max(14, (int) (radius() * (1 - INNER)) - 10)) : side;
 	}
 
 	private double angle(int index) {
