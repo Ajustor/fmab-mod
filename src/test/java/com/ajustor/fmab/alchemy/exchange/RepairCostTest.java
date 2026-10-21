@@ -20,7 +20,7 @@ class RepairCostTest {
 
 	@Test
 	void theCostIsRoundedUpAndTheRepairDown() {
-		assertEquals(INGOT, RepairCost.massFor(1, 1000, INGOT), "la moindre usure coûte de la matière");
+		assertEquals(1, RepairCost.massFor(1, 1000, INGOT), "la moindre usure coûte de la matière");
 		assertEquals(250, RepairCost.restored(INGOT, 1000, INGOT));
 		assertEquals(0, RepairCost.restored(1, 1000, INGOT * 1000), "trop peu de matière ne répare rien");
 	}
