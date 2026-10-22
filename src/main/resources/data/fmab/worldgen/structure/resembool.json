@@ -1,7 +1,12 @@
 {
   "type": "fmab:resembool",
   "biomes": "#fmab:has_structure/resembool",
-  "spawn_overrides": {},
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
   "step": "surface_structures",
   "terrain_adaptation": "none"
 }

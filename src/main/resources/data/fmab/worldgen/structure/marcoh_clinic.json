@@ -1,7 +1,12 @@
 {
   "type": "fmab:single_site",
   "biomes": "#fmab:has_structure/marcoh_clinic",
-  "spawn_overrides": {},
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
   "step": "surface_structures",
   "terrain_adaptation": "beard_thin",
   "piece": "marcoh_clinic",
