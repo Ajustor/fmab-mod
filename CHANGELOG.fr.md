@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 1.11.0 — 2026-10-22
+
+### Nouveautés
+
+- Le bon cercle répare tout ce que l'enclume répare : Bois, Terre, Cuivre, Fer, Or, Netherite, Carbone (diamant), Fibre (cuir), Chair (élytre) ou Chaux (écaille), avec Réparer et la matière de l'objet.
+- Les homonculus (Selim compris) ne s'en prennent plus qu'à qui menace les plans de Père : qui les frappe, porte une Pierre vivante, a refusé l'offre de Père, a vu tomber l'un des leurs ou a scellé un point de sang.
+- La roue des cercles tient neuf cercles par roue : la molette passe d'une roue à l'autre (une roue vide au bout pour en commencer une), et le clic droit tenu range un cercle où l'on veut.
+
+### Corrections
+
+- Les monstres n'apparaissent plus dans les villes et les bourgs (Central, Dublith, Resembool, Rush Valley, Liore, Xing, la clinique de Marcoh), et leurs rues sont mieux éclairées.
 ## 1.10.3 — 2026-10-21
 
 ### Corrections

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.11.0 — 2026-10-22
+
+### New features
+
+- The right circle repairs everything an anvil repairs: Wood, Earth, Copper, Iron, Gold, Netherite, Carbon (diamond), Fiber (leather), Flesh (elytra) or Lime (scute), with Repair and the item's material.
+- Homunculi (Selim included) only go after those who threaten Father's plans: whoever strikes them, carries a living Stone, refused Father's offer, saw one of them fall or sealed a blood crest.
+- The circle wheel holds nine circles per wheel: scroll to go from one wheel to the next (an empty one at the end to start another), and hold right click to put a circle wherever you like.
+
+### Fixes
+
+- Monsters no longer spawn in towns and villages (Central, Dublith, Resembool, Rush Valley, Liore, Xing, Marcoh's clinic), and their streets are better lit.
 ## 1.10.3 — 2026-10-21
 
 ### Fixes
