@@ -77,6 +77,7 @@ public class BloodCrestBlock extends Block {
 		server.sendParticles(BLOOD, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 60, 0.8, 0.6, 0.8, 0);
 		server.playSound(null, pos, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 1.5f, 0.7f);
 		p.sendSystemMessage(Component.translatable("block.fmab.blood_crest.sealed"));
+		FmabAttachments.SABOTEUR.set(p, true);
 		NationalCircle.get(server.getServer()).seal(server.getServer(), pos, p);
 		return InteractionResult.SUCCESS;
 	}

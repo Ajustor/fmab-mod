@@ -113,6 +113,7 @@ public class PrideEntity extends HomunculusEntity {
 
 	@Override
 	public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+		noteAttacker(source);
 		if (!revealed()) {
 			reveal(level);
 		}

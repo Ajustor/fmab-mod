@@ -5,6 +5,7 @@ import com.ajustor.fmab.item.FirearmItem;
 import com.ajustor.fmab.homunculus.HomunculusRules;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,7 +28,9 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import com.ajustor.fmab.stone.Recruitment;
 import net.minecraft.world.entity.LivingEntity;
 import org.jspecify.annotations.Nullable;
@@ -40,16 +43,34 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class HomunculusEntity extends Monster {
 	/**
-	 * Les recrues de Père sont épargnées (voir {@link Recruitment#spared}) : ni le ciblage du jeu, ni
-	 * celui de chaque homonculus ne les visent, tant qu'elles ne frappent pas.
+	 * Les recrues de Père sont épargnées (voir {@link Recruitment#spared}), et les serviteurs de Père
+	 * ne s'en prennent qu'à qui menace ses plans ({@link HomunculusRules#threatens}) : ni le ciblage du
+	 * jeu, ni celui de chaque homonculus ne visent les autres, tant qu'ils ne frappent pas.
 	 */
 	@Override
 	public boolean canAttack(LivingEntity target) {
-		if (target instanceof Player player && Recruitment.spared(FmabAttachments.RECRUITMENT.get(player),
-				player == getLastHurtByMob())) {
-			return false;
+		if (target instanceof Player player) {
+			boolean struck = player == getLastHurtByMob() || struckBy.contains(player.getUUID());
+			String answer = FmabAttachments.RECRUITMENT.get(player);
+			if (Recruitment.spared(answer, struck)) {
+				return false;
+			}
+			Integer souls = FmabAttachments.LIVING_STONE.get(player);
+			if (servesFather() && !HomunculusRules.threatens(answer, souls == null ? 0 : souls,
+					FmabAttachments.SLAIN.getOrCreate(player), Boolean.TRUE.equals(FmabAttachments.SABOTEUR.get(player)),
+					struck)) {
+				return false;
+			}
 		}
 		return super.canAttack(target);
+	}
+
+	/**
+	 * Sert-il les plans de Père, et laisse-t-il donc tranquilles ceux qui ne les menacent pas ? Greed,
+	 * qui n'en fait qu'à sa tête, et Père lui-même, dans son antre, n'épargnent personne.
+	 */
+	protected boolean servesFather() {
+		return true;
 	}
 
 	/** Le joueur le plus proche qu'on peut attaquer (une recrue qui ne frappe pas n'en est pas un). */
@@ -69,6 +90,8 @@ public abstract class HomunculusEntity extends Monster {
 	private boolean wanderer;
 	/** Depuis combien de ticks aucun joueur n'est venu près de lui. */
 	private int alone;
+	/** Les joueurs qui l'ont frappé : il ne l'oublie pas, même longtemps après. */
+	private final Set<UUID> struckBy = new HashSet<>();
 
 	protected HomunculusEntity(EntityType<? extends Monster> type, Level level, int souls) {
 		super(type, level);
@@ -110,6 +133,7 @@ public abstract class HomunculusEntity extends Monster {
 		if (regenerating() && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 			return false;
 		}
+		noteAttacker(source);
 		float dealt = damage * weakness(source);
 		// Les balles ne font guère que les ralentir : la Pierre referme la plaie.
 		if (source.is(FirearmItem.BULLET)) {
@@ -124,6 +148,16 @@ public abstract class HomunculusEntity extends Monster {
 			return true;
 		}
 		return super.hurtServer(level, source, dealt);
+	}
+
+	/**
+	 * Retient le joueur qui le frappe : il devient une menace pour lui. À appeler aussi avant de parer ou
+	 * d'esquiver un coup.
+	 */
+	protected void noteAttacker(DamageSource source) {
+		if (source.getEntity() instanceof Player attacker && !attacker.isCreative()) {
+			struckBy.add(attacker.getUUID());
+		}
 	}
 
 	/** La mort n'est qu'un contretemps : la Pierre paie, et la chair se reforme. */
@@ -249,6 +283,7 @@ public abstract class HomunculusEntity extends Monster {
 		output.putInt("regenerating", regenerating);
 		output.putBoolean("wanderer", wanderer);
 		output.putInt("alone", alone);
+		output.store("struck_by", UUIDUtil.CODEC.listOf(), List.copyOf(struckBy));
 	}
 
 	@Override
@@ -258,6 +293,8 @@ public abstract class HomunculusEntity extends Monster {
 		regenerating = input.getIntOr("regenerating", 0);
 		wanderer = input.getBooleanOr("wanderer", false);
 		alone = input.getIntOr("alone", 0);
+		struckBy.clear();
+		input.read("struck_by", UUIDUtil.CODEC.listOf()).ifPresent(struckBy::addAll);
 		bossEvent.setName(getDisplayName());
 	}
 

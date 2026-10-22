@@ -94,6 +94,12 @@ public class GreedEntity extends HomunculusEntity {
 		return Optional.ofNullable(owner);
 	}
 
+	/** Greed n'en fait qu'à sa tête : les plans de Père ne le regardent plus. */
+	@Override
+	protected boolean servesFather() {
+		return false;
+	}
+
 	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));

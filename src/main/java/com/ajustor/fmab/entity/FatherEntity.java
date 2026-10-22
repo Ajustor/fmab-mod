@@ -107,6 +107,12 @@ public class FatherEntity extends HomunculusEntity {
 		return entityData.get(SUN);
 	}
 
+	/** Père, dans son antre, n'épargne personne : qui vient jusqu'à lui le menace déjà. */
+	@Override
+	protected boolean servesFather() {
+		return false;
+	}
+
 	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
