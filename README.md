@@ -31,7 +31,7 @@ Toutes réglables dans Options → Commandes → Touches, catégorie « Alchimie
 | Touche | Action |
 |---|---|
 | N | Ouvrir le Carnet de cercles |
-| R (maintenue) | Roue des cercles : pointer un cercle et relâcher ; 1 à 9 pour choisir sans viser ; un clic gauche joint aussitôt les mains (Initiés de la Porte) |
+| R (maintenue) | Roue des cercles : pointer un cercle et relâcher ; 1 à 9 pour choisir sans viser ; un clic gauche joint aussitôt les mains (Initiés de la Porte). Neuf cercles par roue : la molette passe d'une roue à l'autre (une roue vide au bout pour en commencer une), le clic droit tenu emporte un cercle vers une autre place ou une autre roue |
 | G / Maj+G | Lancer le cercle des gants / joindre les mains (les deux gants, ou sans cercle pour un Initié) |
 | H | Écran des gants |
 | J | Page de conception : l'objet auquel penser en recomposant |

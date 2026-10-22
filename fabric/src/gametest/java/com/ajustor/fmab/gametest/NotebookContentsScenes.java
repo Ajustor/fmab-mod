@@ -22,7 +22,7 @@ import static com.ajustor.fmab.gametest.GametestAsserts.check;
 /**
  * Le carnet se remplit depuis le Traité sans figer le jeu : chaque cercle d'exemple y est recopié
  * d'un clic, chronométré, bien au-delà des seize pages d'autrefois. Son sommaire liste alors toutes les
- * pages et en ouvre une d'un clic, et la roue des cercles les range sur deux anneaux.
+ * pages et en ouvre une d'un clic, et la roue des cercles les range neuf par neuf, roue après roue.
  * Lancer avec {@code ./gradlew :fabric:26.2:runClientGameTest -PfmabGametest=notebook_contents}.
  */
 public class NotebookContentsScenes implements FabricClientGameTest {
@@ -95,10 +95,15 @@ public class NotebookContentsScenes implements FabricClientGameTest {
 			context.setScreen(() -> null);
 			context.waitTicks(2);
 
-			// La roue des cercles : plus de seize cases, sur deux anneaux.
+			// La roue des cercles : neuf places par roue, la molette passe à la suivante.
+			int wheels = context.computeOnClient(mc -> Notebooks.of(mc.player).wheels());
+			check(wheels >= 2, "plus de neuf cercles devraient remplir plusieurs roues : " + wheels);
 			context.runOnClient(mc -> CircleWheelScreen.open(mc.options.keyUse));
 			context.waitTicks(12);
 			context.takeScreenshot("notebook_contents_wheel");
+			context.runOnClient(mc -> mc.gui.screen().mouseScrolled(0, 0, 0, -1));
+			context.waitTicks(4);
+			context.takeScreenshot("notebook_contents_wheel_2");
 			context.setScreen(() -> null);
 		}
 	}
