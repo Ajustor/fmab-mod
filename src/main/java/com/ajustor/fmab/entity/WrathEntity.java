@@ -91,6 +91,7 @@ public class WrathEntity extends HomunculusEntity {
 		boolean projectile = source.is(DamageTypeTags.IS_PROJECTILE);
 		boolean blindSpot = committed > 0 || fromBehind(source);
 		if (projectile || !blindSpot && random.nextFloat() < DODGE) {
+			noteAttacker(source);
 			dodge(level, source);
 			return false;
 		}

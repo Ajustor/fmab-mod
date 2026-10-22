@@ -116,4 +116,57 @@ class NotebookTest {
 		assertEquals(31, read.selected());
 		assertTrue(NotebookContents.MAX_PAGES >= 32);
 	}
+
+	/** Un carnet d'avant les roues range ses cercles dans l'ordre, neuf par roue. */
+	@Test
+	void anOldNotebookFillsItsWheelsInOrder() {
+		NotebookContents notebook = new NotebookContents(pages(11), 0);
+		assertEquals(List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), notebook.slots());
+		assertEquals(2, notebook.wheels());
+		assertEquals(9, notebook.at(9), "la dixième page ouvre la deuxième roue");
+		assertEquals(-1, notebook.at(11));
+	}
+
+	/** Poser un cercle sur une place libre l'y range ; sur une place prise, les deux échangent. */
+	@Test
+	void placingACircleMovesItOrSwapsIt() {
+		NotebookContents notebook = new NotebookContents(pages(3), 2);
+		NotebookContents far = notebook.placed(0, 4 * NotebookContents.WHEEL + 3);
+		assertEquals(List.of(39, 1, 2), far.slots(), "une roue lointaine, des roues vides entre deux");
+		assertEquals(5, far.wheels());
+		assertEquals(2, far.selected(), "ranger ne change pas la sélection");
+		NotebookContents swapped = notebook.placed(0, 2);
+		assertEquals(List.of(2, 1, 0), swapped.slots());
+		assertSame(notebook, notebook.placed(0, 0));
+		assertSame(notebook, notebook.placed(0, NotebookContents.MAX_SLOTS));
+		assertSame(notebook, notebook.placed(5, 1));
+	}
+
+	/** Une page effacée laisse sa place vide ; une page nouvelle prend la première libre. */
+	@Test
+	void aNewPageTakesTheFirstFreePlace() {
+		NotebookContents notebook = new NotebookContents(pages(3), 0).withoutPage(1);
+		assertEquals(List.of(0, 2), notebook.slots());
+		NotebookContents added = notebook.withPage(2, new NotebookContents.Page("d", Drawing.EMPTY));
+		assertEquals(List.of(0, 2, 1), added.slots());
+		assertEquals(List.of(0, 2, 1), added.withPage(0, new NotebookContents.Page("e", Drawing.EMPTY)).slots(),
+				"redessiner une page la laisse à sa place");
+	}
+
+	/** Les places se gardent à l'enregistrement ; doublons et places hors des roues sont réparés. */
+	@Test
+	void placesSurviveSavingAndAreRepaired() {
+		NotebookContents arranged = new NotebookContents(pages(3), 1).placed(1, 20);
+		var json = NotebookContents.CODEC.encodeStart(JsonOps.INSTANCE, arranged).getOrThrow();
+		assertEquals(arranged, NotebookContents.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow());
+		assertEquals(List.of(5, 0, 1), new NotebookContents(pages(3), 0, List.of(5, 5, -1)).slots());
+		assertEquals(List.of(0, 1), new NotebookContents(pages(2), 0, List.of(NotebookContents.MAX_SLOTS)).slots());
+	}
+
+	private static List<NotebookContents.Page> pages(int n) {
+		return IntStream.range(0, n)
+				.mapToObj(i -> new NotebookContents.Page("p" + i,
+						new Drawing(List.of(new Primitive.Circle(Drawing.CENTER_POINT, 2 + i * 0.25)))))
+				.toList();
+	}
 }

@@ -41,8 +41,8 @@ public class PathPiece extends StructurePiece {
 		}
 	}
 
-	/** Un réverbère tous les ce nombre de pas. */
-	private static final int LAMP_EVERY = 9;
+	/** Un réverbère tous les ce nombre de pas, d'un côté puis de l'autre : la rue n'est jamais noire. */
+	private static final int LAMP_EVERY = 6;
 	/** Le chemin ne cherche pas le sol plus loin que ça de la hauteur du bourg. */
 	private static final int REACH = 24;
 

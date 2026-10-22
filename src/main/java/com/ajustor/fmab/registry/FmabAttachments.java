@@ -155,6 +155,12 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.register(Fmab.id("briggs_ally"));
 
+	/** A scellé un point de sang du cercle national : Père le sait, ses homonculus aussi. Gardé à la mort. */
+	public static final DataSlot<Boolean> SABOTEUR = DataSlot.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.register(Fmab.id("saboteur"));
+
 	/** Recherché par l'armée jusqu'à cette heure de jeu, pour avoir frappé un soldat. */
 	public static final DataSlot<Long> WANTED = DataSlot.<Long>builder()
 			.persistent(Codec.LONG)
