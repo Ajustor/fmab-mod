@@ -39,6 +39,7 @@
 			"com.ajustor.fmab.gametest.KnowledgeScreenScenes",
 			"com.ajustor.fmab.gametest.NotebookContentsScenes",
 			"com.ajustor.fmab.gametest.RepairScenes",
+			"com.ajustor.fmab.gametest.ToolScenes",
 			"com.ajustor.fmab.gametest.MidgameScenes",
 			"com.ajustor.fmab.gametest.GoldScenes",
 			"com.ajustor.fmab.gametest.AlliesScenes",

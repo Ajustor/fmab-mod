@@ -62,6 +62,11 @@ l'examen d'État à Central, la Porte, les homonculus, puis Père.
 - **Fabriquer des objets** : décomposer un objet pour le comprendre, puis le recomposer d'après modèle
   ou d'après la page de conception (J), contre sa matière exacte. Toute matière se transmute, y compris
   celles des autres mods (tags communs, alliages).
+- **L'alchimie comme outil** : abattre les arbres alentour (Bois et Décomposer), récolter et
+  replanter les champs (Plante et Décomposer), les faire pousser contre de la poudre d'os (Plante et
+  Projeter), creuser un tunnel (Terre et Décomposer avec une flèche, ou sur une paroi), jeter un pont
+  ou aplanir un terrain (Terre et Air fusionnés, avec Fixer ou Décomposer). Les étages en série les
+  enchaînent : faire pousser puis récolter, abattre puis tailler en planches.
 - **Échange équivalent** : la matière vient du monde ou des objets posés sur le cercle ; jamais de
   changement de famille, jamais plus de masse produite que donnée.
 - **Supports** : sol, murs et plafonds ; craie, peinture, gravure au burin ; cercles de 1 à 7 blocs ;
@@ -244,6 +249,10 @@ Central, the Gate, the homunculi, then Father.
 - **Making objects**: break an object down to understand it, then recompose it from a model or from
   the design page (J), for its exact matter. Every material can be transmuted, other mods' included
   (common tags, alloys).
+- **Alchemy as a tool**: fell the trees around (Wood and Decompose), harvest and replant fields
+  (Plant and Decompose), make them grow for bone meal (Plant and Project), dig a tunnel (Earth and
+  Decompose with an arrow, or on a wall), throw a bridge or level the ground (Earth and Air fused,
+  with Fix or Decompose). Stages in series chain them: grow then reap, fell then cut into planks.
 - **Equivalent exchange**: matter comes from the world or from items laid on the circle; never a
   change of family, never more mass out than in.
 - **Media**: floors, walls and ceilings; chalk, paint, chisel engraving; 1 to 7-block circles;

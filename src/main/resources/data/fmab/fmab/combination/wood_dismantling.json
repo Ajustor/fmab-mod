@@ -1,1 +1,1 @@
-{ "elements": ["wood"], "action": "decompose", "effect": "fmab:dismantle", "range": 1, "school": "earth" }
+{ "elements": ["wood"], "action": "decompose", "effect": "fmab:fell", "range": 4, "school": "earth" }
