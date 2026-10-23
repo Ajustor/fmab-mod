@@ -49,6 +49,46 @@ class EclipseTest {
 	}
 
 	@Test
+	void theMoonCrossesTheSkyTowardTheSunAllDayLong() {
+		float dawn = Eclipse.separation(7 * DAY);
+		float morning = Eclipse.separation(7 * DAY + 3000);
+		assertEquals(Eclipse.DAWN_SEPARATION, dawn, 1e-6, "au lever, la lune attend le soleil sur sa route");
+		assertTrue(morning > 0 && morning < dawn, "elle s'en approche toute la matinée");
+		assertEquals(0, Eclipse.separation(7 * DAY + 6000), "elle le couvre à midi");
+		float afternoon = Eclipse.separation(7 * DAY + 10000);
+		assertTrue(afternoon < 0 && afternoon > -Eclipse.DAWN_SEPARATION, "elle ressort de l'autre côté");
+	}
+
+	@Test
+	void theEclipseMoonIsOnlyThereByDayOnTheEclipseDay() {
+		assertTrue(Float.isNaN(Eclipse.separation(6 * DAY + 3000)), "la veille");
+		assertTrue(Float.isNaN(Eclipse.separation(7 * DAY + 18000)), "la nuit de l'éclipse");
+		assertEquals(0, Eclipse.coverage(6 * DAY + 6000), "la veille à midi, le soleil est entier");
+	}
+
+	@Test
+	void theSunIsBittenThenCoveredThenFreed() {
+		assertEquals(0, Eclipse.coverage(7 * DAY + 2000), "à huit heures, la lune est encore loin");
+		float bitten = Eclipse.coverage(7 * DAY + 4500);
+		assertTrue(bitten > 0 && bitten < 1, "vers dix heures et demie, elle le mord : " + bitten);
+		assertEquals(1, Eclipse.coverage(7 * DAY + 5000), "la totalité commence avec l'éclipse");
+		assertEquals(1, Eclipse.coverage(7 * DAY + 7999), "et dure jusqu'à sa fin");
+		float freed = Eclipse.coverage(7 * DAY + 8400);
+		assertTrue(freed > 0 && freed < 1, "elle ressort peu à peu : " + freed);
+		assertEquals(0, Eclipse.coverage(7 * DAY + 10000), "l'après-midi, le soleil est libre");
+	}
+
+	@Test
+	void theCoverageNeverGoesBackWhileTheMoonApproaches() {
+		float last = 0;
+		for (long hour = 0; hour <= 5000; hour += 50) {
+			float now = Eclipse.coverage(7 * DAY + hour);
+			assertTrue(now >= last, "à " + hour);
+			last = now;
+		}
+	}
+
+	@Test
 	void theNextEclipseIsAnnouncedAgain() {
 		assertEquals(Eclipse.Announcement.BEGINS, Eclipse.announcement(15 * DAY + 5000, 7 * DAY + 5000));
 	}
