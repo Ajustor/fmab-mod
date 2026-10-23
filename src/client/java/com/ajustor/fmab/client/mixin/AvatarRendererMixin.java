@@ -3,8 +3,10 @@ package com.ajustor.fmab.client.mixin;
 import com.ajustor.fmab.client.render.AutomailLayer;
 import com.ajustor.fmab.client.render.BodyCache;
 import com.ajustor.fmab.client.render.BodyHolder;
+import com.ajustor.fmab.client.render.HandsLayer;
 import com.ajustor.fmab.client.render.PoseHolder;
 import com.ajustor.fmab.client.render.WheelchairPose;
+import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.entity.WheelchairEntity;
 import com.ajustor.fmab.gate.BodyPart;
@@ -13,6 +15,7 @@ import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -24,6 +27,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -82,9 +86,9 @@ public abstract class AvatarRendererMixin {
 		com.ajustor.fmab.data.Gloves gloves = FmabAttachments.GLOVES.get(entity);
 		if (gloves != null) {
 			for (boolean left : new boolean[]{false, true}) {
-				if (gloves.get(left).getItem() instanceof com.ajustor.fmab.item.GloveItem glove) {
-					out.add(new BodyHolder.Worn("glove_" + glove.kind().name().toLowerCase(java.util.Locale.ROOT),
-							left ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM));
+				BodyHolder.Worn glove = HandsLayer.glove(gloves.get(left), left);
+				if (glove != null) {
+					out.add(glove);
 				}
 			}
 		}
@@ -144,15 +148,35 @@ public abstract class AvatarRendererMixin {
 
 	/** À la première personne, la lame transmutée sort de l'avant-bras d'automail. */
 	@Inject(method = "renderRightHand", at = @At("TAIL"))
-	private void fmab$rightBlade(PoseStack poseStack, SubmitNodeCollector collector, int light, Identifier skin,
+	private void fmab$rightHandTail(PoseStack poseStack, SubmitNodeCollector collector, int light, Identifier skin,
 			boolean sleeve, CallbackInfo ci) {
 		fmab$blade(BodyPart.RIGHT_ARM, poseStack, collector, light);
+		fmab$glove(BodyPart.RIGHT_ARM, poseStack, collector, light);
 	}
 
 	@Inject(method = "renderLeftHand", at = @At("TAIL"))
-	private void fmab$leftBlade(PoseStack poseStack, SubmitNodeCollector collector, int light, Identifier skin,
+	private void fmab$leftHandTail(PoseStack poseStack, SubmitNodeCollector collector, int light, Identifier skin,
 			boolean sleeve, CallbackInfo ci) {
 		fmab$blade(BodyPart.LEFT_ARM, poseStack, collector, light);
+		fmab$glove(BodyPart.LEFT_ARM, poseStack, collector, light);
+	}
+
+	/** À la première personne, le gant porté à cette main, et le cercle qu'on y a inscrit. */
+	@Unique
+	private void fmab$glove(BodyPart arm, PoseStack poseStack, SubmitNodeCollector collector, int light) {
+		Player player = Minecraft.getInstance().player;
+		if (!(player instanceof AbstractClientPlayer me) || BodyCache.of(player).lost().contains(arm)) {
+			return;
+		}
+		Gloves gloves = FmabAttachments.GLOVES.get(player);
+		boolean left = arm == BodyPart.LEFT_ARM;
+		BodyHolder.Worn glove = gloves == null ? null : HandsLayer.glove(gloves.get(left), left);
+		if (glove == null) {
+			return;
+		}
+		PlayerModel skeleton = (PlayerModel) ((LivingEntityRenderer<?, ?, ?>) (Object) this).getModel();
+		HandsLayer.submitHand(collector, poseStack, left ? skeleton.leftArm : skeleton.rightArm, glove,
+				me.getSkin().model() == PlayerModelType.SLIM, light);
 	}
 
 	@Unique

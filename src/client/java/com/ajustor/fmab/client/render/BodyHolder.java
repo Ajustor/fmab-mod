@@ -1,8 +1,10 @@
 package com.ajustor.fmab.client.render;
 
+import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.item.AutomailItem;
 import net.minecraft.client.model.geom.PartPose;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Set;
@@ -33,8 +35,14 @@ public interface BodyHolder {
 
 	void fmab$setSkeleton(Map<BodyPart, PartPose> skeleton);
 
-	/** Une pièce portée sur le corps : son calque ({@code textures/entity/worn/}) et le membre qui la porte. */
-	record Worn(String texture, BodyPart part) {
+	/**
+	 * Une pièce portée sur le corps : son calque ({@code textures/entity/worn/}), le membre qui la porte
+	 * et, pour un gant inscrit, le cercle brodé au dos de la main et la couleur de son fil.
+	 */
+	record Worn(String texture, BodyPart part, @Nullable Drawing circle, int ink) {
+		public Worn(String texture, BodyPart part) {
+			this(texture, part, null, 0);
+		}
 	}
 
 	/** Ses gants et ses tatouages. */
