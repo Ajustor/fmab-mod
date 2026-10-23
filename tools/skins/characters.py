@@ -1882,6 +1882,15 @@ def glove_layer(kind):
                 s.band(arm, 8, 1, "#c9a23a")
             if kind == "gauntlet":
                 s.band(arm, 8, 1, "#2e3238")
+        # Le même gant sur la couche des manches : une peau aux manches longues ne le cache plus.
+        for arm, sleeve in (("rarm", "rsleeve"), ("larm", "lsleeve")):
+            for f in SIDES + ("bottom",):
+                w, h = s.size(arm, f)
+                for y in range(h):
+                    for x in range(w):
+                        c = s.pget(arm, f, x, y)
+                        if c[3]:
+                            s.px(sleeve, f, x, y, "#%02x%02x%02x" % c[:3])
     return draw
 
 
@@ -1918,8 +1927,12 @@ def tattoo_layer(slot):
 
 for _kind in GLOVE_COLORS:
     skin("worn/glove_" + _kind, volume=False)(glove_layer(_kind))
+    # Les bras fins (Alex) n'ont pas le même gabarit : leur calque à part (voir HandsLayer).
+    skin("worn/glove_" + _kind + "_slim", volume=False, slim=True)(glove_layer(_kind))
 for _slot in TATTOO_PLACES:
     skin("worn/tattoo_" + _slot, volume=False)(tattoo_layer(_slot))
+    if TATTOO_PLACES[_slot][0] != "body":
+        skin("worn/tattoo_" + _slot + "_slim", volume=False, slim=True)(tattoo_layer(_slot))
 
 
 def build(names=None):
