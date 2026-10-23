@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.0 — 2026-10-23
+
+### New features
+
+- On eclipse day, the moon crosses the sky: pale at sunrise, it reaches the sun, bites into it around ten, hides it from eleven to two leaving only a corona, then moves away; the light dims as more of the sun is covered.
+- Alchemy becomes a tool: the woodcutter fells the trees around (Wood and Decompose), the harvest reaps and replants (Plant and Decompose), the fertiliser makes crops grow (Plant and Project), the tunnel bores through stone (Earth and Decompose with an arrow, or on a wall), the bridge spans the void and earthworks level the ground (Earth and Air fused); five new Treatise pages show them.
 ## 1.11.1 — 2026-10-23
 
 ### Fixes

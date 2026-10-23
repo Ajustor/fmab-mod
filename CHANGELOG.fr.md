@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 1.12.0 — 2026-10-23
+
+### Nouveautés
+
+- Le jour de l'éclipse, on voit la lune traverser le ciel : pâle au lever, elle rejoint le soleil, le mord vers dix heures, le cache de onze à quatorze heures en ne laissant qu'une couronne, puis s'en éloigne ; la lumière baisse avec la part du soleil couverte.
+- L'alchimie devient un outil : le bûcheron abat les arbres alentour (Bois et Décomposer), la moisson récolte et replante (Plante et Décomposer), l'engrais fait pousser (Plante et Projeter), le tunnel perce la pierre (Terre et Décomposer avec une flèche, ou sur une paroi), le pont franchit le vide et le terrassement aplanit le terrain (Terre et Air fusionnés) ; cinq nouvelles pages du Traité les montrent.
 ## 1.11.1 — 2026-10-23
 
 ### Corrections
