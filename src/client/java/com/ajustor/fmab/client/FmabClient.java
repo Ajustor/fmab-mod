@@ -357,10 +357,14 @@ public final class FmabClient {
 	/** Pendant l'éclipse, le jour se teinte d'un crépuscule orangé et sombre. */
 	private static void eclipse(GuiGraphicsExtractor graphics) {
 		Minecraft mc = Minecraft.getInstance();
-		if (mc.level == null || !Eclipse.now(mc.level) || !mc.level.canSeeSky(mc.player.blockPosition())) {
+		if (mc.level == null || !mc.level.canSeeSky(mc.player.blockPosition())) {
 			return;
 		}
-		graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), 0x401A0800);
+		// Le voile se lève avec la part du soleil couverte, jusqu'à la totalité.
+		int alpha = Math.round(0x40 * Eclipse.strength(mc.level));
+		if (alpha > 0) {
+			graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), alpha << 24 | 0x1A0800);
+		}
 	}
 
 	/** Le compteur d'âmes d'une Pierre philosophale vivante, au-dessus de la barre de concentration. */
