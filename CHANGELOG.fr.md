@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.11.1 — 2026-10-23
+
+### Corrections
+
+- Les gants se voient à la première personne, ne disparaissent plus sous les manches longues ni sur les bras fins, et montrent le cercle qu'on y a inscrit.
 ## 1.11.0 — 2026-10-22
 
 ### Nouveautés

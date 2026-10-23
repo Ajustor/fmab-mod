@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.11.1 — 2026-10-23
+
+### Fixes
+
+- Gloves now show in first person, no longer vanish under long sleeves or on slim arms, and show the circle inscribed in them.
 ## 1.11.0 — 2026-10-22
 
 ### New features
