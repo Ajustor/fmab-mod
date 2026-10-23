@@ -1,0 +1,1 @@
+{ "elements": ["plant"], "action": "project", "effect": "fmab:grow", "range": 3, "school": "life" }

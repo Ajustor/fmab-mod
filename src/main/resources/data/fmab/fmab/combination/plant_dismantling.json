@@ -1,1 +1,1 @@
-{ "elements": ["plant"], "action": "decompose", "effect": "fmab:dismantle", "range": 1, "school": "life" }
+{ "elements": ["plant"], "action": "decompose", "effect": "fmab:harvest", "range": 4, "school": "life" }

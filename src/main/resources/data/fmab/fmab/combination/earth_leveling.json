@@ -1,0 +1,1 @@
+{ "elements": ["earth", "air"], "action": "decompose", "effect": "fmab:level", "range": 3, "school": "earth" }

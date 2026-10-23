@@ -132,6 +132,11 @@ public final class Effects {
 		register("fmab:detonate", Effects::detonate);
 		register("fmab:recompose", Recomposition::recompose);
 		register("fmab:dismantle", Recomposition::dismantleEffect);
+		register("fmab:fell", Works::fell);
+		register("fmab:harvest", Works::harvest);
+		register("fmab:grow", Works::grow);
+		register("fmab:bridge", Works::bridge);
+		register("fmab:level", Works::level);
 		for (String grows : new String[]{"fmab:wall", "fmab:spike", "fmab:ice_spike"}) {
 			CHANNELS.put(grows, Channel.GROW);
 		}
@@ -317,9 +322,14 @@ public final class Effects {
 
 	/**
 	 * Terre + Décomposer : la terre autour du support se brise en ressources. Elles passent à
-	 * l'étage suivant, ou retombent sur le cercle.
+	 * l'étage suivant, ou retombent sur le cercle. Avec une flèche de direction, ou tracé sur un mur ou
+	 * un plafond, le cercle creuse un tunnel ({@link Works#tunnel}).
 	 */
 	private static Result decompose(EffectContext ctx) {
+		if (ctx.stage().hasDirection() || !ctx.frame().onFloor()) {
+			// Une flèche, ou un cercle sur un mur : un tunnel plutôt qu'un puits.
+			return Works.tunnel(ctx);
+		}
 		ServerLevel level = ctx.level();
 		// Les objets de pierre posés sur le cercle se défont aussi : on en comprend la structure.
 		int dismantled = Recomposition.dismantle(ctx);
