@@ -1,6 +1,7 @@
 package com.ajustor.fmab.homunculus;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
@@ -78,7 +79,10 @@ public final class Belly {
 				Swallowed s = FmabAttachments.SWALLOWED.get(player);
 				if (s != null) {
 					tick(server, player, s);
-				} else if (player.level().dimension() == BELLY && player.tickCount % 20 == 0) {
+				} else if (player.level().dimension() == BELLY && player.tickCount % 20 == 0
+						&& FmabAttachments.GATE.getOrCreate(player).visit().isEmpty()) {
+					// Personne ne reste dans un Ventre où il n'est plus attendu, sauf celui que la Porte
+					// est en train d'emporter : elle le rendra elle-même.
 					player.teleport(new TeleportTransition(server.overworld(),
 							Vec3.atBottomCenterOf(server.overworld().getRespawnData().pos()), Vec3.ZERO, 0, 0,
 							TeleportTransition.DO_NOTHING));
@@ -102,12 +106,38 @@ public final class Belly {
 		player.sendSystemMessage(Component.translatable("homunculus.fmab.swallowed"));
 	}
 
-	/** Une transmutation réussie dans le Ventre ouvre une Porte vers dehors. */
+	/**
+	 * Une transmutation réussie dans le Ventre ouvre une Porte vers dehors. Une transmutation humaine
+	 * ouvre la vraie Porte, comme Edward : l'alchimiste part pour l'Espace blanc, et la Vérité le rend
+	 * là où Gluttony l'avait avalé, pas dans le Ventre (ni au point d'apparition, faute d'y être encore
+	 * attendu).
+	 */
 	public static void transmuted(ServerPlayer player) {
-		if (swallowed(player) && player.level().dimension() == BELLY) {
-			player.sendSystemMessage(Component.translatable("homunculus.fmab.belly_gate"));
-			release(player.level().getServer(), player);
+		if (!swallowed(player) || player.level().dimension() != BELLY) {
+			return;
 		}
+		player.sendSystemMessage(Component.translatable("homunculus.fmab.belly_gate"));
+		GateState gate = FmabAttachments.GATE.getOrCreate(player);
+		Swallowed s = FmabAttachments.SWALLOWED.get(player);
+		if (gate.visit().isPresent() && gate.visit().get().dimension().equals(BELLY.identifier().toString()) && s != null) {
+			GateState.Visit v = gate.visit().get();
+			FmabAttachments.GATE.set(player, gate.withVisit(new GateState.Visit(s.dimension(), s.origin().offset(1, 0, 1),
+					v.ambition(), v.severe(), v.ticks())));
+			leave(player.level().getServer(), player);
+			return;
+		}
+		release(player.level().getServer(), player);
+	}
+
+	/** Le Ventre lâche l'alchimiste sans le déplacer : ses restes s'évanouissent, il n'y est plus attendu. */
+	private static Swallowed leave(MinecraftServer server, ServerPlayer player) {
+		Swallowed s = FmabAttachments.SWALLOWED.get(player);
+		FmabAttachments.SWALLOWED.remove(player);
+		ServerLevel belly = server.getLevel(BELLY);
+		if (s != null && belly != null) {
+			s.creatures().stream().map(belly::getEntity).filter(e -> e != null).forEach(Entity::discard);
+		}
+		return s;
 	}
 
 	private static BlockPos spot(ServerPlayer player) {
@@ -180,14 +210,9 @@ public final class Belly {
 
 	/** Recraché : retour là où Gluttony l'avait avalé, et les restes s'évanouissent. */
 	private static void release(MinecraftServer server, ServerPlayer player) {
-		Swallowed s = FmabAttachments.SWALLOWED.get(player);
-		FmabAttachments.SWALLOWED.remove(player);
-		ServerLevel belly = server.getLevel(BELLY);
+		Swallowed s = leave(server, player);
 		if (s == null) {
 			return;
-		}
-		if (belly != null) {
-			s.creatures().stream().map(belly::getEntity).filter(e -> e != null).forEach(Entity::discard);
 		}
 		ServerLevel home = server.getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(s.dimension())));
 		Vec3 at = Vec3.atBottomCenterOf(s.origin()).add(1.5, 0, 1.5);
