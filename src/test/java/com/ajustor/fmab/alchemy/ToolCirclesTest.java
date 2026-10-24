@@ -1,12 +1,17 @@
 package com.ajustor.fmab.alchemy;
 
 import com.ajustor.fmab.alchemy.circle.CircleParser;
+import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.alchemy.drawing.Primitive;
+import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.GlyphRecognizer;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.alchemy.rules.CircleAnalyzer;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,6 +55,24 @@ class ToolCirclesTest {
 			Rank rank = analyzer.analyze(parser.parse(example(page).drawing()), Rank.GATE, null).requiredRank();
 			assertEquals(Rank.ALCHEMIST, rank, page + " : la fusion de deux éléments demande un hexagramme");
 		}
+	}
+
+	/** Le cercle d'un joueur : le bûcheron dans un hexagone, deux points d'Intensité pour une zone de huit blocs. */
+	@Test
+	void anAmplifiedWoodcutterInAHexagonStillFellsTrees() {
+		List<Primitive> out = new ArrayList<>(example("treatise.fmab.everyday.recycling").drawing().primitives());
+		List<Vec2> hexagon = new ArrayList<>();
+		for (int i = 0; i < 6; i++) {
+			double a = Math.toRadians(-90 + 60 * i);
+			hexagon.add(new Vec2(Math.round(16 + 14 * Math.cos(a)), Math.round(16 + 14 * Math.sin(a))));
+		}
+		out.set(1, new Primitive.Polygon(hexagon));
+		out.add(new Primitive.Dot(new Vec2(2, 16)));
+		out.add(new Primitive.Dot(new Vec2(30, 16)));
+		Analysis a = analyzer.analyze(parser.parse(new Drawing(out)), Rank.ALCHEMIST, null);
+		assertEquals(Analysis.Outcome.WORKS, a.outcome(), () -> a.issues().toString());
+		assertEquals("fmab:fell", a.effects().getFirst().combination().effect());
+		assertEquals(8, a.effects().getFirst().range(), 1e-9, "deux points doublent la portée");
 	}
 
 	private static Treatise.ExamplePage example(String key) {

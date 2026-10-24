@@ -2,6 +2,8 @@ package com.ajustor.fmab.gametest;
 
 import com.ajustor.fmab.alchemy.Treatise;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.alchemy.drawing.Primitive;
+import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.block.CircleMedium;
@@ -36,6 +38,8 @@ import net.minecraft.world.phys.AABB;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -110,6 +114,57 @@ public class ToolScenes implements FabricClientGameTest {
 		check(beam, "la poutre sans feuilles devrait rester debout");
 		check(count(sp, Items.OAK_LOG) >= 5, "les bûches devraient tomber sur le cercle : " + count(sp, Items.OAK_LOG));
 		context.takeScreenshot("tools_felling");
+		forest(context, sp);
+	}
+
+	/**
+	 * Le cercle d'un joueur : Bois et Décomposer dans un hexagone, deux points d'Intensité. Au milieu
+	 * d'un bosquet dont toutes les bûches se touchent (plus de 256), il abat ce qui est près de lui, là
+	 * où il n'abattait rien ; puis de vrais chênes noirs, tels que le monde les fait pousser.
+	 */
+	private static void forest(ClientGameTestContext context, TestSingleplayerContext sp) {
+		clear(context, sp);
+		sp.getServer().runCommand("fill 2 -60 6 30 -53 7 oak_log");
+		sp.getServer().runCommand("fill 2 -52 5 30 -52 8 oak_leaves[persistent=false,distance=1]");
+		Drawing amplified = amplified(example("treatise.fmab.everyday.recycling"));
+		check(cast(context, sp, Direction.UP, CIRCLE, amplified), "le bûcheron amplifié devrait abattre le bosquet");
+		String grove = sp.getServer().computeOnServer(server -> {
+			ServerLevel level = server.overworld();
+			return "près=" + level.getBlockState(new BlockPos(4, -56, 6)).isAir()
+					+ " loin=" + level.getBlockState(new BlockPos(30, -56, 6)).is(Blocks.OAK_LOG);
+		});
+		check(grove.equals("près=true loin=true"), "le bosquet devrait tomber près du cercle, pas au bout : " + grove);
+		context.takeScreenshot("tools_felling_grove");
+
+		clear(context, sp);
+		sp.getServer().runCommand("place feature minecraft:dark_oak 3 -60 7");
+		sp.getServer().runCommand("place feature minecraft:birch -4 -60 6");
+		context.waitTicks(5);
+		check(cast(context, sp, Direction.UP, CIRCLE, amplified), "le bûcheron devrait abattre des arbres poussés");
+		int left = sp.getServer().computeOnServer(server -> {
+			int n = 0;
+			for (BlockPos p : BlockPos.betweenClosed(new BlockPos(-10, -60, -2), new BlockPos(12, -40, 16))) {
+				n += server.overworld().getBlockState(p).is(net.minecraft.tags.BlockTags.LOGS) ? 1 : 0;
+			}
+			return n;
+		});
+		check(left == 0, "le chêne noir et le bouleau devraient tomber tout entiers : " + left + " bûches restent");
+		check(count(sp, Items.DARK_OAK_LOG) > 0 && count(sp, Items.BIRCH_LOG) > 0, "leurs bûches devraient tomber sur le cercle");
+		context.takeScreenshot("tools_felling_grown");
+	}
+
+	/** Le même cercle, dans un hexagone, avec deux points d'Intensité sur l'anneau. */
+	private static Drawing amplified(Drawing simple) {
+		List<Primitive> out = new ArrayList<>(simple.primitives());
+		List<Vec2> hexagon = new ArrayList<>();
+		for (int i = 0; i < 6; i++) {
+			double a = Math.toRadians(-90 + 60 * i);
+			hexagon.add(new Vec2(Math.round(16 + 14 * Math.cos(a)), Math.round(16 + 14 * Math.sin(a))));
+		}
+		out.set(1, new Primitive.Polygon(hexagon));
+		out.add(new Primitive.Dot(new Vec2(2, 16)));
+		out.add(new Primitive.Dot(new Vec2(30, 16)));
+		return new Drawing(out);
 	}
 
 	/** Le blé mûr se récolte et se replante, le blé vert reste ; puis l'engrais le fait pousser. */
@@ -232,7 +287,11 @@ public class ToolScenes implements FabricClientGameTest {
 	/** Trace le cercle à la craie (au sol face au sud, ou sur la face {@code clicked} d'une paroi) et pose la paume dessus. */
 	private static boolean cast(ClientGameTestContext context, TestSingleplayerContext sp, Direction clicked, BlockPos at,
 			String page) {
-		Drawing drawing = example(page);
+		return cast(context, sp, clicked, at, example(page));
+	}
+
+	private static boolean cast(ClientGameTestContext context, TestSingleplayerContext sp, Direction clicked, BlockPos at,
+			Drawing drawing) {
 		Transmutation.Result result = sp.getServer().computeOnServer(server -> {
 			ServerPlayer p = server.getPlayerList().getPlayers().getFirst();
 			ServerLevel level = p.level();
@@ -248,7 +307,7 @@ public class ToolScenes implements FabricClientGameTest {
 		sp.getConnection().waitForClientboundPackets();
 		context.waitTicks(20);
 		if (result != Transmutation.Result.DONE) {
-			System.out.println(String.format(Locale.ROOT, "[tools] %s : %s", page, result));
+			System.out.println(String.format(Locale.ROOT, "[tools] %s : %s", drawing.primitives().size(), result));
 		}
 		return result == Transmutation.Result.DONE;
 	}

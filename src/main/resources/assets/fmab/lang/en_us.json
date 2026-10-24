@@ -169,6 +169,8 @@
   "transmutation.fmab.glyph_understood": "After drawing it so often, you finally understand: %s",
   "transmutation.fmab.no_material": "Not enough matter: equivalent exchange makes nothing from nothing.",
   "transmutation.fmab.no_target": "Nothing to transmute within range.",
+  "transmutation.fmab.fell.no_trunk": "No trunk within %s blocks of the circle: draw it at the foot of the tree.",
+  "transmutation.fmab.fell.not_a_tree": "These logs touch no leaves that grew on their own: to alchemy, this is a building, not a tree.",
   "transmutation.fmab.support_too_small": "This support only holds %s stage(s).",
   "transmutation.fmab.hand_not_free": "Your hand must be free.",
   "transmutation.fmab.no_glove_circle": "None of your gloves bears a circle.",

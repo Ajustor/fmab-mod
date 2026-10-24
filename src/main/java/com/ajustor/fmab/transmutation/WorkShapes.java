@@ -17,23 +17,26 @@ import java.util.function.Predicate;
  * monde : on dit seulement où agir, le monde est lu par les prédicats qu'on reçoit.
  */
 public final class WorkShapes {
-	/** Un arbre n'a pas plus de bûches : au-delà, c'est une construction, ou une forêt d'un seul tenant. */
-	public static final int TREE_LIMIT = 256;
+	/** Un abattage ne prend jamais plus de bûches, même dans une forêt dont toutes les branches se touchent. */
+	public static final int TREE_LIMIT = 1024;
 
 	private WorkShapes() {
 	}
 
 	/**
 	 * L'arbre auquel appartient cette bûche : toutes les bûches qui s'y touchent, même en diagonale
-	 * (les branches d'acacia et de chêne noir). Vide si ce n'est pas un vrai arbre : aucune de ses
-	 * bûches ne touche de feuilles poussées d'elles-mêmes (une poutre, une maison en rondins), ou il
-	 * dépasse {@link #TREE_LIMIT}.
+	 * (les branches d'acacia et de chêne noir), dans la zone {@code within}. En forêt dense, les branches
+	 * des arbres voisins se touchent et tout le bosquet ne fait qu'un : la zone le borne, et l'on n'en
+	 * prend que ce qui est proche du cercle. Vide si ce n'est pas un vrai arbre : aucune de ses bûches ne
+	 * touche de feuilles poussées d'elles-mêmes (une poutre, une maison en rondins).
 	 *
 	 * @param log            ce qui est une bûche
 	 * @param naturalLeaves  ce qui est une feuille que personne n'a posée
+	 * @param within         jusqu'où l'abattage peut aller
 	 */
-	public static Set<BlockPos> tree(BlockPos start, Predicate<BlockPos> log, Predicate<BlockPos> naturalLeaves) {
-		if (!log.test(start)) {
+	public static Set<BlockPos> tree(BlockPos start, Predicate<BlockPos> log, Predicate<BlockPos> naturalLeaves,
+			Predicate<BlockPos> within) {
+		if (!log.test(start) || !within.test(start)) {
 			return Set.of();
 		}
 		Set<BlockPos> found = new LinkedHashSet<>();
@@ -50,10 +53,7 @@ public final class WorkShapes {
 				for (int dy = -1; dy <= 1; dy++) {
 					for (int dz = -1; dz <= 1; dz++) {
 						BlockPos q = p.offset(dx, dy, dz);
-						if (!found.contains(q) && log.test(q)) {
-							if (found.size() >= TREE_LIMIT) {
-								return Set.of();
-							}
+						if (found.size() < TREE_LIMIT && !found.contains(q) && within.test(q) && log.test(q)) {
 							found.add(q);
 							next.add(q);
 						}
@@ -62,6 +62,15 @@ public final class WorkShapes {
 			}
 		}
 		return leafy ? found : Set.of();
+	}
+
+	/**
+	 * La zone d'un abattage : à {@code reach} blocs du centre à l'horizontale, d'un peu sous le cercle
+	 * jusqu'à la cime des plus grands arbres.
+	 */
+	public static Predicate<BlockPos> felling(BlockPos center, int reach) {
+		return p -> Math.abs(p.getX() - center.getX()) <= reach && Math.abs(p.getZ() - center.getZ()) <= reach
+				&& p.getY() >= center.getY() - 2 && p.getY() <= center.getY() + 40;
 	}
 
 	/**

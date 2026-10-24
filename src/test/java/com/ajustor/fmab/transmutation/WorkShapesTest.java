@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** Les formes des outils de l'alchimie : quel arbre tombe, où passe un tunnel, un pont, un terrassement. */
 class WorkShapesTest {
 	private static final BlockPos ROOT = new BlockPos(0, 64, 0);
+	private static final java.util.function.Predicate<BlockPos> ANYWHERE = p -> true;
 
 	/** Un chêne : un tronc de cinq, une branche en diagonale, des feuilles autour de la cime. */
 	private static Set<BlockPos> oak() {
@@ -43,28 +44,42 @@ class WorkShapesTest {
 	void aWholeTreeFallsBranchesIncludedFromAnyOfItsLogs() {
 		Set<BlockPos> logs = oak();
 		Set<BlockPos> leaves = crown(logs);
-		assertEquals(logs, WorkShapes.tree(ROOT, logs::contains, leaves::contains), "depuis le pied");
-		assertEquals(logs, WorkShapes.tree(ROOT.above(5).east(), logs::contains, leaves::contains), "depuis la branche");
+		assertEquals(logs, WorkShapes.tree(ROOT, logs::contains, leaves::contains, ANYWHERE), "depuis le pied");
+		assertEquals(logs, WorkShapes.tree(ROOT.above(5).east(), logs::contains, leaves::contains, ANYWHERE), "depuis la branche");
 	}
 
 	@Test
 	void aBeamOrALogCabinIsNotATree() {
 		Set<BlockPos> logs = oak();
-		assertEquals(Set.of(), WorkShapes.tree(ROOT, logs::contains, p -> false),
+		assertEquals(Set.of(), WorkShapes.tree(ROOT, logs::contains, p -> false, ANYWHERE),
 				"sans feuilles poussées d'elles-mêmes, ce sont des rondins posés");
-		assertEquals(Set.of(), WorkShapes.tree(ROOT.west(), logs::contains, crown(logs)::contains),
+		assertEquals(Set.of(), WorkShapes.tree(ROOT.west(), logs::contains, crown(logs)::contains, ANYWHERE),
 				"pas de bûche, pas d'arbre");
 	}
 
+	/**
+	 * En forêt dense, les branches des arbres voisins se touchent : tout le bosquet ne fait qu'un. Avant,
+	 * passé 256 bûches, le cercle n'abattait rien du tout ; il abat maintenant ce qui est près de lui.
+	 */
 	@Test
-	void aForestInOnePieceIsTooBigToFell() {
+	void aDenseForestIsFelledNearTheCircleInsteadOfNotAtAll() {
 		Set<BlockPos> logs = new HashSet<>();
-		for (int x = 0; x < 20; x++) {
-			for (int z = 0; z < 20; z++) {
-				logs.add(ROOT.offset(x, 0, z));
+		for (int x = 0; x < 40; x++) {
+			for (int y = 0; y < 8; y++) {
+				logs.add(ROOT.offset(x, y, 0));
 			}
 		}
-		assertEquals(Set.of(), WorkShapes.tree(ROOT, logs::contains, p -> true), "un plancher de rondins n'est pas un arbre");
+		Set<BlockPos> felled = WorkShapes.tree(ROOT, logs::contains, p -> true, WorkShapes.felling(ROOT, 10));
+		assertEquals(11 * 8, felled.size(), "les troncs à dix blocs, pas le reste de la forêt");
+		assertTrue(felled.stream().allMatch(p -> p.getX() - ROOT.getX() <= 10));
+		assertEquals(Set.of(), WorkShapes.tree(ROOT.offset(20, 0, 0), logs::contains, p -> true, WorkShapes.felling(ROOT, 10)),
+				"une bûche hors de la zone ne compte pas");
+	}
+
+	@Test
+	void evenAHugeForestStopsAtTheLimit() {
+		Set<BlockPos> felled = WorkShapes.tree(ROOT, p -> true, p -> true, ANYWHERE);
+		assertEquals(WorkShapes.TREE_LIMIT, felled.size());
 	}
 
 	@Test
