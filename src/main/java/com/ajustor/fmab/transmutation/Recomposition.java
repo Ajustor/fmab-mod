@@ -58,17 +58,22 @@ public final class Recomposition {
 	}
 
 	/**
-	 * Défait les objets posés sur le cercle dont l'élément principal est visé par l'étage. Leur
+	 * Défait les objets posés sur le cercle (avec le glyphe Objet, aussi ceux au sol à portée ; avec
+	 * Bloc seul, aucun) dont l'élément principal est visé par l'étage. Leur
 	 * matière passe à l'étage suivant (ou retombe sur le cercle) ; l'alchimiste en retient la
 	 * structure.
 	 *
 	 * @return combien d'objets se sont défaits
 	 */
 	public static int dismantle(EffectContext ctx) {
+		if (!ctx.stage().aimsItems()) {
+			// Le glyphe Bloc seul : les objets posés ne bougent pas.
+			return 0;
+		}
 		ServerLevel level = ctx.level();
 		Set<String> aimed = ctx.stage().combination().elements();
 		int count = 0;
-		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, ctx.onCircle())) {
+		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, ctx.items())) {
 			ItemStack stack = entity.getItem();
 			Optional<Composition> composition = composition(level, stack.getItem());
 			if (composition.isEmpty() || !aimed.contains(composition.get().principal())) {

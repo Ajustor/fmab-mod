@@ -56,6 +56,14 @@ public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame fram
 	}
 
 	/**
+	 * Les objets qu'un effet défait : ceux posés sur le cercle ; avec le glyphe Objet, aussi ceux qui
+	 * traînent au sol à portée.
+	 */
+	public AABB items() {
+		return stage.aims().contains("item") ? onCircle().inflate(range(), 1, range()) : onCircle();
+	}
+
+	/**
 	 * Direction de l'effet. Au sol : celle de la flèche du cercle (ou du sommet d'un satellite) si
 	 * elle existe, sinon celle où regarde l'alchimiste. Sur un mur ou un plafond : droit devant la
 	 * surface.
@@ -75,6 +83,28 @@ public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame fram
 	public Direction horizontalDirection() {
 		Direction d = direction();
 		return d.getAxis().isHorizontal() ? d : caster.getDirection();
+	}
+
+	/**
+	 * Puise une âme dans la Pierre philosophale que tient l'alchimiste, ou dans son corps s'il est une
+	 * Pierre vivante : certains effets s'en nourrissent au lieu de matière.
+	 *
+	 * @return faux s'il n'a pas de Pierre
+	 */
+	public boolean spendSoul() {
+		if (caster == null) {
+			return false;
+		}
+		java.util.Optional<net.minecraft.world.item.ItemStack> stone = com.ajustor.fmab.stone.PhilosopherStones.held(caster);
+		if (stone.isPresent()) {
+			com.ajustor.fmab.stone.PhilosopherStones.drain(caster, stone.get(), 1);
+			return true;
+		}
+		if (com.ajustor.fmab.stone.LivingStone.fuels(caster)) {
+			com.ajustor.fmab.stone.LivingStone.spend(caster, 1);
+			return true;
+		}
+		return false;
 	}
 
 	/** Bonus de savoir de l'école de l'effet. */

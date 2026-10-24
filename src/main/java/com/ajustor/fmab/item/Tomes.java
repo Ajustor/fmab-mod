@@ -36,7 +36,8 @@ public final class Tomes {
 			"fmab:netherite");
 	/** Les formes : recomposer la matière, orienter, intensifier et façonner un cercle. */
 	public static final Tome FORMS = tome("forms", "fmab:recomposer", "fmab:direction", "fmab:intensite",
-			"fmab:forme_cercle", "fmab:forme_cone", "fmab:duree", "fmab:cibles");
+			"fmab:forme_cercle", "fmab:forme_cone", "fmab:duree", "fmab:cibles",
+			"fmab:objet", "fmab:bloc");
 	/** Notes sur la combustion : le feu et l'air, l'alchimie de Mustang. */
 	public static final Tome FLAME = tome("flame", "fmab:feu", "fmab:air");
 	/** Les notes de recherche de Hohenheim, dans sa maison de Resembool. */

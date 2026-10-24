@@ -1,0 +1,84 @@
+{
+  "id": "fmab:bloc",
+  "layer": "modifier",
+  "modifier": "aim_block",
+  "primitives": [
+    {
+      "type": "polyline",
+      "points": [
+        [
+          -0.8,
+          0.8
+        ],
+        [
+          -0.8,
+          0.27
+        ],
+        [
+          -0.27,
+          0.27
+        ],
+        [
+          -0.27,
+          -0.27
+        ],
+        [
+          0.27,
+          -0.27
+        ],
+        [
+          0.27,
+          -0.8
+        ],
+        [
+          0.8,
+          -0.8
+        ],
+        [
+          0.8,
+          0.8
+        ],
+        [
+          -0.8,
+          0.8
+        ]
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        -0.27,
+        0.27
+      ],
+      "to": [
+        -0.27,
+        0.8
+      ]
+    },
+    {
+      "type": "line",
+      "from": [
+        0.27,
+        -0.27
+      ],
+      "to": [
+        0.27,
+        0.8
+      ]
+    }
+  ],
+  "complexity": 1,
+  "concentration": 2,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 180,
+    "position": 0.1,
+    "scale": [
+      0.7,
+      1.4
+    ]
+  },
+  "name_key": "glyph.fmab.bloc",
+  "description_key": "glyph.fmab.bloc.desc",
+  "since": "1.13"
+}
