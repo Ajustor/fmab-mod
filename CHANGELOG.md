@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.12.1 — 2026-10-24
+
+### Fixes
+
+- The woodcutter now also fells trees in dense forests whose branches touch (it did nothing), and says why when nothing falls.
+
+### Performance
+
+- The online circle editor no longer lags: it reads the circle about seventy times faster, and no longer freezes when changing rank, language or number of sides.
 ## 1.12.0 — 2026-10-23
 
 ### New features

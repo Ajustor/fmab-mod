@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 1.12.1 — 2026-10-24
+
+### Corrections
+
+- Le bûcheron abat aussi les arbres des forêts denses, dont les branches se touchent (il ne faisait rien), et dit pourquoi quand rien ne tombe.
+
+### Performances
+
+- L'éditeur de cercles en ligne ne rame plus : il lit le cercle environ soixante-dix fois plus vite, et ne gèle plus quand on change de rang, de langue ou de nombre de côtés.
 ## 1.12.0 — 2026-10-23
 
 ### Nouveautés
