@@ -5,6 +5,7 @@ import com.ajustor.fmab.registry.FmabTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * L'alchimie comme outil : abattre les arbres, récolter et faire pousser les champs, creuser un
@@ -49,6 +51,8 @@ public final class Works {
 	private static final TagKey<Block> ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("c", "ores"));
 	/** Ce qui fait pousser : la poudre d'os, et ce qu'un autre mod range avec elle. */
 	public static final TagKey<Item> FERTILIZER = TagKey.create(Registries.ITEM, Fmab.id("fertilizer"));
+	/** Un abattage va chercher les branches et les cimes jusqu'à tant de blocs au-delà de sa portée. */
+	static final int TREE_REACH = 6;
 	/** Un tunnel s'enfonce de tant de blocs par bloc de portée. */
 	private static final int TUNNEL_PER_RANGE = 8;
 	/** Un aplanissement rabote jusqu'à tant de blocs au-dessus du sol, et comble jusqu'à tant au-dessous. */
@@ -65,24 +69,32 @@ public final class Works {
 	 * Bois + Décomposer : les objets de bois posés sur le cercle se défont, comme avant, et chaque
 	 * arbre dont une bûche est à portée tombe tout entier. Les feuilles restent, et se faneront en
 	 * laissant leurs pousses ; une poutre ou une maison en rondins, sans feuilles poussées d'elles-mêmes,
-	 * ne bouge pas.
+	 * ne bouge pas. En forêt dense, on n'abat que ce qui est à {@link #TREE_REACH} blocs de la portée.
+	 * Quand rien ne tombe, l'alchimiste apprend pourquoi.
 	 */
 	static Effects.Result fell(EffectContext ctx) {
 		ServerLevel level = ctx.level();
 		int dismantled = Recomposition.dismantle(ctx);
 		BlockPos center = ctx.origin();
 		int r = ctx.range();
+		Predicate<BlockPos> within = WorkShapes.felling(center, r + TREE_REACH);
+		Predicate<BlockPos> log = q -> level.getBlockState(q).is(BlockTags.LOGS);
 		Set<BlockPos> felled = new HashSet<>();
+		boolean trunk = false;
 		for (BlockPos p : BlockPos.betweenClosed(center.offset(-r, -1, -r), center.offset(r, r, r))) {
-			if (felled.contains(p)) {
+			if (felled.contains(p) || !log.test(p)) {
 				continue;
 			}
-			Set<BlockPos> tree = WorkShapes.tree(p.immutable(), q -> level.getBlockState(q).is(BlockTags.LOGS),
-					q -> natural(level.getBlockState(q)));
-			for (BlockPos log : tree) {
-				dig(ctx, log);
+			trunk = true;
+			Set<BlockPos> tree = WorkShapes.tree(p.immutable(), log, q -> natural(level.getBlockState(q)), within);
+			for (BlockPos l : tree) {
+				dig(ctx, l);
 			}
 			felled.addAll(tree);
+		}
+		if (felled.isEmpty() && dismantled == 0 && ctx.caster() != null) {
+			ctx.caster().sendSystemMessage(Component.translatable(trunk ? "transmutation.fmab.fell.not_a_tree"
+					: "transmutation.fmab.fell.no_trunk", r));
 		}
 		return felled.size() + dismantled > 0 ? Effects.Result.DONE : Effects.Result.NO_TARGET;
 	}

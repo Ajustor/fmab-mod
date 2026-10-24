@@ -169,6 +169,8 @@
   "transmutation.fmab.glyph_understood": "À force de le tracer, vous comprenez enfin : %s",
   "transmutation.fmab.no_material": "Pas assez de matière : l'échange équivalent ne fait rien de rien.",
   "transmutation.fmab.no_target": "Rien à transmuter à portée.",
+  "transmutation.fmab.fell.no_trunk": "Aucun tronc à %s blocs du cercle : tracez-le au pied de l'arbre.",
+  "transmutation.fmab.fell.not_a_tree": "Ces bûches ne touchent aucune feuille poussée d'elle-même : pour l'alchimie, c'est une construction, pas un arbre.",
   "transmutation.fmab.support_too_small": "Ce support ne porte que %s étage(s).",
   "transmutation.fmab.hand_not_free": "Il faut avoir la main libre.",
   "transmutation.fmab.no_glove_circle": "Aucun gant porté n'a de cercle.",
