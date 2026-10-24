@@ -220,6 +220,19 @@
         "type": "minecraft:random_chance",
         "chance": 0.08
       }
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fmab:philosopher_stone_notes"
+        }
+      ],
+      "condition": {
+        "type": "minecraft:random_chance",
+        "chance": 0.15
+      }
     }
   ],
   "random_sequence": "fmab:chests/laboratory_5_archives"

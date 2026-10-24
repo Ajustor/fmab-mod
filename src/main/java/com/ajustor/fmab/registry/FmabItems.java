@@ -60,6 +60,10 @@ public final class FmabItems {
 	/** Notes sur la transmutation humaine : très rares, elles en donnent le cercle. */
 	public static final Item HUMAN_TRANSMUTATION_NOTES = register("human_transmutation_notes",
 			HumanTransmutationNotesItem::new, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
+	public static final Item PHILOSOPHER_STONE_NOTES = register("philosopher_stone_notes",
+			p -> new HumanTransmutationNotesItem(p, com.ajustor.fmab.alchemy.ForbiddenCircles.PHILOSOPHER_STONE_EFFECT,
+					com.ajustor.fmab.alchemy.ForbiddenCircles.PHILOSOPHER_STONE, "item.fmab.philosopher_stone_notes"),
+			new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
 
 	public static final Item ALCHEMICAL_THREAD = register("alchemical_thread", Item::new, new Item.Properties());
 	public static final Item ALCHEMICAL_INK = register("alchemical_ink", AlchemicalInkItem::new,
@@ -295,6 +299,7 @@ public final class FmabItems {
 					output.accept(ALCHEMY_TREATISE);
 					Tomes.ALL.forEach(t -> output.accept(Tomes.stack(t)));
 					output.accept(HUMAN_TRANSMUTATION_NOTES);
+					output.accept(PHILOSOPHER_STONE_NOTES);
 					output.accept(CHALK);
 					output.accept(ALCHEMICAL_PAINT);
 					output.accept(ALCHEMIST_CHISEL);

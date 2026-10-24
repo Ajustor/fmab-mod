@@ -64,6 +64,8 @@ public final class FmabNetwork {
 		network.clientbound(OpenTruthPayload.TYPE, OpenTruthPayload.CODEC);
 		network.clientbound(StoneChoicePayload.TYPE, StoneChoicePayload.CODEC);
 		network.serverbound(StoneChosenPayload.TYPE, StoneChosenPayload.CODEC);
+		network.clientbound(StoneRadiusPayload.TYPE, StoneRadiusPayload.CODEC);
+		network.serverbound(StoneRadiusChosenPayload.TYPE, StoneRadiusChosenPayload.CODEC);
 		network.clientbound(SoulOfferPayload.TYPE, SoulOfferPayload.CODEC);
 		network.serverbound(SoulOfferAnswerPayload.TYPE, SoulOfferAnswerPayload.CODEC);
 		network.clientbound(SoulGiftPayload.TYPE, SoulGiftPayload.CODEC);
@@ -115,6 +117,8 @@ public final class FmabNetwork {
 		network.receive(SoulGiftAnswerPayload.TYPE, (payload, player) -> SoulGifts.answer(player, payload));
 		network.receive(StoneChosenPayload.TYPE,
 				(payload, player) -> StoneChoice.answer(player, payload.choice()));
+		network.receive(StoneRadiusChosenPayload.TYPE,
+				(payload, player) -> com.ajustor.fmab.stone.StoneCircle.answer(player, payload.radius()));
 		network.receive(BargainAnswerPayload.TYPE,
 				(payload, player) -> StoneBargain.answer(player, payload.part()));
 		network.receive(TruthChoicePayload.TYPE,
@@ -244,7 +248,8 @@ public final class FmabNetwork {
 		NotebookContents contents = Notebooks.of(player);
 		player.sendOverlayMessage(Component.translatable("circle.fmab.selected",
 				Notebooks.pageName(contents.pages().get(contents.selected()))));
-		if (payload.clap() && FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.GATE)) {
+		if (payload.clap() && (FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.GATE)
+				|| com.ajustor.fmab.stone.LivingStone.is(player))) {
 			GloveCasting.cast(player, true);
 		}
 	}

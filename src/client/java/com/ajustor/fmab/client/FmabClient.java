@@ -240,6 +240,8 @@ public final class FmabClient {
 				(payload, client) -> client.gui.setScreen(new SoulOfferScreen(payload)));
 		ClientPlatform.get().receive(StoneChoicePayload.TYPE,
 				(payload, client) -> client.gui.setScreen(new StoneChoiceScreen(payload)));
+		ClientPlatform.get().receive(com.ajustor.fmab.network.StoneRadiusPayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new com.ajustor.fmab.client.screen.StoneRadiusScreen(payload)));
 		ClientPlatform.get().receive(BargainPayload.TYPE, (payload, client) -> {
 			if (client.gui.screen() instanceof BargainScreen open) {
 				if (payload.souls() < 0) {

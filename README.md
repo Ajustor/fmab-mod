@@ -95,10 +95,14 @@ l'examen d'État à Central, la Porte, les homonculus, puis Père.
   deux bras pour faire tourner ses roues, qui prennent alors les mains. Un autre joueur peut le pousser
   (clic droit dessus, accroupi pour lâcher), ou un villageois contre une émeraude.
 - **Pierre philosophale** : devant la Porte, elle rachète à la Vérité ce qu'elle a pris ; elle anime
-  l'être d'une transmutation humaine, amplifie les transmutations, se fabrique par sacrifice. Un
+  l'être d'une transmutation humaine, amplifie les transmutations. Elle se fabrique par sacrifice, avec
+  son propre cercle (Humain et Décomposer, dans les rares **Notes sur la Pierre philosophale**) : il
+  consume les vies sur le rayon qu'on lui donne, jusqu'à une ferme entière ; du sang cristallisé posé
+  dessus devient la Pierre, ou, sans sang, celui qui se tient au centre devient une Pierre vivante. Un
   alchimiste qui a vu sa Porte rend à un allié debout dans son cercle ce que la Porte lui a pris, et
   même sa Porte s'il l'a donnée : seule une Pierre la paie, au plus haut prix, et il repart de zéro.
-  **Karma**, **éclipse** tous les huit jours, **Pierre vivante** : elle transmute sans attendre, et les
+  **Karma**, **éclipse** tous les huit jours, **Pierre vivante** : elle transmute sans attendre et sans
+  cercle, et les
   projectiles qui la visent se défont en matière dans ses poches.
 - **Homonculus** qui se reconstituent tant que leur Pierre a des âmes : Lust, Gluttony (et son Ventre),
   Envy le déguisé, Greed (allié possible), Sloth, Wrath, Pride ; enfin **Père** et sa zone
@@ -288,8 +292,12 @@ Central, the Gate, the homunculi, then Father.
   both arms, and keeps your hands busy. Another player can push it (right-click it, sneak to let go),
   or a villager for an emerald.
 - **Philosopher's Stone**: before the Gate, buys back from Truth what it took; brings to life the
-  being of a human transmutation, amplifies transmutations, made by sacrifice.
-  **Karma**, an **eclipse** every eighth day, the **Living Stone**: it transmutes without waiting,
+  being of a human transmutation, amplifies transmutations. It is made by sacrifice with its own circle
+  (Human and Decompose, in the rare **Notes on the Philosopher's Stone**): it consumes lives over the
+  radius you give it, up to a whole farm; crystallized blood laid on it becomes the Stone, or, without
+  blood, whoever stands at the center becomes a living Stone.
+  **Karma**, an **eclipse** every eighth day, the **Living Stone**: it transmutes without waiting or a
+  circle,
   and projectiles aimed at it come apart into matter in its pockets.
 - **Homunculi** that reconstitute while their Stone holds souls: Lust, Gluttony (and his Belly),
   Envy in disguise, Greed (a possible ally), Sloth, Wrath, Pride; finally **Father** and his

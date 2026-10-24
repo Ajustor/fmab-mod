@@ -6,7 +6,6 @@ import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
-import com.ajustor.fmab.stone.Sacrifice;
 import com.ajustor.fmab.transmutation.EffectContext;
 import com.ajustor.fmab.transmutation.Effects;
 import net.minecraft.core.BlockPos;
@@ -109,7 +108,9 @@ public final class HumanTransmutation {
 		AABB area = new AABB(circle).inflate(REACH, 1, REACH);
 		List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, area, ItemEntity::isAlive);
 		if (items.stream().anyMatch(e -> e.getItem().is(FmabItems.CRYSTALLIZED_BLOOD))) {
-			return Sacrifice.perform(level, caster, circle, area, items);
+			// Le sang cristallisé appelle une Pierre : ce n'est pas ce cercle-ci qui la fait.
+			caster.sendSystemMessage(Component.translatable("stone.fmab.wrong_circle"));
+			return Effects.Result.NO_TARGET;
 		}
 		if (PhilosopherStones.held(caster).isPresent()) {
 			// La Pierre en main : l'alchimiste choisit d'ouvrir sa Porte ou de donner une âme à un être.

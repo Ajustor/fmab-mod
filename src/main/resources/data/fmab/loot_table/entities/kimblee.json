@@ -72,6 +72,21 @@
           "chance": 0.25
         }
       ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fmab:philosopher_stone_notes"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.3
+        }
+      ]
     }
   ],
   "random_sequence": "fmab:entities/kimblee"

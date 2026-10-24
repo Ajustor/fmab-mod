@@ -690,6 +690,44 @@ def ishval_tattoo():
     return light(img)
 
 
+@item("philosopher_stone_notes")
+def philosopher_stone_notes():
+    """Les notes sur la Pierre philosophale : un carnet relié de cuir sombre, taché de sang séché, ouvert
+    sur le cercle de la Pierre (un double anneau, l'hexagramme, une pierre rouge au centre)."""
+    img = sprite([
+        "................",
+        "..CCCCCCCCCCCC..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..CPPPPPPPPPPc..",
+        "..ccccccccccccc.",
+        "...ccccccccccc..",
+        "................",
+    ], dict(P="#d9c8a0", C="#4a2a24", c="#2e1a16"))
+    ink = "#8a1018"
+    cx, cy = 7.5, 7.5
+    for y in range(2, 13):
+        for x in range(3, 13):
+            d = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
+            if abs(d - 4.4) < 0.55:
+                img.putpixel((x, y), rgb(ink))
+    # L'hexagramme, réduit à ses six pointes, et la Pierre au centre.
+    put(img, ((7, 4), (8, 4), (5, 6), (10, 6), (5, 9), (10, 9), (7, 11), (8, 11)), "#b0202a")
+    put(img, ((7, 7), (8, 7), (7, 8), (8, 8)), "#e0303a")
+    put(img, ((8, 7),), "#ff8080")
+    # Des taches de sang séché.
+    put(img, ((4, 3), (11, 12), (12, 4), (3, 11)), "#6a1418")
+    return light(img)
+
+
 @item("crimson_seals")
 def crimson_seals():
     """Les cercles écarlates de Kimblee : la paume ouverte, tatouée du cercle du soleil (celui de l'autre

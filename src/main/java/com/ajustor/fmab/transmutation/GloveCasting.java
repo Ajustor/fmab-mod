@@ -63,7 +63,8 @@ public final class GloveCasting {
 			player.sendOverlayMessage(Component.translatable("wheelchair.fmab.hands_busy"));
 			return;
 		}
-		if (combine && FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.GATE)) {
+		if (combine && (FmabAttachments.ALCHEMIST.getOrCreate(player).rank().atLeast(Rank.GATE)
+				|| com.ajustor.fmab.stone.LivingStone.is(player))) {
 			clap(player);
 			return;
 		}

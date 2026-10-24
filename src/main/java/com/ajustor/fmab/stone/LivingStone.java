@@ -124,7 +124,18 @@ public final class LivingStone {
 			main.shrink(1);
 			off.shrink(1);
 		}
-		FmabAttachments.LIVING_STONE.set(player, souls);
+		become(player, souls, circle);
+		return true;
+	}
+
+	/**
+	 * Les âmes se fondent dans le corps du joueur : il devient une Pierre vivante, ou grossit celle qu'il
+	 * est déjà. Ses membres pris par la Porte lui reviennent, son karma touche le fond. Une Pierre
+	 * vivante transmute sans cercle, mains jointes, même sans avoir vu sa Porte.
+	 */
+	public static void become(ServerPlayer player, int souls, BlockPos circle) {
+		boolean already = souls(player) > 0;
+		FmabAttachments.LIVING_STONE.set(player, souls(player) + souls);
 		GateState gate = FmabAttachments.GATE.getOrCreate(player);
 		FmabAttachments.GATE.set(player, gate.restore(gate.lost()));
 		GateOfTruth.returnParts(player);
@@ -134,8 +145,8 @@ public final class LivingStone {
 		level.sendParticles(RED, player.getX(), player.getY(0.5), player.getZ(), 300, 1.5, 1.5, 1.5, 0);
 		TransmutationLightning.discharge(level, circle, 3, 1.5);
 		level.playSound(null, circle, SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 1.5f, 0.6f);
-		player.sendSystemMessage(Component.translatable("stone.fmab.became_living_stone", souls));
-		return true;
+		player.sendSystemMessage(Component.translatable(already ? "stone.fmab.living_stone_grew" : "stone.fmab.became_living_stone",
+				souls(player)));
 	}
 
 	private static boolean full(ItemStack stack) {

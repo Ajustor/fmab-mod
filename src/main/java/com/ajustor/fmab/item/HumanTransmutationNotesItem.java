@@ -1,6 +1,7 @@
 package com.ajustor.fmab.item;
 
 import com.ajustor.fmab.alchemy.ForbiddenCircles;
+import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Notebooks;
@@ -30,8 +31,22 @@ import java.util.function.Consumer;
 public class HumanTransmutationNotesItem extends Item {
 	private static final String HUMAN_GLYPH = "fmab:humain";
 
+	/** L'effet du cercle interdit que ces notes recopient, son tracé, et la clé de leurs textes. */
+	private final String effect;
+	private final Drawing circle;
+	private final String key;
+
 	public HumanTransmutationNotesItem(Properties properties) {
+		this(properties, ForbiddenCircles.HUMAN_TRANSMUTATION_EFFECT, ForbiddenCircles.HUMAN_TRANSMUTATION,
+				"item.fmab.human_transmutation_notes");
+	}
+
+	/** Des notes sur un autre cercle interdit : celui de la Pierre philosophale. */
+	public HumanTransmutationNotesItem(Properties properties, String effect, Drawing circle, String key) {
 		super(properties);
+		this.effect = effect;
+		this.circle = circle;
+		this.key = key;
 	}
 
 	@Override
@@ -42,7 +57,7 @@ public class HumanTransmutationNotesItem extends Item {
 		return InteractionResult.SUCCESS;
 	}
 
-	private static void read(ServerPlayer player) {
+	private void read(ServerPlayer player) {
 		boolean news = false;
 		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		Glyph glyph = AlchemyRules.of(player.level().registryAccess()).glyph(HUMAN_GLYPH).orElse(null);
@@ -51,10 +66,10 @@ public class HumanTransmutationNotesItem extends Item {
 			player.sendSystemMessage(Component.translatable("tome.fmab.learned", Component.translatable(glyph.nameKey())));
 			news = true;
 		}
-		String page = "@effect." + ForbiddenCircles.HUMAN_TRANSMUTATION_EFFECT.replace(':', '.');
-		switch (Notebooks.add(player, page, ForbiddenCircles.HUMAN_TRANSMUTATION)) {
+		String page = "@effect." + effect.replace(':', '.');
+		switch (Notebooks.add(player, page, circle)) {
 			case ADDED -> {
-				player.sendSystemMessage(Component.translatable("item.fmab.human_transmutation_notes.copied")
+				player.sendSystemMessage(Component.translatable(key + ".copied")
 						.withStyle(ChatFormatting.DARK_RED));
 				news = true;
 			}
@@ -72,7 +87,7 @@ public class HumanTransmutationNotesItem extends Item {
 	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
 			Consumer<Component> tooltip, TooltipFlag flag) {
-		tooltip.accept(Component.translatable("item.fmab.human_transmutation_notes.tooltip")
+		tooltip.accept(Component.translatable(key + ".tooltip")
 				.withStyle(ChatFormatting.GRAY));
 	}
 }
