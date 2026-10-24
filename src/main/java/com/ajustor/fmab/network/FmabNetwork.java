@@ -56,6 +56,7 @@ public final class FmabNetwork {
 				1 << 20);
 		network.serverbound(CastGlovesPayload.TYPE, CastGlovesPayload.CODEC);
 		network.serverbound(RemoveGlovePayload.TYPE, RemoveGlovePayload.CODEC);
+		network.serverbound(ConsignPayload.TYPE, ConsignPayload.CODEC);
 		network.serverbound(ShellKeyPayload.TYPE, ShellKeyPayload.CODEC);
 		network.serverbound(IzumiActionPayload.TYPE, IzumiActionPayload.CODEC);
 		network.serverbound(WinryActionPayload.TYPE, WinryActionPayload.CODEC);
@@ -102,6 +103,8 @@ public final class FmabNetwork {
 				(payload, player) -> GloveCasting.cast(player, payload.combine()));
 		network.receive(RemoveGlovePayload.TYPE,
 				(payload, player) -> removeGlove(player, payload.left()));
+		network.receive(ConsignPayload.TYPE,
+				(payload, player) -> com.ajustor.fmab.item.Notes.write(player, payload.glyphs()));
 		network.receive(ShellKeyPayload.TYPE,
 				(payload, player) -> {
 					if (Shells.KEY.pass(player.getUUID(), player.level().getGameTime())) {
