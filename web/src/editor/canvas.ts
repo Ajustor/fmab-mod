@@ -82,6 +82,7 @@ export class CircleCanvas {
   private arcStart: Vec2 | null = null;
   private cursor: Vec2 = CENTER_POINT;
   private inside = false;
+  private frame = 0;
 
   constructor(
     readonly canvas: HTMLCanvasElement,
@@ -200,7 +201,16 @@ export class CircleCanvas {
   private move(e: PointerEvent): void {
     this.cursor = this.toGrid(e);
     this.inside = true;
-    this.draw();
+    this.drawSoon();
+  }
+
+  /** Redessine à la prochaine image : la souris envoie plus de mouvements que l'écran n'affiche d'images. */
+  private drawSoon(): void {
+    if (this.frame !== 0) return;
+    this.frame = requestAnimationFrame(() => {
+      this.frame = 0;
+      this.draw();
+    });
   }
 
   private up(e: PointerEvent): void {

@@ -78,8 +78,16 @@ async function main(): Promise<void> {
     canvas.draw();
   }
 
-  const requiredRank = (example: Example): string =>
-    analyzer.analyze(parser.parse(example.primitives), "gate", null).requiredRank;
+  // Le rang d'un exemple ne dépend ni de la langue ni du rang choisi : lu une fois.
+  const ranks = new Map<Example, string>();
+  const requiredRank = (example: Example): string => {
+    let rank = ranks.get(example);
+    if (rank === undefined) {
+      rank = analyzer.analyze(parser.parse(example.primitives), "gate", null).requiredRank;
+      ranks.set(example, rank);
+    }
+    return rank;
+  };
 
   /** Ouvre un exemple : son tracé, le rang qu'il demande, et son explication sous le canevas. */
   function openExample(example: Example): void {
