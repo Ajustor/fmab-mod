@@ -1,0 +1,1 @@
+{"elements": ["*"], "action": "project", "effect": "fmab:matter_spike", "range": 3, "except": ["gold", "human"], "spec": {"zone": "column", "operation": "place", "damage": 5, "channel": "grow"}}

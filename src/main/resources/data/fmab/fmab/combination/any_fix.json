@@ -1,0 +1,1 @@
+{"elements": ["*"], "action": "fix", "effect": "fmab:matter_wall", "range": 2, "except": ["air", "fire", "gold", "human"], "spec": {"zone": "wall", "operation": "place", "channel": "grow"}}

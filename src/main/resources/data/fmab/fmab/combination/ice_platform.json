@@ -1,1 +1,1 @@
-{ "elements": ["water"], "action": "fix", "effect": "fmab:ice_platform", "range": 2, "passive": "fmab:fire_ward" }
+{"elements": ["water"], "action": "fix", "effect": "fmab:ice_platform", "range": 2, "passive": "fmab:fire_ward", "spec": {"steps": [{"target": "effect", "effect": "fmab:ice_platform"}, {"target": "entities", "only_aimed": true, "operation": "effect", "effect": "minecraft:slowness", "amplifier": 4, "duration": 6}]}}

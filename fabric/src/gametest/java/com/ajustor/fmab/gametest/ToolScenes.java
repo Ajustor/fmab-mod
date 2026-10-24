@@ -86,6 +86,7 @@ public class ToolScenes implements FabricClientGameTest {
 			aims(context, sp);
 			harvest(context, sp);
 			stoneGrowth(context, sp);
+			dataEngine(context, sp);
 			tunnel(context, sp);
 			bridge(context, sp);
 			leveling(context, sp);
@@ -357,6 +358,61 @@ public class ToolScenes implements FabricClientGameTest {
 		check(spent == 3, "la Pierre devrait avoir donné trois âmes : " + spent);
 		sp.getServer().runOnServer(server -> server.getPlayerList().getPlayers().getFirst().getInventory().clearContent());
 		context.takeScreenshot("tools_growth_stone");
+	}
+
+	/**
+	 * Le moteur ouvert aux données. Bois et Fixer n'avaient pas de combinaison (le cercle rebondissait) :
+	 * le joker élève un mur des planches posées. L'œil de la Créature sur un cercle d'Eau et Fixer gèle
+	 * une vache sur place. Un cercle d'Or et Fixer décrit par le datapack de test lance sa fonction.
+	 */
+	private static void dataEngine(ClientGameTestContext context, TestSingleplayerContext sp) {
+		clear(context, sp);
+		drop(sp, new ItemStack(Items.OAK_PLANKS, 20));
+		context.waitTicks(5);
+		check(cast(context, sp, Direction.UP, CIRCLE, simple(sp, "fmab:bois", "fmab:fixer", List.of())), "Bois et Fixer devrait élever un mur");
+		int planks = sp.getServer().computeOnServer(server -> {
+			int n = 0;
+			for (BlockPos p : BlockPos.betweenClosed(new BlockPos(-2, -60, 5), new BlockPos(2, -58, 5))) {
+				n += server.overworld().getBlockState(p).is(Blocks.OAK_PLANKS) ? 1 : 0;
+			}
+			return n;
+		});
+		check(planks == 15, "un mur de planches de cinq sur trois devrait se lever : " + planks);
+		check(count(sp, Items.OAK_PLANKS) == 5, "fait des planches posées sur le cercle");
+		context.takeScreenshot("tools_data_wall");
+
+		clear(context, sp);
+		sp.getServer().runCommand("summon minecraft:cow 0.5 -60 4.5 {NoAI:1b,Tags:[\"fmab_cow\"]}");
+		context.waitTicks(2);
+		check(cast(context, sp, Direction.UP, CIRCLE, simple(sp, "fmab:eau", "fmab:fixer", List.of("fmab:creature"))),
+				"Eau, Fixer et Créature devrait geler la vache");
+		boolean frozen = sp.getServer().computeOnServer(server -> server.overworld()
+				.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, new AABB(CIRCLE).inflate(6), e -> e.entityTags().contains("fmab_cow"))
+				.stream().anyMatch(e -> e.hasEffect(net.minecraft.world.effect.MobEffects.SLOWNESS)));
+		check(frozen, "la vache devrait être ralentie");
+		context.takeScreenshot("tools_data_creature");
+
+		clear(context, sp);
+		sp.getServer().runCommand("kill @e[type=cow]");
+		check(cast(context, sp, Direction.UP, CIRCLE, simple(sp, "fmab:or", "fmab:fixer", List.of())), "Or et Fixer devrait lancer la fonction");
+		boolean marked = sp.getServer().computeOnServer(server -> server.overworld().getBlockState(CIRCLE.above(2)).is(Blocks.GOLD_BLOCK));
+		check(marked, "la fonction du datapack devrait poser un bloc d'or à la portée du cercle");
+		context.takeScreenshot("tools_data_function");
+	}
+
+	/** Un cercle simple de cet élément et de cette action, avec des glyphes posés sur l'anneau. */
+	private static Drawing simple(TestSingleplayerContext sp, String element, String action, List<String> ring) {
+		return sp.getServer().computeOnServer(server -> {
+			AlchemyRules rules = AlchemyRules.of(server.overworld().registryAccess());
+			Glyph e = rules.glyph(element).orElseThrow();
+			Glyph a = rules.glyph(action).orElseThrow();
+			int sides = Math.min(12, SimpleCircles.sidesFor(e, a) + ring.size());
+			List<Primitive> out = new ArrayList<>(SimpleCircles.of(e, a, sides).primitives());
+			for (String g : ring) {
+				out.addAll(SimpleCircles.place(rules.glyph(g).orElseThrow(), new Vec2(30, 16), 2, 0));
+			}
+			return new Drawing(out);
+		});
 	}
 
 	private static int souls(TestSingleplayerContext sp) {

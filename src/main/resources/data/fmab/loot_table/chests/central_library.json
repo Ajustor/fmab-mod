@@ -192,7 +192,8 @@
                     "fmab:duree",
                     "fmab:cibles",
                     "fmab:objet",
-                    "fmab:bloc"
+                    "fmab:bloc",
+                    "fmab:creature"
                   ]
                 }
               }

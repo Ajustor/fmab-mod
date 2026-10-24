@@ -71,7 +71,10 @@ class LocalizationTest {
 			needed.add("knowledge.fmab.school." + n.school());
 		}
 		for (Combination c : TestGlyphs.combinations().all()) {
-			needed.add("knowledge.fmab.school." + c.school());
+			// Un joker n'a pas d'école à lui : il prend celle de l'élément auquel il s'applique.
+			if (!c.school().isEmpty()) {
+				needed.add("knowledge.fmab.school." + c.school());
+			}
 		}
 		for (BodyPart p : BodyPart.values()) {
 			needed.add(p.translationKey());

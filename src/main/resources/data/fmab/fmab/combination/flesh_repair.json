@@ -1,1 +1,1 @@
-{ "elements": ["flesh"], "action": "repair", "effect": "fmab:repair", "range": 1 }
+{"elements": ["flesh"], "action": "repair", "effect": "fmab:repair", "range": 1, "spec": {"steps": [{"target": "effect", "effect": "fmab:repair"}, {"target": "entities", "only_aimed": true, "operation": "heal", "amount": 6}]}}

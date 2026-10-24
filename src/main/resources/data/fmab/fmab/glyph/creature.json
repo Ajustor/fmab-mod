@@ -1,0 +1,58 @@
+{
+  "id": "fmab:creature",
+  "layer": "modifier",
+  "modifier": "aim_entity",
+  "primitives": [
+    {
+      "type": "polygon",
+      "points": [
+        [
+          -1.0,
+          0.0
+        ],
+        [
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          -0.5
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.5,
+          0.5
+        ],
+        [
+          -0.5,
+          0.5
+        ]
+      ]
+    },
+    {
+      "type": "circle",
+      "center": [
+        0.0,
+        0.0
+      ],
+      "radius": 0.25
+    }
+  ],
+  "complexity": 1,
+  "concentration": 2,
+  "rank": "apprentice",
+  "tolerance": {
+    "rotation_deg": 180,
+    "position": 0.1,
+    "scale": [
+      0.7,
+      1.4
+    ]
+  },
+  "name_key": "glyph.fmab.creature",
+  "description_key": "glyph.fmab.creature.desc",
+  "since": "1.13"
+}

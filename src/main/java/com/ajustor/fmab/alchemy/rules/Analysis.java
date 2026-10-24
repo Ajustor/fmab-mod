@@ -66,14 +66,19 @@ public record Analysis(
 			aims = Set.copyOf(aims);
 		}
 
-		/** L'effet touche-t-il les objets ? Oui sans glyphe de cible, ou avec Objet. */
+		/** L'effet touche-t-il les objets ? Oui sans Objet ni Bloc, ou avec Objet (Créature n'y change rien). */
 		public boolean aimsItems() {
-			return aims.isEmpty() || aims.contains("item");
+			return aims.contains("item") || !aims.contains("block");
 		}
 
-		/** L'effet touche-t-il les blocs du monde ? Oui sans glyphe de cible, ou avec Bloc. */
+		/** L'effet touche-t-il les blocs du monde ? Oui sans Objet ni Bloc, ou avec Bloc. */
 		public boolean aimsBlocks() {
-			return aims.isEmpty() || aims.contains("block");
+			return aims.contains("block") || !aims.contains("item");
+		}
+
+		/** Le glyphe Créature est-il tracé ? Il ajoute à l'effet ce qu'il fait aux créatures. */
+		public boolean aimsEntities() {
+			return aims.contains("entity");
 		}
 
 		public boolean hasDirection() {

@@ -1,0 +1,1 @@
+{"elements": ["*"], "action": "repair", "effect": "fmab:repair", "range": 1, "except": ["air", "fire", "water", "human"]}
