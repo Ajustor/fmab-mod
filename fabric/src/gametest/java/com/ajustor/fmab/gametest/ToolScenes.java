@@ -3,6 +3,7 @@ package com.ajustor.fmab.gametest;
 import com.ajustor.fmab.alchemy.Treatise;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.Primitive;
+import com.ajustor.fmab.alchemy.drawing.SimpleCircles;
 import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.alchemy.glyph.Rank;
@@ -13,6 +14,7 @@ import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
+import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.Transmutation;
@@ -81,7 +83,9 @@ public class ToolScenes implements FabricClientGameTest {
 			context.runOnClient(mc -> RenderShowcase.hideGui(mc, true));
 
 			felling(context, sp);
+			aims(context, sp);
 			harvest(context, sp);
+			stoneGrowth(context, sp);
 			tunnel(context, sp);
 			bridge(context, sp);
 			leveling(context, sp);
@@ -268,6 +272,96 @@ public class ToolScenes implements FabricClientGameTest {
 		});
 		check(ground.equals("bosse=true trou=true"), "le terrain devrait être de niveau : " + ground);
 		context.takeScreenshot("tools_leveling");
+	}
+
+	/**
+	 * Une hache en bois posée sur le cercle, un chêne à côté. Le crochet de l'Objet sur l'anneau : la
+	 * hache se défait, le chêne reste debout. L'escalier du Bloc à sa place : le chêne tombe, la hache reste.
+	 */
+	private static void aims(ClientGameTestContext context, TestSingleplayerContext sp) {
+		Drawing items = example("treatise.fmab.everyday.aims");
+		oakAndAxe(context, sp);
+		check(cast(context, sp, Direction.UP, CIRCLE, items), "le bûcheron à l'Objet devrait recycler la hache");
+		check(count(sp, Items.WOODEN_AXE) == 0, "la hache devrait se défaire");
+		check(standing(sp), "le chêne devrait rester debout : l'Objet ne vise que les objets");
+		context.takeScreenshot("tools_aim_items");
+
+		Drawing blocks = sp.getServer().computeOnServer(server -> {
+			AlchemyRules rules = AlchemyRules.of(server.overworld().registryAccess());
+			// Le même cercle, l'escalier du Bloc à la place du crochet (ses deux derniers traits).
+			List<Primitive> out = new ArrayList<>(items.primitives().subList(0, items.primitives().size() - 2));
+			out.addAll(SimpleCircles.place(rules.glyph("fmab:bloc").orElseThrow(), new Vec2(30, 16), 1.5, 0));
+			return new Drawing(out);
+		});
+		oakAndAxe(context, sp);
+		check(cast(context, sp, Direction.UP, CIRCLE, blocks), "le bûcheron au Bloc devrait abattre le chêne");
+		check(!standing(sp), "le chêne devrait tomber");
+		check(count(sp, Items.WOODEN_AXE) == 1, "la hache devrait rester : le Bloc ne vise que le monde");
+		context.takeScreenshot("tools_aim_blocks");
+	}
+
+	private static void oakAndAxe(ClientGameTestContext context, TestSingleplayerContext sp) {
+		clear(context, sp);
+		sp.getServer().runOnServer(server -> {
+			ServerLevel level = server.overworld();
+			for (int y = -60; y <= -56; y++) {
+				level.setBlockAndUpdate(new BlockPos(3, y, 5), Blocks.OAK_LOG.defaultBlockState());
+			}
+			for (BlockPos p : BlockPos.betweenClosed(new BlockPos(2, -57, 4), new BlockPos(4, -55, 6))) {
+				if (level.getBlockState(p).isAir()) {
+					level.setBlockAndUpdate(p, Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.DISTANCE, 1));
+				}
+			}
+		});
+		drop(sp, new ItemStack(Items.WOODEN_AXE));
+		context.waitTicks(5);
+	}
+
+	private static boolean standing(TestSingleplayerContext sp) {
+		return sp.getServer().computeOnServer(server -> server.overworld().getBlockState(new BlockPos(3, -58, 5)).is(Blocks.OAK_LOG));
+	}
+
+	/**
+	 * L'engrais, une Pierre philosophale en main et pas de poudre d'os : une âme fait mûrir tout le blé
+	 * et pousser la pousse de chêne en arbre.
+	 */
+	private static void stoneGrowth(ClientGameTestContext context, TestSingleplayerContext sp) {
+		clear(context, sp);
+		CropBlock wheat = (CropBlock) Blocks.WHEAT;
+		sp.getServer().runOnServer(server -> {
+			ServerLevel level = server.overworld();
+			level.setBlockAndUpdate(new BlockPos(0, GROUND, 6), Blocks.WATER.defaultBlockState());
+			for (int x = -2; x <= 2; x++) {
+				level.setBlockAndUpdate(new BlockPos(x, GROUND, 5), Blocks.FARMLAND.defaultBlockState());
+				level.setBlockAndUpdate(new BlockPos(x, -60, 5), wheat.getStateForAge(0));
+			}
+			level.setBlockAndUpdate(new BlockPos(-3, -60, 1), Blocks.OAK_SAPLING.defaultBlockState());
+			ServerPlayer p = server.getPlayerList().getPlayers().getFirst();
+			p.getInventory().clearContent();
+			p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(FmabItems.PHILOSOPHER_STONE));
+		});
+		int before = souls(sp);
+		check(cast(context, sp, Direction.UP, CIRCLE, "treatise.fmab.everyday.growth"), "l'engrais devrait partir avec la Pierre");
+		String grown = sp.getServer().computeOnServer(server -> {
+			ServerLevel level = server.overworld();
+			int ripe = 0;
+			for (int x = -2; x <= 2; x++) {
+				BlockState s = level.getBlockState(new BlockPos(x, -60, 5));
+				ripe += s.is(Blocks.WHEAT) && wheat.isMaxAge(s) ? 1 : 0;
+			}
+			return "mûrs=" + ripe + " arbre=" + level.getBlockState(new BlockPos(-3, -60, 1)).is(Blocks.OAK_LOG);
+		});
+		check(grown.equals("mûrs=5 arbre=true"), "une âme devrait tout faire pousser : " + grown);
+		int spent = before - souls(sp);
+		// Deux âmes pour la transmutation (une, plus une par étage), une pour faire pousser.
+		check(spent == 3, "la Pierre devrait avoir donné trois âmes : " + spent);
+		sp.getServer().runOnServer(server -> server.getPlayerList().getPlayers().getFirst().getInventory().clearContent());
+		context.takeScreenshot("tools_growth_stone");
+	}
+
+	private static int souls(TestSingleplayerContext sp) {
+		return sp.getServer().computeOnServer(server -> com.ajustor.fmab.item.PhilosopherStoneItem.souls(
+				server.getPlayerList().getPlayers().getFirst().getMainHandItem()));
 	}
 
 	/** Le cercle d'exemple de cette page du Traité. */

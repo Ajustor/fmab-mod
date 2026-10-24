@@ -56,12 +56,24 @@ public record Analysis(
 	 * @param shape      la forme de l'effet : {@code line}, {@code circle} ou {@code cone}
 	 * @param duration   glyphes de durée : chacun ajoute une fois la durée de base
 	 * @param targets    glyphes de cibles : chacun ajoute une cible
+	 * @param aims       ce que visent les glyphes Objet et Bloc ({@code item}, {@code block}) ; vide, tout
 	 */
 	public record StageEffect(int stage, int satellite, Combination combination, double range, int intensity,
 			Vec2 origin, double direction, Set<String> infusions, LinkKind link, String shape, int duration,
-			int targets) {
+			int targets, Set<String> aims) {
 		public StageEffect {
 			infusions = Set.copyOf(infusions);
+			aims = Set.copyOf(aims);
+		}
+
+		/** L'effet touche-t-il les objets ? Oui sans glyphe de cible, ou avec Objet. */
+		public boolean aimsItems() {
+			return aims.isEmpty() || aims.contains("item");
+		}
+
+		/** L'effet touche-t-il les blocs du monde ? Oui sans glyphe de cible, ou avec Bloc. */
+		public boolean aimsBlocks() {
+			return aims.isEmpty() || aims.contains("block");
 		}
 
 		public boolean hasDirection() {

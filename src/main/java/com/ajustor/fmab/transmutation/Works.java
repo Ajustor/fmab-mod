@@ -58,6 +58,8 @@ public final class Works {
 	/** Un aplanissement rabote jusqu'à tant de blocs au-dessus du sol, et comble jusqu'à tant au-dessous. */
 	private static final int LEVEL_ABOVE = 6;
 	private static final int LEVEL_BELOW = 3;
+	/** Une âme fait pousser une plante d'au plus tant de coups de poudre d'os : assez pour mûrir ou devenir arbre. */
+	private static final int SOUL_GROWTH = 16;
 	/** Les champs se récoltent un peu au-dessus et au-dessous du cercle : la canne à sucre, les terrasses. */
 	private static final int FIELD_BELOW = 2;
 	private static final int FIELD_ABOVE = 3;
@@ -81,7 +83,10 @@ public final class Works {
 		Predicate<BlockPos> log = q -> level.getBlockState(q).is(BlockTags.LOGS);
 		Set<BlockPos> felled = new HashSet<>();
 		boolean trunk = false;
-		for (BlockPos p : BlockPos.betweenClosed(center.offset(-r, -1, -r), center.offset(r, r, r))) {
+		// Le glyphe Objet seul : on recycle ce qui est posé, sans toucher aux arbres.
+		Iterable<BlockPos> zone = ctx.stage().aimsBlocks()
+				? BlockPos.betweenClosed(center.offset(-r, -1, -r), center.offset(r, r, r)) : List.of();
+		for (BlockPos p : zone) {
 			if (felled.contains(p) || !log.test(p)) {
 				continue;
 			}
@@ -92,7 +97,7 @@ public final class Works {
 			}
 			felled.addAll(tree);
 		}
-		if (felled.isEmpty() && dismantled == 0 && ctx.caster() != null) {
+		if (felled.isEmpty() && dismantled == 0 && ctx.caster() != null && ctx.stage().aimsBlocks()) {
 			ctx.caster().sendSystemMessage(Component.translatable(trunk ? "transmutation.fmab.fell.not_a_tree"
 					: "transmutation.fmab.fell.no_trunk", r));
 		}
@@ -117,6 +122,9 @@ public final class Works {
 		int r = ctx.range();
 		int picked = 0;
 		List<BlockPos> field = new ArrayList<>();
+		if (!ctx.stage().aimsBlocks()) {
+			return dismantled > 0 ? Effects.Result.DONE : Effects.Result.NO_TARGET;
+		}
 		// Du haut vers le bas : on coupe une canne à sucre par le haut avant de regarder son pied.
 		for (int dy = FIELD_ABOVE; dy >= -FIELD_BELOW; dy--) {
 			for (BlockPos p : BlockPos.betweenClosed(center.offset(-r, dy, -r), center.offset(r, dy, r))) {
@@ -204,24 +212,44 @@ public final class Works {
 	/**
 	 * Plante + Projeter : les cultures, les pousses d'arbre, le cacao et les baies à portée poussent
 	 * d'un coup, comme sous la poudre d'os ; chacune en coûte une, prise sur le cercle, dans la matière
-	 * de l'étage précédent ou dans le sac de l'alchimiste.
+	 * de l'étage précédent ou dans le sac de l'alchimiste. Avec une Pierre philosophale, une seule âme
+	 * fait pousser tout ce qu'il y a dans la zone jusqu'à maturité (les pousses deviennent des arbres),
+	 * sans poudre d'os.
 	 */
 	static Effects.Result grow(EffectContext ctx) {
+		if (!ctx.stage().aimsBlocks()) {
+			return Effects.Result.NO_TARGET;
+		}
 		ServerLevel level = ctx.level();
 		BlockPos center = ctx.origin();
 		int r = ctx.range();
-		int grown = 0;
-		boolean lacking = false;
+		List<BlockPos> plants = new ArrayList<>();
 		for (BlockPos p : BlockPos.betweenClosed(center.offset(-r, -FIELD_BELOW, -r), center.offset(r, FIELD_ABOVE, r))) {
 			BlockState state = level.getBlockState(p);
-			if (!growable(state) || (state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state))) {
-				continue;
+			if (growable(state) && !(state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state))) {
+				plants.add(p.immutable());
 			}
+		}
+		if (plants.isEmpty()) {
+			return Effects.Result.NO_TARGET;
+		}
+		if (ctx.spendSoul()) {
+			for (BlockPos at : plants) {
+				// Jusqu'à ce qu'elle ne puisse plus pousser : mûre, ou devenue un arbre.
+				for (int i = 0; i < SOUL_GROWTH && growable(level.getBlockState(at))
+						&& BoneMealItem.growCrop(new ItemStack(Items.BONE_MEAL), level, at); i++) {
+					level.levelEvent(1505, at, 15);
+				}
+			}
+			return Effects.Result.DONE;
+		}
+		int grown = 0;
+		boolean lacking = false;
+		for (BlockPos at : plants) {
 			if (!Effects.takeOne(ctx, FERTILIZER)) {
 				lacking = true;
 				break;
 			}
-			BlockPos at = p.immutable();
 			if (!BoneMealItem.growCrop(new ItemStack(Items.BONE_MEAL), level, at)) {
 				// Elle ne pouvait plus pousser : la poudre retourne à la matière du cercle.
 				ctx.flow().add(new ItemStack(Items.BONE_MEAL));
@@ -249,6 +277,9 @@ public final class Works {
 	 * au plafond, il monte. Les blocs taillés passent dans la matière du cercle.
 	 */
 	static Effects.Result tunnel(EffectContext ctx) {
+		if (!ctx.stage().aimsBlocks()) {
+			return Effects.Result.NO_TARGET;
+		}
 		ServerLevel level = ctx.level();
 		CircleFrame frame = ctx.frame();
 		List<BlockPos> bore;
@@ -277,6 +308,9 @@ public final class Works {
 	 * sur le cercle, de l'étage précédent ou du sac de l'alchimiste ; il s'arrête quand elles manquent.
 	 */
 	static Effects.Result bridge(EffectContext ctx) {
+		if (!ctx.stage().aimsBlocks()) {
+			return Effects.Result.NO_TARGET;
+		}
 		ServerLevel level = ctx.level();
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
 		int placed = 0;
@@ -305,6 +339,9 @@ public final class Works {
 	 * passe dans la matière du cercle, ce qui manque se prend sur le cercle ou dans le sac.
 	 */
 	static Effects.Result level(EffectContext ctx) {
+		if (!ctx.stage().aimsBlocks()) {
+			return Effects.Result.NO_TARGET;
+		}
 		ServerLevel level = ctx.level();
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
 		WorkShapes.Leveling plan = WorkShapes.leveling(ctx.circle(), ctx.support().getY(), ctx.range(), LEVEL_ABOVE,

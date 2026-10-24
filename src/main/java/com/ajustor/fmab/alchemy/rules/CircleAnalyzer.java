@@ -221,7 +221,7 @@ public final class CircleAnalyzer {
 				.filter(c -> formulaComplete(c, infusions, issues))
 				.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), -1, c, range(c, stage.intensity(), knowledge),
 						stage.intensity(), Vec2.ZERO, direction, infusions, stage.link(), stage.shape(),
-						stage.duration(), stage.targets())));
+						stage.duration(), stage.targets(), stage.aims())));
 
 		for (int i = 0; i < stage.satellites().size(); i++) {
 			Satellite s = stage.satellites().get(i);
@@ -233,7 +233,7 @@ public final class CircleAnalyzer {
 			combination(s.layer(GlyphLayer.ELEMENT), s.layer(GlyphLayer.ACTION), false, issues, knowledge)
 					.ifPresent(c -> out.add(new Analysis.StageEffect(stage.index(), index, c, range(c, 0, knowledge), 0,
 							s.center(), Double.isNaN(direction) ? s.center().angle() : direction, Set.of(),
-							stage.link(), "line", 0, 0)));
+							stage.link(), "line", 0, 0, Set.of())));
 		}
 		return out;
 	}

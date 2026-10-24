@@ -75,6 +75,23 @@ class ToolCirclesTest {
 		assertEquals(8, a.effects().getFirst().range(), 1e-9, "deux points doublent la portée");
 	}
 
+	/**
+	 * Le crochet de l'Objet sur l'anneau : le bûcheron ne recycle que les objets. Le glyphe pèse : il faut
+	 * un pentagone, donc un Alchimiste.
+	 */
+	@Test
+	void theItemGlyphRestrictsTheWoodcutterToItems() {
+		Analysis a = analyzer.analyze(parser.parse(example("treatise.fmab.everyday.aims").drawing()), Rank.ALCHEMIST, null);
+		assertEquals(Analysis.Outcome.WORKS, a.outcome(), () -> a.issues().toString());
+		Analysis.StageEffect fell = a.effects().getFirst();
+		assertEquals("fmab:fell", fell.combination().effect());
+		assertEquals(java.util.Set.of("item"), fell.aims());
+		assertTrue(fell.aimsItems() && !fell.aimsBlocks(), "les objets, pas les arbres");
+		Analysis plain = analyzer.analyze(parser.parse(example("treatise.fmab.everyday.recycling").drawing()), Rank.APPRENTICE, null);
+		assertTrue(plain.effects().getFirst().aimsItems() && plain.effects().getFirst().aimsBlocks(),
+				"sans glyphe de cible, rien ne change : les deux");
+	}
+
 	private static Treatise.ExamplePage example(String key) {
 		Optional<Treatise.ExamplePage> found = TreatiseTest.load().chapters().stream()
 				.flatMap(c -> c.pages().stream())

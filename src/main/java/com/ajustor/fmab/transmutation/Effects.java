@@ -326,13 +326,17 @@ public final class Effects {
 	 * un plafond, le cercle creuse un tunnel ({@link Works#tunnel}).
 	 */
 	private static Result decompose(EffectContext ctx) {
-		if (ctx.stage().hasDirection() || !ctx.frame().onFloor()) {
-			// Une flèche, ou un cercle sur un mur : un tunnel plutôt qu'un puits.
-			return Works.tunnel(ctx);
-		}
-		ServerLevel level = ctx.level();
 		// Les objets de pierre posés sur le cercle se défont aussi : on en comprend la structure.
 		int dismantled = Recomposition.dismantle(ctx);
+		if (!ctx.stage().aimsBlocks()) {
+			return dismantled > 0 ? Result.DONE : Result.NO_TARGET;
+		}
+		if (ctx.stage().hasDirection() || !ctx.frame().onFloor()) {
+			// Une flèche, ou un cercle sur un mur : un tunnel plutôt qu'un puits.
+			Result bored = Works.tunnel(ctx);
+			return dismantled > 0 ? Result.DONE : bored;
+		}
+		ServerLevel level = ctx.level();
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
 		BlockPos support = ctx.support();
 		BlockPos center = ctx.origin().below();
@@ -360,6 +364,9 @@ public final class Effects {
 	 * scellée dans une armure, debout sur le cercle, est réparée de même.
 	 */
 	private static Result repair(EffectContext ctx) {
+		if (!ctx.stage().aimsItems()) {
+			return Result.NO_TARGET;
+		}
 		ServerLevel level = ctx.level();
 		String element = ctx.stage().combination().elements().iterator().next();
 		TagKey<Item> materials = FmabTags.elementItems(element);

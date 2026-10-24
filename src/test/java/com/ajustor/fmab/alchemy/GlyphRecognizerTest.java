@@ -40,6 +40,21 @@ class GlyphRecognizerTest {
 		return tests;
 	}
 
+	/** Les glyphes de cible, tracés à la main sur la grille du carnet : le crochet et l'escalier. */
+	@Test
+	void theTargetGlyphsDrawnOnTheGridAreRecognized() {
+		List<Primitive> hook = List.of(
+				new Primitive.Polyline(List.of(new Vec2(10, 7.5), new Vec2(10, 11), new Vec2(9, 12.5), new Vec2(7.5, 11))),
+				new Primitive.Line(new Vec2(9, 9), new Vec2(11, 9)));
+		assertEquals("fmab:objet", recognize(hook));
+		List<Primitive> stairs = List.of(
+				new Primitive.Polyline(List.of(new Vec2(7.5, 12.5), new Vec2(7.5, 11), new Vec2(9, 11), new Vec2(9, 9.5),
+						new Vec2(10.5, 9.5), new Vec2(10.5, 8), new Vec2(12, 8), new Vec2(12, 12.5), new Vec2(7.5, 12.5))),
+				new Primitive.Line(new Vec2(9, 11), new Vec2(9, 12.5)),
+				new Primitive.Line(new Vec2(10.5, 9.5), new Vec2(10.5, 12.5)));
+		assertEquals("fmab:bloc", recognize(stairs));
+	}
+
 	@Test
 	void earthNeedsItsBarAndWaterHasNone() {
 		assertEquals("fmab:eau", recognize(TestGlyphs.drawn("eau", new Vec2(10, 10), 3, 0)));

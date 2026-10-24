@@ -96,7 +96,9 @@
                     "fmab:forme_cercle",
                     "fmab:forme_cone",
                     "fmab:duree",
-                    "fmab:cibles"
+                    "fmab:cibles",
+                    "fmab:objet",
+                    "fmab:bloc"
                   ]
                 }
               }

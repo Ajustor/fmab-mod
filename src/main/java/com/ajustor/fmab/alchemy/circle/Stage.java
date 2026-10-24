@@ -58,6 +58,20 @@ public record Stage(
 		return (int) modifiers.stream().filter(g -> g.role().equals("duration")).count();
 	}
 
+	/**
+	 * Ce que visent les glyphes de cible posés sur l'anneau : {@code item} (Objet), {@code block}
+	 * (Bloc). Vide sans glyphe de cible : l'effet agit sur tout ce qu'il sait toucher.
+	 */
+	public java.util.Set<String> aims() {
+		java.util.Set<String> out = new java.util.TreeSet<>();
+		for (Glyph g : modifiers) {
+			if (g.role().startsWith("aim_")) {
+				out.add(g.role().substring("aim_".length()));
+			}
+		}
+		return java.util.Set.copyOf(out);
+	}
+
 	/** Combien de glyphes de cibles sur l'anneau. */
 	public int targets() {
 		return (int) modifiers.stream().filter(g -> g.role().equals("targets")).count();
