@@ -76,7 +76,9 @@ l'examen d'État à Central, la Porte, les homonculus, puis Père.
   golem), Initié de la Porte. La concentration grandit avec le rang ; un cercle au-delà du rang
   marche, mais perd de sa stabilité. Maîtrise par école (Terre, Métal,
   Eau, Feu, Explosion, Destruction, Médecine, Vie) ; un glyphe non compris marche avec un risque de
-  rebond, et s'apprend par l'usage ou par les tomes.
+  rebond, et s'apprend par l'usage ou par les tomes, qui tombent en poussière une fois lus. Un
+  alchimiste peut consigner les glyphes de son choix dans un livre vierge (bouton « Consigner » du
+  Traité) : des notes à son nom, pour un autre.
 - **Cercles portés** : gants brodés ou gravés (dont les gants à silex de Mustang et les gantelets),
   vêtements brodés, tatouages par rituel, aux passifs permanents.
 - **La Porte** : sans Pierre philosophale, la transmutation humaine échoue toujours et happe
@@ -267,7 +269,9 @@ Central, the Gate, the homunculi, then Father.
   golem), Gate initiate; concentration grows with rank; a circle beyond your rank works but loses
   stability; mastery per school (Earth, Metal, Water, Fire, Explosion, Destruction,
   Medicine, Life); unknown glyphs work with
-  a rebound risk and are learned through use or tomes.
+  a rebound risk and are learned through use or tomes, which crumble once read. An alchemist can
+  write the glyphs of their choice into a blank book ("Write notes" in the Treatise): notes in their
+  name, for someone else.
 - **Worn circles**: embroidered or engraved gloves (including Mustang's spark gloves and
   gauntlets), embroidered clothes, ritual tattoos with permanent passives.
 - **The Gate**: without a Philosopher's Stone, human transmutation always fails and drags the

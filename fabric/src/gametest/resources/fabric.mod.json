@@ -11,6 +11,8 @@
 			"com.ajustor.fmab.gametest.RecompositionScenes",
 			"com.ajustor.fmab.gametest.StoneGateScenes",
 			"com.ajustor.fmab.gametest.GateScenes",
+			"com.ajustor.fmab.gametest.BellyScenes",
+			"com.ajustor.fmab.gametest.TomeScenes",
 			"com.ajustor.fmab.gametest.BlockScenes",
 			"com.ajustor.fmab.gametest.TownScenes",
 			"com.ajustor.fmab.gametest.FigureScenes",

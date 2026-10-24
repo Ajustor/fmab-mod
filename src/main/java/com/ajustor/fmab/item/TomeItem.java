@@ -24,7 +24,10 @@ import net.minecraft.world.level.Level;
 import java.util.function.Consumer;
 
 /**
- * Tome d'alchimie : le lire enseigne ses glyphes. Il ne se consume pas ; on peut le prêter.
+ * Tome d'alchimie : le lire enseigne ses glyphes, une fois. Le savoir passe dans la tête du lecteur et
+ * le tome tombe en poussière ; un tome qui n'apprend rien de neuf reste intact, et peut se donner. Un
+ * alchimiste peut consigner une part de son savoir dans des notes, pour un autre (voir
+ * {@link com.ajustor.fmab.network.ConsignPayload}).
  */
 public class TomeItem extends Item {
 	public TomeItem(Properties properties) {
@@ -37,13 +40,15 @@ public class TomeItem extends Item {
 		if (tome == null) {
 			return InteractionResult.PASS;
 		}
-		if (player instanceof ServerPlayer server) {
-			read(server, tome);
+		if (player instanceof ServerPlayer server && read(server, tome) && !server.isCreative()) {
+			player.getItemInHand(hand).shrink(1);
+			server.sendSystemMessage(Component.translatable("tome.fmab.spent").withStyle(ChatFormatting.GRAY));
 		}
 		return InteractionResult.SUCCESS;
 	}
 
-	private static void read(ServerPlayer player, Tome tome) {
+	/** @return vrai si le lecteur a appris quelque chose : le tome a servi */
+	private static boolean read(ServerPlayer player, Tome tome) {
 		AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(player);
 		AlchemyRules rules = AlchemyRules.of(player.level().registryAccess());
 		int learned = 0;
@@ -62,16 +67,20 @@ public class TomeItem extends Item {
 		}
 		if (learned == 0) {
 			player.sendOverlayMessage(Component.translatable("tome.fmab.nothing_new"));
-			return;
+			return false;
 		}
 		FmabAttachments.ALCHEMIST.set(player, data);
 		player.level().playSound(null, player.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1, 1);
+		return true;
 	}
 
 	@Override
 	public Component getName(ItemStack stack) {
 		Tome tome = stack.get(FmabComponents.TOME);
-		return tome == null ? super.getName(stack) : Component.translatable(tome.titleKey());
+		if (tome == null) {
+			return super.getName(stack);
+		}
+		return tome.author().map(a -> Component.translatable(tome.titleKey(), a)).orElseGet(() -> Component.translatable(tome.titleKey()));
 	}
 
 	@Override

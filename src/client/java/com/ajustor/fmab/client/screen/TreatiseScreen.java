@@ -119,6 +119,10 @@ public class TreatiseScreen extends Screen {
 		contentsButtons.add(addRenderableWidget(Button.builder(Component.translatable("knowledge.fmab.title"),
 				b -> minecraft.gui.setScreen(new KnowledgeScreen(this)))
 				.bounds(left + BOOK_WIDTH - 90, top + 6, 80, 16).build()));
+		// Consigner son savoir dans un livre, pour un autre alchimiste.
+		contentsButtons.add(addRenderableWidget(Button.builder(Component.translatable("tome.fmab.consign.open"),
+				b -> minecraft.gui.setScreen(new ConsignScreen(this)))
+				.bounds(left + 10, top + 6, 80, 16).build()));
 		// Le sommaire, comme dans un livre : deux colonnes de titres qui passent à la ligne plutôt que d'être
 		// coupés, et qu'on clique.
 		links.clear();
