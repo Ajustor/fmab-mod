@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 1.14.0 — 2026-10-24
+
+### Nouveautés
+
+- Les tomes s'usent : lu, un tome enseigne ses glyphes puis tombe en poussière (sauf s'il n'apprend rien de neuf). Un alchimiste peut consigner les glyphes de son choix dans un livre vierge (bouton « Consigner » du Traité) pour les transmettre à un autre.
+
+### Corrections
+
+- Une transmutation humaine dans le Ventre de Gluttony emporte l'alchimiste devant la Porte, puis le ramène là où Gluttony l'avait avalé (et non plus au point d'apparition du monde).
 ## 1.13.0 — 2026-10-24
 
 ### Nouveautés

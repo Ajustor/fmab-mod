@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.14.0 — 2026-10-24
+
+### New features
+
+- Tomes wear out: once read, a tome teaches its glyphs and crumbles to dust (unless it teaches nothing new). An alchemist can write the glyphs of their choice into a blank book ("Write notes" button in the Treatise) to pass them on to someone else.
+
+### Fixes
+
+- A human transmutation in Gluttony's Belly takes the alchemist to the Gate, then brings them back where Gluttony swallowed them (no longer to the world spawn).
 ## 1.13.0 — 2026-10-24
 
 ### New features
