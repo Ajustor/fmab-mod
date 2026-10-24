@@ -1,1 +1,1 @@
-{ "elements": ["fire"], "action": "decompose", "effect": "fmab:smelt", "range": 1 }
+{"elements": ["fire"], "action": "decompose", "effect": "fmab:smelt", "range": 1, "spec": {"steps": [{"target": "effect", "effect": "fmab:smelt"}, {"target": "entities", "only_aimed": true, "operation": "ignite", "seconds": 5}]}}

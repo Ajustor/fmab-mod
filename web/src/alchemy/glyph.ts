@@ -80,7 +80,12 @@ export interface Combination {
   readonly requires?: string;
   /** Éléments que des satellites doivent infuser dans l'étage, sinon le cercle rebondit. */
   readonly formula: ReadonlySet<string>;
+  /** Pour un joker (éléments ["*"]), les éléments auxquels il ne s'applique pas. */
+  readonly except: ReadonlySet<string>;
 }
+
+/** Les éléments d'un joker : il vaut pour tout élément seul qui n'a pas sa propre combinaison. */
+export const ANY = "*";
 
 const SCHOOLS: Record<string, string> = {
   earth: "earth",
@@ -100,9 +105,10 @@ export function parseCombination(id: string, json: Record<string, unknown>): Com
     action: String(json.action),
     effect: String(json.effect),
     range: json.range === undefined ? 1 : Number(json.range),
-    school: json.school ? String(json.school) : (SCHOOLS[first] ?? "earth"),
+    school: json.school !== undefined ? String(json.school) : elements.has(ANY) ? "" : (SCHOOLS[first] ?? "earth"),
     requires: json.requires ? String(json.requires) : undefined,
     formula: new Set(((json.formula as string[] | undefined) ?? []).map(String)),
+    except: new Set(((json.except as string[] | undefined) ?? []).map(String)),
   };
 }
 
@@ -112,7 +118,13 @@ const sameSet = (a: ReadonlySet<string>, b: ReadonlySet<string>): boolean =>
 export class CombinationTable {
   constructor(readonly all: readonly Combination[]) {}
 
+  /** La combinaison de ces éléments : la sienne d'abord, sinon, pour un élément seul, le joker de l'action. */
   find(elements: ReadonlySet<string>, action: string): Combination | undefined {
-    return this.all.find((c) => c.action === action && sameSet(c.elements, elements));
+    const exact = this.all.find((c) => c.action === action && sameSet(c.elements, elements));
+    if (exact !== undefined || elements.size !== 1) return exact;
+    const element = [...elements][0];
+    const wildcard = this.all.find((c) => c.elements.has(ANY) && c.action === action && !c.except.has(element));
+    if (wildcard === undefined) return undefined;
+    return { ...wildcard, elements: new Set([element]), school: wildcard.school || (SCHOOLS[element] ?? "earth"), except: new Set() };
   }
 }

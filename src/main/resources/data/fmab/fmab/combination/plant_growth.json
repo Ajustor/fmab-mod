@@ -1,1 +1,1 @@
-{ "elements": ["plant"], "action": "project", "effect": "fmab:grow", "range": 3, "school": "life" }
+{"elements": ["plant"], "action": "project", "effect": "fmab:grow", "range": 3, "school": "life", "spec": {"steps": [{"target": "effect", "effect": "fmab:grow"}, {"target": "entities", "only_aimed": true, "filter": "animal", "operation": "grow_up"}]}}

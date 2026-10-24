@@ -254,9 +254,7 @@ public final class Transmutation {
 				EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, flow, knowledge,
 						watch ? StateWatch.RANGE_BONUS : 0,
 						size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1) * fusion, 0);
-				Effects.Result result = Effects.get(effect.combination().effect())
-						.map(e -> e.apply(ctx))
-						.orElse(Effects.Result.NO_TARGET);
+				Effects.Result result = Effects.run(effect.combination(), ctx);
 				flow.removeIf(ItemStack::isEmpty);
 				if (result == Effects.Result.DONE) {
 					stageResult = result;
@@ -410,7 +408,7 @@ public final class Transmutation {
 		boolean watch = StateWatch.empowers(caster);
 		boolean anything = false;
 		for (Analysis.StageEffect effect : analysis.effects()) {
-			Effects.Channel mode = Effects.channel(effect.combination().effect());
+			Effects.Channel mode = Effects.channel(effect.combination());
 			if (mode == Effects.Channel.ONCE) {
 				continue;
 			}
@@ -418,9 +416,7 @@ public final class Transmutation {
 					watch ? StateWatch.RANGE_BONUS : 0,
 					size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1),
 					mode == Effects.Channel.GROW ? growth(prolonged, living) : 0);
-			Effects.Result result = Effects.get(effect.combination().effect())
-					.map(e -> e.apply(ctx))
-					.orElse(Effects.Result.NO_TARGET);
+			Effects.Result result = Effects.run(effect.combination(), ctx);
 			anything |= result == Effects.Result.DONE;
 		}
 		EntityCompat.swing(caster, InteractionHand.MAIN_HAND, true);

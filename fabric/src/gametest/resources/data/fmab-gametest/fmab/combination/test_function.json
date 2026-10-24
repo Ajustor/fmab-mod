@@ -1,0 +1,1 @@
+{ "elements": ["gold"], "action": "fix", "effect": "fmab:matter_wall", "range": 2, "spec": { "target": "function", "function": "fmab-gametest:mark" } }

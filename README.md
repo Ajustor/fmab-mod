@@ -139,6 +139,11 @@ Tout ce qui peut être data-driven l'est : glyphes (`data/<ns>/fmab/glyph`), com
 (`data/<ns>/fmab/exchange`), éléments visés (tags `fmab:element/*`), pages du Traité, lieux
 (`data/fmab/worldgen`), Espace blanc et Ventre (`data/fmab/dimension`).
 
+Les effets eux-mêmes peuvent se décrire en données : une combinaison donne une zone, un filtre et une
+opération (briser, poser, geler, blesser, soigner…), ou lance une fonction de datapack ; des jokers
+(`"elements": ["*"]`) donnent un effet à tout élément, ceux des autres mods compris. Voir
+[DATAPACKS.md](DATAPACKS.md).
+
 Configuration du serveur : `config/fmab.json`, créé au premier lancement.
 `restart_wipes_progress` (par défaut `true`) : une âme qui repart de zéro devant la Vérité perd aussi
 toute sa progression d'alchimiste ; à `false`, elle ne retrouve que son corps.
@@ -299,6 +304,13 @@ Central, the Gate, the homunculi, then Father.
 Use `/locate structure fmab:<id>`: `central`, `resembool`, `dublith`, `rush_valley`, `liore`,
 `ishval_ruins`, `xerxes_ruins`, `marcoh_clinic`, `laboratory_5`, `devils_nest`, `xing`,
 `fort_briggs`, `blood_crest`, `yock_island` (see the French table above for who lives where).
+
+### Datapacks
+
+Glyphs, combinations and element tags are data, and so are effects: a combination can describe a zone,
+a filter and an operation (break, place, freeze, damage, heal…), or run a datapack function; wildcards
+(`"elements": ["*"]`) give an effect to any element, other mods' included. See
+[DATAPACKS.md](DATAPACKS.md).
 
 ### Development and releases
 

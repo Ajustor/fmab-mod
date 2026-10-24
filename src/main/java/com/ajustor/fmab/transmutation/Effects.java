@@ -149,6 +149,22 @@ public final class Effects {
 		return CHANNELS.getOrDefault(id, Channel.ONCE);
 	}
 
+	/** Le canal d'une combinaison : celui de son effet codé, ou celui que son effet en données demande. */
+	public static Channel channel(com.ajustor.fmab.alchemy.rules.Combination c) {
+		if (c.spec().isPresent() && c.spec().get().has("channel")) {
+			return Channel.valueOf(c.spec().get().get("channel").getAsString().toUpperCase(java.util.Locale.ROOT));
+		}
+		return channel(c.effect());
+	}
+
+	/** Déclenche l'effet d'une combinaison : décrit en données s'il l'est, sinon l'effet codé de ce nom. */
+	public static Result run(com.ajustor.fmab.alchemy.rules.Combination c, EffectContext ctx) {
+		if (c.spec().isPresent()) {
+			return DataEffects.apply(ctx, c.spec().get());
+		}
+		return get(c.effect()).map(e -> e.apply(ctx)).orElse(Result.NO_TARGET);
+	}
+
 	private Effects() {
 	}
 
