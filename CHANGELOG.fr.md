@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 1.13.0 — 2026-10-24
+
+### Nouveautés
+
+- Deux nouveaux glyphes, Objet et Bloc, choisissent ce que touche un cercle : recycler la hache posée sans abattre les arbres, ou l'inverse. L'engrais avec une Pierre philosophale fait pousser toute la zone jusqu'à maturité pour une seule âme, sans poudre d'os.
+- Le moteur d'alchimie s'ouvre : chaque élément sait désormais se fixer en mur, se projeter en pique et réparer ce qui est fait de lui, un nouveau glyphe Créature ajoute aux cercles ce qu'ils font aux créatures (geler, enflammer, faire grandir, soigner), et les datapacks peuvent décrire de nouveaux effets ou lancer leurs propres fonctions sans mise à jour du mod (voir DATAPACKS.md).
 ## 1.12.1 — 2026-10-24
 
 ### Corrections

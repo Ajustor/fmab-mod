@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.13.0 — 2026-10-24
+
+### New features
+
+- Two new glyphs, Item and Block, choose what a circle touches: recycle the axe laid on it without felling the trees, or the other way round. The fertiliser with a Philosopher's Stone grows the whole area to maturity for a single soul, without bone meal.
+- The alchemy engine opens up: every element can now be fixed into a wall, projected as a spike and repair what is made of it, a new Creature glyph adds to circles what they do to creatures (freeze, ignite, grow up, heal), and datapacks can describe new effects or run their own functions without a mod update (see DATAPACKS.md).
 ## 1.12.1 — 2026-10-24
 
 ### Fixes
