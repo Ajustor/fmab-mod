@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.15.0 — 2026-10-24
+
+### New features
+
+- The Philosopher's Stone has its own circle, learned from the rare Notes on the Philosopher's Stone: it asks for its radius (up to 64 blocks, a whole farm) and consumes the lives within; crystallized blood laid on it becomes the Stone, and without blood, whoever stands at the center becomes a living Stone, no eclipse needed. A living Stone transmutes without a circle. The human transmutation circle no longer makes Stones.
 ## 1.14.0 — 2026-10-24
 
 ### New features

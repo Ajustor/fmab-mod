@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.15.0 — 2026-10-24
+
+### Nouveautés
+
+- La Pierre philosophale a son propre cercle, appris dans les rares Notes sur la Pierre philosophale : il demande son rayon (jusqu'à 64 blocs, toute une ferme) et consume les vies qui s'y trouvent ; du sang cristallisé posé dessus devient la Pierre, et sans sang, celui qui se tient au centre devient une Pierre vivante, sans attendre l'éclipse. Une Pierre vivante transmute sans cercle. Le cercle de transmutation humaine ne fait plus de Pierre.
 ## 1.14.0 — 2026-10-24
 
 ### Nouveautés
