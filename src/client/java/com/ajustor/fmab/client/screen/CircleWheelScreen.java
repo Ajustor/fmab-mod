@@ -76,7 +76,10 @@ public class CircleWheelScreen extends Screen {
 			return;
 		}
 		AlchemistData data = FmabAttachments.ALCHEMIST.get(mc.player);
-		mc.gui.setScreen(new CircleWheelScreen(key, contents, data != null && data.rank().atLeast(Rank.GATE)));
+		// Un Initié de la Porte, ou une Pierre vivante, joint les mains sans cercle.
+		Integer stone = FmabAttachments.LIVING_STONE.get(mc.player);
+		mc.gui.setScreen(new CircleWheelScreen(key, contents, data != null && data.rank().atLeast(Rank.GATE)
+				|| stone != null && stone > 0));
 	}
 
 	// ---- Roues ---------------------------------------------------------------------------------

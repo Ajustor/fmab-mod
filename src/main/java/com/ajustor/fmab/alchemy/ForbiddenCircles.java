@@ -59,6 +59,33 @@ public final class ForbiddenCircles {
 			 {"type": "line", "from": [17.12, 18.18], "to": [14.88, 20.42]}]
 			""");
 
+	/** L'effet du cercle de la Pierre philosophale. */
+	public static final String PHILOSOPHER_STONE_EFFECT = "fmab:philosopher_stone";
+
+	/**
+	 * La Pierre philosophale : Humain et Décomposer au centre d'un hexagramme inscrit dans un hexagone,
+	 * un double anneau autour, à la portée d'un Alchimiste. Avec du sang cristallisé posé dessus, ou
+	 * quelqu'un debout en son centre, il consume les vies de son aire et condense leurs âmes (voir
+	 * {@code StoneCircle}). Le cercle de Xerxès, à l'échelle d'un champ.
+	 */
+	public static final Drawing PHILOSOPHER_STONE = parse("""
+			[{"type": "circle", "center": [16, 16], "radius": 14},
+			 {"type": "circle", "center": [16, 16], "radius": 13.3},
+			 {"type": "polygon", "points": [[16.0, 2.0], [28.12, 23.0], [3.88, 23.0]]},
+			 {"type": "polygon", "points": [[16.0, 30.0], [3.88, 9.0], [28.12, 9.0]]},
+			 {"type": "polygon", "points": [[16.0, 2.0], [28.12, 9.0], [28.12, 23.0], [16.0, 30.0], [3.88, 23.0], [3.88, 9.0]]},
+			 {"type": "circle", "center": [16.0, 10.5], "radius": 1.0},
+			 {"type": "line", "from": [16.0, 11.5], "to": [16.0, 13.0]},
+			 {"type": "line", "from": [14.0, 12.0], "to": [18.0, 12.0]},
+			 {"type": "polyline", "points": [[14.5, 14.5], [16.0, 13.0], [17.5, 14.5]]},
+			 {"type": "line", "from": [14.5, 20.0], "to": [17.5, 20.0]},
+			 {"type": "line", "from": [16.0, 18.5], "to": [16.0, 21.5]},
+			 {"type": "circle", "center": [18.0, 20.0], "radius": 0.5},
+			 {"type": "circle", "center": [14.0, 20.0], "radius": 0.5},
+			 {"type": "circle", "center": [16.0, 22.0], "radius": 0.5},
+			 {"type": "circle", "center": [16.0, 18.0], "radius": 0.5}]
+			""");
+
 	private ForbiddenCircles() {
 	}
 

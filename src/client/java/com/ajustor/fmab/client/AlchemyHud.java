@@ -63,7 +63,8 @@ final class AlchemyHud {
 	/** Le cercle sélectionné sert-il en ce moment ? */
 	private static boolean usable(LocalPlayer player) {
 		AlchemistData data = FmabAttachments.ALCHEMIST.get(player);
-		return data != null && data.rank().atLeast(Rank.GATE) || inscribes(player.getMainHandItem())
+		Integer stone = FmabAttachments.LIVING_STONE.get(player);
+		return data != null && data.rank().atLeast(Rank.GATE) || stone != null && stone > 0 || inscribes(player.getMainHandItem())
 				|| inscribes(player.getOffhandItem());
 	}
 
