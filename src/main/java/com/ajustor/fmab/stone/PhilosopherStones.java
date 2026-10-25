@@ -89,7 +89,8 @@ public final class PhilosopherStones {
 				return;
 			}
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				if (carries(player) || LivingStone.souls(player) > 0) {
+				// Une Pierre vivante se cache dans un corps, comme Hohenheim : seule la Pierre qu'on porte se voit.
+				if (carries(player)) {
 					lure(player);
 				}
 			}

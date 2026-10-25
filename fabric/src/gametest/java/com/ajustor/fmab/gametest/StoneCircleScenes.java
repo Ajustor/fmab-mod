@@ -27,6 +27,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.item.ItemStack;
@@ -97,6 +98,8 @@ public class StoneCircleScenes implements FabricClientGameTest {
 			check(onServer(sp, p -> p.level().getEntitiesOfClass(ItemEntity.class, new AABB(CIRCLE).inflate(3),
 					e -> e.getItem().is(FmabItems.PHILOSOPHER_STONE)).isEmpty()), "aucune Pierre en objet : c'est lui, la Pierre");
 			context.takeScreenshot("stone_circle_living");
+			context.waitTicks(30);
+			check(!onServer(sp, p -> p.hasEffect(MobEffects.GLOWING)), "une Pierre vivante ne luit pas : elle se cache dans un corps");
 
 			// 3. Le cercle de transmutation humaine, du sang dessus, ne fait plus de Pierre.
 			sp.getServer().runCommand("tp @p 0.5 -60 -2.5 0 30");
