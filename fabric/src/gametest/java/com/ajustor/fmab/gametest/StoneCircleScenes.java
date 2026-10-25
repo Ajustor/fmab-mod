@@ -100,6 +100,13 @@ public class StoneCircleScenes implements FabricClientGameTest {
 			context.takeScreenshot("stone_circle_living");
 			context.waitTicks(30);
 			check(!onServer(sp, p -> p.hasEffect(MobEffects.GLOWING)), "une Pierre vivante ne luit pas : elle se cache dans un corps");
+			onServer(sp, p -> {
+				p.getFoodData().setFoodLevel(2);
+				return null;
+			});
+			context.waitTicks(30);
+			check(onServer(sp, p -> p.getFoodData().getFoodLevel()) == 20,
+					"une Pierre vivante n'a jamais faim : " + onServer(sp, p -> p.getFoodData().getFoodLevel()));
 
 			// 3. Le cercle de transmutation humaine, du sang dessus, ne fait plus de Pierre.
 			sp.getServer().runCommand("tp @p 0.5 -60 -2.5 0 30");

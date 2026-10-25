@@ -102,7 +102,7 @@ l'examen d'État à Central, la Porte, les homonculus, puis Père.
   alchimiste qui a vu sa Porte rend à un allié debout dans son cercle ce que la Porte lui a pris, et
   même sa Porte s'il l'a donnée : seule une Pierre la paie, au plus haut prix, et il repart de zéro.
   **Karma**, **éclipse** tous les huit jours, **Pierre vivante** : elle transmute sans attendre et sans
-  cercle, et les
+  cercle, n'a plus besoin de manger, et les
   projectiles qui la visent se défont en matière dans ses poches.
 - **Homonculus** qui se reconstituent tant que leur Pierre a des âmes : Lust, Gluttony (et son Ventre),
   Envy le déguisé, Greed (allié possible), Sloth, Wrath, Pride ; enfin **Père** et sa zone
@@ -297,7 +297,7 @@ Central, the Gate, the homunculi, then Father.
   radius you give it, up to a whole farm; crystallized blood laid on it becomes the Stone, or, without
   blood, whoever stands at the center becomes a living Stone.
   **Karma**, an **eclipse** every eighth day, the **Living Stone**: it transmutes without waiting or a
-  circle,
+  circle, no longer needs to eat,
   and projectiles aimed at it come apart into matter in its pockets.
 - **Homunculi** that reconstitute while their Stone holds souls: Lust, Gluttony (and his Belly),
   Envy in disguise, Greed (a possible ally), Sloth, Wrath, Pride; finally **Father** and his
