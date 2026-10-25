@@ -278,7 +278,7 @@ public final class Transmutation {
 			if (inscribed && !remote) {
 				CHANNELS.put(caster.getUUID(), new Channel(circle, level.getGameTime(), 0));
 			}
-			TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 1);
+			TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 1, amplified);
 			// Le souffle de l'alchimie, puis le son de ce qu'elle a fait de la matière.
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 0.5f, 1.4f);
 			level.playSound(null, circle, schoolSound(practiced.getFirst()), SoundSource.PLAYERS, 1, 1);
@@ -294,7 +294,7 @@ public final class Transmutation {
 		caster.sendOverlayMessage(Component.translatable(last == Effects.Result.NO_MATERIAL
 				? "transmutation.fmab.no_material"
 				: "transmutation.fmab.no_target"));
-		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.3);
+		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.3, amplified);
 		return Result.NOTHING;
 	}
 
@@ -427,7 +427,7 @@ public final class Transmutation {
 			return true;
 		}
 		CHANNELS.put(caster.getUUID(), new Channel(circle, now, prolonged));
-		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.4);
+		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.4, amplified);
 		return true;
 	}
 

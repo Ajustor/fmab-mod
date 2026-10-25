@@ -13,7 +13,9 @@ import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.Transmutation;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -50,6 +52,9 @@ public class StoneCostScenes implements FabricClientGameTest {
 				return result + " " + PhilosopherStoneItem.souls(stone);
 			});
 			check(wall.equals("DONE 98"), "un mur avec la Pierre devrait coûter deux âmes : " + wall);
+			check(server(sp, p -> TransmutationLightning.crackles(p.level(), new BlockPos(0, -60, 4), true)
+					&& !TransmutationLightning.crackles(p.level(), new BlockPos(0, -60, 4), false)),
+					"une Pierre en main : les éclairs de la transmutation sont rouges");
 
 			// Le garder sous la main : la première prolongation paie déjà une âme.
 			String held = server(sp, p -> {
@@ -81,6 +86,19 @@ public class StoneCostScenes implements FabricClientGameTest {
 				return result + " " + LivingStone.souls(p);
 			});
 			check(living.equals("DONE 49"), "un mur coûte une âme à la Pierre vivante : " + living);
+			check(server(sp, p -> TransmutationLightning.crackles(p.level(), new BlockPos(30, -60, 4), true)),
+					"une Pierre vivante : ses éclairs sont rouges");
+
+			// Sans Pierre, l'alchimie reste bleue.
+			String plain = server(sp, p -> {
+				FmabAttachments.LIVING_STONE.remove(p);
+				Concentration.set(p, Concentration.max(p));
+				BlockPos circle = new BlockPos(40, -60, 4);
+				Transmutation.Result result = cast(p, circle, "fmab:terre", "fmab:fixer");
+				return result + " " + TransmutationLightning.crackles(p.level(), circle, false)
+						+ " " + TransmutationLightning.crackles(p.level(), circle, true);
+			});
+			check(plain.equals("DONE true false"), "sans Pierre, des éclairs bleus : " + plain);
 		}
 	}
 

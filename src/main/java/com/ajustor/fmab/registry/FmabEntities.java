@@ -20,6 +20,7 @@ import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.FatherEntity;
 import com.ajustor.fmab.entity.FatherSunEntity;
 import com.ajustor.fmab.entity.GateHandEntity;
+import com.ajustor.fmab.entity.SoulEyeEntity;
 import com.ajustor.fmab.entity.GluttonyEntity;
 import com.ajustor.fmab.entity.GreedEntity;
 import com.ajustor.fmab.entity.HauntedArmorEntity;
@@ -395,6 +396,17 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.updateInterval(2)
 					.build(GATE_HAND_KEY));
+
+	private static final ResourceKey<EntityType<?>> SOUL_EYE_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("soul_eye"));
+
+	/** Un œil qui s'ouvre dans le sol sous un être dont on prend l'âme, le temps qu'il meure. */
+	public static final EntityType<SoulEyeEntity> SOUL_EYE = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, SOUL_EYE_KEY,
+			EntityType.Builder.<SoulEyeEntity>of(SoulEyeEntity::new, MobCategory.MISC)
+					.noSave()
+					.sized(0.4F, 0.1F)
+					.clientTrackingRange(10)
+					.updateInterval(2)
+					.build(SOUL_EYE_KEY));
 
 	private static final ResourceKey<EntityType<?>> MARCOH_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("marcoh"));
 

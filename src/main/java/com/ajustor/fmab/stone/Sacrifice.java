@@ -4,14 +4,10 @@ import com.ajustor.fmab.entity.ChimeraBeastEntity;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.Effects;
-import com.ajustor.fmab.transmutation.TransmutationLightning;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.animal.golem.AbstractGolem;
@@ -19,9 +15,7 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +30,9 @@ import java.util.Optional;
  * Pierre : les âmes se fondent dans son corps, comme en Hohenheim au centre du cercle de Xerxès, et il
  * devient une Pierre philosophale vivante (ou grossit celle qu'il est déjà). Le karma de l'alchimiste
  * s'effondre.
+ *
+ * <p>Le sacrifice ne foudroie pas d'un coup : il se joue en un rite de quelques secondes, comme à Xerxès
+ * (voir {@link StoneRite}).
  */
 public final class Sacrifice {
 	private static final int VILLAGER_SOULS = 12;
@@ -46,7 +43,6 @@ public final class Sacrifice {
 	static final int MAX_SOULS = 100;
 	/** Être au centre du cercle : dans le bloc du cercle, à peu près. */
 	private static final double CENTER = 0.8;
-	private static final DustParticleOptions RED = new DustParticleOptions(0xD01020, 1.2f);
 
 	/** Ce qu'un sacrifice consume : tout ce qui vit, sauf les joueurs, les homonculus et ce qui a un maître. */
 	static List<LivingEntity> victims(ServerLevel level, AABB area) {
@@ -113,25 +109,9 @@ public final class Sacrifice {
 			caster.sendOverlayMessage(Component.translatable("stone.fmab.circle_needs_blood"));
 			return Effects.Result.NO_MATERIAL;
 		}
-		for (LivingEntity victim : victims) {
-			level.sendParticles(RED, victim.getX(), victim.getY(0.5), victim.getZ(), 30, 0.3, 0.6, 0.3, 0);
-			victim.kill(level);
-		}
-		Vec3 at = Vec3.atCenterOf(circle);
-		if (vessel.isPresent()) {
-			LivingStone.become(vessel.get(), souls, circle);
-		} else {
-			for (int filled : stones(souls)) {
-				ItemStack stone = new ItemStack(FmabItems.PHILOSOPHER_STONE);
-				stone.setDamageValue(stone.getMaxDamage() - filled);
-				level.addFreshEntity(new ItemEntity(level, at.x, at.y, at.z, stone));
-			}
-			caster.sendSystemMessage(Component.translatable("stone.fmab.sacrifice_done", souls));
-		}
-		TransmutationLightning.discharge(level, circle, 3, 1.2);
-		level.sendParticles(RED, at.x, at.y + 0.5, at.z, 200, 2, 0.5, 2, 0);
-		level.playSound(null, circle, SoundEvents.WITHER_DEATH, SoundSource.PLAYERS, 0.8f, 1.6f);
+		// Le cercle est lancé : la faute est commise, même si l'alchimiste s'en va avant la fin du rite.
 		Karma.add(caster, -(villagers * 10 + beasts * 2));
+		StoneRite.start(level, caster, circle, area.getXsize() / 2 - 0.5, victims, souls, vessel.orElse(null));
 		return Effects.Result.DONE;
 	}
 }

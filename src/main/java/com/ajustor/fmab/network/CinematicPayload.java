@@ -20,6 +20,10 @@ public record CinematicPayload(String kind, int ticks) implements CustomPacketPa
 	public static final String GATE_KNOWLEDGE = "gate_knowledge";
 	/** L'éclipse du Jour promis : le titre, le ciel rouge. */
 	public static final String PROMISED_DAY = "promised_day";
+	/** Le rite de la Pierre, pour ceux qui sont pris dans le cercle : la lumière rouge, les âmes qui filent, l'éclat. */
+	public static final String STONE_RITE = "stone_rite";
+	/** Le même rite, pour celui qui se tient au centre : les âmes entrent en lui, des yeux s'ouvrent partout. */
+	public static final String STONE_VESSEL = "stone_vessel";
 	/** Père tombe : les bras de la Vérité l'emportent, éclair blanc. */
 	public static final String FATHER_FALL = "father_fall";
 	/** L'épilogue : ce que deviennent les personnages, une fois Père tombé et Hohenheim parti. */

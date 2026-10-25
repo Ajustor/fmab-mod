@@ -9,12 +9,14 @@ import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.entity.SoulEyeEntity;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.StoneCircle;
+import com.ajustor.fmab.stone.StoneRite;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.Effects;
@@ -76,9 +78,22 @@ public class StoneCircleScenes implements FabricClientGameTest {
 			check(cast(context, sp, ForbiddenCircles.PHILOSOPHER_STONE), "le cercle de la Pierre devrait s'éveiller");
 			Effects.Result farm = onServer(sp, p -> StoneCircle.answer(p, 24));
 			context.setScreen(() -> null);
-			context.waitTicks(10);
+			context.waitTicks(StoneRite.AWAKENING - 5);
 			check(farm == Effects.Result.DONE, "le sacrifice devrait avoir lieu : " + farm);
+			// Le rite se joue comme à Xerxès : la lumière gagne le cercle avant que les vies tombent.
+			check(alive(sp) == 10, "pendant l'éveil du cercle, la ferme est figée mais encore en vie : " + alive(sp));
+			check(eyes(sp) == 10, "un œil s'ouvre dans le sol sous chaque villageois que la lumière atteint : " + eyes(sp));
+			context.takeScreenshot("stone_circle_rite_awakening");
+			// Vu du dessus : les yeux ouverts dans le sol sous la ferme.
+			sp.getServer().runCommand("tp @p 0.5 -52 18.5 0 90");
+			context.waitTicks(3);
+			context.takeScreenshot("stone_circle_rite_eyes");
+			sp.getServer().runCommand("tp @p 0.5 -60 -2.5 0 30");
+			context.waitTicks(22);
+			context.takeScreenshot("stone_circle_rite_harvest");
+			context.waitTicks(StoneRite.LENGTH - StoneRite.AWAKENING + 5);
 			check(alive(sp) == 0, "toute la ferme devrait être consumée, à vingt blocs");
+			check(eyes(sp) == 0, "les yeux se referment sur les morts : " + eyes(sp));
 			List<Integer> stones = onServer(sp, p -> p.level().getEntitiesOfClass(ItemEntity.class, new AABB(CIRCLE).inflate(3),
 					e -> e.getItem().is(FmabItems.PHILOSOPHER_STONE)).stream()
 					.map(e -> PhilosopherStoneItem.souls(e.getItem())).sorted().toList());
@@ -92,8 +107,10 @@ public class StoneCircleScenes implements FabricClientGameTest {
 			check(cast(context, sp, ForbiddenCircles.PHILOSOPHER_STONE), "sans sang, le joueur au centre devrait suffire");
 			Effects.Result self = onServer(sp, p -> StoneCircle.answer(p, 8));
 			context.setScreen(() -> null);
-			context.waitTicks(10);
+			context.waitTicks(StoneRite.AWAKENING + 25);
 			check(self == Effects.Result.DONE, "le sacrifice devrait avoir lieu : " + self);
+			context.takeScreenshot("stone_circle_rite_vessel");
+			context.waitTicks(StoneRite.LENGTH - StoneRite.AWAKENING - 15);
 			check(onServer(sp, LivingStone::souls) == 36, "trois villageois, trente-six âmes en lui : " + onServer(sp, LivingStone::souls));
 			check(onServer(sp, p -> p.level().getEntitiesOfClass(ItemEntity.class, new AABB(CIRCLE).inflate(3),
 					e -> e.getItem().is(FmabItems.PHILOSOPHER_STONE)).isEmpty()), "aucune Pierre en objet : c'est lui, la Pierre");
@@ -126,6 +143,10 @@ public class StoneCircleScenes implements FabricClientGameTest {
 
 	private static int alive(TestSingleplayerContext sp) {
 		return onServer(sp, p -> p.level().getEntitiesOfClass(Villager.class, new AABB(CIRCLE).inflate(40), Villager::isAlive).size());
+	}
+
+	private static int eyes(TestSingleplayerContext sp) {
+		return onServer(sp, p -> p.level().getEntitiesOfClass(SoulEyeEntity.class, new AABB(CIRCLE).inflate(40)).size());
 	}
 
 	private static void blood(TestSingleplayerContext sp) {

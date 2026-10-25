@@ -7,7 +7,6 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabItems;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
@@ -32,6 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import com.ajustor.fmab.stone.Recruitment;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.LivingEntity;
 import org.jspecify.annotations.Nullable;
 
@@ -213,8 +214,10 @@ public abstract class HomunculusEntity extends Monster {
 			level.sendParticles(FLESH, getX(), getY(0.5), getZ(), intensity, getBbWidth() * 0.4, getBbHeight() * 0.4,
 					getBbWidth() * 0.4, 0);
 			if (tickCount % 3 == 0) {
-				level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY(0.5), getZ(), intensity / 2,
-						getBbWidth() * 0.5, getBbHeight() * 0.5, getBbWidth() * 0.5, 0.05);
+				for (int i = 0; i < Math.max(1, intensity / 4); i++) {
+					TransmutationLightning.arc(level, new Vec3(getX() + (random.nextDouble() - 0.5) * getBbWidth(),
+							getY(random.nextDouble() * 0.8), getZ() + (random.nextDouble() - 0.5) * getBbWidth()), true);
+				}
 			}
 		}
 		BossBars.update(bossEvent, this, showBossBar() && BossBars.engaged(this));

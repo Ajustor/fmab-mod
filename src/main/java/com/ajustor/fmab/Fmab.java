@@ -89,6 +89,7 @@ public final class Fmab {
 		TransmutationLightning.register();
 		HumanTransmutation.register();
 		com.ajustor.fmab.stone.StoneCircle.register();
+		com.ajustor.fmab.stone.StoneRite.register();
 		GoldTransmutation.register();
 		CopperCircuits.register();
 		PromisedDay.register();
