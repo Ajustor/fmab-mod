@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.16.0 — 2026-10-25
+
+### New features
+
+- A living Stone no longer needs to eat: its souls feed it.
+
+### Fixes
+
+- A living Stone no longer glows or draws monsters: it hides within a body. Only a carried Stone can still be seen from afar.
 ## 1.15.0 — 2026-10-24
 
 ### New features

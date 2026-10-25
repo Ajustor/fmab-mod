@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 1.16.0 — 2026-10-25
+
+### Nouveautés
+
+- Une Pierre vivante n'a plus besoin de manger : ses âmes la nourrissent.
+
+### Corrections
+
+- Une Pierre vivante ne luit plus et n'attire plus les monstres : elle se cache dans un corps. Seule la Pierre qu'on porte se voit encore de loin.
 ## 1.15.0 — 2026-10-24
 
 ### Nouveautés
