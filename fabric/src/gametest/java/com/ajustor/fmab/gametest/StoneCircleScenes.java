@@ -84,7 +84,12 @@ public class StoneCircleScenes implements FabricClientGameTest {
 			check(alive(sp) == 10, "pendant l'éveil du cercle, la ferme est figée mais encore en vie : " + alive(sp));
 			check(eyes(sp) == 10, "un œil s'ouvre dans le sol sous chaque villageois que la lumière atteint : " + eyes(sp));
 			context.takeScreenshot("stone_circle_rite_awakening");
-			context.waitTicks(25);
+			// Vu du dessus : les yeux ouverts dans le sol sous la ferme.
+			sp.getServer().runCommand("tp @p 0.5 -52 18.5 0 90");
+			context.waitTicks(3);
+			context.takeScreenshot("stone_circle_rite_eyes");
+			sp.getServer().runCommand("tp @p 0.5 -60 -2.5 0 30");
+			context.waitTicks(22);
 			context.takeScreenshot("stone_circle_rite_harvest");
 			context.waitTicks(StoneRite.LENGTH - StoneRite.AWAKENING + 5);
 			check(alive(sp) == 0, "toute la ferme devrait être consumée, à vingt blocs");
