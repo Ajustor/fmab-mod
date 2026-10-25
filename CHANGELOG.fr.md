@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 1.17.0 — 2026-10-25
+
+### Nouveautés
+
+- La création d'une Pierre philosophale est mise en scène comme à Xerxès : le cercle s'allume en rouge du bord vers le centre, les vies tombent une à une et leurs âmes filent vers le centre, avant la colonne de lumière ; une cinématique l'accompagne à l'écran.
+- Un œil s'ouvre dans le sol sous chaque être dont on prend l'âme, pendant le rite de la Pierre ou l'absorption d'une Pierre vivante ; les alchimistes qui utilisent une Pierre, ou qui en sont une, ont des éclairs d'alchimie rouges.
 ## 1.16.0 — 2026-10-25
 
 ### Nouveautés

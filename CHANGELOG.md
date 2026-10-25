@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.17.0 — 2026-10-25
+
+### New features
+
+- Creating a Philosopher's Stone is staged like Xerxes: the circle lights up red from the edge inward, lives fall one by one and their souls stream to the center before the pillar of light; an on-screen cinematic goes with it.
+- An eye opens in the ground under every being whose soul is taken, during the Stone rite or a living Stone's absorption; alchemists using a Stone, or being one, now have red alchemy lightning.
 ## 1.16.0 — 2026-10-25
 
 ### New features
