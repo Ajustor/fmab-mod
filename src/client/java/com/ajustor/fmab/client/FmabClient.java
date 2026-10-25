@@ -19,6 +19,7 @@ import com.ajustor.fmab.client.render.DrachmaSoldierRenderer;
 import com.ajustor.fmab.client.render.EnvyRenderer;
 import com.ajustor.fmab.client.render.FatherRenderer;
 import com.ajustor.fmab.client.render.GateHandRenderer;
+import com.ajustor.fmab.client.render.SoulEyeRenderer;
 import com.ajustor.fmab.client.render.GluttonyRenderer;
 import com.ajustor.fmab.client.render.GreedRenderer;
 import com.ajustor.fmab.client.render.HauntedArmorRenderer;
@@ -208,6 +209,7 @@ public final class FmabClient {
 		ClientPlatform.get().entityRenderer(FmabEntities.HOHENHEIM, HohenheimRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.MARCOH, MarcohRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.GATE_HAND, GateHandRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.SOUL_EYE, SoulEyeRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.FATHER_SUN, c -> new ThrownItemRenderer<>(c, 4.0F, true));
 		// Les automails se dessinent sur le corps du joueur, à la place des membres perdus.
 		ClientPlatform.get().renderLayers((type, renderer, layers, context) -> {

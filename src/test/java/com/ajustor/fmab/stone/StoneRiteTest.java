@@ -1,6 +1,7 @@
 package com.ajustor.fmab.stone;
 
 import com.ajustor.fmab.TestBootstrap;
+import com.ajustor.fmab.entity.SoulEyeEntity;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Le rite de la Pierre, comme à Xerxès : la lumière court du bord vers le centre, puis les vies tombent,
- * des plus lointaines aux plus proches, avant que les âmes se condensent.
+ * des plus lointaines aux plus proches (un œil s'ouvre dans le sol sous chacune), avant que les âmes se
+ * condensent.
  */
 class StoneRiteTest {
 	@BeforeAll
@@ -35,5 +37,15 @@ class StoneRiteTest {
 		}
 		assertEquals(StoneRite.AWAKENING, StoneRite.deathTick(0, 1), "une seule vie : elle tombe d'emblée");
 		assertTrue(StoneRite.HARVEST_END < StoneRite.LENGTH, "le temps de condenser les âmes");
+	}
+
+	@Test
+	void theEyeUnderAVictimOpensWatchesAndCloses() {
+		int shut = 40;
+		assertEquals(0, SoulEyeEntity.openness(0, shut), 1e-6, "fermé à l'instant où il paraît");
+		assertTrue(SoulEyeEntity.openness(SoulEyeEntity.OPEN / 2f, shut) > 0.5f, "il s'ouvre vite");
+		assertEquals(1, SoulEyeEntity.openness(20, shut), 1e-6, "grand ouvert pendant que sa proie meurt");
+		assertTrue(SoulEyeEntity.openness(shut - SoulEyeEntity.CLOSE / 2f, shut) < 1, "il se referme");
+		assertEquals(0, SoulEyeEntity.openness(shut, shut), 1e-6);
 	}
 }

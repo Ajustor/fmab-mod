@@ -7,7 +7,6 @@ import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.transmutation.ItemCompositions;
 import com.ajustor.fmab.util.PlayerMaps;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,6 +33,7 @@ import java.util.UUID;
 import com.ajustor.fmab.platform.event.LivingEvents;
 import com.ajustor.fmab.platform.event.ServerEvents;
 import com.ajustor.fmab.compat.EntityCompat;
+import com.ajustor.fmab.transmutation.TransmutationLightning;
 
 /**
  * Ce qu'on lance sur une Pierre vivante se défait avant de la toucher : flèches, tridents, boules de
@@ -224,7 +224,8 @@ public final class ProjectileTransmutation {
 	}
 
 	private static void spark(ServerLevel level, Vec3 at) {
-		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 8, 0.15, 0.15, 0.15, 0.05);
+		// Les éclairs rouges d'une Pierre : c'est elle qui défait le projectile.
+		TransmutationLightning.arc(level, at, true);
 		level.playSound(null, at.x, at.y, at.z, FmabSounds.TRANSMUTE, SoundSource.PLAYERS, 0.3f, 1.6f);
 	}
 }

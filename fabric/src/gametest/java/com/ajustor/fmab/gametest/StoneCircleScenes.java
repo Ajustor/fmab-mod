@@ -9,6 +9,7 @@ import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.AlchemistData;
+import com.ajustor.fmab.entity.SoulEyeEntity;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
@@ -81,11 +82,13 @@ public class StoneCircleScenes implements FabricClientGameTest {
 			check(farm == Effects.Result.DONE, "le sacrifice devrait avoir lieu : " + farm);
 			// Le rite se joue comme à Xerxès : la lumière gagne le cercle avant que les vies tombent.
 			check(alive(sp) == 10, "pendant l'éveil du cercle, la ferme est figée mais encore en vie : " + alive(sp));
+			check(eyes(sp) == 10, "un œil s'ouvre dans le sol sous chaque villageois que la lumière atteint : " + eyes(sp));
 			context.takeScreenshot("stone_circle_rite_awakening");
 			context.waitTicks(25);
 			context.takeScreenshot("stone_circle_rite_harvest");
 			context.waitTicks(StoneRite.LENGTH - StoneRite.AWAKENING + 5);
 			check(alive(sp) == 0, "toute la ferme devrait être consumée, à vingt blocs");
+			check(eyes(sp) == 0, "les yeux se referment sur les morts : " + eyes(sp));
 			List<Integer> stones = onServer(sp, p -> p.level().getEntitiesOfClass(ItemEntity.class, new AABB(CIRCLE).inflate(3),
 					e -> e.getItem().is(FmabItems.PHILOSOPHER_STONE)).stream()
 					.map(e -> PhilosopherStoneItem.souls(e.getItem())).sorted().toList());
@@ -135,6 +138,10 @@ public class StoneCircleScenes implements FabricClientGameTest {
 
 	private static int alive(TestSingleplayerContext sp) {
 		return onServer(sp, p -> p.level().getEntitiesOfClass(Villager.class, new AABB(CIRCLE).inflate(40), Villager::isAlive).size());
+	}
+
+	private static int eyes(TestSingleplayerContext sp) {
+		return onServer(sp, p -> p.level().getEntitiesOfClass(SoulEyeEntity.class, new AABB(CIRCLE).inflate(40)).size());
 	}
 
 	private static void blood(TestSingleplayerContext sp) {

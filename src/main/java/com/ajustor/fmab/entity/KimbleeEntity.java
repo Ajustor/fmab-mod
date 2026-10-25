@@ -1,8 +1,9 @@
 package com.ajustor.fmab.entity;
 
+import com.ajustor.fmab.transmutation.TransmutationLightning;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
@@ -117,7 +118,8 @@ public class KimbleeEntity extends Monster {
 			marked = target.blockPosition();
 			fuse = FUSE;
 			level.playSound(null, blockPosition(), SoundEvents.FLINTANDSTEEL_USE, SoundSource.HOSTILE, 1.5f, 0.6f);
-			level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY(0.6), getZ(), 12, 0.3, 0.3, 0.3, 0.1);
+			// Kimblee transmute avec une Pierre : ses éclairs sont rouges.
+			TransmutationLightning.arc(level, new Vec3(getX(), getY(0.5), getZ()), true);
 		}
 	}
 

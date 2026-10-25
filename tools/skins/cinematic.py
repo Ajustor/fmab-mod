@@ -1,5 +1,6 @@
 """Les images des cinématiques de la Porte : l'œil qui s'ouvre derrière la Porte, et le bras d'ombre
-qui rampe depuis les bords de l'écran quand le cercle happe l'alchimiste.
+qui rampe depuis les bords de l'écran quand le cercle happe l'alchimiste. Et l'œil qui s'ouvre dans le
+sol sous une âme qu'on prend (textures/entity/soul_eye.png).
 `python tools/skins/cinematic.py` les régénère dans textures/gui/cinematic.
 """
 from __future__ import annotations
@@ -117,11 +118,38 @@ def arm():
     return img
 
 
+def soul_eye():
+    """L'œil qui s'ouvre dans le sol sous une âme qu'on prend, 160x32 : l'œil de la Porte réduit à
+    64x32, cerné d'une ombre, aux deux places où la plaque du modèle (64x0x32) cherche sa face du
+    dessus et celle du dessous."""
+    small = eye().resize((64, 32), Image.LANCZOS)
+    plate = Image.new("RGBA", (64, 32), (0, 0, 0, 0))
+    # L'ombre : l'amande élargie, noire, qui s'efface vers l'extérieur.
+    cx, cy = 31.5, 15.5
+    for y in range(32):
+        for x in range(64):
+            nx = (x - cx) / 32
+            if abs(nx) >= 1:
+                continue
+            half = 15.5 * (1 - nx * nx) ** 0.6
+            dy = abs(y - cy)
+            if dy <= half:
+                a = int(200 * min(1, (half - dy) / 3 + 0.2) * min(1, (1 - abs(nx)) * 6))
+                plate.putpixel((x, y), (10, 4, 8, a))
+    plate.alpha_composite(small)
+    img = Image.new("RGBA", (160, 32), (0, 0, 0, 0))
+    img.paste(plate, (32, 0))
+    img.paste(plate, (96, 0))
+    return img
+
+
 def build():
     os.makedirs(OUT, exist_ok=True)
     eye().save(os.path.join(OUT, "eye.png"))
     arm().save(os.path.join(OUT, "arm.png"))
-    print("cinématique : eye, arm")
+    entity = os.path.join(OUT, "..", "..", "entity")
+    soul_eye().save(os.path.join(entity, "soul_eye.png"))
+    print("cinématique : eye, arm, soul_eye")
 
 
 if __name__ == "__main__":

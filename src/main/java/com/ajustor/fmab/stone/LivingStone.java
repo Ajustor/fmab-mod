@@ -6,6 +6,7 @@ import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.LustEntity;
+import com.ajustor.fmab.entity.SoulEyeEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.gate.GateOfTruth;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
@@ -145,7 +146,7 @@ public final class LivingStone {
 		player.setHealth(player.getMaxHealth());
 		ServerLevel level = player.level();
 		level.sendParticles(RED, player.getX(), player.getY(0.5), player.getZ(), 300, 1.5, 1.5, 1.5, 0);
-		TransmutationLightning.discharge(level, circle, 3, 1.5);
+		TransmutationLightning.discharge(level, circle, 3, 1.5, true);
 		level.playSound(null, circle, SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 1.5f, 0.6f);
 		player.sendSystemMessage(Component.translatable(already ? "stone.fmab.living_stone_grew" : "stone.fmab.became_living_stone",
 				souls(player)));
@@ -233,6 +234,8 @@ public final class LivingStone {
 		EntityCompat.swing(absorber, InteractionHand.MAIN_HAND, true);
 		TransmutationPose.strike(absorber, TransmutationPose.Kind.REACH, ABSORB_GAP + 2);
 		draw(level, target, absorber);
+		// Un œil s'ouvre dans le sol sous la proie, tant qu'on la tient.
+		SoulEyeEntity.under(level, target, ABSORB_GAP + 2);
 
 		int gained;
 		if (target instanceof ServerPlayer victim && souls(victim) > 0) {

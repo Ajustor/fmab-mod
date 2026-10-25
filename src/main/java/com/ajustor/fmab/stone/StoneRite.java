@@ -1,5 +1,6 @@
 package com.ajustor.fmab.stone;
 
+import com.ajustor.fmab.entity.SoulEyeEntity;
 import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.platform.event.ServerEvents;
 import com.ajustor.fmab.registry.FmabItems;
@@ -32,7 +33,8 @@ import java.util.UUID;
 
 /**
  * Le rite de la Pierre, comme à Xerxès : le sacrifice ne foudroie pas d'un coup, il se joue en cinq
- * secondes. La lumière rouge court sur le cercle, du bord vers le centre, et fige tout ce qui vit ; puis
+ * secondes. La lumière rouge court sur le cercle, du bord vers le centre, et fige tout ce qui vit (un œil
+ * s'ouvre dans le sol sous chaque vie qu'elle atteint, voir {@link SoulEyeEntity}) ; puis
  * les vies tombent, des plus lointaines aux plus proches, et leurs âmes filent vers le centre en
  * traînées de lumière ; elles s'y condensent en une colonne rouge, puis en Pierres, ou dans le corps de
  * celui qui se tient au centre. Ceux qui sont pris dans le cercle le voient à l'écran
@@ -63,6 +65,8 @@ public final class StoneRite {
 		final int souls;
 		/** Celui qui devient la Pierre, ou null : les âmes se condensent en Pierres. */
 		final UUID vessel;
+		/** Les victimes que la lumière a déjà atteintes : un œil s'est ouvert sous elles. */
+		final boolean[] seen;
 		int age;
 
 		Rite(ServerLevel level, UUID caster, BlockPos circle, double radius, List<LivingEntity> victims, int souls,
@@ -75,6 +79,7 @@ public final class StoneRite {
 			this.victims = victims;
 			this.souls = souls;
 			this.vessel = vessel;
+			this.seen = new boolean[victims.size()];
 		}
 	}
 
@@ -162,9 +167,15 @@ public final class StoneRite {
 			if (!victim.isAlive() || victim.isRemoved()) {
 				continue;
 			}
+			boolean caught = front(age, rite.radius) <= Math.sqrt(victim.distanceToSqr(rite.center));
+			if (caught && !rite.seen[i]) {
+				// La lumière l'atteint : un œil s'ouvre dans le sol sous lui, et le regarde jusqu'à sa mort.
+				rite.seen[i] = true;
+				SoulEyeEntity.under(level, victim, deathTick(i, count) - age + 2);
+			}
 			if (deathTick(i, count) == age) {
 				reap(level, victim, rite.center);
-			} else if (age % 4 == 0 && front(age, rite.radius) <= Math.sqrt(victim.distanceToSqr(rite.center))) {
+			} else if (age % 4 == 0 && caught) {
 				// Pris par la lumière, il ne bouge plus : une lueur rouge monte de lui.
 				level.sendParticles(RED, true, false, victim.getX(), victim.getY(0.3), victim.getZ(), 4, 0.25, 0.4, 0.25, 0);
 			}

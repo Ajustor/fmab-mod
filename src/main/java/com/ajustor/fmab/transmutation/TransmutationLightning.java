@@ -17,7 +17,8 @@ import com.ajustor.fmab.platform.event.ServerEvents;
 
 /**
  * Les éclairs bleus de la transmutation : des arcs en zigzag qui jaillissent du cercle et crépitent
- * quelques instants, plus nombreux et plus longs pour un grand cercle.
+ * quelques instants, plus nombreux et plus longs pour un grand cercle. Rouges quand une Pierre
+ * philosophale nourrit la réaction (en main, dans le corps d'une Pierre vivante, d'un homonculus).
  */
 public final class TransmutationLightning {
 	/** Le bleu de la réaction alchimique, et le blanc de son cœur. */
@@ -92,6 +93,12 @@ public final class TransmutationLightning {
 				0.9f + level.getRandom().nextFloat() * 0.2f);
 		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, center.x, center.y + 0.2, center.z,
 				(int) (20 * intensity * radius), radius * 0.6, 0.3, radius * 0.6, 0.1);
+	}
+
+	/** Une décharge de cette couleur crépite-t-elle en ce moment sur ce cercle ? */
+	public static boolean crackles(ServerLevel level, BlockPos circle, boolean red) {
+		return ACTIVE.stream().anyMatch(d -> d.level == level && d.red == red
+				&& BlockPos.containing(d.center).equals(circle));
 	}
 
 	/** Un seul éclair, qui jaillit de ce point, sans bruit : de quoi faire crépiter tout un cercle. */
