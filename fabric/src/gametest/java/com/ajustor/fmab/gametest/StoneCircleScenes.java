@@ -15,6 +15,7 @@ import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.StoneCircle;
+import com.ajustor.fmab.stone.StoneRite;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.Effects;
@@ -76,8 +77,14 @@ public class StoneCircleScenes implements FabricClientGameTest {
 			check(cast(context, sp, ForbiddenCircles.PHILOSOPHER_STONE), "le cercle de la Pierre devrait s'éveiller");
 			Effects.Result farm = onServer(sp, p -> StoneCircle.answer(p, 24));
 			context.setScreen(() -> null);
-			context.waitTicks(10);
+			context.waitTicks(StoneRite.AWAKENING - 5);
 			check(farm == Effects.Result.DONE, "le sacrifice devrait avoir lieu : " + farm);
+			// Le rite se joue comme à Xerxès : la lumière gagne le cercle avant que les vies tombent.
+			check(alive(sp) == 10, "pendant l'éveil du cercle, la ferme est figée mais encore en vie : " + alive(sp));
+			context.takeScreenshot("stone_circle_rite_awakening");
+			context.waitTicks(25);
+			context.takeScreenshot("stone_circle_rite_harvest");
+			context.waitTicks(StoneRite.LENGTH - StoneRite.AWAKENING + 5);
 			check(alive(sp) == 0, "toute la ferme devrait être consumée, à vingt blocs");
 			List<Integer> stones = onServer(sp, p -> p.level().getEntitiesOfClass(ItemEntity.class, new AABB(CIRCLE).inflate(3),
 					e -> e.getItem().is(FmabItems.PHILOSOPHER_STONE)).stream()
@@ -92,8 +99,10 @@ public class StoneCircleScenes implements FabricClientGameTest {
 			check(cast(context, sp, ForbiddenCircles.PHILOSOPHER_STONE), "sans sang, le joueur au centre devrait suffire");
 			Effects.Result self = onServer(sp, p -> StoneCircle.answer(p, 8));
 			context.setScreen(() -> null);
-			context.waitTicks(10);
+			context.waitTicks(StoneRite.AWAKENING + 25);
 			check(self == Effects.Result.DONE, "le sacrifice devrait avoir lieu : " + self);
+			context.takeScreenshot("stone_circle_rite_vessel");
+			context.waitTicks(StoneRite.LENGTH - StoneRite.AWAKENING - 15);
 			check(onServer(sp, LivingStone::souls) == 36, "trois villageois, trente-six âmes en lui : " + onServer(sp, LivingStone::souls));
 			check(onServer(sp, p -> p.level().getEntitiesOfClass(ItemEntity.class, new AABB(CIRCLE).inflate(3),
 					e -> e.getItem().is(FmabItems.PHILOSOPHER_STONE)).isEmpty()), "aucune Pierre en objet : c'est lui, la Pierre");

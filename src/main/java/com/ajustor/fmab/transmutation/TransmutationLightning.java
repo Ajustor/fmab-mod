@@ -23,6 +23,9 @@ public final class TransmutationLightning {
 	/** Le bleu de la réaction alchimique, et le blanc de son cœur. */
 	private static final DustParticleOptions BLUE = new DustParticleOptions(0x3FA0FF, 0.9f);
 	private static final DustParticleOptions CORE = new DustParticleOptions(0xD8F0FF, 0.6f);
+	/** Le rouge d'une réaction nourrie d'âmes, celle d'une Pierre philosophale. */
+	private static final DustParticleOptions RED = new DustParticleOptions(0xE01828, 0.9f);
+	private static final DustParticleOptions RED_CORE = new DustParticleOptions(0xFFC0C0, 0.6f);
 	/** Durée du crépitement, en ticks. */
 	private static final int DURATION = 12;
 
@@ -31,13 +34,15 @@ public final class TransmutationLightning {
 		final Vec3 center;
 		final double radius;
 		final int boltsPerTick;
+		final boolean red;
 		int ticksLeft;
 
-		Discharge(ServerLevel level, Vec3 center, double radius, int boltsPerTick, int ticksLeft) {
+		Discharge(ServerLevel level, Vec3 center, double radius, int boltsPerTick, boolean red, int ticksLeft) {
 			this.level = level;
 			this.center = center;
 			this.radius = radius;
 			this.boltsPerTick = boltsPerTick;
+			this.red = red;
 			this.ticksLeft = ticksLeft;
 		}
 	}
@@ -56,7 +61,7 @@ public final class TransmutationLightning {
 			for (Iterator<Discharge> it = ACTIVE.iterator(); it.hasNext(); ) {
 				Discharge d = it.next();
 				for (int i = 0; i < d.boltsPerTick; i++) {
-					bolt(d.level, d.center, d.radius, d.level.getRandom());
+					bolt(d.level, d.center, d.radius, d.red, d.level.getRandom());
 				}
 				if (--d.ticksLeft <= 0) {
 					it.remove();
@@ -72,20 +77,30 @@ public final class TransmutationLightning {
 	 * @param intensity  1 pour une transmutation ordinaire ; moins pour un cercle qui fait long feu
 	 */
 	public static void discharge(ServerLevel level, BlockPos circle, double radius, double intensity) {
+		discharge(level, circle, radius, intensity, false);
+	}
+
+	/** Une décharge, rouge si des âmes la nourrissent (une Pierre philosophale). */
+	public static void discharge(ServerLevel level, BlockPos circle, double radius, double intensity, boolean red) {
 		Vec3 center = Vec3.atBottomCenterOf(circle).add(0, 0.1, 0);
 		int bolts = Math.max(1, (int) Math.round((2 + radius) * intensity));
 		if (ACTIVE.size() >= MAX_ACTIVE) {
 			ACTIVE.removeFirst();
 		}
-		ACTIVE.add(new Discharge(level, center, radius, bolts, Math.max(3, (int) (DURATION * intensity))));
+		ACTIVE.add(new Discharge(level, center, radius, bolts, red, Math.max(3, (int) (DURATION * intensity))));
 		level.playSound(null, circle, FmabSounds.TRANSMUTE, SoundSource.PLAYERS, (float) (0.6 * intensity),
 				0.9f + level.getRandom().nextFloat() * 0.2f);
 		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, center.x, center.y + 0.2, center.z,
 				(int) (20 * intensity * radius), radius * 0.6, 0.3, radius * 0.6, 0.1);
 	}
 
+	/** Un seul éclair, qui jaillit de ce point, sans bruit : de quoi faire crépiter tout un cercle. */
+	public static void arc(ServerLevel level, Vec3 at, boolean red) {
+		bolt(level, at, 0, red, level.getRandom());
+	}
+
 	/** Un éclair : il part d'un point du cercle et zigzague vers le haut et vers l'extérieur. */
-	private static void bolt(ServerLevel level, Vec3 center, double radius, RandomSource random) {
+	private static void bolt(ServerLevel level, Vec3 center, double radius, boolean red, RandomSource random) {
 		double angle = random.nextDouble() * Math.PI * 2;
 		double r = random.nextDouble() * radius;
 		Vec3 point = center.add(Math.cos(angle) * r, 0, Math.sin(angle) * r);
@@ -95,17 +110,17 @@ public final class TransmutationLightning {
 					(random.nextDouble() - 0.5) * 0.9 + Math.cos(angle) * 0.25,
 					0.15 + random.nextDouble() * 0.45,
 					(random.nextDouble() - 0.5) * 0.9 + Math.sin(angle) * 0.25);
-			line(level, point, next);
+			line(level, point, next, red);
 			point = next;
 		}
 	}
 
-	private static void line(ServerLevel level, Vec3 from, Vec3 to) {
+	private static void line(ServerLevel level, Vec3 from, Vec3 to, boolean red) {
 		double length = from.distanceTo(to);
 		int steps = Math.max(2, (int) (length / 0.08));
 		for (int i = 0; i <= steps; i++) {
 			Vec3 p = from.lerp(to, (double) i / steps);
-			level.sendParticles(i % 3 == 0 ? CORE : BLUE, p.x, p.y, p.z, 1, 0, 0, 0, 0);
+			level.sendParticles(i % 3 == 0 ? red ? RED_CORE : CORE : red ? RED : BLUE, p.x, p.y, p.z, 1, 0, 0, 0, 0);
 		}
 	}
 }

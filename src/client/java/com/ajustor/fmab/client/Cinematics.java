@@ -7,6 +7,7 @@ import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
 import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.network.CinematicPayload;
+import com.ajustor.fmab.stone.StoneRite;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import net.minecraft.client.DeltaTracker;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -27,7 +28,8 @@ import java.util.List;
 
 /**
  * Les cinématiques, jouées à l'écran par-dessus le monde et l'interface (voir {@code HudMixin}) :
- * bandes noires de cinéma, fondus, et des images dessinées à la main (l'œil de la Vérité, le torrent du savoir, le titre du Jour promis).
+ * bandes noires de cinéma, fondus, et des images dessinées à la main (l'œil de la Vérité, le torrent du savoir, le titre du Jour promis,
+ * les âmes du rite de la Pierre).
  * Le serveur met en scène le reste (bras noirs, sons, mouvements).
  */
 public final class Cinematics {
@@ -173,6 +175,8 @@ public final class Cinematics {
 					title(graphics, w, h, t, Component.translatable("cinematic.fmab.promised_day"),
 							Component.translatable("cinematic.fmab.promised_day.sub"), 0xFFE02030);
 				}
+				case CinematicPayload.STONE_RITE -> rite(graphics, w, h, t, false);
+				case CinematicPayload.STONE_VESSEL -> rite(graphics, w, h, t, true);
 				case CinematicPayload.EPILOGUE -> pages(graphics, w, h, t, "epilogue", CinematicPayload.EPILOGUE_PAGES);
 				case CinematicPayload.NINA -> pages(graphics, w, h, t, "nina", CinematicPayload.NINA_PAGES);
 				case CinematicPayload.FATHER_FALL -> {
@@ -315,6 +319,89 @@ public final class Cinematics {
 			graphics.pose().popMatrix();
 		}
 		fade(graphics, w, h, 0xFF000000, Mth.clamp((t - (length - 12)) / 12, 0, 1));
+	}
+
+	/**
+	 * Le rite de la Pierre, comme à Xerxès (voir {@link StoneRite}) : l'écran rougit au rythme du cœur qui bat
+	 * sous le cercle, puis les âmes affluent des bords vers le centre en traînées de lumière, et tout
+	 * s'embrase quand elles se condensent. Pour celui qui se tient au centre, des yeux s'ouvrent partout
+	 * autour de lui, comme sur le corps de Hohenheim : ce sont les âmes qui entrent en lui.
+	 */
+	private static void rite(GuiGraphicsExtractor graphics, int w, int h, float t, boolean vessel) {
+		float cx = w / 2f, cy = h / 2f;
+		float diagonal = (float) Math.hypot(w, h);
+		float awake = Mth.clamp(t / StoneRite.AWAKENING, 0, 1);
+		float out = Mth.clamp((length - t) / 12, 0, 1);
+		// Le battement du cœur, calé sur celui que joue le serveur.
+		float beat = (t - 1) % 15;
+		float thump = beat < 0 ? 0 : (float) (Math.exp(-beat * 0.5) + 0.5 * Math.exp(-(beat - 4) * (beat - 4) * 0.5));
+		fade(graphics, w, h, 0xFF8A0010, (0.12f + 0.16f * awake + 0.08f * thump) * out);
+		float harvest = Mth.clamp((t - StoneRite.AWAKENING) / (StoneRite.HARVEST_END - StoneRite.AWAKENING), 0, 1);
+		if (t > StoneRite.AWAKENING - 4 && t < StoneRite.HARVEST_END + 8) {
+			souls(graphics, cx, cy, diagonal, t, harvest);
+		}
+		if (vessel) {
+			eyes(graphics, w, h, t);
+		}
+		// L'éclat : les âmes se condensent, la colonne de lumière jaillit.
+		float flash = t - StoneRite.HARVEST_END;
+		if (flash > -2) {
+			float peak = (float) Math.exp(-Math.max(0, flash) * 0.12) * Mth.clamp((flash + 2) / 3, 0, 1);
+			fade(graphics, w, h, vessel ? 0xFFFFE8E8 : 0xFFFF5060, peak * (vessel ? 0.9f : 0.6f));
+		}
+	}
+
+	/** Les âmes arrachées : des traînées rouges et pâles qui filent des bords de l'écran vers son centre. */
+	private static void souls(GuiGraphicsExtractor graphics, float cx, float cy, float diagonal, float t, float harvest) {
+		RandomSource random = RandomSource.create(41);
+		int count = (int) (12 + harvest * 70);
+		for (int i = 0; i < count; i++) {
+			float angle = random.nextFloat() * Mth.TWO_PI;
+			float speed = 0.025f + random.nextFloat() * 0.03f;
+			// d va de 1 (au bord) à 0 (au centre) : elles convergent.
+			float d = 1 - (float) ((random.nextFloat() + t * speed * (1 + harvest)) % 1.0);
+			float r0 = diagonal * 0.55f * d;
+			float len = diagonal * (0.03f + 0.08f * d) * (0.6f + harvest);
+			int alpha = (int) (Mth.clamp((1 - d) * 4, 0, 1) * Mth.clamp(d * 5, 0, 1) * (0.35f + harvest * 0.5f) * 255);
+			int color = random.nextInt(4) == 0 ? 0xF4ECE4 : 0xE02838;
+			graphics.pose().pushMatrix();
+			graphics.pose().translate(cx, cy);
+			// Elles tournent un peu en approchant : le tourbillon au-dessus du centre.
+			graphics.pose().rotate(angle + (1 - d) * 0.8f);
+			graphics.fill((int) r0, 0, (int) (r0 + len), random.nextInt(3) == 0 ? 2 : 1, alpha << 24 | color);
+			graphics.pose().popMatrix();
+		}
+	}
+
+	/** Des yeux qui s'ouvrent un à un sur l'écran, rouges, et regardent : les âmes qui entrent en lui. */
+	private static void eyes(GuiGraphicsExtractor graphics, int w, int h, float t) {
+		RandomSource random = RandomSource.create(17);
+		int count = 22;
+		float first = StoneRite.AWAKENING + 6;
+		for (int i = 0; i < count; i++) {
+			float x = (0.08f + random.nextFloat() * 0.84f) * w;
+			float y = (0.12f + random.nextFloat() * 0.76f) * h;
+			float size = w * (0.07f + random.nextFloat() * 0.1f);
+			float born = first + (StoneRite.HARVEST_END - first) * i / count + random.nextFloat() * 4;
+			float tilt = (random.nextFloat() - 0.5f) * 0.5f;
+			float open = Mth.clamp((t - born) / 6, 0, 1);
+			open = 1 - (1 - open) * (1 - open);
+			// Ils se ferment ensemble dans l'éclat final.
+			float close = Mth.clamp((length - 6 - t) / 8, 0, 1);
+			float k = open * close;
+			if (k <= 0.02f) {
+				continue;
+			}
+			float look = Mth.sin(t * 0.3f + i * 2.1f) * 2;
+			float scale = size / 128;
+			graphics.pose().pushMatrix();
+			graphics.pose().translate(x + look * scale * 6, y);
+			graphics.pose().rotate(tilt);
+			graphics.pose().scale(scale, scale * k);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, EYE, -64, -32, 0, 0, 128, 64, 128, 64, 128, 64,
+					(int) (Mth.clamp(k * 2, 0, 1) * 230) << 24 | 0xFFC0C0);
+			graphics.pose().popMatrix();
+		}
 	}
 
 	private static float pulse(float t) {
