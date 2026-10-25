@@ -43,8 +43,8 @@ import com.ajustor.fmab.compat.EntityCompat;
  * La Pierre philosophale vivante, comme Van Hohenheim : l'alchimiste a fondu dans son corps les âmes
  * de deux Pierres pleines, pendant une éclipse, sur un cercle de transmutation humaine. Il ne paie
  * plus de péage à la Porte, ses transmutations ne lui coûtent rien, et il ressuscite sur place à
- * chaque mort. Mais chaque grande transmutation et chaque mort consument des âmes ; à zéro, il meurt
- * pour de bon et redevient un homme. Son karma touche le fond, et les homonculus le traquent.
+ * chaque mort ; ses âmes le nourrissent, il n'a plus besoin de manger. Mais chaque grande
+ * transmutation et chaque mort consument des âmes ; à zéro, il meurt pour de bon et redevient un homme. Son karma touche le fond, et les homonculus le traquent.
  *
  * <p>Ses âmes n'ont pas de limite : main nue, il absorbe celles des vivants en gardant la main sur
  * eux, de plus en plus vite. Une autre Pierre vivante (ou un homonculus) perd ses âmes une à une ;
@@ -69,6 +69,8 @@ public final class LivingStone {
 	private static final DustParticleOptions RED = new DustParticleOptions(0xD01020, 1.2f);
 	/** Toutes les dix minutes, une chance sur trois qu'un homonculus vienne le chercher. */
 	private static final int HUNT_PERIOD = 20 * 60 * 10;
+	/** Une barre de faim pleine. */
+	private static final int FULL = 20;
 
 	private LivingStone() {
 	}
@@ -153,6 +155,11 @@ public final class LivingStone {
 		return stack.is(FmabItems.PHILOSOPHER_STONE) && PhilosopherStoneItem.souls(stack) >= stack.getMaxDamage();
 	}
 
+	/** La faim d'une Pierre vivante : ses âmes la nourrissent, elle reste rassasiée. Les autres gardent la leur. */
+	public static int fed(int souls, int food) {
+		return souls > 0 ? FULL : food;
+	}
+
 	/** Chaque usage de la Pierre vivante consume des âmes (jamais la dernière, la sienne). */
 	public static void spend(ServerPlayer player, int souls) {
 		int left = souls(player);
@@ -191,6 +198,14 @@ public final class LivingStone {
 					1, 0.8f);
 			player.sendOverlayMessage(Component.translatable("stone.fmab.resurrected", after));
 			return false;
+		});
+		ServerEvents.END_TICK.register(server -> {
+			if (server.getTickCount() % 20 != 0) {
+				return;
+			}
+			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+				player.getFoodData().setFoodLevel(fed(souls(player), player.getFoodData().getFoodLevel()));
+			}
 		});
 		ServerEvents.END_TICK.register(server -> {
 			if (server.getTickCount() % HUNT_PERIOD != 0) {
