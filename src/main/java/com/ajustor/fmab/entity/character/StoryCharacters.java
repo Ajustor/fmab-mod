@@ -70,8 +70,8 @@ public final class StoryCharacters {
 	public static final List<StoryCharacter> ALL = List.of(MUSTANG, HAWKEYE, ARMSTRONG, HUGHES, LING, LAN_FAN,
 			ALPHONSE, PINAKO, BASQUE_GRAND, MCDOUGAL, TATTOOIST, ISHVALAN, TUCKER);
 
-	/** La taille des personnages qui ne font pas celle d'un homme : Alphonse et sa grande armure. */
-	private static final Map<String, Float> SCALES = Map.of("alphonse", 1.25f);
+	/** La taille des personnages qui ne font pas celle d'un homme : Alphonse et sa grande armure, le colosse Armstrong. */
+	private static final Map<String, Float> SCALES = Map.of("alphonse", 1.25f, "armstrong", 1.15f);
 
 	private StoryCharacters() {
 	}
