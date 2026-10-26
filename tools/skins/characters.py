@@ -520,9 +520,11 @@ def scar(s):
     tone = ISHVAL
     skin_face(s, tone, mouth="#4a2416")
     eyes(s, "#c4202a", white="#e6d8c6", brow="#d0ccc4")
-    # La cicatrice en croix, sur le front, entre les yeux.
-    for (x, y) in ((2, 1), (3, 2), (4, 3), (5, 1), (4, 2), (3, 3)):
-        s.px("head", "front", x, y, "#c48e7a")
+    # La grande cicatrice en croix qui barre le front jusqu'entre les yeux, claire sur la peau mate.
+    for (x, y) in ((1, 0), (2, 1), (3, 2), (4, 3), (6, 0), (5, 1), (4, 2), (3, 3)):
+        s.px("head", "front", x, y, "#d8a28e")
+    s.px("head", "front", 3, 2, "#b0786a")
+    s.px("head", "front", 4, 2, "#b0786a")
     short_hair(s, "#e3dfd6", fringe=1, back=5)
     fringe(s, "#e3dfd6", [2, 1, 0, 0, 0, 0, 1, 2])
     hair_volume(s, "#e3dfd6", sides=2, back=4)
