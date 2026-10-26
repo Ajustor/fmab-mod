@@ -2,6 +2,9 @@ package com.ajustor.fmab.client.render;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.character.StoryCharacterEntity;
+import com.ajustor.fmab.entity.character.StoryCharacters;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import java.util.Map;
@@ -23,7 +26,23 @@ public class StoryCharacterRenderer extends FigureRenderer.Simple<StoryCharacter
 			Map.entry("tucker", Temper.MARCOH));
 
 	public StoryCharacterRenderer(EntityRendererProvider.Context context, String id) {
-		super(context, FigureModels.plain(SLIM.contains(id)), Fmab.id("textures/entity/" + id + ".png"),
-				TEMPERS.getOrDefault(id, Temper.HOHENHEIM));
+		super(context, model(id), Fmab.id("textures/entity/" + id + ".png"), TEMPERS.getOrDefault(id, Temper.HOHENHEIM));
+		this.scale = StoryCharacters.scale(id);
+		this.shadowRadius *= scale;
+	}
+
+	private final float scale;
+
+	/** La silhouette du personnage : celle d'un joueur, sauf pour qui a ses volumes à lui. */
+	private static ModelPart model(String id) {
+		return switch (id) {
+			case "alphonse" -> FigureModels.alphonse();
+			default -> FigureModels.plain(SLIM.contains(id));
+		};
+	}
+
+	@Override
+	protected void scale(FigureRenderer.State state, PoseStack poseStack) {
+		poseStack.scale(scale, scale, scale);
 	}
 }

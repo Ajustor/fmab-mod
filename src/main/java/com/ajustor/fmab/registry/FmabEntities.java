@@ -454,8 +454,8 @@ public final class FmabEntities {
 			out.put(character.id(), Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, key,
 					EntityType.Builder.<StoryCharacterEntity>of(
 									(type, level) -> new StoryCharacterEntity(type, level, character), MobCategory.MISC)
-							.sized(0.6F, 1.8F)
-							.eyeHeight(1.62F)
+							.sized(0.6F * StoryCharacters.scale(character.id()), 1.8F * StoryCharacters.scale(character.id()))
+							.eyeHeight(1.62F * StoryCharacters.scale(character.id()))
 							.clientTrackingRange(10)
 							.build(key)));
 		}

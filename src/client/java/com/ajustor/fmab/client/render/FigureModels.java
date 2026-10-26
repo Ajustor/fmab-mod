@@ -161,6 +161,30 @@ public final class FigureModels {
 		return bake(mesh);
 	}
 
+	/**
+	 * Alphonse : la grande armure. Les épaulières rondes, la corne au sommet du heaume, la houppe qui
+	 * retombe dans le dos, et les deux pans du pagne sous le ceinturon (peau élargie, volumes à droite).
+	 */
+	public static ModelPart alphonse() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition root = mesh.getRoot();
+		root.getChild("right_arm").addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 0)
+				.addBox(-4.5f, -3, -3.5f, 6, 4, 7), PartPose.ZERO);
+		root.getChild("left_arm").addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 12)
+				.addBox(-1.5f, -3, -3.5f, 6, 4, 7), PartPose.ZERO);
+		PartDefinition head = root.getChild("head");
+		head.addOrReplaceChild("horn", CubeListBuilder.create().texOffs(96, 0).addBox(-1, -11, -2, 2, 3, 2),
+				PartPose.ZERO);
+		head.addOrReplaceChild("plume", CubeListBuilder.create().texOffs(96, 8).addBox(-1, 0, 0, 2, 8, 2),
+				PartPose.offsetAndRotation(0, -8.5f, 2.5f, 0.35f, 0, 0));
+		PartDefinition body = root.getChild("body");
+		body.addOrReplaceChild("flap", CubeListBuilder.create().texOffs(106, 0).addBox(-2, 12, -2.6f, 4, 6, 1),
+				PartPose.ZERO);
+		body.addOrReplaceChild("back_flap", CubeListBuilder.create().texOffs(106, 8).addBox(-2, 12, 1.6f, 4, 6, 1),
+				PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
 	/** Un soldat d'Amestris : la visière de sa casquette, un peu baissée sur les yeux. */
 	public static ModelPart soldier() {
 		MeshDefinition mesh = mesh(false);
