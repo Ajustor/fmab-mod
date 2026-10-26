@@ -23,6 +23,7 @@
       "id": "minecraft:glass_bottle"
     },
     "frame": "task",
+    "hidden": true,
     "title": {
       "translate": "advancements.fmab.visit_marcoh_clinic.title"
     },

@@ -18,7 +18,8 @@
     "description": {
       "translate": "advancements.fmab.crest_sealed.description"
     },
-    "frame": "task"
+    "frame": "task",
+    "hidden": true
   },
   "requirements": [
     [

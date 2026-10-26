@@ -18,7 +18,8 @@
     "description": {
       "translate": "advancements.fmab.rank_gate.description"
     },
-    "frame": "goal"
+    "frame": "goal",
+    "hidden": true
   },
   "requirements": [
     [

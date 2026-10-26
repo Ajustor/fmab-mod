@@ -21,6 +21,7 @@
       "id": "minecraft:chiseled_sandstone"
     },
     "frame": "task",
+    "hidden": true,
     "title": {
       "translate": "advancements.fmab.visit_xerxes_ruins.title"
     },
