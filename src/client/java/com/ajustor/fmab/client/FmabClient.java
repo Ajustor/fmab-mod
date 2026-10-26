@@ -201,7 +201,7 @@ public final class FmabClient {
 		ClientPlatform.get().entityRenderer(FmabEntities.SLICER, c -> new HauntedArmorRenderer<>(c, "slicer"));
 		ClientPlatform.get().entityRenderer(FmabEntities.DRACHMA_GENERAL, c -> new FigureRenderer.Simple<>(c,
 				FigureModels.plain(false), Fmab.id("textures/entity/drachma_general.png"), Temper.OFFICER));
-		ClientPlatform.get().entityRenderer(FmabEntities.KIMBLEE, c -> new FigureRenderer.Simple<>(c, FigureModels.plain(false),
+		ClientPlatform.get().entityRenderer(FmabEntities.KIMBLEE, c -> new FigureRenderer.Simple<>(c, FigureModels.kimblee(),
 				Fmab.id("textures/entity/kimblee.png"), Temper.SCAR));
 		ClientPlatform.get().entityRenderer(FmabEntities.CHIMERA_BEAST, ChimeraBeastRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.CHIMERA_CRAWLER, ChimeraCrawlerRenderer::new);

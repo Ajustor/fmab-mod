@@ -1847,7 +1847,8 @@ def tattooist(s):
     boots(s, color="#4a3426", rows=3)
 
 
-@skin("kimblee")
+@skin("kimblee", size=WIDE, parts={"brim": (64, 0, 11, 1, 11), "crown": (64, 12, 8, 3, 8),
+                                   "tail": (96, 12, 2, 8, 2)})
 def kimblee(s):
     """Solf J. Kimblee, l'Alchimiste écarlate : costume et chapeau blancs, longs cheveux noirs noués
     bas, yeux d'or, un cercle tatoué dans chaque paume."""
@@ -1878,6 +1879,15 @@ def kimblee(s):
         s.px(arm, "front", 1, 11, "#c0182c" if arm == "rarm" else "#141216")
     pants(s, white)
     boots(s, color="#e8e6e0", rows=2, sole="#8a8680")
+    # Le feutre blanc en volume : le bord, la calotte et son ruban noir.
+    s.fill("brim", white, "cloth")
+    s.fill("brim", shade(white, 0.8), "cloth", faces=("bottom",))
+    s.fill("crown", white, "cloth")
+    s.material("crown", "top", shade(white, 1.03), "cloth")
+    s.band("crown", 2, 1, "#2a2a30")
+    # La longue queue de cheval noire, nouée bas.
+    s.fill("tail", hair, "hair")
+    s.band("tail", 0, 1, "#c0182c")
 
 
 @skin("slicer")
