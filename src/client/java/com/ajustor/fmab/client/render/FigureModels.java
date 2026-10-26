@@ -247,6 +247,19 @@ public final class FigureModels {
 		return bake(mesh);
 	}
 
+	/** Hawkeye : la poitrine, le chignon relevé à l'arrière de la tête, l'étui du pistolet sur la hanche droite. */
+	public static ModelPart hawkeye() {
+		MeshDefinition mesh = mesh(true);
+		PartDefinition root = mesh.getRoot();
+		PartDefinition body = root.getChild("body");
+		bust(body, 24, 0, 6, 2, 2.5f, -0.15f);
+		root.getChild("head").addOrReplaceChild("bun", CubeListBuilder.create().texOffs(56, 16)
+				.addBox(-1.5f, -6.5f, 4, 3, 3, 2), PartPose.ZERO);
+		body.addOrReplaceChild("holster", CubeListBuilder.create().texOffs(56, 24).addBox(-4.8f, 9, -1, 1, 3, 2),
+				PartPose.ZERO);
+		return bake(mesh);
+	}
+
 	/** Un soldat d'Amestris : la visière de sa casquette, un peu baissée sur les yeux. */
 	public static ModelPart soldier() {
 		MeshDefinition mesh = mesh(false);
