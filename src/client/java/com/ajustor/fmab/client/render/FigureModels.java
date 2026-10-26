@@ -260,6 +260,22 @@ public final class FigureModels {
 		return bake(mesh);
 	}
 
+	/**
+	 * Kimblee : le feutre blanc à bord, posé sur le crâne, et la longue queue de cheval noire nouée bas
+	 * (peau élargie, volumes à droite).
+	 */
+	public static ModelPart kimblee() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition head = mesh.getRoot().getChild("head");
+		head.addOrReplaceChild("brim", CubeListBuilder.create().texOffs(64, 0).addBox(-5.5f, -8.6f, -5.5f, 11, 1, 11),
+				PartPose.ZERO);
+		head.addOrReplaceChild("crown", CubeListBuilder.create().texOffs(64, 12).addBox(-4, -11, -4, 8, 3, 8),
+				PartPose.ZERO);
+		head.addOrReplaceChild("tail", CubeListBuilder.create().texOffs(96, 12).addBox(-1, 0, 0, 2, 8, 2),
+				PartPose.offsetAndRotation(0, -2, 4, 0.12f, 0, 0));
+		return bakeWide(mesh);
+	}
+
 	/** Un soldat d'Amestris : la visière de sa casquette, un peu baissée sur les yeux. */
 	public static ModelPart soldier() {
 		MeshDefinition mesh = mesh(false);
