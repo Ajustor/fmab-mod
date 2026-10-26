@@ -1657,8 +1657,9 @@ def lan_fan(s):
 
 
 # Les volumes d'Alphonse (FigureModels.alphonse) : épaulières, corne, houppe, pans du pagne.
-ALPHONSE_PARTS = {"rpauldron": (64, 0, 6, 4, 7), "lpauldron": (64, 12, 6, 4, 7), "horn": (96, 0, 2, 3, 2),
-                  "plume": (96, 8, 2, 8, 2), "flap": (106, 0, 4, 6, 1), "back_flap": (106, 8, 4, 6, 1)}
+ALPHONSE_PARTS = {"rpauldron": (64, 0, 7, 5, 7), "lpauldron": (64, 12, 7, 5, 7), "spike": (92, 0, 1, 2, 1),
+                  "horn": (96, 0, 2, 3, 2), "plume": (96, 8, 2, 9, 1), "flap": (106, 0, 4, 6, 1),
+                  "back_flap": (106, 8, 4, 6, 1)}
 
 
 @skin("alphonse", size=WIDE, parts=ALPHONSE_PARTS)
@@ -1717,8 +1718,8 @@ def alphonse(s):
         for f in SIDES:
             w, h = s.size(pauldron, f)
             s.rect(pauldron, f, 0, h - 1, w, 1, dark)
-    # La pointe de l'épaulière gauche, au milieu du dessus.
-    s.rect("lpauldron", "top", 2, 3, 2, 2, light)
+    # La pointe de l'épaulière gauche.
+    s.fill("spike", light, "metal")
     # Les bras : le coude, le brassard, le gantelet et ses jointures.
     for arm in ("rarm", "larm"):
         s.band(arm, 5, 1, dark, "metal")
