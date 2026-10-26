@@ -1540,11 +1540,16 @@ def mustang(s):
         s.px(arm, "front", w // 2, 11, "#c0182c")
         s.px(arm, "back", w // 2 - 1, 10, "#c0182c")
         s.px(arm, "back", w // 2, 11, "#c0182c")
+    # La chaîne d'argent de la montre d'Alchimiste d'État, qui part de la ceinture vers la poche.
+    for x, y in ((5, 8), (6, 9), (7, 9)):
+        s.px("body", "front", x, y, "#d8dde2")
+    s.px("body", "left", 0, 9, "#d8dde2")
 
 
-@skin("hawkeye", slim=True)
+@skin("hawkeye", slim=True, parts={**BUST, "bun": (56, 16, 3, 3, 2), "holster": (56, 24, 1, 3, 2)})
 def hawkeye(s):
-    """Riza Hawkeye : les cheveux blonds relevés en chignon, l'uniforme, le regard brun et droit."""
+    """Riza Hawkeye : les cheveux blonds relevés en chignon à pince, l'uniforme, le regard brun et
+    droit, l'étui de son pistolet à la hanche."""
     blond = "#e8cf7a"
     skin_face(s, PALE, mouth="#b0645c")
     eyes(s, "#5a3a22", brow=shade(blond, 0.75), lid="#3a2a20")
@@ -1555,6 +1560,13 @@ def hawkeye(s):
     s.rect("hat", "back", 2, 2, 4, 3, shade(blond, 0.9))
     s.px("hat", "back", 3, 3, "#3a3036")
     amestris_uniform(s, tone=PALE)
+    bust(s, AMESTRIS_BLUE)
+    # Le chignon en volume, et sa pince sombre.
+    s.fill("bun", shade(blond, 0.92), "hair")
+    s.rect("bun", "back", 0, 1, 3, 1, "#3a3036")
+    # L'étui du pistolet, en cuir noir.
+    s.fill("holster", "#1e1a1c", "leather")
+    s.material("holster", "top", "#4a4248", "leather")
 
 
 # Les volumes d'Armstrong (FigureModels.armstrong) : la boucle, la moustache en guidon, les épaules.

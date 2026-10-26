@@ -39,6 +39,7 @@ public class StoryCharacterRenderer extends FigureRenderer.Simple<StoryCharacter
 			case "alphonse" -> FigureModels.alphonse();
 			case "armstrong" -> FigureModels.armstrong();
 			case "pinako" -> FigureModels.pinako();
+			case "hawkeye" -> FigureModels.hawkeye();
 			default -> FigureModels.plain(SLIM.contains(id));
 		};
 	}
