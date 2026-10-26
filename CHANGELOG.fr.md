@@ -1,5 +1,41 @@
 # Journal des modifications
 
+## 1.18.0 — 2026-10-26
+
+### Nouveautés
+
+- Devenir une Pierre vivante ne fait plus chuter le karma, et elle regagne un cœur par seconde tant qu'il lui reste des âmes.
+- Une Pierre vivante qui n'a jamais répondu à Père reçoit d'abord la visite de Lust et son offre, quel que soit son karma, avant d'être traquée.
+- Mains jointes, un cercle qui n'appelle que l'air, le feu ou l'eau agit même sans surface, devant soi ; les gants de Mustang visent une créature ou le vide.
+- Alphonse ressemble à celui de l'anime : une grande armure bleu-vert hérissée de pointes, plus haute qu'un homme, avec son tablier de toile, ses yeux rouges et ses bras croisés au repos.
+- Greed apparaît sous forme humaine hors combat ; en combat, son Bouclier ultime se déploie sur tout son corps, des bras jusqu'au visage.
+- Armstrong est un colosse, avec sa boucle blonde dressée sur le crâne et sa grosse moustache en guidon.
+- Olivier Armstrong porte le col de fourrure blanche du manteau de Briggs et son sabre à la hanche.
+- Pinako est toute petite, comme dans l'anime, et fume sa longue pipe.
+- Izumi porte ses dreadlocks nouées en une longue queue dans le dos, deux mèches devant les épaules.
+- Mustang porte à la ceinture la chaîne de sa montre d'argent d'Alchimiste d'État.
+- Hawkeye a son chignon relevé à pince et l'étui de son pistolet à la hanche.
+- Kimblee porte un vrai feutre blanc à bord et ruban noir, et sa longue queue de cheval noire.
+- Ling a ses yeux toujours plissés en deux fentes rieuses et sa petite queue de cheval.
+- Le Bouclier ultime de Greed est une carapace noire et luisante qui suit ses muscles, au lieu de rayures.
+- Gluttony est tout rond : un tronc plus large que les épaules, un gros ventre et un double menton.
+- Envy a ses longues mèches vertes hérissées qui tombent dans le dos.
+- King Bradley porte ses sabres aux hanches.
+- Basque Grand est un colosse aux épaules massives, comme dans l'anime.
+- Élément + Décomposer brise aussi les minerais de cet élément autour du cercle, y compris ceux des autres mods (le zinc de Create) ; l'or peut désormais se décomposer.
+
+### Corrections
+
+- L'être dont une Pierre vivante absorbe l'âme est paralysé tant qu'on le tient, et le bras tendu reste en place au lieu de rejouer son geste en boucle.
+- L'œil dans le sol n'apparaît plus que pendant le rite du cercle de la Pierre, et non plus sous l'être qu'une Pierre vivante absorbe de la main.
+- Pendant le rite de la Pierre, tout être vivant pris dans le cercle est paralysé jusqu'à la fin, joueurs compris.
+- Avec Iris et un shader pack, la lune de l'éclipse se dessine de nouveau, et un voile rouge plus épais assombrit le jour, puisque les shaders ignorent l'éclipse.
+- Les lunettes de Hughes ont une fine monture de métal au lieu d'un bandeau noir sur les yeux.
+- Les lunettes rondes de Tucker se voient enfin, au lieu d'un bandeau sombre sur les yeux.
+- La montre gravée de l'épilogue est celle d'Edward, en argent, avec son inscription « Don't forget 3. Oct. 11 ».
+- Les progrès liés aux événements cachés (homonculus, Pierre, Porte, lieux secrets, révélations) restent masqués jusqu'à ce qu'on les obtienne.
+- Une transmutation qui ne fait rien ne coûte plus ni concentration ni âmes ; un rebond reste payant.
+- L'épreuve d'Izumi « transmuter avec un gant » ne se valide plus en joignant les mains ou avec un tatouage.
 ## 1.17.0 — 2026-10-25
 
 ### Nouveautés

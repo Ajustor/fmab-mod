@@ -1,5 +1,41 @@
 # Changelog
 
+## 1.18.0 — 2026-10-26
+
+### New features
+
+- Becoming a living Stone no longer sinks your karma, and it regains a heart per second as long as it has souls left.
+- A living Stone that has never answered Father first gets Lust's visit and his offer, whatever its karma, before being hunted.
+- With joined hands, a circle calling only on air, fire or water works even without a surface, in front of you; Mustang's gloves aim at a creature or empty air.
+- Alphonse looks like the anime: a tall blue-green spiked armour bigger than a man, with his cloth apron, red eyes and arms crossed at rest.
+- Greed appears in human form outside combat; in a fight, his Ultimate Shield spreads over his whole body, from the arms up to the face.
+- Armstrong is a giant, with his single blond curl standing up and his big handlebar moustache.
+- Olivier Armstrong wears the white fur collar of the Briggs greatcoat and her sabre at her hip.
+- Pinako is tiny, as in the anime, and smokes her long pipe.
+- Izumi wears her dreadlocks tied in a long tail down her back, with two locks in front of her shoulders.
+- Mustang wears the chain of his silver State Alchemist watch at his belt.
+- Hawkeye has her clipped-up bun and her pistol holster at her hip.
+- Kimblee wears a real white brimmed fedora with a black band, and his long black ponytail.
+- Ling has his ever-squinting, smiling eyes and his small ponytail.
+- Greed's Ultimate Shield is a glossy black carapace following his muscles instead of stripes.
+- Gluttony is round all over: a trunk wider than his shoulders, a big belly and a double chin.
+- Envy has his long, spiky green locks falling down his back.
+- King Bradley carries his sabres at his hips.
+- Basque Grand is a giant with massive shoulders, as in the anime.
+- Element + Decompose also breaks that element's ores around the circle, including other mods' ores (Create's zinc); gold can now be decomposed.
+
+### Fixes
+
+- A being whose soul a living Stone absorbs is paralysed while held, and the outstretched arm stays put instead of replaying its gesture in a loop.
+- The eye in the ground now only appears during the Stone circle rite, no longer under a being a living Stone absorbs by hand.
+- During the Stone rite, every living being caught in the circle is paralysed until the end, players included.
+- With Iris and a shader pack, the eclipse moon is drawn again, and a thicker red veil darkens the day, since shaders ignore the eclipse.
+- Hughes' glasses have a thin metal frame instead of a black band over his eyes.
+- Tucker's round glasses are finally visible instead of a dark band over his eyes.
+- The epilogue's engraved watch is Edward's, in silver, with its "Don't forget 3. Oct. 11" inscription.
+- Advancements tied to hidden events (homunculi, the Stone, the Gate, secret places, revelations) stay hidden until earned.
+- A transmutation that does nothing no longer costs concentration or souls; a rebound still does.
+- Izumi's "transmute with a glove" trial no longer completes with joined hands or a tattoo.
 ## 1.17.0 — 2026-10-25
 
 ### New features
