@@ -1613,7 +1613,7 @@ def hughes(s):
     """Maes Hughes : cheveux noirs courts, lunettes, une barbe de quelques jours, l'uniforme."""
     skin_face(s, FAIR, mouth="#9a5a52")
     eyes(s, "#4a8a50", brow="#1e1a1c")
-    glasses(s, "#2a2a30")
+    glasses(s, "#7a7c86")
     short_hair(s, "#1e1a1c", fringe=1, back=5)
     for x in range(1, 7):
         s.tint("head", "front", x, 7, 1, 1, 0.82)
