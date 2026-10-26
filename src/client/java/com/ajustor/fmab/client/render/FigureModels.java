@@ -135,6 +135,22 @@ public final class FigureModels {
 		return bake(mesh);
 	}
 
+	/**
+	 * Izumi : la poitrine, ses dreadlocks nouées en une grosse queue qui tombe dans le dos et deux mèches
+	 * qui retombent devant les épaules (peau élargie, volumes à droite).
+	 */
+	public static ModelPart izumi() {
+		MeshDefinition mesh = mesh(true);
+		PartDefinition root = mesh.getRoot();
+		bust(root.getChild("body"), 24, 0, 6, 2, 2.5f, -0.15f);
+		PartDefinition head = root.getChild("head");
+		head.addOrReplaceChild("dreads", CubeListBuilder.create().texOffs(64, 0).addBox(-1.5f, -5, 4, 3, 13, 2),
+				PartPose.ZERO);
+		head.addOrReplaceChild("locks", CubeListBuilder.create().texOffs(78, 0).addBox(-4.6f, -3, -2.5f, 1, 6, 1)
+				.texOffs(78, 0).mirror().addBox(3.6f, -3, -2.5f, 1, 6, 1), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
 	/** Winry : la poitrine, et la queue de cheval nouée haut qui tombe dans la nuque. */
 	public static ModelPart winry() {
 		MeshDefinition mesh = mesh(true);
