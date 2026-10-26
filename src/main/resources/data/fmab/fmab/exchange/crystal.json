@@ -7,6 +7,7 @@
     "minecraft:snowball": 1,
     "minecraft:snow_block": 4,
     "minecraft:quartz": 1,
-    "minecraft:amethyst_shard": 1
+    "minecraft:amethyst_shard": 1,
+    "#c:ores/quartz": 1
   }
 }
