@@ -3,7 +3,6 @@ package com.ajustor.fmab.gametest;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.SimpleCircles;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
-import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.block.CircleMedium;
 import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
@@ -101,7 +100,9 @@ public class IzumiTrialScenes implements FabricClientGameTest {
 			context.waitTicks(5);
 			boolean clapped = sp.getServer().computeOnServer(server -> {
 				var p = server.getPlayerList().getPlayers().getFirst();
-				FmabAttachments.ALCHEMIST.set(p, FmabAttachments.ALCHEMIST.getOrCreate(p).withRank(Rank.GATE));
+				// Une Pierre vivante joint les mains sans avoir vu la Porte : pas de rang à changer, donc ni
+				// progrès ni cinématique qui mettraient la partie en pause.
+				FmabAttachments.LIVING_STONE.set(p, 50);
 				p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 				p.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
 				Concentration.set(p, Concentration.max(p));
@@ -110,11 +111,13 @@ public class IzumiTrialScenes implements FabricClientGameTest {
 				return FmabAttachments.TRAINING.getOrCreate(p).achieved().contains(Trial.GLOVES.id());
 			});
 			check(!clapped, "joindre les mains ne devrait pas réussir l'épreuve du gant");
+			context.setScreen(() -> null);
 			// Ailleurs, que le mur des mains jointes ne gêne pas.
 			sp.getServer().runCommand("tp @p 10.5 -60 0.5 0 60");
 			context.waitTicks(15);
 			boolean gloved = sp.getServer().computeOnServer(server -> {
 				var p = server.getPlayerList().getPlayers().getFirst();
+				FmabAttachments.LIVING_STONE.remove(p);
 				ItemStack glove = new ItemStack(FmabItems.CLOTH_GLOVES);
 				glove.set(FmabComponents.GLOVE_CIRCLE, wall(p));
 				FmabAttachments.GLOVES.set(p, Gloves.NONE.with(false, glove));
