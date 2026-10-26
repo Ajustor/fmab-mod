@@ -187,48 +187,60 @@ public final class FigureModels {
 	}
 
 	/**
-	 * Alphonse : la grande armure. Le heaume à la mentonnière avancée, son arête, sa corne et la houppe
-	 * qui sort du sommet ; un plastron bombé bien plus large que le corps ; les grosses épaulières
-	 * rondes (la gauche à pointe), les brassards, les genouillères, la jupe de tassettes et les pans du
-	 * pagne (peau élargie, volumes à droite).
+	 * Alphonse, d'après l'anime : une armure massive à la tête petite. Le heaume à la mentonnière en
+	 * grille, sa crête, sa pointe et la longue houppe ; un plastron énorme ; des épaulières rondes
+	 * hérissées d'une pointe, des brassards épais ; des jambes écartées et très épaisses (cuissards,
+	 * grèves, solerets), une pointe à chaque genou, une sacoche sur la cuisse droite ; le long tablier
+	 * de toile qui tombe jusqu'aux genoux (peau élargie, volumes à droite).
 	 */
 	public static ModelPart alphonse() {
 		MeshDefinition mesh = mesh(false);
 		PartDefinition root = mesh.getRoot();
 		PartDefinition head = root.getChild("head");
-		head.addOrReplaceChild("snout", CubeListBuilder.create().texOffs(96, 18).addBox(-2.5f, -4, -5.5f, 5, 4, 2),
+		head.addOrReplaceChild("snout", CubeListBuilder.create().texOffs(100, 32).addBox(-2.5f, -4, -5.5f, 5, 4, 2),
 				PartPose.ZERO);
-		head.addOrReplaceChild("crest", CubeListBuilder.create().texOffs(96, 24).addBox(-1, -9, -4.5f, 2, 1, 6),
+		head.addOrReplaceChild("crest", CubeListBuilder.create().texOffs(100, 38).addBox(-1, -9, -4.5f, 2, 1, 6),
 				PartPose.ZERO);
-		head.addOrReplaceChild("horn", CubeListBuilder.create().texOffs(116, 0).addBox(-1, -12.5f, -3.5f, 2, 4, 2),
-				PartPose.ZERO);
-		head.addOrReplaceChild("plume", CubeListBuilder.create().texOffs(116, 6).addBox(-1, -9, 3.5f, 2, 10, 1),
+		head.addOrReplaceChild("horn", CubeListBuilder.create().texOffs(114, 32).addBox(-1, -11.5f, -3.5f, 2, 3, 2)
+				.texOffs(116, 38).addBox(-0.5f, -14, -3, 1, 3, 1), PartPose.ZERO);
+		head.addOrReplaceChild("plume", CubeListBuilder.create().texOffs(122, 30).addBox(-1, -9, 3.5f, 2, 14, 1),
 				PartPose.ZERO);
 		PartDefinition body = root.getChild("body");
-		body.addOrReplaceChild("chest", CubeListBuilder.create().texOffs(64, 0).addBox(-5, -0.5f, -3, 10, 7, 6),
+		body.addOrReplaceChild("chest", CubeListBuilder.create().texOffs(64, 0).addBox(-5.5f, -1, -3.5f, 11, 8, 7),
 				PartPose.ZERO);
-		body.addOrReplaceChild("skirt", CubeListBuilder.create().texOffs(64, 41).addBox(-4.5f, 9, -2.5f, 9, 4, 5),
+		body.addOrReplaceChild("apron", CubeListBuilder.create().texOffs(100, 20).addBox(-3, 9, -3.6f, 6, 11, 1),
 				PartPose.ZERO);
-		body.addOrReplaceChild("flap", CubeListBuilder.create().texOffs(96, 31).addBox(-2, 11, -3, 4, 6, 1),
-				PartPose.ZERO);
-		body.addOrReplaceChild("back_flap", CubeListBuilder.create().texOffs(106, 31).addBox(-2, 11, 2, 4, 6, 1),
+		body.addOrReplaceChild("back_flap", CubeListBuilder.create().texOffs(114, 20).addBox(-2.5f, 9, 2.6f, 5, 7, 1),
 				PartPose.ZERO);
 		PartDefinition right = root.getChild("right_arm");
-		right.addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 13).addBox(-5.5f, -4, -4, 8, 6, 8),
+		right.addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 15).addBox(-6, -4.5f, -4.5f, 9, 6, 9),
 				PartPose.ZERO);
-		right.addOrReplaceChild("bracer", CubeListBuilder.create().texOffs(96, 0).addBox(-3.5f, 4, -2.5f, 5, 4, 5),
+		right.addOrReplaceChild("spike", CubeListBuilder.create().texOffs(116, 38).addBox(-2, -7.5f, -0.5f, 1, 3, 1),
+				PartPose.ZERO);
+		right.addOrReplaceChild("bracer", CubeListBuilder.create().texOffs(100, 0).addBox(-4, 4, -3, 6, 5, 6),
 				PartPose.ZERO);
 		PartDefinition left = root.getChild("left_arm");
-		left.addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 27).addBox(-2.5f, -4, -4, 8, 6, 8),
+		left.addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 30).addBox(-3, -4.5f, -4.5f, 9, 6, 9),
 				PartPose.ZERO);
-		left.addOrReplaceChild("spike", CubeListBuilder.create().texOffs(124, 0).addBox(1, -7, -0.5f, 1, 3, 1),
+		left.addOrReplaceChild("spike", CubeListBuilder.create().texOffs(116, 38).addBox(1, -7.5f, -0.5f, 1, 3, 1),
 				PartPose.ZERO);
-		left.addOrReplaceChild("bracer", CubeListBuilder.create().texOffs(96, 9).addBox(-1.5f, 4, -2.5f, 5, 4, 5),
+		left.addOrReplaceChild("bracer", CubeListBuilder.create().texOffs(100, 0).mirror().addBox(-2, 4, -3, 6, 5, 6),
 				PartPose.ZERO);
-		root.getChild("right_leg").addOrReplaceChild("knee", CubeListBuilder.create().texOffs(92, 41)
-				.addBox(-2.5f, 3.5f, -2.8f, 5, 3, 1), PartPose.ZERO);
-		root.getChild("left_leg").addOrReplaceChild("knee", CubeListBuilder.create().texOffs(92, 41).mirror()
-				.addBox(-2.5f, 3.5f, -2.8f, 5, 3, 1), PartPose.ZERO);
+		// Les jambes, écartées par la carrure : cuissard, grève et soleret autour de chacune.
+		for (boolean isLeft : new boolean[]{false, true}) {
+			PartDefinition leg = root.addOrReplaceChild(isLeft ? "left_leg" : "right_leg", CubeListBuilder.create()
+					.texOffs(isLeft ? 16 : 0, isLeft ? 48 : 16).addBox(-2, 0, -2, 4, 12, 4), PartPose.offset(isLeft ? 3.1f : -3.1f, 12, 0));
+			leg.addOrReplaceChild("thigh", CubeListBuilder.create().texOffs(64, 45).mirror(isLeft)
+					.addBox(-3, 0, -3, 6, 6, 6), PartPose.ZERO);
+			leg.addOrReplaceChild("greave", CubeListBuilder.create().texOffs(88, 45).mirror(isLeft)
+					.addBox(-3, 6.5f, -3, 6, 4, 6), PartPose.ZERO);
+			leg.addOrReplaceChild("foot", CubeListBuilder.create().texOffs(100, 11).mirror(isLeft)
+					.addBox(-3, 10, -4, 6, 2, 7), PartPose.ZERO);
+			leg.addOrReplaceChild("knee", CubeListBuilder.create().texOffs(120, 38).addBox(-0.5f, 5, -4.2f, 1, 2, 1),
+					PartPose.ZERO);
+		}
+		root.getChild("right_leg").addOrReplaceChild("pouch", CubeListBuilder.create().texOffs(112, 45)
+				.addBox(-4.6f, 1, -1, 2, 3, 2), PartPose.ZERO);
 		return bakeWide(mesh);
 	}
 
