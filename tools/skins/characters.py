@@ -1626,22 +1626,82 @@ def lan_fan(s):
     boots(s, color="#101014", rows=4)
 
 
-@skin("alphonse")
+# Les volumes d'Alphonse (FigureModels.alphonse) : épaulières, corne, houppe, pans du pagne.
+ALPHONSE_PARTS = {"rpauldron": (64, 0, 6, 4, 7), "lpauldron": (64, 12, 6, 4, 7), "horn": (96, 0, 2, 3, 2),
+                  "plume": (96, 8, 2, 8, 2), "flap": (106, 0, 4, 6, 1), "back_flap": (106, 8, 4, 6, 1)}
+
+
+@skin("alphonse", size=WIDE, parts=ALPHONSE_PARTS)
 def alphonse(s):
-    """Alphonse Elric : la grande armure d'acier, ses yeux rouges dans la fente du heaume, le pagne
-    rouge et les sangles de cuir."""
-    armor(s, ALPHONSE_STEEL, ALPHONSE_TRIM, eye="#ff4a3a")
-    # La corne du front, au-dessus de la fente.
-    s.px("head", "front", 3, 1, "#d8e0ea")
-    s.px("head", "front", 4, 1, "#d8e0ea")
-    s.rect("hat", "top", 3, 3, 2, 2, "#e8e8e0")
-    s.material("hat", "back", "#e8e8e0", "hair", x=3, w=2, h=7)
-    # Le pagne rouge, devant et derrière, et les sangles de cuir en travers du ventre.
-    s.material("body", "front", "#9a2228", "cloth", x=2, w=4, y=9, h=3)
-    s.material("body", "back", "#9a2228", "cloth", x=2, w=4, y=9, h=3)
-    s.band("body", 8, 1, "#5a3a22", "leather")
+    """Alphonse Elric, comme dans Brotherhood : la grande armure d'acier gris bleuté, vide ; deux points
+    de lumière pâle au fond de la fente du heaume, la corne du front et la longue houppe blanche, les
+    épaulières rondes (la gauche à pointe), le ceinturon de cuir et le pagne rouge sombre."""
+    steel, dark, light = "#6f7889", "#3e4450", "#b8c2d2"
+    void, glow, cloth, leather = "#121318", "#fff3c4", "#8a2a2c", "#5a3a22"
+    for part in ("head", "body", "rarm", "larm", "rleg", "lleg"):
+        s.fill(part, steel, "metal")
+    # Le heaume : le cimier, l'arcade, la fente où brillent les yeux, la grille de la bouche.
+    s.material("head", "top", shade(steel, 1.1), "metal")
+    s.rect("head", "front", 0, 0, 8, 1, shade(steel, 1.1))
+    s.rect("head", "front", 3, 0, 2, 2, light)
+    s.rect("head", "front", 1, 2, 6, 1, dark)
+    s.rect("head", "front", 1, 3, 6, 2, void)
+    s.px("head", "front", 2, 3, glow)
+    s.px("head", "front", 5, 3, glow)
+    s.px("head", "front", 2, 4, shade(glow, 0.55))
+    s.px("head", "front", 5, 4, shade(glow, 0.55))
+    s.rect("head", "front", 2, 5, 4, 2, dark)
+    for x in (2, 4):
+        s.rect("head", "front", x, 5, 1, 2, void)
+    s.rect("head", "front", 0, 7, 8, 1, shade(steel, 0.8))
+    for f in ("left", "right"):
+        s.rect("head", f, 3, 3, 2, 2, dark)
+        s.px("head", f, 3, 3, light)
+    s.seam("head", "back", 4, 1, 6, None, k=0.75)
+    # La corne et la houppe (volumes à part).
+    s.fill("horn", light, "metal")
+    s.material("horn", "top", shade(light, 1.1), "metal")
+    s.fill("plume", "#ecebe4", "hair")
+    s.tint("plume", "front", 0, 0, 2, 1, 0.8)
+    # Le buste : le col, le plastron bombé et son arête, les lames du ventre, le ceinturon, les tassettes.
+    s.band("body", 0, 1, dark, "metal")
+    s.tint("body", "front", 1, 1, 6, 4, 1.12)
+    s.seam("body", "front", 4, 1, 5, light)
+    s.seam("body", "front", 3, 1, 5, None, k=0.8)
+    s.band("body", 6, 1, shade(steel, 0.9), "metal")
+    s.band("body", 7, 1, shade(steel, 0.82), "metal")
+    s.band("body", 8, 1, leather, "leather")
+    s.rect("body", "front", 3, 8, 2, 1, "#b0a070")
+    s.band("body", 9, 3, shade(steel, 0.78), "metal")
+    for f in ("front", "back"):
+        s.material("body", f, cloth, "cloth", x=2, w=4, y=9, h=3)
+    # Les pans du pagne, devant et derrière, qui pendent sous le ceinturon.
+    for flap in ("flap", "back_flap"):
+        s.fill(flap, cloth, "cloth")
+        s.tint(flap, "front", 0, 5, 4, 1, 0.8)
+        s.tint(flap, "back", 0, 5, 4, 1, 0.8)
+    # Les épaulières rondes : un rebord clair en haut, sombre en bas.
+    for pauldron in ("rpauldron", "lpauldron"):
+        s.fill(pauldron, shade(steel, 1.15), "metal")
+        s.material(pauldron, "top", shade(steel, 1.25), "metal")
+        for f in SIDES:
+            w, h = s.size(pauldron, f)
+            s.rect(pauldron, f, 0, h - 1, w, 1, dark)
+    # La pointe de l'épaulière gauche, au milieu du dessus.
+    s.rect("lpauldron", "top", 2, 3, 2, 2, light)
+    # Les bras : le coude, le brassard, le gantelet et ses jointures.
+    for arm in ("rarm", "larm"):
+        s.band(arm, 5, 1, dark, "metal")
+        s.band(arm, 6, 3, shade(steel, 1.05), "metal")
+        s.band(arm, 9, 3, shade(steel, 0.72), "metal")
+        s.rect(arm, "front", 0, 9, 4, 1, light)
+    # Les jambes : la genouillère pointue, la grève, les solerets.
     for leg in ("rleg", "lleg"):
-        s.band(leg, 0, 1, "#5a3a22", "leather")
+        s.band(leg, 5, 1, dark, "metal")
+        s.rect(leg, "front", 1, 4, 2, 2, light)
+        s.band(leg, 8, 1, dark, "metal")
+        s.band(leg, 9, 3, shade(steel, 0.75), "metal")
+        s.rect(leg, "front", 0, 11, 4, 1, shade(steel, 0.6))
 
 
 @skin("pinako", slim=True)
