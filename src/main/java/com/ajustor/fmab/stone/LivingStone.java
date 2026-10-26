@@ -6,7 +6,6 @@ import com.ajustor.fmab.data.TransmutationPose;
 import com.ajustor.fmab.entity.EnvyEntity;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.LustEntity;
-import com.ajustor.fmab.entity.SoulEyeEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.gate.GateOfTruth;
 import com.ajustor.fmab.item.PhilosopherStoneItem;
@@ -239,8 +238,6 @@ public final class LivingStone {
 		TransmutationPose.keep(absorber, TransmutationPose.Kind.REACH, ABSORB_GAP + 2);
 		Paralysis.hold(target, ABSORB_GAP + 2);
 		draw(level, target, absorber);
-		// Un œil s'ouvre dans le sol sous la proie, tant qu'on la tient.
-		SoulEyeEntity.under(level, target, ABSORB_GAP + 2);
 
 		int gained;
 		if (target instanceof ServerPlayer victim && souls(victim) > 0) {

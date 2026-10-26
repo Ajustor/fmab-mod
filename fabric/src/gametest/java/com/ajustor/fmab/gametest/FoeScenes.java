@@ -4,6 +4,7 @@ import com.ajustor.fmab.entity.BarryEntity;
 import com.ajustor.fmab.entity.Butcher;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.LustEntity;
+import com.ajustor.fmab.entity.SoulEyeEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
@@ -95,6 +96,8 @@ public class FoeScenes implements FabricClientGameTest {
 					"la proie tenue ne devrait pas bouger, elle a fait " + husk[0].position().distanceTo(from[0]));
 			check(FmabAttachments.POSE.get(p).start() == start[0],
 					"le bras tendu ne devrait pas reprendre son élan à chaque pulsation");
+			check(p.level().getEntitiesOfClass(SoulEyeEntity.class, husk[0].getBoundingBox().inflate(4)).isEmpty(),
+					"l'œil ne s'ouvre que sous le grand cercle de la Pierre, pas sous la main d'une Pierre vivante");
 		});
 		context.waitTicks(20);
 		onPlayer(context, sp, p -> {
