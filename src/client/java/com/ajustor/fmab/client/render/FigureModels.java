@@ -156,7 +156,7 @@ public final class FigureModels {
 		MeshDefinition mesh = mesh(true);
 		PartDefinition root = mesh.getRoot();
 		bust(root.getChild("body"), 24, 0, 6, 2, 2.5f, -0.15f);
-		ponytail(root.getChild("head"), 8, -6, 0.22f);
+		ponytail(root.getChild("head"), 11, -6, 0.22f);
 		return bake(mesh);
 	}
 
