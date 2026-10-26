@@ -127,6 +127,15 @@ public final class EclipseSky {
 		return new Vector4f(0.6f, 0.65f, 0.75f, vanilla.w() * (1 - mask));
 	}
 
+	/**
+	 * L'opacité du voile de l'écran pendant l'éclipse (0 à 255). Sans shaders, le ciel et la lumière
+	 * s'assombrissent déjà : un léger voile suffit. Un shader pack calcule les siens d'après l'heure et
+	 * ignore l'éclipse : le voile fait alors tout le travail, et cache même son soleil à la totalité.
+	 */
+	public static int veilAlpha(float strength, boolean shaders) {
+		return Math.round((shaders ? 0xB0 : 0x40) * Math.clamp(strength, 0, 1));
+	}
+
 	/** La couronne, d'un blanc chaud. */
 	public static Vector4f coronaColor(Vector4f vanilla) {
 		return new Vector4f(1, 0.92f, 0.78f, vanilla.w());

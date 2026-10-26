@@ -33,7 +33,13 @@ class RecruitmentTest {
 	@Test
 	void othersAreHuntedOnlyForTheirStone() {
 		assertEquals(Recruitment.Visit.NONE, Recruitment.visit(Karma.RECRUITABLE + 1, 0, null));
-		assertEquals(Recruitment.Visit.HUNT, Recruitment.visit(0, 1, null));
+		assertEquals(Recruitment.Visit.HUNT, Recruitment.visit(0, 1, Recruitment.REFUSED));
+	}
+
+	@Test
+	void aLivingStoneIsOfferedFirstWhateverItsKarma() {
+		assertEquals(Recruitment.Visit.OFFER, Recruitment.visit(0, 1, null), "une Pierre propre reçoit d'abord l'offre");
+		assertEquals(Recruitment.Visit.OFFER, Recruitment.visit(80, 36, null));
 	}
 
 	@Test

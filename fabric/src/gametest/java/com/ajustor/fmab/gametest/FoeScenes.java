@@ -4,11 +4,13 @@ import com.ajustor.fmab.entity.BarryEntity;
 import com.ajustor.fmab.entity.Butcher;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.LustEntity;
+import com.ajustor.fmab.entity.SoulEyeEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
+import com.ajustor.fmab.stone.Paralysis;
 import com.ajustor.fmab.stone.Recruitment;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -18,6 +20,9 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.zombie.Husk;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -28,7 +33,8 @@ import static com.ajustor.fmab.gametest.GametestAsserts.check;
 /**
  * Les adversaires qui ont leurs règles à eux, joués pour de vrai : l'offre de Père à une âme noire
  * (Lust vient sans combattre ; accepter ou refuser change la suite), Barry le Boucher (le hachoir
- * levé avant de balayer, le sceau qui tient au premier effondrement). Chaque règle est vérifiée, et
+ * levé avant de balayer, le sceau qui tient au premier effondrement), la proie figée d'une Pierre
+ * vivante. Chaque règle est vérifiée, et
  * capturée dans {@code build/run/clientGameTest/screenshots}.
  */
 public class FoeScenes implements FabricClientGameTest {
@@ -53,7 +59,53 @@ public class FoeScenes implements FabricClientGameTest {
 			offerAccepted(context, sp);
 			offerRefused(context, sp);
 			barry(context, sp);
+			absorbed(context, sp);
 		}
+	}
+
+	/**
+	 * La proie d'une Pierre vivante reste figée tant qu'on la tient, et le bras tendu ne reprend pas son
+	 * élan à chaque pulsation ; lâchée, elle repart.
+	 */
+	private static void absorbed(ClientGameTestContext context, TestSingleplayerContext sp) {
+		Husk[] husk = new Husk[1];
+		Vec3[] from = new Vec3[1];
+		long[] start = new long[1];
+		onPlayer(context, sp, p -> {
+			p.setHealth(p.getMaxHealth());
+			FmabAttachments.LIVING_STONE.set(p, 50);
+			husk[0] = EntityTypes.HUSK.create(p.level(), EntitySpawnReason.COMMAND);
+			husk[0].snapTo(p.getX() + 5, p.getY(), p.getZ() + 5, 225, 0);
+			p.level().addFreshEntity(husk[0]);
+			husk[0].setTarget(p);
+		});
+		for (int pulse = 0; pulse < 6; pulse++) {
+			onPlayer(context, sp, p -> {
+				LivingStone.absorb(p, husk[0]);
+				if (from[0] == null) {
+					from[0] = husk[0].position();
+					start[0] = FmabAttachments.POSE.get(p).start();
+				}
+			});
+			context.waitTicks(2);
+		}
+		context.takeScreenshot("foes_04_absorbed_held");
+		onPlayer(context, sp, p -> {
+			check(husk[0].isAlive() && Paralysis.held(husk[0]), "la proie tenue devrait être paralysée");
+			check(husk[0].position().distanceTo(from[0]) < 0.2,
+					"la proie tenue ne devrait pas bouger, elle a fait " + husk[0].position().distanceTo(from[0]));
+			check(FmabAttachments.POSE.get(p).start() == start[0],
+					"le bras tendu ne devrait pas reprendre son élan à chaque pulsation");
+			check(p.level().getEntitiesOfClass(SoulEyeEntity.class, husk[0].getBoundingBox().inflate(4)).isEmpty(),
+					"l'œil ne s'ouvre que sous le grand cercle de la Pierre, pas sous la main d'une Pierre vivante");
+		});
+		context.waitTicks(20);
+		onPlayer(context, sp, p -> {
+			check(!Paralysis.held(husk[0]) && husk[0].getAttributeValue(Attributes.MOVEMENT_SPEED) > 0,
+					"lâchée, la proie devrait pouvoir bouger de nouveau");
+			husk[0].discard();
+			FmabAttachments.LIVING_STONE.remove(p);
+		});
 	}
 
 	private static void onPlayer(ClientGameTestContext context, TestSingleplayerContext sp, Consumer<ServerPlayer> action) {
