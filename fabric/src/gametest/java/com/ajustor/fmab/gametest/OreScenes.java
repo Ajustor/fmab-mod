@@ -65,7 +65,7 @@ public class OreScenes implements FabricClientGameTest {
 	/** Trace Élément + Décomposer à la craie et pose la paume dessus. */
 	private static Transmutation.Result decompose(ServerPlayer p, String element) {
 		var level = p.level();
-		FmabAttachments.ALCHEMIST.set(p, AlchemistData.NEW.withRank(Rank.GATE));
+		FmabAttachments.ALCHEMIST.set(p, AlchemistData.NEW.withRank(Rank.GATE).learn(element).learn("fmab:decomposer"));
 		AlchemyRules rules = AlchemyRules.of(level.registryAccess());
 		Glyph e = rules.glyph(element).orElseThrow();
 		Glyph a = rules.glyph("fmab:decomposer").orElseThrow();
