@@ -46,13 +46,20 @@ public final class FigureModels {
 				PartPose.offsetAndRotation(0, y, -2, tilt, 0, 0));
 	}
 
-	/** Olivier : la poitrine, et sa longue chevelure blonde qui tombe dans le dos. */
+	/**
+	 * Olivier : la poitrine, sa longue chevelure blonde qui tombe dans le dos, le col de fourrure du
+	 * manteau de Briggs et le sabre à la hanche gauche.
+	 */
 	public static ModelPart olivier() {
 		MeshDefinition mesh = mesh(true);
 		PartDefinition body = mesh.getRoot().getChild("body");
 		bust(body, 24, 0, 6, 2, 2.5f, -0.15f);
 		body.addOrReplaceChild("hair", CubeListBuilder.create().texOffs(64, 0).addBox(-4, -1, 2.3f, 8, 11, 1),
 				PartPose.ZERO);
+		body.addOrReplaceChild("collar", CubeListBuilder.create().texOffs(82, 0).addBox(-5, -1, -3, 10, 2, 6),
+				PartPose.ZERO);
+		body.addOrReplaceChild("sabre", CubeListBuilder.create().texOffs(114, 0).addBox(-0.5f, 0, -0.5f, 1, 9, 1),
+				PartPose.offsetAndRotation(4.6f, 8, -1, 0.35f, 0, 0));
 		return bakeWide(mesh);
 	}
 

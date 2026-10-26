@@ -692,9 +692,11 @@ def may_chang(s):
     boots(s, color="#1e1a22", rows=3)
 
 
-@skin("olivier", slim=True, size=WIDE, parts={**BUST, "hair": (64, 0, 8, 11, 1)})
+@skin("olivier", slim=True, size=WIDE, parts={**BUST, "hair": (64, 0, 8, 11, 1), "collar": (82, 0, 10, 2, 6),
+                                              "sabre": (114, 0, 1, 9, 1)})
 def olivier(s):
-    """Olivier Mira Armstrong : la longue chevelure blonde qui cache un œil, l'uniforme de général."""
+    """Olivier Mira Armstrong : la longue chevelure blonde qui cache un œil, l'uniforme de général, le
+    col de fourrure du manteau de Briggs et le sabre à la hanche."""
     tone, blond = "#f0d4b8", "#ecd27a"
     skin_face(s, tone, mouth="#b05a5a")
     eyes(s, "#3d6aa8", brow=shade(blond, 0.75))
@@ -723,6 +725,17 @@ def olivier(s):
     s.band("body", 11, 1, AMESTRIS_BLUE)
     coat_tails(s, shade(AMESTRIS_BLUE, 0.85), rows=7)
     boots(s, color="#16161b", rows=6)
+    # Le col de fourrure blanche du manteau de Briggs.
+    fur = "#e4e0d8"
+    s.fill("collar", fur, "fur")
+    s.material("collar", "top", shade(fur, 1.05), "fur")
+    s.fill("collar", shade(fur, 0.7), "fur", faces=("bottom",))
+    # Le sabre au fourreau noir, sa garde dorée en haut.
+    s.fill("sabre", "#1a1a20", "leather")
+    for f in SIDES:
+        s.px("sabre", f, 0, 0, GOLD)
+        s.px("sabre", f, 0, 1, shade(GOLD, 0.8))
+    s.material("sabre", "top", GOLD, "metal")
 
 
 @skin("winry", slim=True, parts={**BUST, "ponytail": (56, 16, 2, 8, 2)})
