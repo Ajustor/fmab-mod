@@ -185,6 +185,25 @@ public final class FigureModels {
 		return bakeWide(mesh);
 	}
 
+	/**
+	 * Armstrong : la boucle blonde dressée sur le crâne nu, la moustache en guidon qui déborde des
+	 * joues, et des épaules de colosse (peau élargie, volumes à droite).
+	 */
+	public static ModelPart armstrong() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition root = mesh.getRoot();
+		PartDefinition head = root.getChild("head");
+		head.addOrReplaceChild("curl", CubeListBuilder.create().texOffs(64, 0).addBox(-1, -10.5f, -4, 2, 3, 2),
+				PartPose.rotation(-0.2f, 0, 0));
+		head.addOrReplaceChild("stache", CubeListBuilder.create().texOffs(72, 0).addBox(-5, -3, -4.6f, 10, 2, 1),
+				PartPose.ZERO);
+		root.getChild("right_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 8).addBox(-3.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
+		root.getChild("left_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 16).addBox(-1.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
 	/** Un soldat d'Amestris : la visière de sa casquette, un peu baissée sur les yeux. */
 	public static ModelPart soldier() {
 		MeshDefinition mesh = mesh(false);
