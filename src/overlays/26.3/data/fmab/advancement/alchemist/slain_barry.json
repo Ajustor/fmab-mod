@@ -24,7 +24,8 @@
     "description": {
       "translate": "advancements.fmab.slain_barry.description"
     },
-    "frame": "task"
+    "frame": "task",
+    "hidden": true
   },
   "requirements": [
     [
