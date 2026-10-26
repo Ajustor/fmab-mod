@@ -11,6 +11,7 @@ import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
@@ -99,6 +100,22 @@ public class StoneCostScenes implements FabricClientGameTest {
 						+ " " + TransmutationLightning.crackles(p.level(), circle, true);
 			});
 			check(plain.equals("DONE true false"), "sans Pierre, des éclairs bleus : " + plain);
+
+			// Devenir une Pierre vivante ne touche pas au karma ; ses âmes referment ses plaies.
+			int karma = server(sp, p -> {
+				Karma.set(p, 30);
+				LivingStone.become(p, 50, p.blockPosition());
+				p.setHealth(4);
+				return Karma.of(p);
+			});
+			check(karma == 30, "devenir une Pierre vivante ne devrait pas changer le karma : " + karma);
+			context.waitTicks(60);
+			float health = server(sp, ServerPlayer::getHealth);
+			check(health >= 8, "une Pierre vivante devrait regagner un cœur par seconde : " + health);
+			server(sp, p -> {
+				FmabAttachments.LIVING_STONE.remove(p);
+				return null;
+			});
 		}
 	}
 
