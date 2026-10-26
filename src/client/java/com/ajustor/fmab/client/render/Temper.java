@@ -69,6 +69,11 @@ public record Temper(float tempo, float breath, float bob, float sway, float slu
 	/** Père : immobile, souverain. */
 	public static final Temper FATHER = new Temper(0.5f, 0.3f, 0.4f, 0.02f, 0, Idle.NONE, Guard.NONE);
 	/** Une armure vide : pas de souffle, un pas qui cliquette. */
+	/**
+	 * Alphonse : une armure lourde et calme. Le pas pesant, presque pas de souffle (il n'a pas de
+	 * corps), les bras croisés quand il attend, les poings levés quand il se bat.
+	 */
+	public static final Temper ALPHONSE = new Temper(0.5f, 0.1f, 0.9f, 0.05f, -0.03f, Idle.CROSSED, Guard.FISTS);
 	public static final Temper ARMOR = new Temper(0, 0, 0.8f, 0.05f, 0, Idle.NONE, Guard.SWORD);
 
 	/** La phase de la marche, celle de l'animation vanilla des jambes. */
