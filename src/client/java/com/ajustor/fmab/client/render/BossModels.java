@@ -47,11 +47,24 @@ public final class BossModels {
 		return LayerDefinition.create(mesh, 64, 64).bakeRoot();
 	}
 
-	/** Gluttony : un ventre rond qui déborde devant lui. */
+	/**
+	 * Gluttony : tout rond. Un tronc plus large que les épaules, le ventre qui déborde encore devant lui,
+	 * le double menton sous le visage, et les bras écartés par sa corpulence.
+	 */
 	public static ModelPart gluttony() {
 		MeshDefinition mesh = base();
-		mesh.getRoot().getChild("body").addOrReplaceChild("belly",
-				CubeListBuilder.create().texOffs(0, 32).addBox(-5, 3, -5, 10, 8, 4), PartPose.ZERO);
+		PartDefinition root = mesh.getRoot();
+		PartDefinition body = root.getChild("body");
+		body.addOrReplaceChild("girth", CubeListBuilder.create().texOffs(0, 32).addBox(-6, 1, -2.5f, 12, 10, 5),
+				PartPose.ZERO);
+		body.addOrReplaceChild("belly", CubeListBuilder.create().texOffs(34, 32).addBox(-5, 3, -4.5f, 10, 7, 2),
+				PartPose.ZERO);
+		root.getChild("head").addOrReplaceChild("chin", CubeListBuilder.create().texOffs(34, 41)
+				.addBox(-4, -1, -4.8f, 8, 2, 2), PartPose.ZERO);
+		root.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(40, 16).addBox(-3, -2, -2, 4, 12, 4),
+				PartPose.offset(-7, 2, 0));
+		root.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(32, 48).addBox(-1, -2, -2, 4, 12, 4),
+				PartPose.offset(7, 2, 0));
 		return bake(mesh);
 	}
 
@@ -85,11 +98,14 @@ public final class BossModels {
 		return bake(mesh);
 	}
 
-	/** Envy : la touffe hérissée en palmier, au sommet du crâne. */
+	/** Envy : la touffe hérissée en palmier au sommet du crâne, et les longues mèches qui tombent dans le dos. */
 	public static ModelPart envy() {
 		MeshDefinition mesh = base();
-		mesh.getRoot().getChild("head").addOrReplaceChild("spikes",
+		PartDefinition head = mesh.getRoot().getChild("head");
+		head.addOrReplaceChild("spikes",
 				CubeListBuilder.create().texOffs(0, 32).addBox(-4.5f, -10.5f, -4.5f, 9, 3, 9), PartPose.ZERO);
+		head.addOrReplaceChild("mane",
+				CubeListBuilder.create().texOffs(36, 32).addBox(-4.5f, -7.5f, 4, 9, 12, 1), PartPose.ZERO);
 		return bake(mesh);
 	}
 
@@ -101,11 +117,15 @@ public final class BossModels {
 		return bake(mesh);
 	}
 
-	/** Wrath : les pans de la vareuse du Généralissime, qui tombent sur les cuisses. */
+	/** Wrath : les pans de la vareuse du Généralissime, qui tombent sur les cuisses, et ses sabres aux hanches. */
 	public static ModelPart wrath() {
 		MeshDefinition mesh = base();
-		mesh.getRoot().getChild("body").addOrReplaceChild("coat",
+		PartDefinition body = mesh.getRoot().getChild("body");
+		body.addOrReplaceChild("coat",
 				CubeListBuilder.create().texOffs(0, 32).addBox(-4.5f, 10, -2.5f, 9, 5, 5), PartPose.ZERO);
+		body.addOrReplaceChild("sabres", CubeListBuilder.create()
+				.texOffs(28, 32).addBox(4.6f, 8, 0.5f, 1, 10, 1)
+				.texOffs(28, 32).mirror().addBox(-5.6f, 8, 0.5f, 1, 10, 1), PartPose.ZERO);
 		return bake(mesh);
 	}
 

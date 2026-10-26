@@ -520,9 +520,11 @@ def scar(s):
     tone = ISHVAL
     skin_face(s, tone, mouth="#4a2416")
     eyes(s, "#c4202a", white="#e6d8c6", brow="#d0ccc4")
-    # La cicatrice en croix, sur le front, entre les yeux.
-    for (x, y) in ((2, 1), (3, 2), (4, 3), (5, 1), (4, 2), (3, 3)):
-        s.px("head", "front", x, y, "#c48e7a")
+    # La grande cicatrice en croix qui barre le front jusqu'entre les yeux, claire sur la peau mate.
+    for (x, y) in ((1, 0), (2, 1), (3, 2), (4, 3), (6, 0), (5, 1), (4, 2), (3, 3)):
+        s.px("head", "front", x, y, "#d8a28e")
+    s.px("head", "front", 3, 2, "#b0786a")
+    s.px("head", "front", 4, 2, "#b0786a")
     short_hair(s, "#e3dfd6", fringe=1, back=5)
     fringe(s, "#e3dfd6", [2, 1, 0, 0, 0, 0, 1, 2])
     hair_volume(s, "#e3dfd6", sides=2, back=4)
@@ -617,9 +619,10 @@ def cornello(s):
     s.material("robe", "top", shade(robe, 0.9), "cloth")
 
 
-@skin("izumi", slim=True, parts=BUST)
+@skin("izumi", slim=True, size=WIDE, parts={**BUST, "dreads": (64, 0, 3, 13, 2), "lock": (78, 0, 1, 6, 1)})
 def izumi(s):
-    """Izumi Curtis : les dreadlocks noires, la chemise blanche, le pantalon sombre, les sandales."""
+    """Izumi Curtis : les dreadlocks noires nouées en une grosse queue dans le dos et deux mèches devant
+    les épaules, les anneaux d'or aux oreilles, la chemise blanche, le pantalon sombre, les sandales."""
     tone = "#e4bc98"
     skin_face(s, tone, mouth="#9a4e48")
     eyes(s, "#2c2420", brow="#18120e", lid="#18120e")
@@ -651,6 +654,14 @@ def izumi(s):
     boots(s, color="#6b4b32", rows=1)
     for leg in ("rleg", "lleg"):
         s.band(leg, 10, 1, tone, "skin")
+    # Les dreadlocks en volume : la queue dans le dos, ses mèches séparées, le lien qui la noue.
+    s.fill("dreads", hair, "hair")
+    for f in SIDES:
+        w, h = s.size("dreads", f)
+        for x in range(1, w, 2):
+            s.seam("dreads", f, x, 0, h, None, k=0.7)
+        s.rect("dreads", f, 0, 1, w, 1, "#6b4b32")
+    s.fill("lock", hair, "hair")
 
 
 @skin("may_chang", slim=True, parts={"buns": (24, 0, 3, 3, 3), "braids": (56, 16, 1, 7, 1)})
@@ -692,9 +703,11 @@ def may_chang(s):
     boots(s, color="#1e1a22", rows=3)
 
 
-@skin("olivier", slim=True, size=WIDE, parts={**BUST, "hair": (64, 0, 8, 11, 1)})
+@skin("olivier", slim=True, size=WIDE, parts={**BUST, "hair": (64, 0, 8, 11, 1), "collar": (82, 0, 14, 2, 6),
+                                              "sabre": (122, 0, 1, 10, 1)})
 def olivier(s):
-    """Olivier Mira Armstrong : la longue chevelure blonde qui cache un œil, l'uniforme de général."""
+    """Olivier Mira Armstrong : la longue chevelure blonde qui cache un œil, l'uniforme de général, le
+    col de fourrure du manteau de Briggs et le sabre à la hanche."""
     tone, blond = "#f0d4b8", "#ecd27a"
     skin_face(s, tone, mouth="#b05a5a")
     eyes(s, "#3d6aa8", brow=shade(blond, 0.75))
@@ -723,9 +736,20 @@ def olivier(s):
     s.band("body", 11, 1, AMESTRIS_BLUE)
     coat_tails(s, shade(AMESTRIS_BLUE, 0.85), rows=7)
     boots(s, color="#16161b", rows=6)
+    # Le col de fourrure blanche du manteau de Briggs.
+    fur = "#e4e0d8"
+    s.fill("collar", fur, "fur")
+    s.material("collar", "top", shade(fur, 1.05), "fur")
+    s.fill("collar", shade(fur, 0.7), "fur", faces=("bottom",))
+    # Le sabre au fourreau noir, sa garde dorée en haut.
+    s.fill("sabre", "#1a1a20", "leather")
+    for f in SIDES:
+        s.px("sabre", f, 0, 0, GOLD)
+        s.px("sabre", f, 0, 1, shade(GOLD, 0.8))
+    s.material("sabre", "top", GOLD, "metal")
 
 
-@skin("winry", slim=True, parts={**BUST, "ponytail": (56, 16, 2, 8, 2)})
+@skin("winry", slim=True, parts={**BUST, "ponytail": (56, 16, 2, 11, 2)})
 def winry(s):
     """Winry Rockbell : queue de cheval blonde, débardeur noir, combinaison bleue nouée à la taille."""
     tone, blond = "#f2d6ba", "#efd27e"
@@ -900,7 +924,7 @@ def lust(s):
     s.seam("lleg", "front", 0, 4, 8, tone)
 
 
-@skin("gluttony", parts={"belly": (0, 32, 10, 8, 4)})
+@skin("gluttony", parts={"girth": (0, 32, 12, 10, 5), "belly": (34, 32, 10, 7, 2), "chin": (34, 41, 8, 2, 2)})
 def gluttony(s):
     """Gluttony : le crâne chauve et rond, les petits yeux vides, la bouche baveuse, le pull noir."""
     tone = "#efe2d2"
@@ -917,14 +941,21 @@ def gluttony(s):
         s.fill(part, BLACK_CLOTH, "cloth")
     s.band("body", 0, 1, "#2c2a32")
     hands(s, tone, rows=2)
-    s.fill("belly", BLACK_CLOTH, "cloth")
-    s.material("belly", "front", "#2a2830", "cloth")
-    # Le pull tendu sur le ventre : un reflet en haut, l'ombre qui tombe dessous.
-    s.tint("belly", "front", 1, 1, 8, 1, 1.25)
-    s.tint("belly", "front", 2, 2, 6, 1, 1.12)
-    s.tint("belly", "front", 0, 6, 10, 2, 0.8)
-    s.tint("belly", "front", 0, 0, 1, 8, 0.85)
-    s.tint("belly", "front", 9, 0, 1, 8, 0.85)
+    # Le tronc rond, sous le pull noir : plus clair au milieu, l'ombre sur les flancs.
+    s.fill("girth", BLACK_CLOTH, "cloth")
+    s.material("girth", "front", "#2a2830", "cloth")
+    s.band_tint("girth", 8, 2, 0.8)
+    s.tint("girth", "front", 0, 0, 1, 10, 0.8)
+    s.tint("girth", "front", 11, 0, 1, 10, 0.8)
+    s.band("girth", 0, 1, "#2c2a32")
+    # Le ventre tendu qui déborde : un reflet en haut, l'ombre qui tombe dessous.
+    s.fill("belly", "#2e2c34", "cloth")
+    s.tint("belly", "front", 1, 1, 8, 1, 1.3)
+    s.tint("belly", "front", 2, 2, 6, 1, 1.15)
+    s.tint("belly", "front", 0, 5, 10, 2, 0.75)
+    # Le double menton, de la même peau pâle que le visage.
+    s.fill("chin", tone, "skin")
+    s.tint("chin", "front", 0, 1, 8, 1, 0.85)
     boots(s, color="#0f0e12", rows=2)
 
 
@@ -975,6 +1006,13 @@ def envy_body(s):
     s.px("head", "front", 4, 0, "#c0182c")
     s.fill("spikes", hair, "hair")
     s.material("spikes", "top", shade(hair, 1.3), "hair")
+    # Les longues mèches hérissées qui tombent dans le dos, les pointes en dents de scie.
+    s.fill("mane", hair, "hair")
+    w, h = s.size("mane", "back")
+    for x in range(w):
+        for y in range(h - (2 if x % 3 == 0 else 1 if x % 3 == 1 else 3), h):
+            s.px("mane", "back", x, y, None)
+            s.px("mane", "front", w - 1 - x, y, None)
     # Le haut court et la jupe-short noirs ; le ventre et les bras nus.
     s.fill("body", tone, "skin")
     s.band("body", 0, 6, BLACK_CLOTH)
@@ -992,17 +1030,17 @@ def envy_body(s):
     ouroboros(s, "lleg", "front", 0, 4)
 
 
-@skin("envy", parts={"spikes": (0, 32, 9, 3, 9)})
+@skin("envy", parts={"spikes": (0, 32, 9, 3, 9), "mane": (36, 32, 9, 12, 1)})
 def envy(s):
     """Envy : la tignasse en palmier, le bandeau, le haut noir et l'ouroboros sur la cuisse."""
     envy_body(s)
 
 
-@skin("envy_giant", parts={"spikes": (0, 32, 9, 3, 9)})
+@skin("envy_giant", parts={"spikes": (0, 32, 9, 3, 9), "mane": (36, 32, 9, 12, 1)})
 def envy_giant(s):
     """La vraie forme d'Envy : une bête verte faite des visages de ceux qu'il a absorbés."""
     flesh = "#4f6b3a"
-    for part in ("head", "body", "rarm", "larm", "rleg", "lleg", "spikes"):
+    for part in ("head", "body", "rarm", "larm", "rleg", "lleg", "spikes", "mane"):
         s.fill(part, flesh, "stone")
     s.material("spikes", "top", shade(flesh, 0.8), "stone")
     # Des visages et des mains humaines prisonniers de la chair.
@@ -1071,13 +1109,27 @@ def greed(s):
 @skin("greed_shield", parts={"fur": (0, 32, 10, 3, 6)})
 def greed_shield(s):
     """Le bouclier ultime : une carapace de carbone noir, facettée, et la mâchoire de requin."""
-    shell = "#2a2a33"
+    shell = "#22222a"
     for part in ("head", "body", "rarm", "larm", "rleg", "lleg"):
         s.fill(part, shell, "metal")
-    for part in ("body", "rarm", "larm", "rleg", "lleg"):
-        w, h = s.size(part, "front")
-        for y in range(0, h, 3):
-            s.tint(part, "front", 0, y, w, 1, 1.35)
+    # Une carapace qui suit les muscles : les pectoraux, la grille des abdominaux, des reflets luisants.
+    s.tint("body", "front", 1, 1, 3, 3, 1.45)
+    s.tint("body", "front", 4, 1, 3, 3, 1.45)
+    s.seam("body", "front", 4, 1, 3, None, k=0.6)
+    s.tint("body", "front", 1, 4, 6, 1, 0.7)
+    for y in (5, 7, 9):
+        s.tint("body", "front", 2, y, 4, 1, 1.3)
+    s.seam("body", "front", 4, 5, 6, None, k=0.65)
+    s.tint("body", "back", 1, 1, 6, 4, 1.25)
+    s.seam("body", "back", 4, 0, 10, None, k=0.65)
+    for part in ("rarm", "larm"):
+        s.band_tint(part, 0, 3, 1.35)
+        s.band_tint(part, 5, 1, 0.65)
+        s.band_tint(part, 7, 2, 1.25)
+    for part in ("rleg", "lleg"):
+        s.band_tint(part, 1, 3, 1.25)
+        s.band_tint(part, 5, 1, 0.65)
+        s.band_tint(part, 8, 2, 1.2)
     s.rect("head", "front", 1, 2, 2, 1, "#c41a2a")
     s.rect("head", "front", 5, 2, 2, 1, "#c41a2a")
     s.rect("head", "front", 0, 5, 8, 2, "#0c0c10")
@@ -1087,7 +1139,7 @@ def greed_shield(s):
     s.fill("fur", "#3a3a44", "fur")
 
 
-@skin("wrath", parts={"coat": (0, 32, 9, 5, 5)})
+@skin("wrath", parts={"coat": (0, 32, 9, 5, 5), "sabre": (28, 32, 1, 10, 1)})
 def wrath(s):
     """King Bradley : le bandeau sur l'œil gauche, la moustache, l'uniforme de Généralissime."""
     tone = "#e4c0a0"
@@ -1115,6 +1167,11 @@ def wrath(s):
     s.material("coat", "top", shade("#24396e", 0.7), "cloth")
     s.tint("coat", "front", 0, 4, 9, 1, 0.8)
     s.rect("coat", "front", 4, 0, 1, 5, shade("#24396e", 0.6))
+    # Les sabres au fourreau noir, la garde dorée.
+    s.fill("sabre", "#16161c", "leather")
+    for f in SIDES:
+        s.px("sabre", f, 0, 0, GOLD)
+    s.material("sabre", "top", GOLD, "metal")
 
 
 @skin("pride")
@@ -1516,11 +1573,16 @@ def mustang(s):
         s.px(arm, "front", w // 2, 11, "#c0182c")
         s.px(arm, "back", w // 2 - 1, 10, "#c0182c")
         s.px(arm, "back", w // 2, 11, "#c0182c")
+    # La chaîne d'argent de la montre d'Alchimiste d'État, qui part de la ceinture vers la poche.
+    for x, y in ((5, 8), (6, 9), (7, 9)):
+        s.px("body", "front", x, y, "#d8dde2")
+    s.px("body", "left", 0, 9, "#d8dde2")
 
 
-@skin("hawkeye", slim=True)
+@skin("hawkeye", slim=True, parts={**BUST, "bun": (56, 16, 3, 3, 2), "holster": (56, 24, 1, 3, 2)})
 def hawkeye(s):
-    """Riza Hawkeye : les cheveux blonds relevés en chignon, l'uniforme, le regard brun et droit."""
+    """Riza Hawkeye : les cheveux blonds relevés en chignon à pince, l'uniforme, le regard brun et
+    droit, l'étui de son pistolet à la hanche."""
     blond = "#e8cf7a"
     skin_face(s, PALE, mouth="#b0645c")
     eyes(s, "#5a3a22", brow=shade(blond, 0.75), lid="#3a2a20")
@@ -1531,22 +1593,46 @@ def hawkeye(s):
     s.rect("hat", "back", 2, 2, 4, 3, shade(blond, 0.9))
     s.px("hat", "back", 3, 3, "#3a3036")
     amestris_uniform(s, tone=PALE)
+    bust(s, AMESTRIS_BLUE)
+    # Le chignon en volume, et sa pince sombre.
+    s.fill("bun", shade(blond, 0.92), "hair")
+    s.rect("bun", "back", 0, 1, 3, 1, "#3a3036")
+    # L'étui du pistolet, en cuir noir.
+    s.fill("holster", "#1e1a1c", "leather")
+    s.material("holster", "top", "#4a4248", "leather")
 
 
-@skin("armstrong")
+# Les volumes d'Armstrong (FigureModels.armstrong) : la boucle, la moustache en guidon, les épaules.
+ARMSTRONG_PARTS = {"curl": (64, 0, 2, 3, 2), "stache": (72, 0, 10, 1, 1), "tip": (72, 4, 1, 2, 1),
+                   "rshoulder": (64, 8, 5, 3, 5),
+                   "lshoulder": (64, 16, 5, 3, 5)}
+
+
+@skin("armstrong", size=WIDE, parts=ARMSTRONG_PARTS)
 def armstrong(s):
-    """Alex Louis Armstrong, l'Alchimiste au bras puissant : crâne nu, une boucle blonde, grosse
-    moustache, gantelets à pointes."""
+    """Alex Louis Armstrong, l'Alchimiste au bras puissant : un colosse au crâne nu, une seule boucle
+    blonde dressée sur le front, la grosse moustache blonde en guidon, de petits yeux bleus, les
+    épaules énormes sous l'uniforme, gantelets à pointes."""
     blond = "#ecd27a"
     skin_face(s, PALE, mouth=None)
     eyes(s, "#5a7ab0", brow=blond)
     s.material("head", "top", shade(PALE, 0.96), "skin")
-    # La boucle unique sur le front, et la moustache en croc.
+    # La racine de la boucle sur le front, la moustache peinte sous le nez.
     s.px("head", "front", 3, 0, blond)
     s.px("head", "front", 4, 0, blond)
-    s.px("head", "front", 4, 1, shade(blond, 0.85))
     mustache(s, blond, wide=True)
+    # La boucle et la moustache en volume.
+    s.fill("curl", blond, "hair")
+    s.tint("curl", "front", 0, 2, 2, 1, 0.8)
+    s.fill("stache", blond, "hair")
+    s.tint("stache", "front", 4, 0, 2, 1, 0.85)
+    s.fill("tip", shade(blond, 0.95), "hair")
     amestris_uniform(s, officer=True, tone=PALE, gloves="#3a3d44")
+    # Les épaules de colosse, sous le drap bleu de l'uniforme, l'épaulette dorée.
+    for shoulder in ("rshoulder", "lshoulder"):
+        s.fill(shoulder, AMESTRIS_BLUE, "cloth")
+        s.material(shoulder, "top", shade(AMESTRIS_BLUE, 1.1), "cloth")
+        s.rect(shoulder, "top", 0, 0, 5, 1, GOLD)
     # Les pointes des gantelets.
     for arm in ("rarm", "larm"):
         w, _ = s.size(arm, "front")
@@ -1560,7 +1646,7 @@ def hughes(s):
     """Maes Hughes : cheveux noirs courts, lunettes, une barbe de quelques jours, l'uniforme."""
     skin_face(s, FAIR, mouth="#9a5a52")
     eyes(s, "#4a8a50", brow="#1e1a1c")
-    glasses(s, "#2a2a30")
+    glasses(s, "#7a7c86")
     short_hair(s, "#1e1a1c", fringe=1, back=5)
     for x in range(1, 7):
         s.tint("head", "front", x, 7, 1, 1, 0.82)
@@ -1569,15 +1655,17 @@ def hughes(s):
     amestris_uniform(s, officer=True)
 
 
-@skin("ling")
+@skin("ling", parts={"tail": (56, 16, 2, 5, 2)})
 def ling(s):
-    """Ling Yao, prince de Xing : cheveux noirs noués, yeux étirés, tenue blanche à bandes bleu nuit."""
+    """Ling Yao, prince de Xing : cheveux noirs noués en une petite queue, les yeux toujours plissés en
+    deux fentes rieuses, tenue blanche à bandes bleu nuit."""
     tone = "#f0d4b4"
     skin_face(s, tone, mouth="#a8645a")
+    # Les yeux plissés : deux fentes fines, le coin extérieur relevé.
     s.rect("head", "front", 1, 4, 2, 1, "#2a2224")
     s.rect("head", "front", 5, 4, 2, 1, "#2a2224")
-    s.rect("head", "front", 1, 3, 2, 1, "#141016")
-    s.rect("head", "front", 5, 3, 2, 1, "#141016")
+    s.px("head", "front", 0, 3, "#2a2224")
+    s.px("head", "front", 7, 3, "#2a2224")
     hair = "#141016"
     short_hair(s, hair, fringe=0, back=7)
     fringe(s, hair, [3, 2, 2, 1, 1, 2, 2, 3])
@@ -1594,6 +1682,8 @@ def ling(s):
     hands(s, tone, rows=2)
     pants(s, navy)
     boots(s, color="#1a1a20", rows=3)
+    s.fill("tail", hair, "hair")
+    s.band("tail", 0, 1, navy)
 
 
 @skin("lan_fan", slim=True)
@@ -1626,32 +1716,107 @@ def lan_fan(s):
     boots(s, color="#101014", rows=4)
 
 
-@skin("alphonse")
+# Les volumes d'Alphonse (FigureModels.alphonse), dans la moitié droite de la peau élargie.
+ALPHONSE_PARTS = {"chest": (64, 0, 11, 8, 7), "rpauldron": (64, 15, 9, 6, 9), "lpauldron": (64, 30, 9, 6, 9),
+                  "thigh": (64, 45, 6, 6, 6), "greave": (88, 45, 6, 4, 6), "bracer": (100, 0, 6, 5, 6),
+                  "foot": (100, 11, 6, 2, 7), "apron": (100, 20, 6, 11, 1), "back_flap": (114, 20, 5, 7, 1),
+                  "snout": (100, 32, 5, 4, 2), "crest": (100, 38, 2, 1, 6), "horn": (114, 32, 2, 3, 2),
+                  "plume": (122, 30, 2, 14, 1), "spike": (116, 38, 1, 3, 1), "knee": (120, 38, 1, 2, 1),
+                  "pouch": (112, 45, 2, 3, 2)}
+
+
+@skin("alphonse", size=WIDE, parts=ALPHONSE_PARTS)
 def alphonse(s):
-    """Alphonse Elric : la grande armure d'acier, ses yeux rouges dans la fente du heaume, le pagne
-    rouge et les sangles de cuir."""
-    armor(s, ALPHONSE_STEEL, ALPHONSE_TRIM, eye="#ff4a3a")
-    # La corne du front, au-dessus de la fente.
-    s.px("head", "front", 3, 1, "#d8e0ea")
-    s.px("head", "front", 4, 1, "#d8e0ea")
-    s.rect("hat", "top", 3, 3, 2, 2, "#e8e8e0")
-    s.material("hat", "back", "#e8e8e0", "hair", x=3, w=2, h=7)
-    # Le pagne rouge, devant et derrière, et les sangles de cuir en travers du ventre.
-    s.material("body", "front", "#9a2228", "cloth", x=2, w=4, y=9, h=3)
-    s.material("body", "back", "#9a2228", "cloth", x=2, w=4, y=9, h=3)
-    s.band("body", 8, 1, "#5a3a22", "leather")
-    for leg in ("rleg", "lleg"):
-        s.band(leg, 0, 1, "#5a3a22", "leather")
+    """Alphonse Elric, d'après l'anime : la grande armure d'acier bleu-vert, vide, hérissée de pointes ;
+    deux petits yeux rouges au fond du heaume, la mentonnière en grille de dents, la longue houppe
+    blanche ; le long tablier de toile lavande sous le ceinturon de cuir, la sacoche sur la cuisse
+    droite, une marque rouge sur l'épaulière gauche."""
+    steel, dark, light = "#7a9ea3", "#4a666c", "#b8d0d2"
+    void, eye, cloth, leather = "#141a1c", "#e8483e", "#a9acc9", "#7a5a3a"
+    for part in ("head", "body", "rarm", "larm", "rleg", "lleg"):
+        s.fill(part, steel, "metal")
+    # Le heaume : la fente sombre et ses deux petits yeux rouges.
+    s.material("head", "top", shade(steel, 1.1), "metal")
+    s.rect("head", "front", 0, 0, 8, 2, shade(steel, 1.08))
+    s.rect("head", "front", 1, 2, 6, 1, dark)
+    s.rect("head", "front", 1, 3, 6, 1, void)
+    s.px("head", "front", 2, 3, eye)
+    s.px("head", "front", 5, 3, eye)
+    s.rect("head", "front", 0, 7, 8, 1, dark)
+    for f in ("left", "right"):
+        s.rect("head", f, 3, 3, 2, 2, dark)
+        s.px("head", f, 3, 3, light)
+    s.seam("head", "back", 4, 1, 6, None, k=0.75)
+    # La mentonnière : une grille en dents de scie.
+    s.fill("snout", steel, "metal")
+    w, h = s.size("snout", "front")
+    s.rect("snout", "front", 0, 1, w, h - 1, void)
+    for x in range(w):
+        s.px("snout", "front", x, 1 if x % 2 else 2, steel)
+        s.px("snout", "front", x, h - 1, steel)
+    s.rect("snout", "front", 0, 0, w, 1, light)
+    s.fill("crest", light, "metal")
+    s.fill("horn", shade(steel, 1.15), "metal")
+    s.fill("spike", light, "metal")
+    s.fill("knee", light, "metal")
+    s.fill("plume", "#f2f1ec", "hair")
+    s.tint("plume", "front", 0, 0, 2, 1, 0.8)
+    # Le corps sous le plastron, le ceinturon de cuir.
+    s.band("body", 8, 1, leather, "leather")
+    s.band("body", 9, 3, shade(steel, 0.85), "metal")
+    # Le plastron : son col, son arête, ses plaques.
+    s.fill("chest", steel, "metal")
+    s.material("chest", "top", shade(steel, 1.15), "metal")
+    s.rect("chest", "front", 0, 0, 11, 1, dark)
+    s.tint("chest", "front", 1, 1, 9, 4, 1.1)
+    s.seam("chest", "front", 5, 1, 7, light)
+    s.seam("chest", "front", 6, 1, 7, None, k=0.8)
+    s.band("chest", 5, 1, shade(steel, 0.8), "metal")
+    s.band("chest", 7, 1, dark, "metal")
+    # Le long tablier de toile, ses plis, son ourlet ; le pan de derrière.
+    for flap in ("apron", "back_flap"):
+        s.fill(flap, cloth, "cloth")
+        w, h = s.size(flap, "front")
+        for x in range(1, w, 2):
+            s.seam(flap, "front", x, 2, h - 3, None, k=0.88)
+        s.tint(flap, "front", 0, h - 1, w, 1, 0.8)
+        s.rect(flap, "front", 0, 0, w, 1, leather)
+    # Les épaulières rondes, la marque rouge sur la gauche.
+    for pauldron in ("rpauldron", "lpauldron"):
+        s.fill(pauldron, steel, "metal")
+        s.material(pauldron, "top", shade(steel, 1.2), "metal")
+        for f in SIDES:
+            w, h = s.size(pauldron, f)
+            s.rect(pauldron, f, 0, h - 1, w, 1, dark)
+            s.tint(pauldron, f, 0, 0, w, 2, 1.12)
+    for x, y in ((4, 2), (5, 3), (3, 3), (4, 4), (4, 3)):
+        s.px("lpauldron", "left", x, y, "#a8282c")
+    # Les brassards, les gantelets et leurs jointures.
+    s.fill("bracer", steel, "metal")
+    s.band("bracer", 0, 1, dark, "metal")
+    s.band("bracer", 4, 1, dark, "metal")
+    for arm in ("rarm", "larm"):
+        s.band(arm, 9, 3, shade(steel, 0.75), "metal")
+        s.rect(arm, "front", 0, 9, 4, 1, light)
+    # Les jambes : cuissards, grèves évasées, solerets massifs.
+    s.fill("thigh", steel, "metal")
+    s.band("thigh", 5, 1, dark, "metal")
+    s.fill("greave", steel, "metal")
+    s.band("greave", 0, 1, dark, "metal")
+    s.fill("foot", shade(steel, 0.85), "metal")
+    s.material("foot", "top", steel, "metal")
+    s.fill("pouch", "#d8cfb8", "leather")
+    s.band("pouch", 0, 1, shade("#d8cfb8", 0.8), "leather")
 
 
-@skin("pinako", slim=True)
+@skin("pinako", slim=True, parts={"pipe": (24, 0, 1, 1, 3), "bowl": (56, 16, 1, 2, 1), "bun": (56, 20, 2, 2, 2)})
 def pinako(s):
-    """Pinako Rockbell : la vieille mécanicienne, chignon gris sur le crâne, lunettes rondes, tenue
-    sombre et tablier."""
+    """Pinako Rockbell : la vieille mécanicienne, toute petite, chignon gris sur le crâne, lunettes
+    rondes, tenue sombre et tablier, et sa longue pipe."""
     tone = "#e6c4a4"
     skin_face(s, tone, mouth="#8a5a52")
-    eyes(s, "#3a3036", brow="#9a9590")
-    glasses(s, "#3a3036")
+    eyes(s, "#5a4636", brow="#b8b4ae")
+    glasses(s, "#a8a29a")
     grey = "#a8a49e"
     short_hair(s, grey, fringe=1, back=6)
     hair_volume(s, grey, sides=3, back=6)
@@ -1667,17 +1832,28 @@ def pinako(s):
     hands(s, tone, rows=2)
     pants(s, "#4a3e3a")
     boots(s, color="#2a2226", rows=2)
+    # Le chignon, en volume sur le sommet du crâne.
+    s.fill("bun", shade(grey, 1.05), "hair")
+    # La pipe : un tuyau sombre, le fourneau de bois et sa braise.
+    s.fill("pipe", "#2a2226", "leather")
+    s.fill("bowl", "#6a4a2e", "leather")
+    s.material("bowl", "top", "#e06a2a", "flat")
 
 
-@skin("basque_grand")
+@skin("basque_grand", size=WIDE, parts={"rshoulder": (64, 0, 5, 3, 5), "lshoulder": (64, 8, 5, 3, 5)})
 def basque_grand(s):
-    """Basque Grand, l'Alchimiste au sang de fer : mâchoire carrée, grosse moustache brune, l'uniforme."""
+    """Basque Grand, l'Alchimiste au sang de fer : un colosse à la mâchoire carrée, grosse moustache
+    brune, les épaules massives sous l'uniforme."""
     skin_face(s, FAIR, mouth=None)
     eyes(s, "#3a2a20", brow="#4a3020")
     short_hair(s, "#4a3020", fringe=1, back=4)
     mustache(s, "#5a3a24", wide=True)
     s.tint("head", "front", 0, 7, 8, 1, 0.85)
     amestris_uniform(s, officer=True)
+    for shoulder in ("rshoulder", "lshoulder"):
+        s.fill(shoulder, AMESTRIS_BLUE, "cloth")
+        s.material(shoulder, "top", shade(AMESTRIS_BLUE, 1.1), "cloth")
+        s.rect(shoulder, "top", 0, 0, 5, 1, GOLD)
 
 
 @skin("mcdougal")
@@ -1727,7 +1903,8 @@ def tattooist(s):
     boots(s, color="#4a3426", rows=3)
 
 
-@skin("kimblee")
+@skin("kimblee", size=WIDE, parts={"brim": (64, 0, 11, 1, 11), "crown": (64, 12, 8, 3, 8),
+                                   "tail": (96, 12, 2, 8, 2)})
 def kimblee(s):
     """Solf J. Kimblee, l'Alchimiste écarlate : costume et chapeau blancs, longs cheveux noirs noués
     bas, yeux d'or, un cercle tatoué dans chaque paume."""
@@ -1758,6 +1935,15 @@ def kimblee(s):
         s.px(arm, "front", 1, 11, "#c0182c" if arm == "rarm" else "#141216")
     pants(s, white)
     boots(s, color="#e8e6e0", rows=2, sole="#8a8680")
+    # Le feutre blanc en volume : le bord, la calotte et son ruban noir.
+    s.fill("brim", white, "cloth")
+    s.fill("brim", shade(white, 0.8), "cloth", faces=("bottom",))
+    s.fill("crown", white, "cloth")
+    s.material("crown", "top", shade(white, 1.03), "cloth")
+    s.band("crown", 2, 1, "#2a2a30")
+    # La longue queue de cheval noire, nouée bas.
+    s.fill("tail", hair, "hair")
+    s.band("tail", 0, 1, "#c0182c")
 
 
 @skin("slicer")
@@ -1784,7 +1970,7 @@ def tucker(s):
     tone = "#e6c8a8"
     skin_face(s, tone, mouth="#8a5a52")
     eyes(s, "#4a3a2a", brow="#5a4030")
-    glasses(s, "#5a5048")
+    glasses(s, "#a8a29a")
     short_hair(s, "#5a4030", fringe=2, back=5)
     hair_volume(s, "#5a4030", sides=3, back=5)
     for part in ("body", "rarm", "larm"):

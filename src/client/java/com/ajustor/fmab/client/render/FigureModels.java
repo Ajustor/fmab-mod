@@ -46,13 +46,22 @@ public final class FigureModels {
 				PartPose.offsetAndRotation(0, y, -2, tilt, 0, 0));
 	}
 
-	/** Olivier : la poitrine, et sa longue chevelure blonde qui tombe dans le dos. */
+	/**
+	 * Olivier : la poitrine, sa longue chevelure blonde qui tombe dans le dos, le col de fourrure du
+	 * manteau de Briggs et le sabre à la hanche gauche.
+	 */
 	public static ModelPart olivier() {
 		MeshDefinition mesh = mesh(true);
 		PartDefinition body = mesh.getRoot().getChild("body");
 		bust(body, 24, 0, 6, 2, 2.5f, -0.15f);
 		body.addOrReplaceChild("hair", CubeListBuilder.create().texOffs(64, 0).addBox(-4, -1, 2.3f, 8, 11, 1),
 				PartPose.ZERO);
+		// Le col de fourrure couvre aussi le haut des épaules.
+		body.addOrReplaceChild("collar", CubeListBuilder.create().texOffs(82, 0).addBox(-7, -1.5f, -3, 14, 2, 6),
+				PartPose.ZERO);
+		// Le sabre pend à la hanche gauche, derrière le bras.
+		body.addOrReplaceChild("sabre", CubeListBuilder.create().texOffs(122, 0).addBox(-0.5f, 0, -0.5f, 1, 10, 1),
+				PartPose.offset(3.2f, 9, 2.6f));
 		return bakeWide(mesh);
 	}
 
@@ -126,12 +135,28 @@ public final class FigureModels {
 		return bake(mesh);
 	}
 
+	/**
+	 * Izumi : la poitrine, ses dreadlocks nouées en une grosse queue qui tombe dans le dos et deux mèches
+	 * qui retombent devant les épaules (peau élargie, volumes à droite).
+	 */
+	public static ModelPart izumi() {
+		MeshDefinition mesh = mesh(true);
+		PartDefinition root = mesh.getRoot();
+		bust(root.getChild("body"), 24, 0, 6, 2, 2.5f, -0.15f);
+		PartDefinition head = root.getChild("head");
+		head.addOrReplaceChild("dreads", CubeListBuilder.create().texOffs(64, 0).addBox(-1.5f, -5, 4, 3, 13, 2),
+				PartPose.ZERO);
+		head.addOrReplaceChild("locks", CubeListBuilder.create().texOffs(78, 0).addBox(-4.6f, -3, -2.5f, 1, 6, 1)
+				.texOffs(78, 0).mirror().addBox(3.6f, -3, -2.5f, 1, 6, 1), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
 	/** Winry : la poitrine, et la queue de cheval nouée haut qui tombe dans la nuque. */
 	public static ModelPart winry() {
 		MeshDefinition mesh = mesh(true);
 		PartDefinition root = mesh.getRoot();
 		bust(root.getChild("body"), 24, 0, 6, 2, 2.5f, -0.15f);
-		ponytail(root.getChild("head"), 8, -6, 0.22f);
+		ponytail(root.getChild("head"), 11, -6, 0.22f);
 		return bake(mesh);
 	}
 
@@ -159,6 +184,141 @@ public final class FigureModels {
 				.addBox(-5.2f, -6, 0.5f, 1, 7, 1)
 				.addBox(4.2f, -6, 0.5f, 1, 7, 1, true), PartPose.ZERO);
 		return bake(mesh);
+	}
+
+	/**
+	 * Alphonse, d'après l'anime : une armure massive à la tête petite. Le heaume à la mentonnière en
+	 * grille, sa crête, sa pointe et la longue houppe ; un plastron énorme ; des épaulières rondes
+	 * hérissées d'une pointe, des brassards épais ; des jambes écartées et très épaisses (cuissards,
+	 * grèves, solerets), une pointe à chaque genou, une sacoche sur la cuisse droite ; le long tablier
+	 * de toile qui tombe jusqu'aux genoux (peau élargie, volumes à droite).
+	 */
+	public static ModelPart alphonse() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition root = mesh.getRoot();
+		PartDefinition head = root.getChild("head");
+		head.addOrReplaceChild("snout", CubeListBuilder.create().texOffs(100, 32).addBox(-2.5f, -4, -5.5f, 5, 4, 2),
+				PartPose.ZERO);
+		head.addOrReplaceChild("crest", CubeListBuilder.create().texOffs(100, 38).addBox(-1, -9, -4.5f, 2, 1, 6),
+				PartPose.ZERO);
+		head.addOrReplaceChild("horn", CubeListBuilder.create().texOffs(114, 32).addBox(-1, -11.5f, -3.5f, 2, 3, 2)
+				.texOffs(116, 38).addBox(-0.5f, -14, -3, 1, 3, 1), PartPose.ZERO);
+		head.addOrReplaceChild("plume", CubeListBuilder.create().texOffs(122, 30).addBox(-1, -9, 3.5f, 2, 14, 1),
+				PartPose.ZERO);
+		PartDefinition body = root.getChild("body");
+		body.addOrReplaceChild("chest", CubeListBuilder.create().texOffs(64, 0).addBox(-5.5f, -1, -3.5f, 11, 8, 7),
+				PartPose.ZERO);
+		body.addOrReplaceChild("apron", CubeListBuilder.create().texOffs(100, 20).addBox(-3, 9, -3.6f, 6, 11, 1),
+				PartPose.ZERO);
+		body.addOrReplaceChild("back_flap", CubeListBuilder.create().texOffs(114, 20).addBox(-2.5f, 9, 2.6f, 5, 7, 1),
+				PartPose.ZERO);
+		// Les épaulières tiennent aux épaules, pas aux bras : elles ne tournent pas quand le bras balance.
+		body.addOrReplaceChild("right_pauldron", CubeListBuilder.create().texOffs(64, 15)
+				.addBox(-11, -2.5f, -4.5f, 9, 6, 9).texOffs(116, 38).addBox(-7, -5.5f, -0.5f, 1, 3, 1), PartPose.ZERO);
+		body.addOrReplaceChild("left_pauldron", CubeListBuilder.create().texOffs(64, 30)
+				.addBox(2, -2.5f, -4.5f, 9, 6, 9).texOffs(116, 38).addBox(6, -5.5f, -0.5f, 1, 3, 1), PartPose.ZERO);
+		root.getChild("right_arm").addOrReplaceChild("bracer", CubeListBuilder.create().texOffs(100, 0)
+				.addBox(-4, 4, -3, 6, 5, 6), PartPose.ZERO);
+		PartDefinition left = root.getChild("left_arm");
+		left.addOrReplaceChild("bracer", CubeListBuilder.create().texOffs(100, 0).mirror().addBox(-2, 4, -3, 6, 5, 6),
+				PartPose.ZERO);
+		// Les jambes, écartées par la carrure : cuissard, grève et soleret autour de chacune.
+		for (boolean isLeft : new boolean[]{false, true}) {
+			PartDefinition leg = root.addOrReplaceChild(isLeft ? "left_leg" : "right_leg", CubeListBuilder.create()
+					.texOffs(isLeft ? 16 : 0, isLeft ? 48 : 16).addBox(-2, 0, -2, 4, 12, 4), PartPose.offset(isLeft ? 3.1f : -3.1f, 12, 0));
+			leg.addOrReplaceChild("thigh", CubeListBuilder.create().texOffs(64, 45).mirror(isLeft)
+					.addBox(-3, 0, -3, 6, 6, 6), PartPose.ZERO);
+			leg.addOrReplaceChild("greave", CubeListBuilder.create().texOffs(88, 45).mirror(isLeft)
+					.addBox(-3, 6.5f, -3, 6, 4, 6), PartPose.ZERO);
+			leg.addOrReplaceChild("foot", CubeListBuilder.create().texOffs(100, 11).mirror(isLeft)
+					.addBox(-3, 10, -4, 6, 2, 7), PartPose.ZERO);
+			leg.addOrReplaceChild("knee", CubeListBuilder.create().texOffs(120, 38).addBox(-0.5f, 5, -4.2f, 1, 2, 1),
+					PartPose.ZERO);
+		}
+		root.getChild("right_leg").addOrReplaceChild("pouch", CubeListBuilder.create().texOffs(112, 45)
+				.addBox(-4.6f, 1, -1, 2, 3, 2), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
+	/**
+	 * Armstrong : la boucle blonde dressée sur le crâne nu, la moustache en guidon qui déborde des
+	 * joues, et des épaules de colosse (peau élargie, volumes à droite).
+	 */
+	public static ModelPart armstrong() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition root = mesh.getRoot();
+		PartDefinition head = root.getChild("head");
+		head.addOrReplaceChild("curl", CubeListBuilder.create().texOffs(64, 0).addBox(-1, -10.5f, -4, 2, 3, 2),
+				PartPose.rotation(-0.2f, 0, 0));
+		// La moustache : une barre fine sous le nez, et deux crocs qui retombent au bout.
+		head.addOrReplaceChild("stache", CubeListBuilder.create().texOffs(72, 0).addBox(-5, -2.7f, -4.6f, 10, 1, 1)
+				.texOffs(72, 4).addBox(-5, -1.7f, -4.6f, 1, 2, 1)
+				.texOffs(72, 4).mirror().addBox(4, -1.7f, -4.6f, 1, 2, 1), PartPose.ZERO);
+		root.getChild("right_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 8).addBox(-3.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
+		root.getChild("left_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 16).addBox(-1.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
+	/** Pinako : le chignon dressé sur le crâne, la longue pipe au coin de la bouche et son fourneau. */
+	public static ModelPart pinako() {
+		MeshDefinition mesh = mesh(true);
+		PartDefinition head = mesh.getRoot().getChild("head");
+		head.addOrReplaceChild("bun", CubeListBuilder.create().texOffs(56, 20).addBox(-1, -10, -1, 2, 2, 2),
+				PartPose.ZERO);
+		head.addOrReplaceChild("pipe", CubeListBuilder.create().texOffs(24, 0).addBox(1.5f, -1.6f, -7, 1, 1, 3),
+				PartPose.ZERO);
+		head.addOrReplaceChild("bowl", CubeListBuilder.create().texOffs(56, 16).addBox(1.5f, -3.1f, -7.5f, 1, 2, 1),
+				PartPose.ZERO);
+		return bake(mesh);
+	}
+
+	/** Hawkeye : la poitrine, le chignon relevé à l'arrière de la tête, l'étui du pistolet sur la hanche droite. */
+	public static ModelPart hawkeye() {
+		MeshDefinition mesh = mesh(true);
+		PartDefinition root = mesh.getRoot();
+		PartDefinition body = root.getChild("body");
+		bust(body, 24, 0, 6, 2, 2.5f, -0.15f);
+		root.getChild("head").addOrReplaceChild("bun", CubeListBuilder.create().texOffs(56, 16)
+				.addBox(-1.5f, -6.5f, 4, 3, 3, 2), PartPose.ZERO);
+		body.addOrReplaceChild("holster", CubeListBuilder.create().texOffs(56, 24).addBox(-4.8f, 9, -1, 1, 3, 2),
+				PartPose.ZERO);
+		return bake(mesh);
+	}
+
+	/**
+	 * Kimblee : le feutre blanc à bord, posé sur le crâne, et la longue queue de cheval noire nouée bas
+	 * (peau élargie, volumes à droite).
+	 */
+	public static ModelPart kimblee() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition head = mesh.getRoot().getChild("head");
+		head.addOrReplaceChild("brim", CubeListBuilder.create().texOffs(64, 0).addBox(-5.5f, -8.6f, -5.5f, 11, 1, 11),
+				PartPose.ZERO);
+		head.addOrReplaceChild("crown", CubeListBuilder.create().texOffs(64, 12).addBox(-4, -11, -4, 8, 3, 8),
+				PartPose.ZERO);
+		head.addOrReplaceChild("tail", CubeListBuilder.create().texOffs(96, 12).addBox(-1, 0, 0, 2, 8, 2),
+				PartPose.offsetAndRotation(0, -2, 4, 0.12f, 0, 0));
+		return bakeWide(mesh);
+	}
+
+	/** Ling : la petite queue de cheval nouée sur la nuque. */
+	public static ModelPart ling() {
+		MeshDefinition mesh = mesh(false);
+		ponytail(mesh.getRoot().getChild("head"), 5, -3, 0.2f);
+		return bake(mesh);
+	}
+
+	/** Basque Grand : des épaules de colosse sous l'uniforme (peau élargie, volumes à droite). */
+	public static ModelPart basqueGrand() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition root = mesh.getRoot();
+		root.getChild("right_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 0).addBox(-3.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
+		root.getChild("left_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 8).addBox(-1.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
+		return bakeWide(mesh);
 	}
 
 	/** Un soldat d'Amestris : la visière de sa casquette, un peu baissée sur les yeux. */

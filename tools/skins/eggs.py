@@ -461,8 +461,8 @@ def _(e):
 
 @egg("alphonse")
 def _(e):
-    portrait(e, "#8f9aa6", "#5d6670", "#8f9aa6", eye="#ff4a3a", fringe=False)
-    e.row(13, 5, 10, "#9a2228")
+    portrait(e, "#7a9ea3", "#141a1c", "#7a9ea3", eye="#e8483e", fringe=False)
+    e.row(13, 5, 10, "#a9acc9")
 
 
 @egg("pinako")
