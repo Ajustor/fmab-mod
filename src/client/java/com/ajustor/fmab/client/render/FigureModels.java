@@ -218,13 +218,15 @@ public final class FigureModels {
 		return bakeWide(mesh);
 	}
 
-	/** Pinako : la longue pipe au coin de la bouche, son fourneau dressé au bout. */
+	/** Pinako : le chignon dressé sur le crâne, la longue pipe au coin de la bouche et son fourneau. */
 	public static ModelPart pinako() {
 		MeshDefinition mesh = mesh(true);
 		PartDefinition head = mesh.getRoot().getChild("head");
-		head.addOrReplaceChild("pipe", CubeListBuilder.create().texOffs(24, 0).addBox(1, -2, -7, 1, 1, 3),
+		head.addOrReplaceChild("bun", CubeListBuilder.create().texOffs(56, 20).addBox(-1, -10, -1, 2, 2, 2),
 				PartPose.ZERO);
-		head.addOrReplaceChild("bowl", CubeListBuilder.create().texOffs(56, 16).addBox(1, -3.5f, -7.8f, 1, 2, 1),
+		head.addOrReplaceChild("pipe", CubeListBuilder.create().texOffs(24, 0).addBox(1.5f, -1.6f, -7, 1, 1, 3),
+				PartPose.ZERO);
+		head.addOrReplaceChild("bowl", CubeListBuilder.create().texOffs(56, 16).addBox(1.5f, -3.1f, -7.5f, 1, 2, 1),
 				PartPose.ZERO);
 		return bake(mesh);
 	}
