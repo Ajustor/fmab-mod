@@ -31,6 +31,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import com.ajustor.fmab.compat.EntityCompat;
+import com.ajustor.fmab.alchemy.rules.Analysis;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Lancer le cercle d'un gant : sur la surface visée, à portée de main (ou à distance pour les gants
@@ -46,6 +51,10 @@ public final class GloveCasting {
 	 * plus pressé. Une Pierre vivante, elle, n'attend pas.
 	 */
 	private static final Throttle CASTS = new Throttle(10);
+	/** Les éléments qu'on tire de l'air, sans surface où puiser. */
+	private static final Set<String> FROM_THE_AIR = Set.of("air", "fire", "water");
+	/** Mains jointes dans le vide : le cercle agit à cette distance devant les yeux. */
+	private static final double AIR_REACH = 2;
 
 	private GloveCasting() {
 	}
@@ -92,8 +101,8 @@ public final class GloveCasting {
 
 	/**
 	 * Qui a vu la Porte joint les mains et transmute sans cercle : le cercle sélectionné dans le
-	 * carnet (ou sur la roue des cercles) agit sur la surface visée. Il faut deux mains, libres ou
-	 * tenant une Pierre philosophale.
+	 * carnet (ou sur la roue des cercles) agit sur la surface visée, ou dans l'air devant lui s'il
+	 * n'appelle que l'air, le feu ou l'eau. Il faut deux mains, libres ou tenant une Pierre philosophale.
 	 */
 	private static void clap(ServerPlayer player) {
 		if (Tolls.disabled(player, BodyPart.LEFT_ARM) || Tolls.disabled(player, BodyPart.RIGHT_ARM)) {
@@ -110,15 +119,41 @@ public final class GloveCasting {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.clap_no_circle"));
 			return;
 		}
-		BlockHitResult hit = aimed(player, player.blockInteractionRange());
-		if (hit == null) {
+		BlockPos circle;
+		CircleFrame frame;
+		HitResult hit = player.pick(player.blockInteractionRange(), 1, false);
+		if (hit instanceof BlockHitResult block && hit.getType() == HitResult.Type.BLOCK) {
+			circle = block.getBlockPos().relative(block.getDirection());
+			frame = CircleFrame.forFace(block.getDirection(), player.getDirection());
+		} else if (!needsSurface(elements(player, drawing))) {
+			// L'air, le feu et l'eau se tirent de l'air même : le cercle agit devant les mains, comme
+			// tracé au sol à cet endroit.
+			circle = BlockPos.containing(player.getEyePosition().add(player.getLookAngle().scale(AIR_REACH)));
+			frame = CircleFrame.forFace(Direction.UP, player.getDirection());
+		} else {
+			player.sendOverlayMessage(Component.translatable("transmutation.fmab.no_surface"));
 			return;
 		}
 		player.level().playSound(null, player.blockPosition(), FmabSounds.CLAP, SoundSource.PLAYERS, 1, 1);
 		EntityCompat.swing(player, InteractionHand.OFF_HAND, true);
-		Transmutation.activate(player.level(), hit.getBlockPos().relative(hit.getDirection()),
-				CircleFrame.forFace(hit.getDirection(), player.getDirection()), drawing, player, false, Integer.MAX_VALUE);
+		Transmutation.activate(player.level(), circle, frame, drawing, player, false, Integer.MAX_VALUE);
 		TransmutationPose.strike(player, TransmutationPose.Kind.CLAP, 14);
+	}
+
+	/**
+	 * Faut-il une surface pour ces éléments (ceux de chaque effet du cercle) ? Oui dès que l'un d'eux
+	 * puise dans la matière : la terre, les métaux, la chair… L'air, le feu et l'eau se tirent de l'air
+	 * ambiant.
+	 */
+	public static boolean needsSurface(Collection<? extends Collection<String>> elements) {
+		return elements.stream().anyMatch(effect -> !FROM_THE_AIR.containsAll(effect));
+	}
+
+	/** Les éléments de chaque effet du cercle, tels que cet alchimiste le comprend. */
+	private static List<Set<String>> elements(ServerPlayer player, Drawing drawing) {
+		Analysis analysis = AlchemyRules.of(player.level().registryAccess())
+				.analyze(drawing, FmabAttachments.ALCHEMIST.getOrCreate(player));
+		return analysis.effects().stream().map(effect -> effect.combination().elements()).toList();
 	}
 
 	private static boolean clapsWith(ItemStack held) {
