@@ -924,7 +924,7 @@ def lust(s):
     s.seam("lleg", "front", 0, 4, 8, tone)
 
 
-@skin("gluttony", parts={"belly": (0, 32, 10, 8, 4)})
+@skin("gluttony", parts={"girth": (0, 32, 12, 10, 5), "belly": (34, 32, 10, 7, 2), "chin": (34, 41, 8, 2, 2)})
 def gluttony(s):
     """Gluttony : le crâne chauve et rond, les petits yeux vides, la bouche baveuse, le pull noir."""
     tone = "#efe2d2"
@@ -941,14 +941,21 @@ def gluttony(s):
         s.fill(part, BLACK_CLOTH, "cloth")
     s.band("body", 0, 1, "#2c2a32")
     hands(s, tone, rows=2)
-    s.fill("belly", BLACK_CLOTH, "cloth")
-    s.material("belly", "front", "#2a2830", "cloth")
-    # Le pull tendu sur le ventre : un reflet en haut, l'ombre qui tombe dessous.
-    s.tint("belly", "front", 1, 1, 8, 1, 1.25)
-    s.tint("belly", "front", 2, 2, 6, 1, 1.12)
-    s.tint("belly", "front", 0, 6, 10, 2, 0.8)
-    s.tint("belly", "front", 0, 0, 1, 8, 0.85)
-    s.tint("belly", "front", 9, 0, 1, 8, 0.85)
+    # Le tronc rond, sous le pull noir : plus clair au milieu, l'ombre sur les flancs.
+    s.fill("girth", BLACK_CLOTH, "cloth")
+    s.material("girth", "front", "#2a2830", "cloth")
+    s.band_tint("girth", 8, 2, 0.8)
+    s.tint("girth", "front", 0, 0, 1, 10, 0.8)
+    s.tint("girth", "front", 11, 0, 1, 10, 0.8)
+    s.band("girth", 0, 1, "#2c2a32")
+    # Le ventre tendu qui déborde : un reflet en haut, l'ombre qui tombe dessous.
+    s.fill("belly", "#2e2c34", "cloth")
+    s.tint("belly", "front", 1, 1, 8, 1, 1.3)
+    s.tint("belly", "front", 2, 2, 6, 1, 1.15)
+    s.tint("belly", "front", 0, 5, 10, 2, 0.75)
+    # Le double menton, de la même peau pâle que le visage.
+    s.fill("chin", tone, "skin")
+    s.tint("chin", "front", 0, 1, 8, 1, 0.85)
     boots(s, color="#0f0e12", rows=2)
 
 
