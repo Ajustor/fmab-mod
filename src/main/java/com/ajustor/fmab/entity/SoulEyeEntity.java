@@ -15,9 +15,8 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 /**
- * Un œil qui s'ouvre dans le sol, sous un être dont on prend l'âme : sous chaque vie qu'un cercle de la
- * Pierre consume, sous celle qu'une Pierre vivante absorbe de la main. Il suit sa proie, la regarde
- * mourir, et se referme. Le temps d'une cinématique : il n'est jamais sauvegardé.
+ * Un œil qui s'ouvre dans le sol, sous chaque vie que le grand cercle de la Pierre consume (pas sous
+ * celle qu'une Pierre vivante absorbe de la main). Il suit sa proie, la regarde mourir, et se referme. Le temps d'une cinématique : il n'est jamais sauvegardé.
  */
 public class SoulEyeEntity extends Entity {
 	private static final EntityDataAccessor<Integer> TARGET =
