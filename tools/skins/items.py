@@ -348,8 +348,8 @@ def state_watch():
 
 @item("engraved_watch")
 def engraved_watch():
-    """La montre de Hohenheim : un boîtier de laiton patiné, ouvert sur un cadran pâle aux deux
-    aiguilles, l'intérieur du couvercle rayé d'une inscription, la bélière et la chaîne."""
+    """La montre d'Edward, celle d'Alchimiste d'État : un boîtier d'argent, ouvert sur un cadran pâle
+    aux deux aiguilles, l'intérieur du couvercle rayé de son inscription, la bélière et la chaîne."""
     img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
     cx, cy, r = 7.5, 9.5, 6.0
     for y in range(16):
@@ -358,12 +358,12 @@ def engraved_watch():
             if d > r + 0.4:
                 continue
             if d > r - 0.6:
-                img.putpixel((x, y), rgb("#5a4320"))
+                img.putpixel((x, y), rgb("#3e434b"))
                 continue
             if d > r - 1.8:
-                # Le laiton : clair en haut à gauche, patiné en bas à droite.
+                # L'argent : clair en haut à gauche, terni en bas à droite.
                 t = ((x - cx) + (y - cy)) / (2 * r)
-                img.putpixel((x, y), mix(rgb("#f0d27a"), rgb("#9a7432"), min(1.0, max(0.0, t + 0.5))))
+                img.putpixel((x, y), mix(rgb("#eef1f5"), rgb("#7c838d"), min(1.0, max(0.0, t + 0.5))))
                 continue
             # Le cadran, couleur d'os, plus sombre vers le bord.
             img.putpixel((x, y), shade(rgb("#efe6cf"), 1.0 - 0.12 * d / r))
@@ -372,13 +372,13 @@ def engraved_watch():
         img.putpixel((int(cx + 0.5) + dx, int(cy) + dy), rgb("#6b5a3a"))
     for x, y in ((8, 9), (8, 8), (8, 7), (9, 9), (10, 9)):
         img.putpixel((x, y), rgb("#2b2418"))
-    # La bélière et son anneau, en laiton.
-    for x, y, c in ((7, 3, "#b8913f"), (8, 3, "#e8c66e"), (7, 2, "#e8c66e"), (8, 2, "#a07a35"),
-                    (6, 1, "#5a4320"), (7, 0, "#e8c66e"), (8, 0, "#e8c66e"), (9, 1, "#5a4320")):
+    # La bélière et son anneau, en argent.
+    for x, y, c in ((7, 3, "#a4abb5"), (8, 3, "#e2e6ec"), (7, 2, "#e2e6ec"), (8, 2, "#8a919b"),
+                    (6, 1, "#3e434b"), (7, 0, "#e2e6ec"), (8, 0, "#e2e6ec"), (9, 1, "#3e434b")):
         img.putpixel((x, y), rgb(c))
     # La chaîne, qui retombe à gauche.
     for k, (x, y) in enumerate(((5, 1), (4, 1), (3, 2), (2, 3), (2, 4), (1, 5), (1, 6))):
-        img.putpixel((x, y), rgb("#e8c66e" if k % 2 == 0 else "#8a6a2e"))
+        img.putpixel((x, y), rgb("#e2e6ec" if k % 2 == 0 else "#7c838d"))
     return img
 
 

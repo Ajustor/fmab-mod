@@ -28,6 +28,17 @@ class AdvancementTest {
 			"tome_read", "first_node", "gloves_worn", "tattoo", "chimera", "gold", "trial_first_wall",
 			"trial_surface", "trial_practice", "trial_gloves", "trial_spar", "trial_island", "epilogue", "nina");
 
+	/**
+	 * Les progrès qui dévoileraient un événement caché (un homonculus, la Pierre, la Porte, le cercle
+	 * national, un lieu secret, une révélation) : masqués tant qu'on ne les a pas obtenus.
+	 */
+	private static final Set<String> SECRETS = Set.of("slain_lust", "slain_gluttony", "slain_envy", "slain_greed",
+			"slain_sloth", "slain_wrath", "slain_pride", "slain_father", "slain_barry", "epilogue", "seven_sins",
+			"seal_opened", "philosopher_stone", "living_stone", "rank_gate", "soul_armor", "automail", "crest_sealed",
+			"circle_broken", "visit_laboratory_5", "visit_devils_nest", "visit_xerxes_ruins", "visit_blood_crest",
+			"visit_marcoh_clinic", "hohenheim_met", "chimera", "gold", "marcoh_notes", "cornello_exposed",
+			"scar_tattoo", "greed_pact", "nina");
+
 	private static Map<String, JsonObject> load() throws IOException {
 		Path dir = TestGlyphs.resources().resolve("data/fmab/advancement/alchemist");
 		Map<String, JsonObject> out = new HashMap<>();
@@ -105,5 +116,17 @@ class AdvancementTest {
 			adv = all.get(parent);
 		}
 		return false;
+	}
+
+	@Test
+	void secretsStayHiddenUntilEarned() throws IOException {
+		Map<String, JsonObject> all = load();
+		for (String secret : SECRETS) {
+			JsonObject adv = all.get("fmab:alchemist/" + secret);
+			assertTrue(adv != null, secret + " : progrès inconnu");
+			JsonObject display = adv.getAsJsonObject("display");
+			assertTrue(display.has("hidden") && display.get("hidden").getAsBoolean(),
+					secret + " dévoile un événement caché : il devrait être masqué");
+		}
 	}
 }

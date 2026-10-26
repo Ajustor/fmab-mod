@@ -28,7 +28,8 @@
     "description": {
       "translate": "advancements.fmab.visit_devils_nest.description"
     },
-    "frame": "task"
+    "frame": "task",
+    "hidden": true
   },
   "requirements": [
     [

@@ -7,6 +7,7 @@
     "minecraft:netherite_block": 648,
     "#c:ingots/netherite": 72,
     "#c:storage_blocks/netherite": 648,
-    "#c:nuggets/netherite": 8
+    "#c:nuggets/netherite": 8,
+    "#c:ores/netherite_scrap": 9
   }
 }

@@ -89,7 +89,10 @@ public class ClapAirScenes implements FabricClientGameTest {
 	private static String clap(ServerPlayer p, String element, String action) {
 		p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 		p.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
-		FmabAttachments.ALCHEMIST.set(p, AlchemistData.NEW.withRank(Rank.GATE));
+		// Une Pierre vivante joint les mains sans avoir vu la Porte : le rang d'Initié déclencherait des
+		// progrès qui mettent la partie en pause.
+		FmabAttachments.ALCHEMIST.set(p, AlchemistData.NEW.withRank(Rank.ALCHEMIST));
+		FmabAttachments.LIVING_STONE.set(p, 50);
 		FmabAttachments.POSE.set(p, TransmutationPose.NONE);
 		Concentration.set(p, Concentration.max(p));
 		Drawing drawing = circle(p, element, action);

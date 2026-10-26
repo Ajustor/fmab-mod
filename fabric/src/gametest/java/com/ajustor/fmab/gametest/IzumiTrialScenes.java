@@ -8,13 +8,18 @@ import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.client.screen.IzumiScreen;
+import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
+import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.CircleFrame;
 import com.ajustor.fmab.transmutation.Concentration;
+import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Transmutation;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -22,6 +27,9 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
@@ -86,7 +94,44 @@ public class IzumiTrialScenes implements FabricClientGameTest {
 			hover(context, Trial.PRACTICE);
 			context.takeScreenshot("izumi_trials_hint_practice");
 			context.setScreen(() -> null);
+
+			// L'épreuve du gant : une transmutation sans cercle tracé (des mains jointes) ne la valide pas.
+			sp.getServer().runCommand("tp @p 0.5 -60 0.5 0 60");
+			context.waitTicks(5);
+			boolean clapped = sp.getServer().computeOnServer(server -> {
+				var p = server.getPlayerList().getPlayers().getFirst();
+				// Ce que fait le claquement de mains : le cercle du carnet agit sans avoir été tracé, et sans gant.
+				Concentration.set(p, Concentration.max(p));
+				Transmutation.activate(p.level(), new BlockPos(0, -60, 3), CircleFrame.forFace(Direction.UP, Direction.SOUTH),
+						wall(p), p, false, Integer.MAX_VALUE);
+				return FmabAttachments.TRAINING.getOrCreate(p).achieved().contains(Trial.GLOVES.id());
+			});
+			check(!clapped, "joindre les mains ne devrait pas réussir l'épreuve du gant");
+			context.setScreen(() -> null);
+			// Ailleurs, que le mur des mains jointes ne gêne pas.
+			sp.getServer().runCommand("tp @p 10.5 -60 0.5 0 60");
+			context.waitTicks(15);
+			boolean gloved = sp.getServer().computeOnServer(server -> {
+				var p = server.getPlayerList().getPlayers().getFirst();
+				// Les gants veulent la main libre.
+				p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+				ItemStack glove = new ItemStack(FmabItems.CLOTH_GLOVES);
+				glove.set(FmabComponents.GLOVE_CIRCLE, wall(p));
+				FmabAttachments.GLOVES.set(p, Gloves.NONE.with(false, glove));
+				Concentration.set(p, Concentration.max(p));
+				GloveCasting.cast(p, false);
+				return FmabAttachments.TRAINING.getOrCreate(p).achieved().contains(Trial.GLOVES.id());
+			});
+			check(gloved, "une transmutation au gant devrait réussir l'épreuve du gant");
 		}
+	}
+
+	/** Un mur de terre : Terre et Fixer. */
+	private static Drawing wall(ServerPlayer p) {
+		AlchemyRules rules = AlchemyRules.of(p.level().registryAccess());
+		Glyph earth = rules.glyph("fmab:terre").orElseThrow();
+		Glyph fix = rules.glyph("fmab:fixer").orElseThrow();
+		return SimpleCircles.of(earth, fix, SimpleCircles.sidesFor(earth, fix));
 	}
 
 	/** Le curseur sur la ligne de cette épreuve, comme le joueur qui la survole. */

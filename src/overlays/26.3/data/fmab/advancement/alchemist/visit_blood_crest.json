@@ -26,7 +26,8 @@
     "description": {
       "translate": "advancements.fmab.visit_blood_crest.description"
     },
-    "frame": "task"
+    "frame": "task",
+    "hidden": true
   },
   "requirements": [
     [
