@@ -83,6 +83,8 @@ public class StoneCostScenes implements FabricClientGameTest {
 			check(empty.equals("NOTHING 100"), "un essai à vide ne devrait coûter aucune âme : " + empty);
 			String tired = server(sp, p -> {
 				p.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+				// Des glyphes compris : sans Pierre, un glyphe mal compris peut faire rebondir le cercle.
+				FmabAttachments.ALCHEMIST.set(p, FmabAttachments.ALCHEMIST.getOrCreate(p).learn("fmab:fer").learn("fmab:decomposer"));
 				Concentration.set(p, Concentration.max(p));
 				Transmutation.Result result = cast(p, new BlockPos(25, -60, 4), "fmab:fer", "fmab:decomposer");
 				return result + " " + (Concentration.of(p) == Concentration.max(p));
