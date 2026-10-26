@@ -9,7 +9,6 @@ import com.ajustor.fmab.block.TransmutationCircleBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.data.Gloves;
-import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.data.Training;
 import com.ajustor.fmab.network.OpenIzumiPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
@@ -18,6 +17,7 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.transmutation.AlchemyRules;
+import com.ajustor.fmab.transmutation.CircleFrame;
 import com.ajustor.fmab.transmutation.Concentration;
 import com.ajustor.fmab.transmutation.GloveCasting;
 import com.ajustor.fmab.transmutation.Transmutation;
@@ -95,19 +95,15 @@ public class IzumiTrialScenes implements FabricClientGameTest {
 			context.takeScreenshot("izumi_trials_hint_practice");
 			context.setScreen(() -> null);
 
-			// L'épreuve du gant : des mains jointes transmutent sans tracer, mais sans gant.
+			// L'épreuve du gant : une transmutation sans cercle tracé (des mains jointes) ne la valide pas.
 			sp.getServer().runCommand("tp @p 0.5 -60 0.5 0 60");
 			context.waitTicks(5);
 			boolean clapped = sp.getServer().computeOnServer(server -> {
 				var p = server.getPlayerList().getPlayers().getFirst();
-				// Une Pierre vivante joint les mains sans avoir vu la Porte : pas de rang à changer, donc ni
-				// progrès ni cinématique qui mettraient la partie en pause.
-				FmabAttachments.LIVING_STONE.set(p, 50);
-				p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-				p.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+				// Ce que fait le claquement de mains : le cercle du carnet agit sans avoir été tracé, et sans gant.
 				Concentration.set(p, Concentration.max(p));
-				Notebooks.add(p, "mur", wall(p));
-				GloveCasting.cast(p, true);
+				Transmutation.activate(p.level(), new BlockPos(0, -60, 3), CircleFrame.forFace(Direction.UP, Direction.SOUTH),
+						wall(p), p, false, Integer.MAX_VALUE);
 				return FmabAttachments.TRAINING.getOrCreate(p).achieved().contains(Trial.GLOVES.id());
 			});
 			check(!clapped, "joindre les mains ne devrait pas réussir l'épreuve du gant");
@@ -117,7 +113,8 @@ public class IzumiTrialScenes implements FabricClientGameTest {
 			context.waitTicks(15);
 			boolean gloved = sp.getServer().computeOnServer(server -> {
 				var p = server.getPlayerList().getPlayers().getFirst();
-				FmabAttachments.LIVING_STONE.remove(p);
+				// Les gants veulent la main libre.
+				p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 				ItemStack glove = new ItemStack(FmabItems.CLOTH_GLOVES);
 				glove.set(FmabComponents.GLOVE_CIRCLE, wall(p));
 				FmabAttachments.GLOVES.set(p, Gloves.NONE.with(false, glove));
