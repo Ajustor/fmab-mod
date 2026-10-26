@@ -1840,15 +1840,20 @@ def pinako(s):
     s.material("bowl", "top", "#e06a2a", "flat")
 
 
-@skin("basque_grand")
+@skin("basque_grand", size=WIDE, parts={"rshoulder": (64, 0, 5, 3, 5), "lshoulder": (64, 8, 5, 3, 5)})
 def basque_grand(s):
-    """Basque Grand, l'Alchimiste au sang de fer : mâchoire carrée, grosse moustache brune, l'uniforme."""
+    """Basque Grand, l'Alchimiste au sang de fer : un colosse à la mâchoire carrée, grosse moustache
+    brune, les épaules massives sous l'uniforme."""
     skin_face(s, FAIR, mouth=None)
     eyes(s, "#3a2a20", brow="#4a3020")
     short_hair(s, "#4a3020", fringe=1, back=4)
     mustache(s, "#5a3a24", wide=True)
     s.tint("head", "front", 0, 7, 8, 1, 0.85)
     amestris_uniform(s, officer=True)
+    for shoulder in ("rshoulder", "lshoulder"):
+        s.fill(shoulder, AMESTRIS_BLUE, "cloth")
+        s.material(shoulder, "top", shade(AMESTRIS_BLUE, 1.1), "cloth")
+        s.rect(shoulder, "top", 0, 0, 5, 1, GOLD)
 
 
 @skin("mcdougal")
@@ -1965,7 +1970,7 @@ def tucker(s):
     tone = "#e6c8a8"
     skin_face(s, tone, mouth="#8a5a52")
     eyes(s, "#4a3a2a", brow="#5a4030")
-    glasses(s, "#5a5048")
+    glasses(s, "#a8a29a")
     short_hair(s, "#5a4030", fringe=2, back=5)
     hair_volume(s, "#5a4030", sides=3, back=5)
     for part in ("body", "rarm", "larm"):
