@@ -205,8 +205,10 @@ public final class FigureModels {
 		PartDefinition head = root.getChild("head");
 		head.addOrReplaceChild("curl", CubeListBuilder.create().texOffs(64, 0).addBox(-1, -10.5f, -4, 2, 3, 2),
 				PartPose.rotation(-0.2f, 0, 0));
-		head.addOrReplaceChild("stache", CubeListBuilder.create().texOffs(72, 0).addBox(-5, -3, -4.6f, 10, 2, 1),
-				PartPose.ZERO);
+		// La moustache : une barre fine sous le nez, et deux crocs qui retombent au bout.
+		head.addOrReplaceChild("stache", CubeListBuilder.create().texOffs(72, 0).addBox(-5, -2.7f, -4.6f, 10, 1, 1)
+				.texOffs(72, 4).addBox(-5, -1.7f, -4.6f, 1, 2, 1)
+				.texOffs(72, 4).mirror().addBox(4, -1.7f, -4.6f, 1, 2, 1), PartPose.ZERO);
 		root.getChild("right_arm").addOrReplaceChild("shoulder",
 				CubeListBuilder.create().texOffs(64, 8).addBox(-3.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
 		root.getChild("left_arm").addOrReplaceChild("shoulder",
