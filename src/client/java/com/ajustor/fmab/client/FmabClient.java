@@ -1,5 +1,6 @@
 package com.ajustor.fmab.client;
 
+import com.ajustor.fmab.client.compat.IrisCompat;
 import com.ajustor.fmab.client.render.HandsLayer;
 import com.ajustor.fmab.client.render.Temper;
 import com.ajustor.fmab.client.render.FigureModels;
@@ -114,6 +115,7 @@ public final class FmabClient {
 	public static void init() {
 		// Avant le premier chargement des langues : celle choisie pour le mod s'y applique déjà.
 		FmabClientConfig.load();
+		IrisCompat.register();
 		Fmab.setClientHooks((kind, hand) -> {
 			switch (kind) {
 				case TREATISE -> Minecraft.getInstance().gui.setScreen(new TreatiseScreen());
