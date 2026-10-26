@@ -41,6 +41,7 @@ public class StoryCharacterRenderer extends FigureRenderer.Simple<StoryCharacter
 			case "pinako" -> FigureModels.pinako();
 			case "hawkeye" -> FigureModels.hawkeye();
 			case "ling" -> FigureModels.ling();
+			case "basque_grand" -> FigureModels.basqueGrand();
 			default -> FigureModels.plain(SLIM.contains(id));
 		};
 	}
