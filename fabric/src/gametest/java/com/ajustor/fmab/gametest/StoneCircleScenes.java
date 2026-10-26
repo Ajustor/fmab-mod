@@ -15,6 +15,7 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.LivingStone;
+import com.ajustor.fmab.stone.Paralysis;
 import com.ajustor.fmab.stone.StoneCircle;
 import com.ajustor.fmab.stone.StoneRite;
 import com.ajustor.fmab.transmutation.AlchemyRules;
@@ -110,6 +111,7 @@ public class StoneCircleScenes implements FabricClientGameTest {
 			context.waitTicks(StoneRite.AWAKENING + 25);
 			check(self == Effects.Result.DONE, "le sacrifice devrait avoir lieu : " + self);
 			context.takeScreenshot("stone_circle_rite_vessel");
+			check(onServer(sp, Paralysis::held), "pendant le rite, tout ce qui est dans le cercle est figé, le joueur au centre aussi");
 			context.waitTicks(StoneRite.LENGTH - StoneRite.AWAKENING - 15);
 			check(onServer(sp, LivingStone::souls) == 36, "trois villageois, trente-six âmes en lui : " + onServer(sp, LivingStone::souls));
 			check(onServer(sp, p -> p.level().getEntitiesOfClass(ItemEntity.class, new AABB(CIRCLE).inflate(3),

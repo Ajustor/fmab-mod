@@ -15,10 +15,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.item.ItemStack;
@@ -49,6 +46,8 @@ public final class StoneRite {
 	public static final int LENGTH = 100;
 	/** Ceux qui voient la cinématique : dans le cercle, ou à quelques pas de son bord. */
 	private static final double WITNESS = 16;
+	/** Jusqu'où, au-dessus et au-dessous du cercle, on est pris dans le rite. */
+	private static final double HOLD_HEIGHT = 4;
 	private static final int HEARTBEAT = 15;
 	private static final int PILLAR = 24;
 	private static final DustParticleOptions RED = new DustParticleOptions(0xD01020, 1.2f);
@@ -115,7 +114,7 @@ public final class StoneRite {
 	}
 
 	/**
-	 * Le cercle s'éveille : les victimes sont figées, ceux qui sont pris dedans voient la cinématique, et le
+	 * Le cercle s'éveille : tout ce qui vit dedans est figé ({@link #hold}), ceux qui y sont pris voient la cinématique, et le
 	 * rite suit son cours ({@link #LENGTH} ticks).
 	 *
 	 * @param vessel celui qui deviendra la Pierre, ou null pour condenser les âmes en Pierres
@@ -125,12 +124,6 @@ public final class StoneRite {
 		Vec3 center = Vec3.atCenterOf(circle);
 		List<LivingEntity> order = new ArrayList<>(victims);
 		order.sort(Comparator.comparingDouble((LivingEntity e) -> e.distanceToSqr(center)).reversed());
-		for (LivingEntity victim : order) {
-			victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, LENGTH, 9, false, false));
-			if (victim instanceof Mob mob) {
-				mob.getNavigation().stop();
-			}
-		}
 		ACTIVE.add(new Rite(level, caster.getUUID(), circle.immutable(), radius, order, souls,
 				vessel == null ? null : vessel.getUUID()));
 		AABB seen = new AABB(circle).inflate(radius + WITNESS);
@@ -138,6 +131,21 @@ public final class StoneRite {
 			CinematicPayload.play(p, p == vessel ? CinematicPayload.STONE_VESSEL : CinematicPayload.STONE_RITE, LENGTH);
 		}
 		level.playSound(null, circle, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, loud(radius), 0.5f);
+	}
+
+	/** Paralyse tout être vivant dans le cercle (les victimes, mais aussi les joueurs, homonculus, golems…). */
+	private static void hold(Rite rite) {
+		AABB area = new AABB(rite.circle).inflate(rite.radius, HOLD_HEIGHT, rite.radius);
+		for (LivingEntity e : rite.level.getEntitiesOfClass(LivingEntity.class, area,
+				e -> e.isAlive() && !e.isSpectator() && inside(e.position(), rite.center, rite.radius))) {
+			Paralysis.hold(e, 2);
+		}
+	}
+
+	/** Ce point est-il dans le cercle (à la verticale de son disque) ? */
+	static boolean inside(Vec3 at, Vec3 center, double radius) {
+		double dx = at.x - center.x, dz = at.z - center.z;
+		return dx * dx + dz * dz <= radius * radius;
 	}
 
 	/** Un tick du rite ; vrai quand il est fini. */
@@ -159,6 +167,10 @@ public final class StoneRite {
 				double angle = random.nextDouble() * Math.PI * 2;
 				TransmutationLightning.arc(level, rite.center.add(Math.cos(angle) * r, 0, Math.sin(angle) * r), true);
 			}
+		}
+		// Tout ce qui vit dans le cercle est figé jusqu'à la fin du rite, même ce qui y entre en route.
+		if (age < LENGTH) {
+			hold(rite);
 		}
 		// Les vies tombent, et leurs âmes filent vers le centre.
 		int count = rite.victims.size();
