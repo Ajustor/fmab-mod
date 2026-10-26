@@ -37,4 +37,12 @@ class StoryCharactersTest {
 			assertTrue(Files.exists(assets.resolve("items/" + c.id() + "_spawn_egg.json")), "modèle d'œuf de " + c.id());
 		}
 	}
+
+	@Test
+	void giantsAndLittleOnesHaveTheirSize() {
+		assertTrue(StoryCharacters.scale("alphonse") > 1.2f, "Alphonse et sa grande armure");
+		assertTrue(StoryCharacters.scale("armstrong") > 1, "le colosse Armstrong");
+		assertTrue(StoryCharacters.scale("pinako") < 0.7f, "la toute petite Pinako");
+		assertTrue(StoryCharacters.scale("hughes") == 1, "les autres font la taille d'un homme");
+	}
 }
