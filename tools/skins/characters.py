@@ -617,9 +617,10 @@ def cornello(s):
     s.material("robe", "top", shade(robe, 0.9), "cloth")
 
 
-@skin("izumi", slim=True, parts=BUST)
+@skin("izumi", slim=True, size=WIDE, parts={**BUST, "dreads": (64, 0, 3, 13, 2), "lock": (78, 0, 1, 6, 1)})
 def izumi(s):
-    """Izumi Curtis : les dreadlocks noires, la chemise blanche, le pantalon sombre, les sandales."""
+    """Izumi Curtis : les dreadlocks noires nouées en une grosse queue dans le dos et deux mèches devant
+    les épaules, les anneaux d'or aux oreilles, la chemise blanche, le pantalon sombre, les sandales."""
     tone = "#e4bc98"
     skin_face(s, tone, mouth="#9a4e48")
     eyes(s, "#2c2420", brow="#18120e", lid="#18120e")
@@ -651,6 +652,14 @@ def izumi(s):
     boots(s, color="#6b4b32", rows=1)
     for leg in ("rleg", "lleg"):
         s.band(leg, 10, 1, tone, "skin")
+    # Les dreadlocks en volume : la queue dans le dos, ses mèches séparées, le lien qui la noue.
+    s.fill("dreads", hair, "hair")
+    for f in SIDES:
+        w, h = s.size("dreads", f)
+        for x in range(1, w, 2):
+            s.seam("dreads", f, x, 0, h, None, k=0.7)
+        s.rect("dreads", f, 0, 1, w, 1, "#6b4b32")
+    s.fill("lock", hair, "hair")
 
 
 @skin("may_chang", slim=True, parts={"buns": (24, 0, 3, 3, 3), "braids": (56, 16, 1, 7, 1)})
