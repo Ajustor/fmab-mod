@@ -117,11 +117,15 @@ public final class BossModels {
 		return bake(mesh);
 	}
 
-	/** Wrath : les pans de la vareuse du Généralissime, qui tombent sur les cuisses. */
+	/** Wrath : les pans de la vareuse du Généralissime, qui tombent sur les cuisses, et ses sabres aux hanches. */
 	public static ModelPart wrath() {
 		MeshDefinition mesh = base();
-		mesh.getRoot().getChild("body").addOrReplaceChild("coat",
+		PartDefinition body = mesh.getRoot().getChild("body");
+		body.addOrReplaceChild("coat",
 				CubeListBuilder.create().texOffs(0, 32).addBox(-4.5f, 10, -2.5f, 9, 5, 5), PartPose.ZERO);
+		body.addOrReplaceChild("sabres", CubeListBuilder.create()
+				.texOffs(28, 32).addBox(4.6f, 8, 0.5f, 1, 10, 1)
+				.texOffs(28, 32).mirror().addBox(-5.6f, 8, 0.5f, 1, 10, 1), PartPose.ZERO);
 		return bake(mesh);
 	}
 
