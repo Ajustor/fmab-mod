@@ -1533,20 +1533,37 @@ def hawkeye(s):
     amestris_uniform(s, tone=PALE)
 
 
-@skin("armstrong")
+# Les volumes d'Armstrong (FigureModels.armstrong) : la boucle, la moustache en guidon, les épaules.
+ARMSTRONG_PARTS = {"curl": (64, 0, 2, 3, 2), "stache": (72, 0, 10, 2, 1), "rshoulder": (64, 8, 5, 3, 5),
+                   "lshoulder": (64, 16, 5, 3, 5)}
+
+
+@skin("armstrong", size=WIDE, parts=ARMSTRONG_PARTS)
 def armstrong(s):
-    """Alex Louis Armstrong, l'Alchimiste au bras puissant : crâne nu, une boucle blonde, grosse
-    moustache, gantelets à pointes."""
+    """Alex Louis Armstrong, l'Alchimiste au bras puissant : un colosse au crâne nu, une seule boucle
+    blonde dressée sur le front, la grosse moustache blonde en guidon, de petits yeux bleus, les
+    épaules énormes sous l'uniforme, gantelets à pointes."""
     blond = "#ecd27a"
     skin_face(s, PALE, mouth=None)
     eyes(s, "#5a7ab0", brow=blond)
     s.material("head", "top", shade(PALE, 0.96), "skin")
-    # La boucle unique sur le front, et la moustache en croc.
+    # La racine de la boucle sur le front, la moustache peinte sous le nez.
     s.px("head", "front", 3, 0, blond)
     s.px("head", "front", 4, 0, blond)
-    s.px("head", "front", 4, 1, shade(blond, 0.85))
     mustache(s, blond, wide=True)
+    # La boucle et la moustache en volume.
+    s.fill("curl", blond, "hair")
+    s.tint("curl", "front", 0, 2, 2, 1, 0.8)
+    s.fill("stache", blond, "hair")
+    s.tint("stache", "front", 4, 0, 2, 2, 0.85)
+    for f in ("front", "back"):
+        s.tint("stache", f, 0, 1, 10, 1, 0.85)
     amestris_uniform(s, officer=True, tone=PALE, gloves="#3a3d44")
+    # Les épaules de colosse, sous le drap bleu de l'uniforme, l'épaulette dorée.
+    for shoulder in ("rshoulder", "lshoulder"):
+        s.fill(shoulder, AMESTRIS_BLUE, "cloth")
+        s.material(shoulder, "top", shade(AMESTRIS_BLUE, 1.1), "cloth")
+        s.rect(shoulder, "top", 0, 0, 5, 1, GOLD)
     # Les pointes des gantelets.
     for arm in ("rarm", "larm"):
         w, _ = s.size(arm, "front")

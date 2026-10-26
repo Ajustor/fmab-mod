@@ -37,6 +37,7 @@ public class StoryCharacterRenderer extends FigureRenderer.Simple<StoryCharacter
 	private static ModelPart model(String id) {
 		return switch (id) {
 			case "alphonse" -> FigureModels.alphonse();
+			case "armstrong" -> FigureModels.armstrong();
 			default -> FigureModels.plain(SLIM.contains(id));
 		};
 	}
