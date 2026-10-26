@@ -57,18 +57,22 @@ public class StoneCostScenes implements FabricClientGameTest {
 					&& !TransmutationLightning.crackles(p.level(), new BlockPos(0, -60, 4), false)),
 					"une Pierre en main : les éclairs de la transmutation sont rouges");
 
-			// Le garder sous la main : la première prolongation paie déjà une âme.
+			// Le garder sous la main : la première prolongation paie déjà une âme, si elle fait grandir le
+			// mur ; une prolongation qui ne fait rien ne coûte rien.
 			String held = server(sp, p -> {
 				ItemStack stone = holdStone(p);
 				BlockPos circle = new BlockPos(10, -60, 4);
 				cast(p, circle, "fmab:terre", "fmab:fixer");
 				int before = PhilosopherStoneItem.souls(stone);
+				int blocks = solid(p, circle);
 				BlockState state = p.level().getBlockState(circle);
 				Drawing drawing = ((TransmutationCircleBlockEntity) p.level().getBlockEntity(circle)).drawing();
 				boolean prolonged = Transmutation.channel(p.level(), circle, state, drawing, p, CircleSize.NORMAL);
-				return prolonged + " " + (before - PhilosopherStoneItem.souls(stone));
+				boolean grew = solid(p, circle) != blocks;
+				return prolonged + " " + (before - PhilosopherStoneItem.souls(stone)) + " " + (grew ? 1 : 0);
 			});
-			check(held.equals("true 1"), "prolonger avec la Pierre devrait coûter une âme : " + held);
+			check(held.startsWith("true ") && held.charAt(5) == held.charAt(7),
+					"prolonger avec la Pierre ne devrait coûter une âme que s'il fait grandir le mur (prolongé, âmes, a grandi) : " + held);
 
 			// Décomposer du fer quand il n'y en a pas : rien ne se fait, rien ne se paie.
 			String empty = server(sp, p -> {
@@ -107,6 +111,17 @@ public class StoneCostScenes implements FabricClientGameTest {
 			});
 			check(plain.equals("DONE true false"), "sans Pierre, des éclairs bleus : " + plain);
 		}
+	}
+
+	/** Les blocs pleins autour du cercle : de quoi voir si un mur a grandi. */
+	private static int solid(ServerPlayer p, BlockPos circle) {
+		int n = 0;
+		for (BlockPos at : BlockPos.betweenClosed(circle.offset(-6, 0, -6), circle.offset(6, 8, 6))) {
+			if (!p.level().getBlockState(at).isAir()) {
+				n++;
+			}
+		}
+		return n;
 	}
 
 	private static ItemStack holdStone(ServerPlayer p) {
