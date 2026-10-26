@@ -747,7 +747,7 @@ def olivier(s):
     s.material("sabre", "top", GOLD, "metal")
 
 
-@skin("winry", slim=True, parts={**BUST, "ponytail": (56, 16, 2, 8, 2)})
+@skin("winry", slim=True, parts={**BUST, "ponytail": (56, 16, 2, 11, 2)})
 def winry(s):
     """Winry Rockbell : queue de cheval blonde, débardeur noir, combinaison bleue nouée à la taille."""
     tone, blond = "#f2d6ba", "#efd27e"
