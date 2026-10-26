@@ -1,5 +1,6 @@
 package com.ajustor.fmab.gametest;
 
+import net.minecraft.sounds.SoundSource;
 import com.ajustor.fmab.client.screen.BodyScreen;
 import com.ajustor.fmab.client.screen.GlovesScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
@@ -56,6 +57,8 @@ public class RenderShowcase implements FabricClientGameTest {
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		// Les scènes tournent sans le son (c'est la première à démarrer) : le client de test reste muet.
+		context.runOnClient(mc -> mc.options.getSoundSourceOptionInstance(SoundSource.MASTER).set(0.0));
 		if (!selected("showcase")) {
 			return;
 		}

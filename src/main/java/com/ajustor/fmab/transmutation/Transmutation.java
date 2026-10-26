@@ -211,22 +211,27 @@ public final class Transmutation {
 			touch(level, circle, caster);
 			partner.ifPresent(id -> fuse(level, circle, caster, id));
 		}
-		Concentration.set(caster, concentration - cost);
-		// La Pierre paie dès que l'énergie part : rebond ou essai à vide compris.
-		stone.ifPresent(s -> PhilosopherStones.drain(caster, s, PhilosopherStones.cost(analysis)));
-		if (living && stone.isEmpty()) {
-			LivingStone.spend(caster, analysis.parsed().stages().size());
-		}
+		// Le prix (concentration, âmes de la Pierre) ne se paie que si l'énergie fait quelque chose :
+		// une transmutation, ou un rebond. Un essai à vide ne coûte rien.
+		Runnable pay = () -> {
+			Concentration.set(caster, concentration - cost);
+			stone.ifPresent(s -> PhilosopherStones.drain(caster, s, PhilosopherStones.cost(analysis)));
+			if (living && stone.isEmpty()) {
+				LivingStone.spend(caster, analysis.parsed().stages().size());
+			}
+		};
 		// L'énergie est partie : quoi qu'il arrive, on s'est familiarisé avec les glyphes tracés.
 		practiceGlyphs(caster, rules, analysis);
 
 		if (analysis.outcome() == Analysis.Outcome.REBOUND && !(steady && PhilosopherStones.steadies(analysis))) {
+			pay.run();
 			rebound(level, circle, frame, caster, analysis.reboundSeverity(), inscribed);
 			return Result.REBOUND;
 		}
 		// Un glyphe qu'on ne comprend pas peut tout faire basculer (sauf si la Pierre le tient).
 		if (!steady && analysis.risk() > 0 && caster.getRandom().nextDouble() < analysis.risk()) {
 			caster.sendSystemMessage(Component.translatable("transmutation.fmab.misunderstood"));
+			pay.run();
 			rebound(level, circle, frame, caster, analysis.risk(), inscribed);
 			return Result.REBOUND;
 		}
@@ -274,6 +279,7 @@ public final class Transmutation {
 			TransmutationPose.strike(caster, TransmutationPose.Kind.PALM, 14);
 		}
 		if (anything) {
+			pay.run();
 			// Un cercle parti tout seul ne se tient pas : l'auteur n'a pas la main dessus.
 			if (inscribed && !remote) {
 				CHANNELS.put(caster.getUUID(), new Channel(circle, level.getGameTime(), 0));
@@ -385,22 +391,10 @@ public final class Transmutation {
 		boolean living = LivingStone.fuels(caster);
 		Optional<ItemStack> stone = PhilosopherStones.held(caster);
 		boolean amplified = stone.isPresent() || living;
-		if (amplified) {
-			if (channelPaysASoul(channel.growth() + 1)) {
-				if (stone.isPresent()) {
-					PhilosopherStones.drain(caster, stone.get(), 1);
-				} else {
-					LivingStone.spend(caster, 1);
-				}
-			}
-		} else {
-			float concentration = Concentration.of(caster);
-			if (concentration < 1) {
-				caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", 1, 0));
-				CHANNELS.remove(caster.getUUID());
-				return true;
-			}
-			Concentration.set(caster, concentration - 1);
+		if (!amplified && Concentration.of(caster) < 1) {
+			caster.sendOverlayMessage(Component.translatable("transmutation.fmab.tired", 1, 0));
+			CHANNELS.remove(caster.getUUID());
+			return true;
 		}
 		int prolonged = channel.growth() + 1;
 		CircleFrame frame = CircleFrame.of(state);
@@ -425,6 +419,16 @@ public final class Transmutation {
 			// Plus de matière, ou rien qui puisse grandir : l'énergie s'arrête.
 			CHANNELS.remove(caster.getUUID());
 			return true;
+		}
+		// La prolongation ne se paie que si elle a fait quelque chose.
+		if (!amplified) {
+			Concentration.set(caster, Concentration.of(caster) - 1);
+		} else if (channelPaysASoul(prolonged)) {
+			if (stone.isPresent()) {
+				PhilosopherStones.drain(caster, stone.get(), 1);
+			} else {
+				LivingStone.spend(caster, 1);
+			}
 		}
 		CHANNELS.put(caster.getUUID(), new Channel(circle, now, prolonged));
 		TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 0.4, amplified);
