@@ -30,8 +30,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
- * La Pierre paie à chaque usage : une transmutation réussie, un essai à vide, chaque prolongation
- * (une âme sur quatre) ; et la Pierre vivante paie même un cercle à un étage. Lancer avec
+ * La Pierre paie à chaque usage qui fait quelque chose : une transmutation réussie, chaque
+ * prolongation (une âme sur quatre) ; un essai à vide ne coûte ni âme ni concentration. La Pierre
+ * vivante paie même un cercle à un étage. Lancer avec
  * {@code ./gradlew :fabric:26.2:runClientGameTest -PfmabGametest=stone_cost}.
  */
 public class StoneCostScenes implements FabricClientGameTest {
@@ -69,14 +70,20 @@ public class StoneCostScenes implements FabricClientGameTest {
 			});
 			check(held.equals("true 1"), "prolonger avec la Pierre devrait coûter une âme : " + held);
 
-			// Décomposer du fer quand il n'y en a pas : l'énergie part, la Pierre paie quand même.
+			// Décomposer du fer quand il n'y en a pas : rien ne se fait, rien ne se paie.
 			String empty = server(sp, p -> {
 				ItemStack stone = holdStone(p);
 				Transmutation.Result result = cast(p, new BlockPos(20, -60, 4), "fmab:fer", "fmab:decomposer");
 				return result + " " + PhilosopherStoneItem.souls(stone);
 			});
-			check(empty.startsWith("NOTHING") && !empty.endsWith(" 100"),
-					"un essai à vide devrait coûter des âmes : " + empty);
+			check(empty.equals("NOTHING 100"), "un essai à vide ne devrait coûter aucune âme : " + empty);
+			String tired = server(sp, p -> {
+				p.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+				Concentration.set(p, Concentration.max(p));
+				Transmutation.Result result = cast(p, new BlockPos(25, -60, 4), "fmab:fer", "fmab:decomposer");
+				return result + " " + (Concentration.of(p) == Concentration.max(p));
+			});
+			check(tired.equals("NOTHING true"), "un essai à vide ne devrait coûter aucune concentration : " + tired);
 
 			// La Pierre vivante paie même un cercle à un étage.
 			String living = server(sp, p -> {
