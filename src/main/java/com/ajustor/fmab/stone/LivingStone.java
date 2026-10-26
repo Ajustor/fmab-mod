@@ -171,6 +171,7 @@ public final class LivingStone {
 	}
 
 	public static void register() {
+		Paralysis.register();
 		InteractionEvents.USE_ENTITY.register((player, level, hand, entity, hit) -> {
 			if (!(player instanceof ServerPlayer absorber) || hand != InteractionHand.MAIN_HAND
 					|| !player.getMainHandItem().isEmpty() || souls(absorber) <= 0 || !player.isShiftKeyDown()
@@ -221,9 +222,10 @@ public final class LivingStone {
 	}
 
 	/**
-	 * Une pulsation d'absorption. Plus on tient la même victime, plus ça va vite.
+	 * Une pulsation d'absorption. Plus on tient la même victime, plus ça va vite ; tant qu'on la tient,
+	 * elle est paralysée, et le bras reste tendu sans reprendre son élan.
 	 */
-	private static void absorb(ServerPlayer absorber, LivingEntity target) {
+	public static void absorb(ServerPlayer absorber, LivingEntity target) {
 		ServerLevel level = absorber.level();
 		long now = level.getGameTime();
 		Grip grip = GRIPS.get(absorber.getUUID());
@@ -231,8 +233,11 @@ public final class LivingStone {
 				? grip.streak() + 1 : 0;
 		GRIPS.put(absorber.getUUID(), new Grip(target.getUUID(), now, streak));
 		int rate = Math.min(MAX_RATE, 1 + streak / 3);
-		EntityCompat.swing(absorber, InteractionHand.MAIN_HAND, true);
-		TransmutationPose.strike(absorber, TransmutationPose.Kind.REACH, ABSORB_GAP + 2);
+		if (streak == 0) {
+			EntityCompat.swing(absorber, InteractionHand.MAIN_HAND, true);
+		}
+		TransmutationPose.keep(absorber, TransmutationPose.Kind.REACH, ABSORB_GAP + 2);
+		Paralysis.hold(target, ABSORB_GAP + 2);
 		draw(level, target, absorber);
 		// Un œil s'ouvre dans le sol sous la proie, tant qu'on la tient.
 		SoulEyeEntity.under(level, target, ABSORB_GAP + 2);
