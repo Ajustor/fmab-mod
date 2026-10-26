@@ -289,7 +289,7 @@ public final class Transmutation {
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 0.5f, 1.4f);
 			level.playSound(null, circle, schoolSound(practiced.getFirst()), SoundSource.PLAYERS, 1, 1);
 			practice(caster, rules, knowledge, practiced);
-			Trainings.onTransmutation(caster, analysis, frame, inscribed, done);
+			Trainings.onTransmutation(caster, analysis, frame, done);
 			Belly.transmuted(caster);
 			if (done.contains("fmab:repair")) {
 				// Réparer ce qui est cassé : un peu de bien en ce monde.

@@ -30,8 +30,12 @@ public final class Trainings {
 	private Trainings() {
 	}
 
-	/** Une transmutation a réussi : quelles épreuves vient-elle de remplir ? */
-	public static void onTransmutation(ServerPlayer player, Analysis analysis, CircleFrame frame, boolean inscribed,
+	/**
+	 * Une transmutation a réussi : quelles épreuves vient-elle de remplir ? L'épreuve du gant se
+	 * constate au gant lui-même ({@code GloveCasting}) : des mains jointes ou un tatouage transmutent
+	 * eux aussi sans tracer, mais sans gant.
+	 */
+	public static void onTransmutation(ServerPlayer player, Analysis analysis, CircleFrame frame,
 			Collection<String> effects) {
 		if (effects.contains("fmab:wall")) {
 			achieve(player, Trial.FIRST_WALL);
@@ -41,9 +45,6 @@ public final class Trainings {
 		}
 		if (analysis.parsed().stages().size() >= 2) {
 			StateExam.proveTwoStages(player);
-		}
-		if (!inscribed) {
-			achieve(player, Trial.GLOVES);
 		}
 	}
 
