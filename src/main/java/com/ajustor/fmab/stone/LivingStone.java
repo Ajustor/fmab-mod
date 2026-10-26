@@ -44,8 +44,9 @@ import com.ajustor.fmab.compat.EntityCompat;
  * La Pierre philosophale vivante, comme Van Hohenheim : l'alchimiste a fondu dans son corps les âmes
  * de deux Pierres pleines, pendant une éclipse, sur un cercle de transmutation humaine. Il ne paie
  * plus de péage à la Porte, ses transmutations ne lui coûtent rien, et il ressuscite sur place à
- * chaque mort ; ses âmes le nourrissent, il n'a plus besoin de manger. Mais chaque grande
- * transmutation et chaque mort consument des âmes ; à zéro, il meurt pour de bon et redevient un homme. Son karma touche le fond, et les homonculus le traquent.
+ * chaque mort ; ses âmes le nourrissent, il n'a plus besoin de manger, et ses plaies se referment
+ * d'elles-mêmes : en théorie, il est immortel. Mais chaque grande transmutation et chaque mort
+ * consument des âmes ; à zéro, il meurt pour de bon et redevient un homme. Et les homonculus le traquent.
  *
  * <p>Ses âmes n'ont pas de limite : main nue, il absorbe celles des vivants en gardant la main sur
  * eux, de plus en plus vite. Une autre Pierre vivante (ou un homonculus) perd ses âmes une à une ;
@@ -72,6 +73,8 @@ public final class LivingStone {
 	private static final int HUNT_PERIOD = 20 * 60 * 10;
 	/** Une barre de faim pleine. */
 	private static final int FULL = 20;
+	/** Ce que ses âmes lui rendent de vie chaque seconde : un cœur. */
+	private static final float REGENERATION = 2;
 
 	private LivingStone() {
 	}
@@ -133,7 +136,7 @@ public final class LivingStone {
 
 	/**
 	 * Les âmes se fondent dans le corps du joueur : il devient une Pierre vivante, ou grossit celle qu'il
-	 * est déjà. Ses membres pris par la Porte lui reviennent, son karma touche le fond. Une Pierre
+	 * est déjà. Ses membres pris par la Porte lui reviennent ; son karma ne bouge pas. Une Pierre
 	 * vivante transmute sans cercle, mains jointes, même sans avoir vu sa Porte.
 	 */
 	public static void become(ServerPlayer player, int souls, BlockPos circle) {
@@ -142,7 +145,6 @@ public final class LivingStone {
 		GateState gate = FmabAttachments.GATE.getOrCreate(player);
 		FmabAttachments.GATE.set(player, gate.restore(gate.lost()));
 		GateOfTruth.returnParts(player);
-		Karma.set(player, Karma.MIN);
 		player.setHealth(player.getMaxHealth());
 		ServerLevel level = player.level();
 		level.sendParticles(RED, player.getX(), player.getY(0.5), player.getZ(), 300, 1.5, 1.5, 1.5, 0);
@@ -159,6 +161,11 @@ public final class LivingStone {
 	/** La faim d'une Pierre vivante : ses âmes la nourrissent, elle reste rassasiée. Les autres gardent la leur. */
 	public static int fed(int souls, int food) {
 		return souls > 0 ? FULL : food;
+	}
+
+	/** La vie que ses âmes rendent chaque seconde à une Pierre vivante, tant qu'il lui en reste ; rien aux autres. */
+	public static float regeneration(int souls) {
+		return souls > 0 ? REGENERATION : 0;
 	}
 
 	/** Chaque usage de la Pierre vivante consume des âmes (jamais la dernière, la sienne). */
@@ -206,6 +213,10 @@ public final class LivingStone {
 			}
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				player.getFoodData().setFoodLevel(fed(souls(player), player.getFoodData().getFoodLevel()));
+				float heal = regeneration(souls(player));
+				if (heal > 0 && player.isAlive() && player.getHealth() < player.getMaxHealth()) {
+					player.heal(heal);
+				}
 			}
 		});
 		ServerEvents.END_TICK.register(server -> {
