@@ -6,6 +6,11 @@ import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.stone.PhilosopherStones;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -47,14 +52,56 @@ import java.util.TreeSet;
  * propres façons d'être faits.
  */
 public final class Recomposition {
+	/** Les minerais, de tous les mods. */
+	private static final TagKey<Block> ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("c", "ores"));
+
 	private Recomposition() {
 	}
 
 	// --- Comprendre (décomposer un objet) ----------------------------------------------------------
 
-	/** Élément + Décomposer : les objets posés sur le cercle se défont en leur matière. */
+	/**
+	 * Élément + Décomposer : les objets posés sur le cercle se défont en leur matière, et les minerais
+	 * de cet élément autour du cercle se brisent.
+	 */
 	public static Effects.Result dismantleEffect(EffectContext ctx) {
-		return dismantle(ctx) > 0 ? Effects.Result.DONE : Effects.Result.NO_TARGET;
+		return dismantle(ctx) + mine(ctx) > 0 ? Effects.Result.DONE : Effects.Result.NO_TARGET;
+	}
+
+	/**
+	 * Brise les minerais (tag {@code c:ores}) dont l'élément principal, d'après les tables d'échange,
+	 * est visé par l'étage : un cercle qui sait défaire le zinc défait aussi le minerai de zinc, de
+	 * quelque mod qu'il vienne. Leurs drops passent à l'étage suivant (ou retombent sur le cercle).
+	 * Avec le glyphe Objet seul, aucun.
+	 *
+	 * @return combien de blocs se sont brisés
+	 */
+	public static int mine(EffectContext ctx) {
+		if (!ctx.stage().aimsBlocks()) {
+			return 0;
+		}
+		ServerLevel level = ctx.level();
+		Set<String> aimed = ctx.stage().combination().elements();
+		BlockPos o = ctx.origin();
+		int r = ctx.range();
+		int broken = 0;
+		for (BlockPos p : BlockPos.betweenClosed(o.offset(-r, -r, -r), o.offset(r, r, r))) {
+			BlockState state = level.getBlockState(p);
+			if (!state.is(ORES) || state.hasBlockEntity() || state.getDestroySpeed(level, p) < 0 || p.equals(ctx.support())
+					|| !minable(composition(level, state.getBlock().asItem()).map(Composition::principal), aimed)) {
+				continue;
+			}
+			BlockPos at = p.immutable();
+			ctx.flow().addAll(Block.getDrops(state, level, at, null));
+			level.destroyBlock(at, false, ctx.caster());
+			broken++;
+		}
+		return broken;
+	}
+
+	/** Un minerai de cet élément principal se brise-t-il sous un cercle qui vise ces éléments ? */
+	public static boolean minable(Optional<String> principal, Set<String> aimed) {
+		return principal.isPresent() && aimed.contains(principal.get());
 	}
 
 	/**

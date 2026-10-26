@@ -11,6 +11,8 @@
     "#c:dusts/sulfur": 1,
     "#c:gems/sulfur": 1,
     "#c:dusts/saltpeter": 1,
-    "#c:gems/saltpeter": 1
+    "#c:gems/saltpeter": 1,
+    "#c:ores/sulfur": 4,
+    "#c:ores/saltpeter": 4
   }
 }
