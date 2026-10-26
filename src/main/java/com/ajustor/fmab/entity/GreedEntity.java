@@ -43,8 +43,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Greed (Avarice) : il veut tout. Son Bouclier ultime durcit sa peau en carbone : rien ne le
- * blesse, sauf quand il le retire pour frapper. Il ne cherche pas la bagarre ; on peut même
+ * Greed (Avarice) : il veut tout. Hors combat, c'est un homme en gilet à col de fourrure ; dès qu'il
+ * se bat, son Bouclier ultime se déploie et durcit sa peau en carbone : rien ne le blesse, sauf quand
+ * il le retire pour frapper. Il ne cherche pas la bagarre ; on peut même
  * l'acheter (or, émeraudes, diamants) ou gagner son respect en le battant, et il devient un allié,
  * tant qu'on le paie.
  */
@@ -54,6 +55,8 @@ public class GreedEntity extends HomunculusEntity {
 	private static final int SOULS = 5;
 	/** Le bouclier se retire le temps de frapper. */
 	private static final int OPENING = 50;
+	/** Le temps que le carbone met à recouvrir tout le corps, ou à se retirer, en ticks. */
+	public static final int DEPLOY = 10;
 	/** Ce que vaut une offrande, en lingots d'or ; il en veut au moins tant pour un pacte. */
 	private static final int PRICE = 32;
 	/** Défaites après lesquelles il reconnaît son vainqueur. */
@@ -62,6 +65,9 @@ public class GreedEntity extends HomunculusEntity {
 	private static final int WAGE_PERIOD = 24000;
 
 	private int opening;
+	/** Côté client : la part du corps que le carbone recouvre (0 à 1), et sa valeur au tick d'avant. */
+	private float cover;
+	private float coverO;
 	private UUID owner;
 	private UUID respected;
 	private int defeats;
@@ -83,11 +89,36 @@ public class GreedEntity extends HomunculusEntity {
 	@Override
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 		super.defineSynchedData(builder);
-		builder.define(SHIELD, true);
+		builder.define(SHIELD, false);
 	}
 
 	public boolean shielded() {
 		return entityData.get(SHIELD);
+	}
+
+	/** Le bouclier est-il levé ? En combat, hors du moment où il frappe. */
+	public static boolean armored(boolean fighting, int opening) {
+		return fighting && opening <= 0;
+	}
+
+	/** La part du corps couverte de carbone à cet instant (côté client), de 0 à 1. */
+	public float cover(float partialTicks) {
+		return coverO + (cover - coverO) * partialTicks;
+	}
+
+	/** Le carbone qui gagne ou recule d'un tick vers ce qu'il doit couvrir. */
+	public static float spread(float cover, boolean shielded) {
+		float step = 1f / DEPLOY;
+		return shielded ? Math.min(1, cover + step) : Math.max(0, cover - step);
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+		if (level().isClientSide()) {
+			coverO = cover;
+			cover = spread(cover, shielded());
+		}
 	}
 
 	public Optional<UUID> owner() {
@@ -164,7 +195,6 @@ public class GreedEntity extends HomunculusEntity {
 				winner.sendSystemMessage(Component.translatable("homunculus.fmab.greed_yields"));
 			}
 		}
-		entityData.set(SHIELD, true);
 	}
 
 	@Override
@@ -240,8 +270,16 @@ public class GreedEntity extends HomunculusEntity {
 		if (!(level() instanceof ServerLevel level)) {
 			return;
 		}
-		if (opening > 0 && --opening == 0) {
-			entityData.set(SHIELD, true);
+		if (opening > 0) {
+			opening--;
+		}
+		// En combat, le bouclier se déploie ; hors combat, il redevient un homme.
+		boolean armored = armored(getTarget() != null && getTarget().isAlive(), opening);
+		if (armored != shielded()) {
+			entityData.set(SHIELD, armored);
+			if (armored) {
+				level.playSound(null, blockPosition(), SoundEvents.ARMOR_EQUIP_NETHERITE.value(), SoundSource.HOSTILE, 1, 0.8f);
+			}
 		}
 		if (owner != null && level.getGameTime() >= nextWage) {
 			collectWage(level);
