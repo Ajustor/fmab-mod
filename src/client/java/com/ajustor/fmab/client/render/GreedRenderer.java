@@ -93,7 +93,7 @@ public class GreedRenderer extends FigureRenderer<GreedEntity, GreedRenderer.Sta
 			if (state.cover <= 0 || state.isInvisible) {
 				return;
 			}
-			RenderCompat.submitModel(collector.order(1), model, state, poseStack, RenderTypes.entityCutoutNoCull(SHIELD),
+			RenderCompat.submitModel(collector.order(1), model, state, poseStack, RenderTypes.entityCutout(SHIELD),
 					light, LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor);
 		}
 	}
