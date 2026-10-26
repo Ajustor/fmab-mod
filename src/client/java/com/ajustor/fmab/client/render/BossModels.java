@@ -47,11 +47,24 @@ public final class BossModels {
 		return LayerDefinition.create(mesh, 64, 64).bakeRoot();
 	}
 
-	/** Gluttony : un ventre rond qui déborde devant lui. */
+	/**
+	 * Gluttony : tout rond. Un tronc plus large que les épaules, le ventre qui déborde encore devant lui,
+	 * le double menton sous le visage, et les bras écartés par sa corpulence.
+	 */
 	public static ModelPart gluttony() {
 		MeshDefinition mesh = base();
-		mesh.getRoot().getChild("body").addOrReplaceChild("belly",
-				CubeListBuilder.create().texOffs(0, 32).addBox(-5, 3, -5, 10, 8, 4), PartPose.ZERO);
+		PartDefinition root = mesh.getRoot();
+		PartDefinition body = root.getChild("body");
+		body.addOrReplaceChild("girth", CubeListBuilder.create().texOffs(0, 32).addBox(-6, 1, -2.5f, 12, 10, 5),
+				PartPose.ZERO);
+		body.addOrReplaceChild("belly", CubeListBuilder.create().texOffs(34, 32).addBox(-5, 3, -4.5f, 10, 7, 2),
+				PartPose.ZERO);
+		root.getChild("head").addOrReplaceChild("chin", CubeListBuilder.create().texOffs(34, 41)
+				.addBox(-4, -1, -4.8f, 8, 2, 2), PartPose.ZERO);
+		root.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(40, 16).addBox(-3, -2, -2, 4, 12, 4),
+				PartPose.offset(-7, 2, 0));
+		root.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(32, 48).addBox(-1, -2, -2, 4, 12, 4),
+				PartPose.offset(7, 2, 0));
 		return bake(mesh);
 	}
 
