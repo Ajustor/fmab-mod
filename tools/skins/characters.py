@@ -1139,7 +1139,7 @@ def greed_shield(s):
     s.fill("fur", "#3a3a44", "fur")
 
 
-@skin("wrath", parts={"coat": (0, 32, 9, 5, 5)})
+@skin("wrath", parts={"coat": (0, 32, 9, 5, 5), "sabre": (28, 32, 1, 10, 1)})
 def wrath(s):
     """King Bradley : le bandeau sur l'œil gauche, la moustache, l'uniforme de Généralissime."""
     tone = "#e4c0a0"
@@ -1167,6 +1167,11 @@ def wrath(s):
     s.material("coat", "top", shade("#24396e", 0.7), "cloth")
     s.tint("coat", "front", 0, 4, 9, 1, 0.8)
     s.rect("coat", "front", 4, 0, 1, 5, shade("#24396e", 0.6))
+    # Les sabres au fourreau noir, la garde dorée.
+    s.fill("sabre", "#16161c", "leather")
+    for f in SIDES:
+        s.px("sabre", f, 0, 0, GOLD)
+    s.material("sabre", "top", GOLD, "metal")
 
 
 @skin("pride")
