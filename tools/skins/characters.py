@@ -1735,14 +1735,14 @@ def alphonse(s):
         s.rect(leg, "front", 0, 11, 4, 1, shade(steel, 0.6))
 
 
-@skin("pinako", slim=True, parts={"pipe": (24, 0, 1, 1, 3), "bowl": (56, 16, 1, 2, 1)})
+@skin("pinako", slim=True, parts={"pipe": (24, 0, 1, 1, 3), "bowl": (56, 16, 1, 2, 1), "bun": (56, 20, 2, 2, 2)})
 def pinako(s):
     """Pinako Rockbell : la vieille mécanicienne, toute petite, chignon gris sur le crâne, lunettes
     rondes, tenue sombre et tablier, et sa longue pipe."""
     tone = "#e6c4a4"
     skin_face(s, tone, mouth="#8a5a52")
-    eyes(s, "#3a3036", brow="#9a9590")
-    glasses(s, "#3a3036")
+    eyes(s, "#5a4636", brow="#b8b4ae")
+    glasses(s, "#a8a29a")
     grey = "#a8a49e"
     short_hair(s, grey, fringe=1, back=6)
     hair_volume(s, grey, sides=3, back=6)
@@ -1758,6 +1758,8 @@ def pinako(s):
     hands(s, tone, rows=2)
     pants(s, "#4a3e3a")
     boots(s, color="#2a2226", rows=2)
+    # Le chignon, en volume sur le sommet du crâne.
+    s.fill("bun", shade(grey, 1.05), "hair")
     # La pipe : un tuyau sombre, le fourneau de bois et sa braise.
     s.fill("pipe", "#2a2226", "leather")
     s.fill("bowl", "#6a4a2e", "leather")
