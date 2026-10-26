@@ -1006,6 +1006,13 @@ def envy_body(s):
     s.px("head", "front", 4, 0, "#c0182c")
     s.fill("spikes", hair, "hair")
     s.material("spikes", "top", shade(hair, 1.3), "hair")
+    # Les longues mèches hérissées qui tombent dans le dos, les pointes en dents de scie.
+    s.fill("mane", hair, "hair")
+    w, h = s.size("mane", "back")
+    for x in range(w):
+        for y in range(h - (2 if x % 3 == 0 else 1 if x % 3 == 1 else 3), h):
+            s.px("mane", "back", x, y, None)
+            s.px("mane", "front", w - 1 - x, y, None)
     # Le haut court et la jupe-short noirs ; le ventre et les bras nus.
     s.fill("body", tone, "skin")
     s.band("body", 0, 6, BLACK_CLOTH)
@@ -1023,17 +1030,17 @@ def envy_body(s):
     ouroboros(s, "lleg", "front", 0, 4)
 
 
-@skin("envy", parts={"spikes": (0, 32, 9, 3, 9)})
+@skin("envy", parts={"spikes": (0, 32, 9, 3, 9), "mane": (36, 32, 9, 12, 1)})
 def envy(s):
     """Envy : la tignasse en palmier, le bandeau, le haut noir et l'ouroboros sur la cuisse."""
     envy_body(s)
 
 
-@skin("envy_giant", parts={"spikes": (0, 32, 9, 3, 9)})
+@skin("envy_giant", parts={"spikes": (0, 32, 9, 3, 9), "mane": (36, 32, 9, 12, 1)})
 def envy_giant(s):
     """La vraie forme d'Envy : une bête verte faite des visages de ceux qu'il a absorbés."""
     flesh = "#4f6b3a"
-    for part in ("head", "body", "rarm", "larm", "rleg", "lleg", "spikes"):
+    for part in ("head", "body", "rarm", "larm", "rleg", "lleg", "spikes", "mane"):
         s.fill(part, flesh, "stone")
     s.material("spikes", "top", shade(flesh, 0.8), "stone")
     # Des visages et des mains humaines prisonniers de la chair.

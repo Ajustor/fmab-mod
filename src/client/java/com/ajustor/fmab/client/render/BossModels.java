@@ -98,11 +98,14 @@ public final class BossModels {
 		return bake(mesh);
 	}
 
-	/** Envy : la touffe hérissée en palmier, au sommet du crâne. */
+	/** Envy : la touffe hérissée en palmier au sommet du crâne, et les longues mèches qui tombent dans le dos. */
 	public static ModelPart envy() {
 		MeshDefinition mesh = base();
-		mesh.getRoot().getChild("head").addOrReplaceChild("spikes",
+		PartDefinition head = mesh.getRoot().getChild("head");
+		head.addOrReplaceChild("spikes",
 				CubeListBuilder.create().texOffs(0, 32).addBox(-4.5f, -10.5f, -4.5f, 9, 3, 9), PartPose.ZERO);
+		head.addOrReplaceChild("mane",
+				CubeListBuilder.create().texOffs(36, 32).addBox(-4.5f, -7.5f, 4, 9, 12, 1), PartPose.ZERO);
 		return bake(mesh);
 	}
 
