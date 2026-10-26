@@ -2,6 +2,7 @@ package com.ajustor.fmab.gametest;
 
 import com.ajustor.fmab.entity.BarryEntity;
 import com.ajustor.fmab.entity.Butcher;
+import com.ajustor.fmab.entity.GreedEntity;
 import com.ajustor.fmab.entity.HomunculusEntity;
 import com.ajustor.fmab.entity.LustEntity;
 import com.ajustor.fmab.entity.SoulEyeEntity;
@@ -60,7 +61,33 @@ public class FoeScenes implements FabricClientGameTest {
 			offerRefused(context, sp);
 			barry(context, sp);
 			absorbed(context, sp);
+			greed(context, sp);
 		}
+	}
+
+	/** Greed se promène en homme ; dès qu'il se bat, son Bouclier ultime se déploie. */
+	private static void greed(ClientGameTestContext context, TestSingleplayerContext sp) {
+		GreedEntity[] greed = new GreedEntity[1];
+		onPlayer(context, sp, p -> {
+			p.setHealth(p.getMaxHealth());
+			greed[0] = FmabEntities.GREED.create(p.level(), EntitySpawnReason.COMMAND);
+			greed[0].snapTo(p.getX() - 3, p.getY(), p.getZ() + 12, 165, 0);
+			p.level().addFreshEntity(greed[0]);
+		});
+		context.waitTicks(10);
+		context.takeScreenshot("foes_05_greed_human");
+		onPlayer(context, sp, p -> {
+			check(!greed[0].shielded(), "hors combat, Greed devrait être un homme, sans son bouclier");
+			greed[0].setTarget(p);
+		});
+		context.waitTicks(GreedEntity.DEPLOY + 4);
+		context.takeScreenshot("foes_06_greed_shield");
+		onPlayer(context, sp, p -> {
+			// Assez loin pour ne pas encore frapper (il retirerait son bouclier pour le coup).
+			check(greed[0].shielded(), "en combat, le Bouclier ultime de Greed devrait se déployer");
+			greed[0].discard();
+			p.setHealth(p.getMaxHealth());
+		});
 	}
 
 	/**
