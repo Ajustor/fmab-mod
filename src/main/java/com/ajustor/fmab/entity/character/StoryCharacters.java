@@ -72,9 +72,10 @@ public final class StoryCharacters {
 
 	/**
 	 * La taille des personnages qui ne font pas celle d'un homme : Alphonse et sa grande armure, le
-	 * colosse Armstrong, la toute petite Pinako.
+	 * colosse Armstrong et Basque Grand, la toute petite Pinako.
 	 */
-	private static final Map<String, Float> SCALES = Map.of("alphonse", 1.25f, "armstrong", 1.15f, "pinako", 0.5f);
+	private static final Map<String, Float> SCALES = Map.of("alphonse", 1.25f, "armstrong", 1.15f,
+			"basque_grand", 1.12f, "pinako", 0.5f);
 
 	private StoryCharacters() {
 	}

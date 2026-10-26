@@ -310,6 +310,17 @@ public final class FigureModels {
 		return bake(mesh);
 	}
 
+	/** Basque Grand : des épaules de colosse sous l'uniforme (peau élargie, volumes à droite). */
+	public static ModelPart basqueGrand() {
+		MeshDefinition mesh = mesh(false);
+		PartDefinition root = mesh.getRoot();
+		root.getChild("right_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 0).addBox(-3.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
+		root.getChild("left_arm").addOrReplaceChild("shoulder",
+				CubeListBuilder.create().texOffs(64, 8).addBox(-1.5f, -2.5f, -2.5f, 5, 3, 5), PartPose.ZERO);
+		return bakeWide(mesh);
+	}
+
 	/** Un soldat d'Amestris : la visière de sa casquette, un peu baissée sur les yeux. */
 	public static ModelPart soldier() {
 		MeshDefinition mesh = mesh(false);
