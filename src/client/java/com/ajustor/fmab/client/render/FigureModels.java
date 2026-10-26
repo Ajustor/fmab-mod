@@ -276,6 +276,13 @@ public final class FigureModels {
 		return bakeWide(mesh);
 	}
 
+	/** Ling : la petite queue de cheval nouée sur la nuque. */
+	public static ModelPart ling() {
+		MeshDefinition mesh = mesh(false);
+		ponytail(mesh.getRoot().getChild("head"), 5, -3, 0.2f);
+		return bake(mesh);
+	}
+
 	/** Un soldat d'Amestris : la visière de sa casquette, un peu baissée sur les yeux. */
 	public static ModelPart soldier() {
 		MeshDefinition mesh = mesh(false);

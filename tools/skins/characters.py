@@ -1622,15 +1622,17 @@ def hughes(s):
     amestris_uniform(s, officer=True)
 
 
-@skin("ling")
+@skin("ling", parts={"tail": (56, 16, 2, 5, 2)})
 def ling(s):
-    """Ling Yao, prince de Xing : cheveux noirs noués, yeux étirés, tenue blanche à bandes bleu nuit."""
+    """Ling Yao, prince de Xing : cheveux noirs noués en une petite queue, les yeux toujours plissés en
+    deux fentes rieuses, tenue blanche à bandes bleu nuit."""
     tone = "#f0d4b4"
     skin_face(s, tone, mouth="#a8645a")
+    # Les yeux plissés : deux fentes fines, le coin extérieur relevé.
     s.rect("head", "front", 1, 4, 2, 1, "#2a2224")
     s.rect("head", "front", 5, 4, 2, 1, "#2a2224")
-    s.rect("head", "front", 1, 3, 2, 1, "#141016")
-    s.rect("head", "front", 5, 3, 2, 1, "#141016")
+    s.px("head", "front", 0, 3, "#2a2224")
+    s.px("head", "front", 7, 3, "#2a2224")
     hair = "#141016"
     short_hair(s, hair, fringe=0, back=7)
     fringe(s, hair, [3, 2, 2, 1, 1, 2, 2, 3])
@@ -1647,6 +1649,8 @@ def ling(s):
     hands(s, tone, rows=2)
     pants(s, navy)
     boots(s, color="#1a1a20", rows=3)
+    s.fill("tail", hair, "hair")
+    s.band("tail", 0, 1, navy)
 
 
 @skin("lan_fan", slim=True)
