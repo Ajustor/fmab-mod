@@ -1095,13 +1095,27 @@ def greed(s):
 @skin("greed_shield", parts={"fur": (0, 32, 10, 3, 6)})
 def greed_shield(s):
     """Le bouclier ultime : une carapace de carbone noir, facettée, et la mâchoire de requin."""
-    shell = "#2a2a33"
+    shell = "#22222a"
     for part in ("head", "body", "rarm", "larm", "rleg", "lleg"):
         s.fill(part, shell, "metal")
-    for part in ("body", "rarm", "larm", "rleg", "lleg"):
-        w, h = s.size(part, "front")
-        for y in range(0, h, 3):
-            s.tint(part, "front", 0, y, w, 1, 1.35)
+    # Une carapace qui suit les muscles : les pectoraux, la grille des abdominaux, des reflets luisants.
+    s.tint("body", "front", 1, 1, 3, 3, 1.45)
+    s.tint("body", "front", 4, 1, 3, 3, 1.45)
+    s.seam("body", "front", 4, 1, 3, None, k=0.6)
+    s.tint("body", "front", 1, 4, 6, 1, 0.7)
+    for y in (5, 7, 9):
+        s.tint("body", "front", 2, y, 4, 1, 1.3)
+    s.seam("body", "front", 4, 5, 6, None, k=0.65)
+    s.tint("body", "back", 1, 1, 6, 4, 1.25)
+    s.seam("body", "back", 4, 0, 10, None, k=0.65)
+    for part in ("rarm", "larm"):
+        s.band_tint(part, 0, 3, 1.35)
+        s.band_tint(part, 5, 1, 0.65)
+        s.band_tint(part, 7, 2, 1.25)
+    for part in ("rleg", "lleg"):
+        s.band_tint(part, 1, 3, 1.25)
+        s.band_tint(part, 5, 1, 0.65)
+        s.band_tint(part, 8, 2, 1.2)
     s.rect("head", "front", 1, 2, 2, 1, "#c41a2a")
     s.rect("head", "front", 5, 2, 2, 1, "#c41a2a")
     s.rect("head", "front", 0, 5, 8, 2, "#0c0c10")
