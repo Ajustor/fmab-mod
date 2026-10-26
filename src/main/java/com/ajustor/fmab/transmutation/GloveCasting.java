@@ -256,14 +256,32 @@ public final class GloveCasting {
 			return false;
 		}
 		ServerLevel level = player.level();
-		if (target == null) {
-			double reach = item.kind().reach() > 0 ? item.kind().reach() : player.blockInteractionRange();
-			BlockHitResult block = aimed(player, reach);
+		Drawing drawing = glove.get(FmabComponents.GLOVE_CIRCLE);
+		BlockPos circle;
+		CircleFrame frame;
+		if (target != null) {
+			circle = target.relative(face);
+			frame = CircleFrame.forFace(face, player.getDirection());
+		} else if (item.kind().reach() > 0) {
+			// Les gants de Mustang visent au loin : une surface, une créature, ou le vide si le cercle
+			// n'appelle que l'air, le feu ou l'eau (comme tracé au sol à cet endroit).
+			GloveArts.Aim aim = GloveArts.aim(player, item.kind().reach());
+			if (aim.face() != null) {
+				frame = CircleFrame.forFace(aim.face(), player.getDirection());
+			} else if (!needsSurface(elements(player, drawing))) {
+				frame = CircleFrame.forFace(Direction.UP, player.getDirection());
+			} else {
+				player.sendOverlayMessage(Component.translatable("transmutation.fmab.no_surface"));
+				return false;
+			}
+			circle = aim.at();
+		} else {
+			BlockHitResult block = aimed(player, player.blockInteractionRange());
 			if (block == null) {
 				return false;
 			}
-			target = block.getBlockPos();
-			face = block.getDirection();
+			circle = block.getBlockPos().relative(block.getDirection());
+			frame = CircleFrame.forFace(block.getDirection(), player.getDirection());
 		}
 		if (item.kind().reach() > 0) {
 			// Mouillé, le gant ne fait pas d'étincelle : Mustang sous la pluie est inutile.
@@ -275,16 +293,15 @@ public final class GloveCasting {
 			// Le claquement de doigts : l'étincelle part du gant et file jusqu'à la cible.
 			level.playSound(null, player.blockPosition(), SoundEvents.FLINTANDSTEEL_USE, SoundSource.PLAYERS, 1, 1.4f);
 			Vec3 from = player.getEyePosition().add(player.getLookAngle().scale(0.6)).subtract(0, 0.3, 0);
-			Vec3 step = Vec3.atCenterOf(target).subtract(from);
+			Vec3 step = Vec3.atCenterOf(circle).subtract(from);
 			int points = (int) (step.length() * 2);
 			for (int i = 0; i <= points; i++) {
 				Vec3 at = from.add(step.scale((double) i / Math.max(1, points)));
 				level.sendParticles(ParticleTypes.SMALL_FLAME, at.x, at.y, at.z, 1, 0.02, 0.02, 0.02, 0);
 			}
 		}
-		Drawing drawing = glove.get(FmabComponents.GLOVE_CIRCLE);
-		Transmutation.Result result = Transmutation.activate(level, target.relative(face),
-				CircleFrame.forFace(face, player.getDirection()), drawing, player, false, item.kind().stages());
+		Transmutation.Result result = Transmutation.activate(level, circle, frame, drawing, player, false,
+				item.kind().stages());
 		int wear = switch (result) {
 			case INERT, TIRED -> 0;
 			case REBOUND -> REBOUND_WEAR;

@@ -23,6 +23,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.EntityHitResult;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Ce que certains gants font sans cercle, comme dans l'anime. Les gants à étincelles de Mustang : un
@@ -41,6 +45,36 @@ public final class GloveArts {
 	private GloveArts() {
 	}
 
+	/**
+	 * Là où l'on vise : la créature dans le regard, sinon le bloc d'air devant la surface visée (et sa
+	 * face), sinon le bout du regard, en plein ciel.
+	 *
+	 * @param at   la case où agir
+	 * @param face la face de la surface visée, ou null s'il n'y en a pas (créature, ou rien)
+	 */
+	record Aim(BlockPos at, @Nullable Direction face) {
+	}
+
+	static Aim aim(ServerPlayer player, double reach) {
+		Vec3 eye = player.getEyePosition();
+		Vec3 end = eye.add(player.getLookAngle().scale(reach));
+		BlockHitResult block = player.level().clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER,
+				ClipContext.Fluid.NONE, player));
+		boolean surface = block.getType() == HitResult.Type.BLOCK;
+		if (surface) {
+			end = block.getLocation();
+		}
+		EntityHitResult entity = ProjectileUtil.getEntityHitResult(player, eye, end, new AABB(eye, end).inflate(1),
+				e -> e instanceof LivingEntity && e.isPickable() && !e.isSpectator(), eye.distanceToSqr(end));
+		if (entity != null) {
+			return new Aim(BlockPos.containing(entity.getLocation()), null);
+		}
+		if (surface) {
+			return new Aim(block.getBlockPos().relative(block.getDirection()), block.getDirection());
+		}
+		return new Aim(BlockPos.containing(end), null);
+	}
+
 	/** Porte-t-il un gant de cette sorte, sans cercle, dans une main libre ? */
 	static boolean bare(ServerPlayer player, GloveItem.Kind kind) {
 		Gloves gloves = FmabAttachments.GLOVES.getOrCreate(player);
@@ -53,7 +87,10 @@ public final class GloveArts {
 		return false;
 	}
 
-	/** Le claquement de Mustang : une gerbe de feu, au loin, là où l'on regarde. */
+	/**
+	 * Le claquement de Mustang : une gerbe de feu, au loin, là où l'on regarde. L'étincelle enflamme
+	 * l'air même : sur une surface, une créature, ou en plein ciel.
+	 */
 	static void snap(ServerPlayer player) {
 		ServerLevel level = player.level();
 		if (player.isInWaterOrRain()) {
@@ -61,15 +98,10 @@ public final class GloveArts {
 			level.playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5f, 1.6f);
 			return;
 		}
-		HitResult hit = player.pick(SNAP_REACH, 1, false);
-		if (!(hit instanceof BlockHitResult block) || hit.getType() != HitResult.Type.BLOCK) {
-			player.sendOverlayMessage(Component.translatable("transmutation.fmab.no_surface"));
-			return;
-		}
 		if (!pay(player, SNAP_COST)) {
 			return;
 		}
-		BlockPos at = block.getBlockPos().relative(block.getDirection());
+		BlockPos at = aim(player, SNAP_REACH).at();
 		level.playSound(null, player.blockPosition(), SoundEvents.FLINTANDSTEEL_USE, SoundSource.PLAYERS, 1, 1.4f);
 		level.playSound(null, at, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.2f, 0.9f);
 		Vec3 center = Vec3.atCenterOf(at);
