@@ -20,7 +20,7 @@ public class StoryCharacterRenderer extends FigureRenderer.Simple<StoryCharacter
 			Map.entry("mustang", Temper.OFFICER), Map.entry("hawkeye", Temper.SOLDIER),
 			Map.entry("armstrong", Temper.IZUMI), Map.entry("hughes", Temper.OFFICER),
 			Map.entry("ling", Temper.MAY), Map.entry("lan_fan", Temper.SOLDIER),
-			Map.entry("alphonse", Temper.HOHENHEIM), Map.entry("pinako", Temper.MARCOH),
+			Map.entry("alphonse", Temper.ALPHONSE), Map.entry("pinako", Temper.MARCOH),
 			Map.entry("basque_grand", Temper.OFFICER), Map.entry("mcdougal", Temper.OFFICER),
 			Map.entry("tattooist", Temper.IZUMI), Map.entry("ishvalan", Temper.CORNELLO),
 			Map.entry("tucker", Temper.MARCOH));

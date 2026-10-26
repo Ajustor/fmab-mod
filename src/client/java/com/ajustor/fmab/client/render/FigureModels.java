@@ -212,18 +212,14 @@ public final class FigureModels {
 				PartPose.ZERO);
 		body.addOrReplaceChild("back_flap", CubeListBuilder.create().texOffs(114, 20).addBox(-2.5f, 9, 2.6f, 5, 7, 1),
 				PartPose.ZERO);
-		PartDefinition right = root.getChild("right_arm");
-		right.addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 15).addBox(-6, -4.5f, -4.5f, 9, 6, 9),
-				PartPose.ZERO);
-		right.addOrReplaceChild("spike", CubeListBuilder.create().texOffs(116, 38).addBox(-2, -7.5f, -0.5f, 1, 3, 1),
-				PartPose.ZERO);
-		right.addOrReplaceChild("bracer", CubeListBuilder.create().texOffs(100, 0).addBox(-4, 4, -3, 6, 5, 6),
-				PartPose.ZERO);
+		// Les épaulières tiennent aux épaules, pas aux bras : elles ne tournent pas quand le bras balance.
+		body.addOrReplaceChild("right_pauldron", CubeListBuilder.create().texOffs(64, 15)
+				.addBox(-11, -2.5f, -4.5f, 9, 6, 9).texOffs(116, 38).addBox(-7, -5.5f, -0.5f, 1, 3, 1), PartPose.ZERO);
+		body.addOrReplaceChild("left_pauldron", CubeListBuilder.create().texOffs(64, 30)
+				.addBox(2, -2.5f, -4.5f, 9, 6, 9).texOffs(116, 38).addBox(6, -5.5f, -0.5f, 1, 3, 1), PartPose.ZERO);
+		root.getChild("right_arm").addOrReplaceChild("bracer", CubeListBuilder.create().texOffs(100, 0)
+				.addBox(-4, 4, -3, 6, 5, 6), PartPose.ZERO);
 		PartDefinition left = root.getChild("left_arm");
-		left.addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 30).addBox(-3, -4.5f, -4.5f, 9, 6, 9),
-				PartPose.ZERO);
-		left.addOrReplaceChild("spike", CubeListBuilder.create().texOffs(116, 38).addBox(1, -7.5f, -0.5f, 1, 3, 1),
-				PartPose.ZERO);
 		left.addOrReplaceChild("bracer", CubeListBuilder.create().texOffs(100, 0).mirror().addBox(-2, 4, -3, 6, 5, 6),
 				PartPose.ZERO);
 		// Les jambes, écartées par la carrure : cuissard, grève et soleret autour de chacune.
