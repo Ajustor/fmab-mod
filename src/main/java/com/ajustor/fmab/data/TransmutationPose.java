@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Le geste d'un alchimiste qui transmute, vu de tous : le client le joue sur le modèle du joueur
@@ -48,6 +49,21 @@ public record TransmutationPose(Kind kind, long start, long until) {
 	public static void strike(ServerPlayer player, Kind kind, int ticks) {
 		long now = player.level().getGameTime();
 		FmabAttachments.POSE.set(player, new TransmutationPose(kind, now, now + ticks));
+	}
+
+	/**
+	 * Le joueur garde la pose {@code ticks} ticks de plus : un geste qu'on maintient (une absorption,
+	 * un cercle qu'on tient) ne reprend pas son élan à chaque pulsation.
+	 */
+	public static void keep(ServerPlayer player, Kind kind, int ticks) {
+		long now = player.level().getGameTime();
+		FmabAttachments.POSE.set(player, kept(FmabAttachments.POSE.get(player), kind, now, ticks));
+	}
+
+	/** La pose prolongée : même geste encore en cours, il garde son début ; sinon il en prend un nouveau. */
+	public static TransmutationPose kept(@Nullable TransmutationPose current, Kind kind, long now, int ticks) {
+		long start = current != null && current.kind() == kind && current.active(now) ? current.start() : now;
+		return new TransmutationPose(kind, start, now + ticks);
 	}
 
 	public boolean active(long now) {
