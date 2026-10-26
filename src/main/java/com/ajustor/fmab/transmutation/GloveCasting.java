@@ -15,6 +15,8 @@ import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.tattoo.TattooSlot;
+import com.ajustor.fmab.training.Trainings;
+import com.ajustor.fmab.training.Trial;
 import com.ajustor.fmab.util.Throttle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -250,6 +252,10 @@ public final class GloveCasting {
 		Drawing drawing = glove.get(FmabComponents.GLOVE_CIRCLE);
 		Transmutation.Result result = Transmutation.activate(level, target.relative(face),
 				CircleFrame.forFace(face, player.getDirection()), drawing, player, false, item.kind().stages());
+		if (result == Transmutation.Result.DONE) {
+			// L'épreuve d'Izumi : transmuter avec un gant, sans rien tracer.
+			Trainings.achieve(player, Trial.GLOVES);
+		}
 		int wear = switch (result) {
 			case INERT, TIRED -> 0;
 			case REBOUND -> REBOUND_WEAR;
