@@ -56,10 +56,12 @@ public final class FigureModels {
 		bust(body, 24, 0, 6, 2, 2.5f, -0.15f);
 		body.addOrReplaceChild("hair", CubeListBuilder.create().texOffs(64, 0).addBox(-4, -1, 2.3f, 8, 11, 1),
 				PartPose.ZERO);
-		body.addOrReplaceChild("collar", CubeListBuilder.create().texOffs(82, 0).addBox(-5, -1, -3, 10, 2, 6),
+		// Le col de fourrure couvre aussi le haut des épaules.
+		body.addOrReplaceChild("collar", CubeListBuilder.create().texOffs(82, 0).addBox(-7, -1.5f, -3, 14, 2, 6),
 				PartPose.ZERO);
-		body.addOrReplaceChild("sabre", CubeListBuilder.create().texOffs(114, 0).addBox(-0.5f, 0, -0.5f, 1, 9, 1),
-				PartPose.offsetAndRotation(4.6f, 8, -1, 0.35f, 0, 0));
+		// Le sabre pend à la hanche gauche, derrière le bras.
+		body.addOrReplaceChild("sabre", CubeListBuilder.create().texOffs(122, 0).addBox(-0.5f, 0, -0.5f, 1, 10, 1),
+				PartPose.offset(3.2f, 9, 2.6f));
 		return bakeWide(mesh);
 	}
 

@@ -692,8 +692,8 @@ def may_chang(s):
     boots(s, color="#1e1a22", rows=3)
 
 
-@skin("olivier", slim=True, size=WIDE, parts={**BUST, "hair": (64, 0, 8, 11, 1), "collar": (82, 0, 10, 2, 6),
-                                              "sabre": (114, 0, 1, 9, 1)})
+@skin("olivier", slim=True, size=WIDE, parts={**BUST, "hair": (64, 0, 8, 11, 1), "collar": (82, 0, 14, 2, 6),
+                                              "sabre": (122, 0, 1, 10, 1)})
 def olivier(s):
     """Olivier Mira Armstrong : la longue chevelure blonde qui cache un œil, l'uniforme de général, le
     col de fourrure du manteau de Briggs et le sabre à la hanche."""
