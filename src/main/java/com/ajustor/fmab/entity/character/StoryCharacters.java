@@ -7,6 +7,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Items;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.ajustor.fmab.entity.character.StoryCharacter.sells;
 
@@ -69,6 +70,14 @@ public final class StoryCharacters {
 	public static final List<StoryCharacter> ALL = List.of(MUSTANG, HAWKEYE, ARMSTRONG, HUGHES, LING, LAN_FAN,
 			ALPHONSE, PINAKO, BASQUE_GRAND, MCDOUGAL, TATTOOIST, ISHVALAN, TUCKER);
 
+	/** La taille des personnages qui ne font pas celle d'un homme : Alphonse et sa grande armure. */
+	private static final Map<String, Float> SCALES = Map.of("alphonse", 1.25f);
+
 	private StoryCharacters() {
+	}
+
+	/** La taille de ce personnage, par rapport à un joueur (modèle et boîte de collision). */
+	public static float scale(String id) {
+		return SCALES.getOrDefault(id, 1f);
 	}
 }

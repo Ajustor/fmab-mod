@@ -22,7 +22,7 @@ import static com.ajustor.fmab.gametest.GametestAsserts.check;
  * profil (à hauteur de buste) et de dos, de près, puis toute la troupe. Lancer avec {@code ./gradlew runClientGameTest -PfmabGametest=figures}.
  */
 public class FigureScenes implements FabricClientGameTest {
-	private static final List<String> FIGURES = List.of("lust", "izumi", "winry", "olivier", "may_chang", "hohenheim",
+	private static final List<String> FIGURES = List.of("alphonse", "lust", "izumi", "winry", "olivier", "may_chang", "hohenheim",
 			"amestrian_soldier", "briggs_soldier", "drachma_soldier", "state_examiner", "scar", "marcoh", "cornello",
 			"envy", "greed", "wrath", "gluttony", "sloth", "pride", "pride_revealed", "chimera_beast", "chimera_crawler");
 	/** Les personnages sous une seconde forme : on les frappe une fois pour qu'ils se révèlent. */
