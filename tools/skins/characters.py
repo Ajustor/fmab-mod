@@ -1547,7 +1547,8 @@ def hawkeye(s):
 
 
 # Les volumes d'Armstrong (FigureModels.armstrong) : la boucle, la moustache en guidon, les épaules.
-ARMSTRONG_PARTS = {"curl": (64, 0, 2, 3, 2), "stache": (72, 0, 10, 2, 1), "rshoulder": (64, 8, 5, 3, 5),
+ARMSTRONG_PARTS = {"curl": (64, 0, 2, 3, 2), "stache": (72, 0, 10, 1, 1), "tip": (72, 4, 1, 2, 1),
+                   "rshoulder": (64, 8, 5, 3, 5),
                    "lshoulder": (64, 16, 5, 3, 5)}
 
 
@@ -1568,9 +1569,8 @@ def armstrong(s):
     s.fill("curl", blond, "hair")
     s.tint("curl", "front", 0, 2, 2, 1, 0.8)
     s.fill("stache", blond, "hair")
-    s.tint("stache", "front", 4, 0, 2, 2, 0.85)
-    for f in ("front", "back"):
-        s.tint("stache", f, 0, 1, 10, 1, 0.85)
+    s.tint("stache", "front", 4, 0, 2, 1, 0.85)
+    s.fill("tip", shade(blond, 0.95), "hair")
     amestris_uniform(s, officer=True, tone=PALE, gloves="#3a3d44")
     # Les épaules de colosse, sous le drap bleu de l'uniforme, l'épaulette dorée.
     for shoulder in ("rshoulder", "lshoulder"):
