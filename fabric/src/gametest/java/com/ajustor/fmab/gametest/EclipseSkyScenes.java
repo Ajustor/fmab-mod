@@ -1,5 +1,6 @@
 package com.ajustor.fmab.gametest;
 
+import com.ajustor.fmab.client.compat.IrisCompat;
 import com.ajustor.fmab.client.render.EclipseSky;
 import com.ajustor.fmab.stone.Eclipse;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -46,6 +47,38 @@ public class EclipseSkyScenes implements FabricClientGameTest {
 			context.waitTicks(20);
 			check(!context.computeOnClient(mc -> EclipseSky.active()), "la veille, la lune est la lune ordinaire");
 			context.runOnClient(mc -> RenderShowcase.hideGui(mc, false));
+		}
+		irisAssignment();
+		check(EclipseSky.veilAlpha(1, true) > 2 * EclipseSky.veilAlpha(1, false),
+				"sous shaders, le voile de la totalité devrait être bien plus épais");
+		check(EclipseSky.veilAlpha(0, true) == 0, "hors éclipse, pas de voile, même sous shaders");
+	}
+
+	/** Une API comme celle d'Iris : elle retient le pipeline qu'on lui confie. */
+	public static final class FakeIris {
+		Object pipeline;
+		Object program;
+
+		public void assignPipeline(Object pipeline, String program) {
+			this.pipeline = pipeline;
+			this.program = program;
+		}
+	}
+
+	/** Sous shaders, Iris doit savoir que la silhouette de la lune se dessine comme les astres. */
+	private static void irisAssignment() {
+		FakeIris iris = new FakeIris();
+		try {
+			check(IrisCompat.assign(iris, EclipseSky.MASK, "SKY_TEXTURED"), "l'API d'Iris devrait être trouvée");
+		} catch (ReflectiveOperationException e) {
+			throw new AssertionError(e);
+		}
+		check(iris.pipeline == EclipseSky.MASK && "SKY_TEXTURED".equals(iris.program),
+				"la silhouette de la lune devrait être confiée au programme des astres d'Iris");
+		try {
+			check(!IrisCompat.assign(new Object(), EclipseSky.MASK, "SKY_TEXTURED"), "sans API, rien n'est confié");
+		} catch (ReflectiveOperationException e) {
+			throw new AssertionError(e);
 		}
 	}
 

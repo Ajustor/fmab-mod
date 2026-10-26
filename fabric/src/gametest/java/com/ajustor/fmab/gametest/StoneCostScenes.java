@@ -11,6 +11,8 @@ import com.ajustor.fmab.item.PhilosopherStoneItem;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabItems;
+import com.ajustor.fmab.entity.LustEntity;
+import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.Concentration;
@@ -26,6 +28,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
@@ -99,6 +103,30 @@ public class StoneCostScenes implements FabricClientGameTest {
 						+ " " + TransmutationLightning.crackles(p.level(), circle, true);
 			});
 			check(plain.equals("DONE true false"), "sans Pierre, des éclairs bleus : " + plain);
+
+			// Devenir une Pierre vivante ne touche pas au karma ; ses âmes referment ses plaies.
+			int karma = server(sp, p -> {
+				Karma.set(p, 30);
+				LivingStone.become(p, 50, p.blockPosition());
+				p.setHealth(4);
+				return Karma.of(p);
+			});
+			check(karma == 30, "devenir une Pierre vivante ne devrait pas changer le karma : " + karma);
+			context.waitTicks(60);
+			float health = server(sp, ServerPlayer::getHealth);
+			check(health >= 8, "une Pierre vivante devrait regagner un cœur par seconde : " + health);
+			// Même au karma propre, la première visite à une Pierre vivante est l'offre de Père.
+			boolean offered = server(sp, p -> {
+				LivingStone.visit(p);
+				List<LustEntity> came = p.level().getEntitiesOfClass(LustEntity.class, p.getBoundingBox().inflate(64));
+				came.forEach(LustEntity::discard);
+				return came.size() == 1 && came.getFirst().envoy();
+			});
+			check(offered, "une Pierre vivante qui n'a pas répondu devrait d'abord recevoir l'offre de Lust");
+			server(sp, p -> {
+				FmabAttachments.LIVING_STONE.remove(p);
+				return null;
+			});
 		}
 	}
 

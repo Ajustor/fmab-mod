@@ -3,8 +3,9 @@ package com.ajustor.fmab.stone;
 import org.jspecify.annotations.Nullable;
 
 /**
- * L'offre de Père aux âmes noires. Sous {@link Karma#RECRUITABLE}, la première visite des homonculus
- * n'est pas un combat : Lust vient proposer d'entrer à son service. Accepter, c'est un noyau de Pierre
+ * L'offre de Père aux âmes noires et aux Pierres vivantes. Sous {@link Karma#RECRUITABLE}, ou pour qui
+ * est devenu une Pierre vivante, la première visite des homonculus n'est pas un combat : Lust vient
+ * proposer d'entrer à son service. Accepter, c'est un noyau de Pierre
  * en acompte et la paix avec les homonculus ; refuser (la frapper, ou la laisser sans réponse), c'est
  * la traque, comme pour qui porte une Pierre vivante.
  */
@@ -34,15 +35,15 @@ public final class Recruitment {
 	}
 
 	/**
-	 * La visite due à un joueur : une recrue n'est plus inquiétée ; une âme noire qui n'a pas encore
-	 * répondu reçoit l'offre ; qui a refusé, ou porte une Pierre vivante, est traqué.
+	 * La visite due à un joueur : une recrue n'est plus inquiétée ; une âme noire ou une Pierre vivante
+	 * qui n'a pas encore répondu reçoit l'offre ; qui a refusé, âme noire ou Pierre vivante, est traqué.
 	 */
 	public static Visit visit(int karma, int souls, @Nullable String answer) {
 		if (ACCEPTED.equals(answer)) {
 			return Visit.NONE;
 		}
 		boolean dark = karma <= Karma.RECRUITABLE;
-		if (dark && answer == null) {
+		if ((dark || souls > 0) && answer == null) {
 			return Visit.OFFER;
 		}
 		return dark || souls > 0 ? Visit.HUNT : Visit.NONE;

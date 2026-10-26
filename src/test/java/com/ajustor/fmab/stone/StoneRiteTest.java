@@ -3,9 +3,11 @@ package com.ajustor.fmab.stone;
 import com.ajustor.fmab.TestBootstrap;
 import com.ajustor.fmab.entity.SoulEyeEntity;
 import org.junit.jupiter.api.BeforeAll;
+import net.minecraft.world.phys.Vec3;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -47,5 +49,12 @@ class StoneRiteTest {
 		assertEquals(1, SoulEyeEntity.openness(20, shut), 1e-6, "grand ouvert pendant que sa proie meurt");
 		assertTrue(SoulEyeEntity.openness(shut - SoulEyeEntity.CLOSE / 2f, shut) < 1, "il se referme");
 		assertEquals(0, SoulEyeEntity.openness(shut, shut), 1e-6);
+	}
+
+	@Test
+	void everyoneOverTheDiscIsCaughtInTheRite() {
+		Vec3 center = new Vec3(0.5, -60, 0.5);
+		assertTrue(StoneRite.inside(new Vec3(10.5, -58, 0.5), center, 10), "au bord, et un peu au-dessus");
+		assertFalse(StoneRite.inside(new Vec3(8.5, -60, 8.5), center, 10), "hors du disque");
 	}
 }
