@@ -49,6 +49,9 @@ public class EclipseSkyScenes implements FabricClientGameTest {
 			context.runOnClient(mc -> RenderShowcase.hideGui(mc, false));
 		}
 		irisAssignment();
+		check(EclipseSky.veilAlpha(1, true) > 2 * EclipseSky.veilAlpha(1, false),
+				"sous shaders, le voile de la totalité devrait être bien plus épais");
+		check(EclipseSky.veilAlpha(0, true) == 0, "hors éclipse, pas de voile, même sous shaders");
 	}
 
 	/** Une API comme celle d'Iris : elle retient le pipeline qu'on lui confie. */

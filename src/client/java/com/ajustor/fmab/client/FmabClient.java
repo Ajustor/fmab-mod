@@ -1,6 +1,7 @@
 package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.client.compat.IrisCompat;
+import com.ajustor.fmab.client.render.EclipseSky;
 import com.ajustor.fmab.client.render.HandsLayer;
 import com.ajustor.fmab.client.render.Temper;
 import com.ajustor.fmab.client.render.FigureModels;
@@ -366,8 +367,9 @@ public final class FmabClient {
 		if (mc.level == null || !mc.level.canSeeSky(mc.player.blockPosition())) {
 			return;
 		}
-		// Le voile se lève avec la part du soleil couverte, jusqu'à la totalité.
-		int alpha = Math.round(0x40 * Eclipse.strength(mc.level));
+		// Le voile se lève avec la part du soleil couverte, jusqu'à la totalité ; bien plus épais sous
+		// shaders, qui ne savent rien de l'éclipse.
+		int alpha = EclipseSky.veilAlpha(Eclipse.strength(mc.level), IrisCompat.shaders());
 		if (alpha > 0) {
 			graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), alpha << 24 | 0x1A0800);
 		}

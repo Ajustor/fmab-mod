@@ -4,6 +4,8 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.client.render.EclipseSky;
 import com.ajustor.fmab.platform.Platform;
 
+import org.jspecify.annotations.Nullable;
+
 import java.lang.reflect.Method;
 
 /**
@@ -18,7 +20,27 @@ public final class IrisCompat {
 	private static final String API = "net.irisshaders.iris.api.v0.IrisApi";
 	private static final String PROGRAM = "net.irisshaders.iris.api.v0.IrisProgram";
 
+	/** L'API d'Iris et sa question « un shader pack est-il actif ? », ou rien sans Iris. */
+	private static @Nullable Object iris;
+	private static @Nullable Method inUse;
+
 	private IrisCompat() {
+	}
+
+	/**
+	 * Un shader pack dessine-t-il le monde ? Il calcule alors son ciel et sa lumière lui-même, sans
+	 * l'éclipse : c'est au voile de l'écran de l'assombrir.
+	 */
+	public static boolean shaders() {
+		if (iris == null || inUse == null) {
+			return false;
+		}
+		try {
+			return (boolean) inUse.invoke(iris);
+		} catch (ReflectiveOperationException e) {
+			inUse = null;
+			return false;
+		}
 	}
 
 	public static void register() {
@@ -28,6 +50,8 @@ public final class IrisCompat {
 		try {
 			Class<?> api = Class.forName(API);
 			Object iris = api.getMethod("getInstance").invoke(null);
+			IrisCompat.iris = iris;
+			inUse = api.getMethod("isShaderPackInUse");
 			Object sky = Class.forName(PROGRAM).getField("SKY_TEXTURED").get(null);
 			if (!assign(iris, EclipseSky.MASK, sky)) {
 				Fmab.LOGGER.warn("Iris : pas de assignPipeline, la lune de l'éclipse risque de manquer sous shaders");
