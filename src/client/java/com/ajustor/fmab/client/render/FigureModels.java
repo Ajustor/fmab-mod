@@ -176,14 +176,17 @@ public final class FigureModels {
 		MeshDefinition mesh = mesh(false);
 		PartDefinition root = mesh.getRoot();
 		root.getChild("right_arm").addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 0)
-				.addBox(-4.5f, -3, -3.5f, 6, 4, 7), PartPose.ZERO);
-		root.getChild("left_arm").addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 12)
-				.addBox(-1.5f, -3, -3.5f, 6, 4, 7), PartPose.ZERO);
+				.addBox(-5, -3.5f, -3.5f, 7, 5, 7), PartPose.ZERO);
+		PartDefinition left = root.getChild("left_arm");
+		left.addOrReplaceChild("pauldron", CubeListBuilder.create().texOffs(64, 12)
+				.addBox(-2, -3.5f, -3.5f, 7, 5, 7), PartPose.ZERO);
+		left.addOrReplaceChild("spike", CubeListBuilder.create().texOffs(92, 0).addBox(1, -5.5f, -0.5f, 1, 2, 1),
+				PartPose.ZERO);
 		PartDefinition head = root.getChild("head");
 		head.addOrReplaceChild("horn", CubeListBuilder.create().texOffs(96, 0).addBox(-1, -11, -2, 2, 3, 2),
 				PartPose.ZERO);
-		head.addOrReplaceChild("plume", CubeListBuilder.create().texOffs(96, 8).addBox(-1, 0, 0, 2, 8, 2),
-				PartPose.offsetAndRotation(0, -8.5f, 2.5f, 0.35f, 0, 0));
+		head.addOrReplaceChild("plume", CubeListBuilder.create().texOffs(96, 8).addBox(-1, -9, 4, 2, 9, 1),
+				PartPose.ZERO);
 		PartDefinition body = root.getChild("body");
 		body.addOrReplaceChild("flap", CubeListBuilder.create().texOffs(106, 0).addBox(-2, 12, -2.6f, 4, 6, 1),
 				PartPose.ZERO);
