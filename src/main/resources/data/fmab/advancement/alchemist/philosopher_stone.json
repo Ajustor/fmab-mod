@@ -22,7 +22,8 @@
     "description": {
       "translate": "advancements.fmab.philosopher_stone.description"
     },
-    "frame": "goal"
+    "frame": "goal",
+    "hidden": true
   },
   "requirements": [
     [

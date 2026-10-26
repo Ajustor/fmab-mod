@@ -18,7 +18,8 @@
     "description": {
       "translate": "advancements.fmab.slain_gluttony.description"
     },
-    "frame": "task"
+    "frame": "task",
+    "hidden": true
   },
   "requirements": [
     [
