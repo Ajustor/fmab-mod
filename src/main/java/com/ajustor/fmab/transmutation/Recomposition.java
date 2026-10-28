@@ -39,7 +39,8 @@ import java.util.TreeSet;
  *
  * <ol>
  *   <li><b>Comprendre</b> : on décompose l'objet sur un cercle (son élément principal + Décomposer).
- *   Il se défait en sa matière, et l'alchimiste en retient la structure.</li>
+ *   Il se défait en sa matière, et l'alchimiste en retient la structure. Celui qui l'a fabriqué de
+ *   ses mains (établi, four, tailleur de pierre…) la connaît déjà.</li>
  *   <li><b>Décomposer</b> la matière : celle qu'on pose sur le cercle ou qu'on porte, de chaque
  *   élément dont l'objet est fait, à hauteur de sa masse.</li>
  *   <li><b>Recomposer</b> : posé sur le cercle, un exemplaire de l'objet sert de modèle, et le cercle
@@ -154,6 +155,13 @@ public final class Recomposition {
 		FmabAttachments.UNDERSTOOD.set(caster, Set.copyOf(more));
 		caster.sendSystemMessage(Component.translatable("transmutation.fmab.understood", stack.getHoverName())
 				.withStyle(ChatFormatting.DARK_AQUA));
+	}
+
+	/** Qui fabrique un objet de ses mains sait comment il est fait. */
+	public static void crafted(ServerPlayer crafter, ItemStack stack) {
+		if (!stack.isEmpty() && composition(crafter.level(), stack.getItem()).isPresent()) {
+			understand(crafter, stack);
+		}
 	}
 
 	public static boolean understands(ServerPlayer caster, Item item) {

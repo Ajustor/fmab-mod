@@ -42,8 +42,8 @@ import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
  * Fabriquer un objet par l'alchimie, en jeu : on décompose une pioche pour la comprendre (elle rend
- * sa matière), puis on en recompose une d'après modèle avec du fer et du bois. Sans l'avoir
- * comprise, sans la bonne matière ou avec le mauvais élément, rien ne se fait. Chaque étape est
+ * sa matière), puis on en recompose une d'après modèle avec du fer et du bois. Fabriquer un objet
+ * de ses mains suffit aussi à le comprendre. Sans l'avoir comprise, sans la bonne matière ou avec le mauvais élément, rien ne se fait. Chaque étape est
  * vérifiée et capturée.
  */
 public class RecompositionScenes implements FabricClientGameTest {
@@ -109,6 +109,19 @@ public class RecompositionScenes implements FabricClientGameTest {
 			cast(context, sp, "fmab:fer", "fmab:recomposer");
 			check(count(context, sp, Items.IRON_SHOVEL) == 1, "une pelle jamais comprise ne se copie pas");
 			context.takeScreenshot("recomposition_04_not_understood");
+			clear(context, sp);
+
+			// 4 bis. Une pelle qu'on a fabriquée soi-même, on sait comment elle est faite.
+			server(context, sp, (level, p) -> {
+				new ItemStack(Items.IRON_SHOVEL).onCraftedBy(p, 1);
+				return null;
+			});
+			drop(context, sp, new ItemStack(Items.IRON_SHOVEL));
+			drop(context, sp, new ItemStack(Items.IRON_INGOT, 2));
+			drop(context, sp, new ItemStack(Items.OAK_PLANKS, 2));
+			cast(context, sp, "fmab:fer", "fmab:recomposer");
+			check(count(context, sp, Items.IRON_SHOVEL) == 2, "une pelle fabriquée de ses mains se copie");
+			context.takeScreenshot("recomposition_04b_crafted_understood");
 			clear(context, sp);
 
 			// 5. Une pioche de pierre est surtout de terre : le cercle de fer ne la vise pas.
