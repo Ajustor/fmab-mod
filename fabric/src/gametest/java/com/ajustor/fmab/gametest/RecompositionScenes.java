@@ -131,6 +131,11 @@ public class RecompositionScenes implements FabricClientGameTest {
 			cast(context, sp, "fmab:terre", "fmab:decomposer");
 			check(count(context, sp, Items.STONE_PICKAXE) == 0 && count(context, sp, Items.COBBLESTONE) == 3,
 					"la terre la défait en trois pierres");
+			// La terre a aussi emporté le sol sous le cercle, son support compris : on rebouche.
+			clear(context, sp);
+			sp.getServer().runCommand("fill -5 -63 -3 5 -62 7 dirt");
+			sp.getServer().runCommand("fill -5 -61 -3 5 -61 7 grass_block");
+			drop(context, sp, new ItemStack(Items.COBBLESTONE, 3));
 			drop(context, sp, new ItemStack(Items.STONE_PICKAXE));
 			cast(context, sp, "fmab:terre", "fmab:recomposer");
 			check(count(context, sp, Items.STONE_PICKAXE) == 2, "et la recompose d'après modèle");
@@ -329,6 +334,7 @@ public class RecompositionScenes implements FabricClientGameTest {
 	}
 
 	private static AABB around() {
-		return new AABB(CIRCLE).inflate(2.5, 1.5, 2.5);
+		// Jusqu'au fond d'un puits creusé sous le cercle.
+		return new AABB(CIRCLE).inflate(2.5, 1.5, 2.5).expandTowards(0, -3, 0);
 	}
 }
