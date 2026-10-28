@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.19.0 — 2026-10-28
+
+### Nouveautés
+
+- Carnet : le glyphe du tampon se choisit dans un sélecteur (bouton du tampon ou touche G), avec recherche par nom, tri par couche, miniatures et derniers glyphes posés en tête.
 ## 1.18.0 — 2026-10-26
 
 ### Nouveautés

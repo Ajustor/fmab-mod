@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.19.0 — 2026-10-28
+
+### New features
+
+- Notebook: the stamp's glyph is picked from a selector (stamp button or G key), with name search, layer tabs, thumbnails and recently used glyphs first.
 ## 1.18.0 — 2026-10-26
 
 ### New features
