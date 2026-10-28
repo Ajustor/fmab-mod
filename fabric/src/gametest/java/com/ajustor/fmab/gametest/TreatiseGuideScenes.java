@@ -142,12 +142,13 @@ public class TreatiseGuideScenes implements FabricClientGameTest {
 		check(block(sp, CIRCLE.below().south()).is(Blocks.ICE), "l'eau devant le cercle devrait être de la glace");
 		context.takeScreenshot("guide_world_03_river_frozen");
 
-		// Le puits de mine : cinq sur cinq, trois de profondeur, autour du pilier qui porte le cercle.
+		// Le puits de mine : cinq sur cinq, trois de profondeur, le bloc qui porte le cercle compris.
 		ground(context, sp, "stone");
 		view(context, sp, 0.5, -60, -1.5, 45);
 		check(cast(context, sp, examples.get("treatise.fmab.everyday.mine")), "le puits devrait se creuser");
 		check(block(sp, CIRCLE.below().east(2).south(2).below(2)).isAir(), "le puits devrait faire cinq de côté et trois de fond");
-		check(!block(sp, CIRCLE.below()).isAir(), "le bloc qui porte le cercle devrait rester");
+		check(block(sp, CIRCLE.below()).isAir(), "le bloc qui porte le cercle devrait céder avec le reste");
+		check(!block(sp, CIRCLE).is(FmabBlocks.TRANSMUTATION_CIRCLE), "le cercle devrait partir avec son support");
 		context.takeScreenshot("guide_world_04_mine_shaft");
 
 		// L'interrupteur de cuivre : le bloc de redstone allume la lampe qui le touche.

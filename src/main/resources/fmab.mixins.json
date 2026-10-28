@@ -6,6 +6,7 @@
 	"mixins": [
 		"AmbientVoiceMixin",
 		"EntityMixin",
+		"ItemStackMixin",
 		"LivingEntityMixin",
 		"MobMixin",
 		"MonsterVoiceMixin",

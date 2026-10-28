@@ -337,7 +337,7 @@ public final class Effects {
 	}
 
 	/**
-	 * Terre + Décomposer : la terre autour du support se brise en ressources. Elles passent à
+	 * Terre + Décomposer : la terre sous le cercle, support compris, se brise en ressources. Elles passent à
 	 * l'étage suivant, ou retombent sur le cercle. Avec une flèche de direction, ou tracé sur un mur ou
 	 * un plafond, le cercle creuse un tunnel ({@link Works#tunnel}).
 	 */
@@ -354,14 +354,11 @@ public final class Effects {
 		}
 		ServerLevel level = ctx.level();
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
-		BlockPos support = ctx.support();
 		BlockPos center = ctx.origin().below();
 		int r = ctx.range();
 		int broken = 0;
+		// Le support aussi se brise, et le cercle tracé dessus avec lui.
 		for (BlockPos p : BlockPos.betweenClosed(center.offset(-r, -r, -r), center.offset(r, 0, r))) {
-			if (p.equals(support)) {
-				continue;
-			}
 			BlockState state = level.getBlockState(p);
 			if (state.is(earth) && !state.hasBlockEntity() && state.getDestroySpeed(level, p) >= 0) {
 				BlockPos at = p.immutable();

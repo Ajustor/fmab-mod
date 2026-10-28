@@ -28,13 +28,15 @@ import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
  * Élément + Décomposer brise les minerais de cet élément autour du cercle, et seulement eux : le fer
- * défait le minerai de fer et laisse le charbon, le carbone défait le charbon. Lancer avec
+ * défait le minerai de fer et laisse le charbon, le carbone défait le charbon.
+ * Le minerai qui porte le cercle se défait comme les autres, et le cercle part avec lui. Lancer avec
  * {@code ./gradlew :fabric:26.2:runClientGameTest -PfmabGametest=ores}.
  */
 public class OreScenes implements FabricClientGameTest {
 	private static final BlockPos CIRCLE = new BlockPos(0, -60, 3);
 	private static final BlockPos IRON = CIRCLE.below().east();
 	private static final BlockPos COAL = CIRCLE.below().west();
+	private static final BlockPos SUPPORT = CIRCLE.below();
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -49,13 +51,18 @@ public class OreScenes implements FabricClientGameTest {
 				ServerPlayer p = server.getPlayerList().getPlayers().getFirst();
 				p.level().setBlockAndUpdate(IRON, Blocks.IRON_ORE.defaultBlockState());
 				p.level().setBlockAndUpdate(COAL, Blocks.COAL_ORE.defaultBlockState());
+				p.level().setBlockAndUpdate(SUPPORT, Blocks.IRON_ORE.defaultBlockState());
 				return decompose(p, "fmab:fer") + " fer=" + p.level().getBlockState(IRON).is(Blocks.IRON_ORE)
-						+ " charbon=" + p.level().getBlockState(COAL).is(Blocks.COAL_ORE);
+						+ " charbon=" + p.level().getBlockState(COAL).is(Blocks.COAL_ORE)
+						+ " support=" + p.level().getBlockState(SUPPORT).is(Blocks.IRON_ORE)
+						+ " cercle=" + p.level().getBlockState(CIRCLE).is(FmabBlocks.TRANSMUTATION_CIRCLE);
 			});
-			check(iron.equals("DONE fer=false charbon=true"), "le fer devrait défaire le minerai de fer seul : " + iron);
+			check(iron.equals("DONE fer=false charbon=true support=false cercle=false"),
+					"le fer devrait défaire le minerai de fer seul, support compris, et le cercle avec : " + iron);
 			context.waitTicks(10);
 			String coal = sp.getServer().computeOnServer(server -> {
 				ServerPlayer p = server.getPlayerList().getPlayers().getFirst();
+				p.level().setBlockAndUpdate(SUPPORT, Blocks.STONE.defaultBlockState());
 				return decompose(p, "fmab:carbone") + " charbon=" + p.level().getBlockState(COAL).is(Blocks.COAL_ORE);
 			});
 			check(coal.equals("DONE charbon=false"), "le carbone devrait défaire le minerai de charbon : " + coal);
