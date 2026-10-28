@@ -37,6 +37,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
+import java.util.List;
+
 import static com.ajustor.fmab.gametest.GametestAsserts.check;
 import com.ajustor.fmab.platform.client.ClientPlatform;
 
@@ -131,11 +133,19 @@ public class RecompositionScenes implements FabricClientGameTest {
 			cast(context, sp, "fmab:terre", "fmab:decomposer");
 			check(count(context, sp, Items.STONE_PICKAXE) == 0 && count(context, sp, Items.COBBLESTONE) == 3,
 					"la terre la défait en trois pierres");
-			// La terre a aussi emporté le sol sous le cercle, son support compris : on rebouche.
-			clear(context, sp);
+			// La terre a aussi emporté le sol sous le cercle, son support compris : on rebouche, et ce
+			// que la pioche a rendu, tombé au fond, remonte sur le cercle.
 			sp.getServer().runCommand("fill -5 -63 -3 5 -62 7 dirt");
 			sp.getServer().runCommand("fill -5 -61 -3 5 -61 7 grass_block");
-			drop(context, sp, new ItemStack(Items.COBBLESTONE, 3));
+			server(context, sp, (level, p) -> {
+				List<ItemEntity> fallen = level.getEntitiesOfClass(ItemEntity.class, around());
+				fallen.forEach(e -> {
+					e.setPos(CIRCLE.getX() + 0.5, CIRCLE.getY() + 0.1, CIRCLE.getZ() + 0.5);
+					e.setDeltaMovement(0, 0, 0);
+				});
+				return null;
+			});
+			context.waitTicks(5);
 			drop(context, sp, new ItemStack(Items.STONE_PICKAXE));
 			cast(context, sp, "fmab:terre", "fmab:recomposer");
 			check(count(context, sp, Items.STONE_PICKAXE) == 2, "et la recompose d'après modèle");
