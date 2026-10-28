@@ -9,6 +9,8 @@ import com.ajustor.fmab.alchemy.drawing.Primitive;
 import com.ajustor.fmab.alchemy.drawing.SimpleCircles;
 import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
+import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
+import com.ajustor.fmab.alchemy.glyph.GlyphPicker;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.data.AlchemistData;
@@ -25,6 +27,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -34,6 +37,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -100,8 +104,8 @@ public class NotebookScreen extends Screen {
 	private Button symmetryButton;
 	private Button stampButton;
 	private Button stampSizeButton;
-	/** Glyphe du tampon, parmi ceux que le joueur comprend ; demi-taille et rotation. */
-	private int stampIndex;
+	/** Glyphe du tampon, parmi ceux que le joueur comprend (null : le premier) ; demi-taille et rotation. */
+	private String stampId;
 	private int stampHalfSize = 3;
 	/** Tailles du tampon, en demi-largeur : de 6 à 12 cases, assez grand pour être reconnu. */
 	private static final int MIN_STAMP_HALF_SIZE = 3;
@@ -123,6 +127,30 @@ public class NotebookScreen extends Screen {
 	private static final int CONTENTS_TOP = 16;
 	private static final int CONTENTS_HOVER = 0x30000000;
 	private static final int CONTENTS_CURRENT = 0x40E0B040;
+	/**
+	 * Le sélecteur de glyphes, ouvert à la place de la grille comme le sommaire : une recherche, un
+	 * onglet par couche, et les glyphes compris en miniatures, les derniers posés en tête.
+	 */
+	private boolean pickerOpen;
+	/** La couche montrée, ou null pour toutes. */
+	private GlyphLayer pickerLayer;
+	private int pickerScroll;
+	private EditBox searchBox;
+	/** Le glyphe sous la souris dans le sélecteur : le panneau le décrit. */
+	private Glyph pickerHovered;
+	/** Les tracés des miniatures, gardés d'une image à l'autre : leur texture se retrouve sans recalcul. */
+	private final Map<String, Drawing> thumbnails = new HashMap<>();
+	/** Les derniers glyphes posés, le plus récent d'abord ; ils restent d'une ouverture du carnet à l'autre. */
+	private static List<String> recentStamps = List.of();
+	/** La touche G vient d'ouvrir le sélecteur : son caractère ne s'écrit pas dans la recherche. */
+	private boolean swallowNextChar;
+	private static final int PICKER_TABS = 22;
+	private static final int PICKER_TOP = 38;
+	private static final int PICKER_CELL = 48;
+	private static final int PICKER_THUMB = 28;
+	private static final int PICKER_ROW = 42;
+	private static final int THUMB_HALF_SIZE = 12;
+	private static final GlyphLayer[] PICKER_LAYERS = {null, GlyphLayer.ELEMENT, GlyphLayer.ACTION, GlyphLayer.MODIFIER};
 
 	/** Une ligne du panneau d'analyse et sa couleur. */
 	private record Line(Component text, int color) {
@@ -166,9 +194,10 @@ public class NotebookScreen extends Screen {
 			refreshLabels();
 		}).bounds(px + 94, y, 96, 18).build());
 		y += 20;
-		// Tampon : < glyphe > et sa taille. La molette le fait tourner.
+		// Tampon : < glyphe > et sa taille. Le nom ouvre le sélecteur ; la molette fait tourner le tampon.
 		addRenderableWidget(Button.builder(Component.literal("<"), b -> cycleStamp(-1)).bounds(px, y, 20, 18).build());
-		stampButton = addRenderableWidget(Button.builder(Component.empty(), b -> selectTool(Tool.STAMP))
+		stampButton = addRenderableWidget(Button.builder(Component.empty(), b -> togglePicker())
+				.tooltip(Tooltip.create(Component.translatable("notebook.fmab.stamp.tooltip")))
 				.bounds(px + 22, y, 104, 18).build());
 		addRenderableWidget(Button.builder(Component.literal(">"), b -> cycleStamp(1)).bounds(px + 128, y, 20, 18).build());
 		stampSizeButton = addRenderableWidget(Button.builder(Component.empty(), b -> {
@@ -214,6 +243,15 @@ public class NotebookScreen extends Screen {
 				.tooltip(Tooltip.create(Component.translatable("notebook.fmab.move_later")))
 				.bounds(px + 164, y, 26, 18).build());
 		panelTop = y + 26;
+		// La recherche du sélecteur : posée sur le papier, elle se dessine après lui (voir drawPicker).
+		int size = cell * Drawing.GRID;
+		String query = searchBox == null ? "" : searchBox.getValue();
+		searchBox = addWidget(new EditBox(font, canvasX + 4, canvasY + 4, size - 8, 16,
+				Component.translatable("notebook.fmab.picker.search")));
+		searchBox.setHint(Component.translatable("notebook.fmab.picker.search"));
+		searchBox.setValue(query);
+		searchBox.setResponder(s -> pickerScroll = 0);
+		searchBox.visible = pickerOpen;
 		refreshLabels();
 	}
 
@@ -226,8 +264,15 @@ public class NotebookScreen extends Screen {
 		graphics.fill(canvasX - 2, canvasY - 2, canvasX + size + 2, canvasY + size + 2, 0xFF8A7A5A);
 		graphics.fill(canvasX, canvasY, canvasX + size, canvasY + size, PAPER);
 		pageButton.setMessage(pageLabel());
+		// Les glyphes compris changent pendant que le carnet est ouvert : le tampon suit.
+		refreshLabels();
 		if (contentsOpen) {
 			drawContents(graphics, mouseX, mouseY);
+			drawPanel(graphics);
+			return;
+		}
+		if (pickerOpen) {
+			drawPicker(graphics, mouseX, mouseY, a);
 			drawPanel(graphics);
 			return;
 		}
@@ -326,9 +371,122 @@ public class NotebookScreen extends Screen {
 		return Math.max(0, rows * CONTENTS_ROW - (cell * Drawing.GRID - CONTENTS_TOP));
 	}
 
+	/** Le sélecteur : la recherche, les onglets des couches, puis les glyphes retenus en miniatures. */
+	private void drawPicker(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+		int size = cell * Drawing.GRID;
+		searchBox.extractRenderState(graphics, mouseX, mouseY, a);
+		int tabWidth = (size - 8) / PICKER_LAYERS.length;
+		for (int i = 0; i < PICKER_LAYERS.length; i++) {
+			int x = canvasX + 4 + i * tabWidth, y = canvasY + PICKER_TABS;
+			boolean current = PICKER_LAYERS[i] == pickerLayer;
+			boolean over = mouseX >= x && mouseX < x + tabWidth && mouseY >= y && mouseY < y + 12;
+			if (current || over) {
+				graphics.fill(x + 1, y, x + tabWidth - 1, y + 12, current ? CONTENTS_CURRENT : CONTENTS_HOVER);
+			}
+			String label = font.plainSubstrByWidth(layerLabel(PICKER_LAYERS[i]).getString(), tabWidth - 4);
+			graphics.centeredText(font, Component.literal(label), x + tabWidth / 2, y + 2, INK);
+		}
+		pickerScroll = Math.clamp(pickerScroll, 0, maxPickerScroll());
+		List<Glyph> glyphs = pickerGlyphs();
+		int hovered = pickerEntryAt(mouseX, mouseY);
+		pickerHovered = hovered >= 0 ? glyphs.get(hovered) : null;
+		if (glyphs.isEmpty()) {
+			graphics.centeredText(font, Component.translatable("notebook.fmab.picker.empty"), canvasX + size / 2,
+					canvasY + PICKER_TOP + 8, INK);
+			return;
+		}
+		int columns = pickerColumns();
+		int columnWidth = (size - 8) / columns;
+		Glyph current = stampGlyph();
+		graphics.enableScissor(canvasX, canvasY + PICKER_TOP, canvasX + size, canvasY + size);
+		for (int i = 0; i < glyphs.size(); i++) {
+			int x = canvasX + 4 + (i % columns) * columnWidth;
+			int y = canvasY + PICKER_TOP + (i / columns) * PICKER_ROW - pickerScroll;
+			if (y + PICKER_ROW < canvasY + PICKER_TOP || y > canvasY + size) {
+				continue;
+			}
+			Glyph g = glyphs.get(i);
+			if (g.equals(current)) {
+				graphics.fill(x + 1, y, x + columnWidth - 1, y + PICKER_ROW - 1, CONTENTS_CURRENT);
+			} else if (i == hovered) {
+				graphics.fill(x + 1, y, x + columnWidth - 1, y + PICKER_ROW - 1, CONTENTS_HOVER);
+			}
+			graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(thumbnail(g), INK),
+					x + (columnWidth - PICKER_THUMB) / 2, y + 2, 0, 0, PICKER_THUMB, PICKER_THUMB,
+					CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE);
+			String name = font.plainSubstrByWidth(glyphName(g), columnWidth - 2);
+			graphics.centeredText(font, Component.literal(name), x + columnWidth / 2, y + PICKER_THUMB + 4, INK);
+		}
+		graphics.disableScissor();
+	}
+
+	private Component layerLabel(GlyphLayer layer) {
+		return Component.translatable("notebook.fmab.picker." + (layer == null ? "all" : layer.name().toLowerCase(Locale.ROOT)));
+	}
+
+	/** Le tracé de référence d'un glyphe, au milieu de la grille : sa miniature. */
+	private Drawing thumbnail(Glyph g) {
+		return thumbnails.computeIfAbsent(g.id(),
+				id -> new Drawing(SimpleCircles.place(g, Drawing.CENTER_POINT, THUMB_HALF_SIZE, 0)));
+	}
+
+	private int pickerColumns() {
+		return Math.max(1, (cell * Drawing.GRID - 8) / PICKER_CELL);
+	}
+
+	/** Le glyphe du sélecteur sous la souris (son rang parmi les retenus), ou −1. */
+	private int pickerEntryAt(double x, double y) {
+		int size = cell * Drawing.GRID;
+		if (x < canvasX + 4 || x >= canvasX + size - 4 || y < canvasY + PICKER_TOP || y >= canvasY + size) {
+			return -1;
+		}
+		int columns = pickerColumns();
+		int column = Math.min((int) ((x - canvasX - 4) / ((size - 8) / columns)), columns - 1);
+		int row = (int) ((y - canvasY - PICKER_TOP + pickerScroll) / PICKER_ROW);
+		int index = row * columns + column;
+		return index < pickerGlyphs().size() ? index : -1;
+	}
+
+	/** L'onglet de couche sous la souris (rang dans {@link #PICKER_LAYERS}), ou −1. */
+	private int pickerTabAt(double x, double y) {
+		int size = cell * Drawing.GRID;
+		if (x < canvasX + 4 || x >= canvasX + size - 4 || y < canvasY + PICKER_TABS || y >= canvasY + PICKER_TABS + 12) {
+			return -1;
+		}
+		return Math.min((int) ((x - canvasX - 4) / ((size - 8) / PICKER_LAYERS.length)), PICKER_LAYERS.length - 1);
+	}
+
+	private int maxPickerScroll() {
+		int rows = (pickerGlyphs().size() + pickerColumns() - 1) / pickerColumns();
+		return Math.max(0, rows * PICKER_ROW - (cell * Drawing.GRID - PICKER_TOP));
+	}
+
+	/** Les glyphes compris que retiennent la couche et la recherche, les derniers posés en tête. */
+	private List<Glyph> pickerGlyphs() {
+		return GlyphPicker.filter(stampable(), pickerLayer, searchBox.getValue(), this::glyphName, recentStamps);
+	}
+
+	private String glyphName(Glyph g) {
+		return Component.translatable(g.nameKey()).getString();
+	}
+
+	/** Le panneau du sélecteur : le glyphe pointé (ou celui du tampon), ce qu'il vise, ce qu'il coûte. */
+	private List<Line> pickerLines() {
+		List<Line> out = new ArrayList<>();
+		Glyph g = pickerHovered != null ? pickerHovered : stampGlyph();
+		if (g != null) {
+			out.add(new Line(Component.translatable(g.nameKey()), EFFECT));
+			out.add(new Line(Component.translatable("treatise.fmab.layer." + g.layer().name().toLowerCase(Locale.ROOT)), DIM));
+			out.add(new Line(Component.translatable(g.descriptionKey()), TEXT));
+			out.add(new Line(Component.translatable("notebook.fmab.picker.cost", g.complexity(), g.concentration()), DIM));
+		}
+		out.add(new Line(Component.translatable("notebook.fmab.picker.hint"), DIM));
+		return out;
+	}
+
 	private void drawPanel(GuiGraphicsExtractor graphics) {
 		int px = canvasX + cell * Drawing.GRID + 10;
-		List<Line> lines = analysisLines();
+		List<Line> lines = pickerOpen ? pickerLines() : analysisLines();
 		if (!status.getString().isEmpty()) {
 			lines.add(new Line(status, STATUS));
 		}
@@ -487,6 +645,20 @@ public class NotebookScreen extends Screen {
 			}
 			return insideCanvas(event.x(), event.y());
 		}
+		if (pickerOpen) {
+			if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+				int tab = pickerTabAt(event.x(), event.y());
+				int index = pickerEntryAt(event.x(), event.y());
+				if (tab >= 0) {
+					pickerLayer = PICKER_LAYERS[tab];
+					pickerScroll = 0;
+					setFocused(searchBox);
+				} else if (index >= 0) {
+					pick(pickerGlyphs().get(index));
+				}
+			}
+			return insideCanvas(event.x(), event.y());
+		}
 		if (!insideCanvas(event.x(), event.y())) {
 			return false;
 		}
@@ -502,7 +674,13 @@ public class NotebookScreen extends Screen {
 		setFocused(null);
 		switch (tool) {
 			case DOT -> commit(new Primitive.Dot(p));
-			case STAMP -> commitAll(stampAt(p));
+			case STAMP -> {
+				Glyph g = stampGlyph();
+				if (g != null) {
+					recentStamps = GlyphPicker.remember(recentStamps, g.id());
+				}
+				commitAll(stampAt(p));
+			}
 			case ARC -> {
 				if (arcStart != null) {
 					commit(arc(anchor, arcStart, p));
@@ -577,6 +755,10 @@ public class NotebookScreen extends Screen {
 			contentsScroll = Math.clamp(contentsScroll - (int) Math.round(scrollY * CONTENTS_ROW), 0, maxContentsScroll());
 			return true;
 		}
+		if (pickerOpen && insideCanvas(x, y) && scrollY != 0) {
+			pickerScroll = Math.clamp(pickerScroll - (int) Math.round(scrollY * PICKER_ROW / 2.0), 0, maxPickerScroll());
+			return true;
+		}
 		if (tool == Tool.STAMP && insideCanvas(x, y) && scrollY != 0) {
 			stampRotation = Math.floorMod(stampRotation + (scrollY > 0 ? 15 : -15), 360);
 			refreshLabels();
@@ -587,11 +769,41 @@ public class NotebookScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (event.key() == InputConstants.KEY_Z && event.hasControlDown() && !nameBox.isFocused()) {
+		swallowNextChar = false;
+		if (pickerOpen) {
+			if (event.key() == InputConstants.KEY_ESCAPE) {
+				togglePicker();
+				return true;
+			}
+			if (event.key() == InputConstants.KEY_RETURN || event.key() == InputConstants.KEY_NUMPADENTER) {
+				List<Glyph> glyphs = pickerGlyphs();
+				if (!glyphs.isEmpty()) {
+					pick(glyphs.getFirst());
+				}
+				return true;
+			}
+			return super.keyPressed(event);
+		}
+		boolean typing = nameBox.isFocused();
+		if (event.key() == InputConstants.KEY_Z && event.hasControlDown() && !typing) {
 			undo();
 			return true;
 		}
+		if (event.key() == InputConstants.KEY_G && !typing && !event.hasControlDown()) {
+			togglePicker();
+			swallowNextChar = true;
+			return true;
+		}
 		return super.keyPressed(event);
+	}
+
+	@Override
+	public boolean charTyped(CharacterEvent event) {
+		if (swallowNextChar) {
+			swallowNextChar = false;
+			return true;
+		}
+		return super.charTyped(event);
 	}
 
 	@Override
@@ -635,12 +847,84 @@ public class NotebookScreen extends Screen {
 
 	private Glyph stampGlyph() {
 		List<Glyph> glyphs = stampable();
-		return glyphs.isEmpty() ? null : glyphs.get(Math.floorMod(stampIndex, glyphs.size()));
+		return glyphs.stream().filter(g -> g.id().equals(stampId)).findFirst()
+				.orElse(glyphs.isEmpty() ? null : glyphs.getFirst());
 	}
 
 	private void cycleStamp(int delta) {
-		stampIndex += delta;
+		List<Glyph> glyphs = stampable();
+		if (!glyphs.isEmpty()) {
+			int index = Math.max(0, glyphs.indexOf(stampGlyph()));
+			stampId = glyphs.get(Math.floorMod(index + delta, glyphs.size())).id();
+		}
 		selectTool(Tool.STAMP);
+	}
+
+	/** Le glyphe choisi au sélecteur passe au tampon, et la grille revient. */
+	private void pick(Glyph g) {
+		stampId = g.id();
+		recentStamps = GlyphPicker.remember(recentStamps, g.id());
+		closePicker();
+		selectTool(Tool.STAMP);
+	}
+
+	/** Ouvre ou referme le sélecteur de glyphes, à la place de la grille ; la recherche prend la main. */
+	public void togglePicker() {
+		if (pickerOpen) {
+			closePicker();
+			return;
+		}
+		if (stampable().isEmpty()) {
+			return;
+		}
+		resetGesture();
+		contentsOpen = false;
+		pickerOpen = true;
+		pickerScroll = 0;
+		searchBox.visible = true;
+		searchBox.setValue("");
+		setFocused(searchBox);
+	}
+
+	private void closePicker() {
+		pickerOpen = false;
+		pickerHovered = null;
+		searchBox.visible = false;
+		if (getFocused() == searchBox) {
+			setFocused(null);
+		}
+	}
+
+	public boolean pickerOpen() {
+		return pickerOpen;
+	}
+
+	/** Tape une recherche dans le sélecteur ; rend les identifiants retenus, dans l'ordre affiché. */
+	public List<String> searchGlyphs(String query) {
+		searchBox.setValue(query);
+		return pickerGlyphs().stream().map(Glyph::id).toList();
+	}
+
+	/** Montre une seule couche (null : toutes), comme un clic sur son onglet. */
+	public void showLayer(GlyphLayer layer) {
+		pickerLayer = layer;
+		pickerScroll = 0;
+	}
+
+	/** Choisit le premier glyphe retenu, comme la touche Entrée. */
+	public boolean pickFirst() {
+		List<Glyph> glyphs = pickerGlyphs();
+		if (glyphs.isEmpty()) {
+			return false;
+		}
+		pick(glyphs.getFirst());
+		return true;
+	}
+
+	/** L'identifiant du glyphe du tampon, si l'outil tampon est en main ; sinon null. */
+	public String stampInHand() {
+		Glyph g = stampGlyph();
+		return tool == Tool.STAMP && g != null ? g.id() : null;
 	}
 
 	/** Le glyphe du tampon posé en {@code at}, ou rien si le joueur n'en comprend aucun. */
@@ -755,7 +1039,7 @@ public class NotebookScreen extends Screen {
 			toolButtons.get(i).active = Tool.values()[i] != tool;
 		}
 		Glyph g = stampGlyph();
-		stampButton.active = tool != Tool.STAMP && g != null;
+		stampButton.active = g != null;
 		stampButton.setMessage(g == null ? Component.translatable("notebook.fmab.stamp.none")
 				: Component.translatable("notebook.fmab.stamp", Component.translatable(g.nameKey())));
 		stampSizeButton.setMessage(Component.translatable("notebook.fmab.stamp.size", stampHalfSize * 2));
@@ -842,6 +1126,7 @@ public class NotebookScreen extends Screen {
 	public void toggleContents() {
 		store();
 		resetGesture();
+		closePicker();
 		contentsOpen = !contentsOpen;
 		if (contentsOpen) {
 			// La page ouverte reste en vue.

@@ -2,12 +2,16 @@ package com.ajustor.fmab.gametest;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.Treatise;
+import com.ajustor.fmab.alchemy.glyph.Glyph;
+import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.client.screen.CircleWheelScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
+import com.ajustor.fmab.data.AlchemistData;
 import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.google.gson.JsonParser;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -92,6 +96,45 @@ public class NotebookContentsScenes implements FabricClientGameTest {
 			check(!context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).contentsOpen()),
 					"le sommaire devrait se refermer sur la page ouverte");
 			context.takeScreenshot("notebook_contents_page");
+
+			// Le sélecteur de glyphes : tous compris, on trouve le tampon par son nom au lieu de les faire
+			// défiler un à un, et le dernier posé revient en tête.
+			sp.getServer().runOnServer(server -> {
+				var p = server.getPlayerList().getPlayers().getFirst();
+				AlchemistData data = FmabAttachments.ALCHEMIST.getOrCreate(p);
+				for (Glyph g : AlchemyRules.of(server.registryAccess()).glyphs()) {
+					data = data.learn(g.id());
+				}
+				FmabAttachments.ALCHEMIST.set(p, data);
+			});
+			sp.getConnection().waitForClientboundPackets();
+			context.waitTicks(5);
+			context.runOnClient(mc -> ((NotebookScreen) mc.gui.screen()).togglePicker());
+			context.waitTicks(12);
+			check(context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).pickerOpen()),
+					"le sélecteur de glyphes devrait s'ouvrir");
+			int known = context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).searchGlyphs("").size());
+			check(known > 20, "le sélecteur devrait montrer tous les glyphes compris, pas " + known);
+			context.takeScreenshot("notebook_contents_picker");
+			context.runOnClient(mc -> ((NotebookScreen) mc.gui.screen()).showLayer(GlyphLayer.ACTION));
+			context.waitTicks(4);
+			context.takeScreenshot("notebook_contents_picker_actions");
+			context.runOnClient(mc -> ((NotebookScreen) mc.gui.screen()).showLayer(null));
+			List<String> found = context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).searchGlyphs("netherite"));
+			check(found.equals(List.of("fmab:netherite")), "chercher « netherite » devrait le trouver seul : " + found);
+			context.waitTicks(2);
+			context.takeScreenshot("notebook_contents_picker_search");
+			check(context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).pickFirst()),
+					"Entrée devrait choisir le glyphe trouvé");
+			context.waitTicks(2);
+			check(!context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).pickerOpen()),
+					"choisir un glyphe devrait rendre la grille");
+			check("fmab:netherite".equals(context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).stampInHand())),
+					"le tampon devrait porter le glyphe choisi");
+			context.runOnClient(mc -> ((NotebookScreen) mc.gui.screen()).togglePicker());
+			context.waitTicks(2);
+			List<String> again = context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).searchGlyphs(""));
+			check(again.getFirst().equals("fmab:netherite"), "le dernier glyphe posé devrait venir en tête : " + again);
 			context.setScreen(() -> null);
 			context.waitTicks(2);
 
