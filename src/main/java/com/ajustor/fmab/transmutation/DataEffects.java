@@ -218,8 +218,8 @@ public final class DataEffects {
 				}
 			}
 		}
+		// Le support est de la matière comme une autre : s'il cède, le cercle part avec lui.
 		out.remove(ctx.circle());
-		out.remove(ctx.support());
 		return out;
 	}
 

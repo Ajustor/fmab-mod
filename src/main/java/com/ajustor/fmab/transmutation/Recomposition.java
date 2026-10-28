@@ -87,7 +87,7 @@ public final class Recomposition {
 		int broken = 0;
 		for (BlockPos p : BlockPos.betweenClosed(o.offset(-r, -r, -r), o.offset(r, r, r))) {
 			BlockState state = level.getBlockState(p);
-			if (!state.is(ORES) || state.hasBlockEntity() || state.getDestroySpeed(level, p) < 0 || p.equals(ctx.support())
+			if (!state.is(ORES) || state.hasBlockEntity() || state.getDestroySpeed(level, p) < 0
 					|| !minable(composition(level, state.getBlock().asItem()).map(Composition::principal), aimed)) {
 				continue;
 			}
