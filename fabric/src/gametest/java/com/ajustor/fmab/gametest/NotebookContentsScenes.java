@@ -3,6 +3,7 @@ package com.ajustor.fmab.gametest;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.Treatise;
 import com.ajustor.fmab.alchemy.glyph.Glyph;
+import com.ajustor.fmab.alchemy.glyph.GlyphLayer;
 import com.ajustor.fmab.alchemy.glyph.Rank;
 import com.ajustor.fmab.client.screen.CircleWheelScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
@@ -115,6 +116,10 @@ public class NotebookContentsScenes implements FabricClientGameTest {
 			int known = context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).searchGlyphs("").size());
 			check(known > 20, "le sélecteur devrait montrer tous les glyphes compris, pas " + known);
 			context.takeScreenshot("notebook_contents_picker");
+			context.runOnClient(mc -> ((NotebookScreen) mc.gui.screen()).showLayer(GlyphLayer.ACTION));
+			context.waitTicks(4);
+			context.takeScreenshot("notebook_contents_picker_actions");
+			context.runOnClient(mc -> ((NotebookScreen) mc.gui.screen()).showLayer(null));
 			List<String> found = context.computeOnClient(mc -> ((NotebookScreen) mc.gui.screen()).searchGlyphs("netherite"));
 			check(found.equals(List.of("fmab:netherite")), "chercher « netherite » devrait le trouver seul : " + found);
 			context.waitTicks(2);

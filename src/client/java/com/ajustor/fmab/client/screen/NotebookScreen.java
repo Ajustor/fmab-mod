@@ -264,6 +264,8 @@ public class NotebookScreen extends Screen {
 		graphics.fill(canvasX - 2, canvasY - 2, canvasX + size + 2, canvasY + size + 2, 0xFF8A7A5A);
 		graphics.fill(canvasX, canvasY, canvasX + size, canvasY + size, PAPER);
 		pageButton.setMessage(pageLabel());
+		// Les glyphes compris changent pendant que le carnet est ouvert : le tampon suit.
+		refreshLabels();
 		if (contentsOpen) {
 			drawContents(graphics, mouseX, mouseY);
 			drawPanel(graphics);
@@ -901,6 +903,12 @@ public class NotebookScreen extends Screen {
 	public List<String> searchGlyphs(String query) {
 		searchBox.setValue(query);
 		return pickerGlyphs().stream().map(Glyph::id).toList();
+	}
+
+	/** Montre une seule couche (null : toutes), comme un clic sur son onglet. */
+	public void showLayer(GlyphLayer layer) {
+		pickerLayer = layer;
+		pickerScroll = 0;
 	}
 
 	/** Choisit le premier glyphe retenu, comme la touche Entrée. */
