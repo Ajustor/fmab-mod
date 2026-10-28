@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 1.20.0 — 2026-10-28
+
+### Nouveautés
+
+- Fabriquer un objet (établi, four, tailleur de pierre, forge) suffit à le comprendre : il peut ensuite se recomposer par l'alchimie, sans avoir à le décomposer d'abord.
+
+### Corrections
+
+- Le bloc qui porte un cercle n'est plus épargné : un effet qui le couvre (Décomposer, minerais, effets de zone) le détruit ou le transforme, et le cercle disparaît avec lui.
 ## 1.19.0 — 2026-10-28
 
 ### Nouveautés

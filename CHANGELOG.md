@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.20.0 — 2026-10-28
+
+### New features
+
+- Crafting an item (crafting table, furnace, stonecutter, smithing) is enough to understand it: it can then be recomposed through alchemy without decomposing it first.
+
+### Fixes
+
+- The block holding a circle is no longer spared: an effect covering it (Decompose, ores, area effects) destroys or transforms it, and the circle goes with it.
 ## 1.19.0 — 2026-10-28
 
 ### New features
