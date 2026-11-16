@@ -31,7 +31,7 @@ public final class AntiAlchemy {
 
 	/**
 	 * L'alchimie d'Amestris est-elle captée ici ? Plus du tout une fois le cercle national brisé ;
-	 * deux fois plus loin pendant le Jour promis (l'éclipse), tant qu'il tient.
+	 * deux fois plus loin pendant le Jour promis (l'éclipse qui l'éveille), tant qu'il tient.
 	 */
 	public static boolean suppressed(ServerLevel level, BlockPos pos) {
 		NationalCircle circle = NationalCircle.get(level.getServer());
@@ -47,7 +47,7 @@ public final class AntiAlchemy {
 
 	/** Le rayon de la zone, qui grandit pendant le Jour promis avec les points de sang encore actifs. */
 	public static double radius(ServerLevel level, NationalCircle circle) {
-		if (!Eclipse.now(level) || circle.broken()) {
+		if (!Eclipse.now(level) || !circle.awake()) {
 			return RADIUS;
 		}
 		return RADIUS * (1 + (NationalCircle.POINTS - circle.sealedCount()) / (double) NationalCircle.POINTS);

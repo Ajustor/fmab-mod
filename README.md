@@ -158,6 +158,8 @@ un membre (transmutation humaine sous l'armure, après avoir vu sa Porte) ; à `
 l'appelle gratuitement.
 `gate_restoration_cost` (par défaut `100`, de 1 à 100) : les âmes de Pierre que coûte de rendre sa Porte
 à un joueur qui l'a donnée ; une Pierre en tient 100 au plus.
+`promised_day_sacrifices` (par défaut `5`) : combien de joueurs doivent avoir ouvert leur Porte pour
+qu'une éclipse éveille le cercle national (le Jour promis) ; à `0`, chaque éclipse l'éveille.
 
 Commandes de test (opérateur) : `/fmab rank <rang>`, `/fmab learn_all`, `/fmab forget_all`,
 `/fmab rest`, `/fmab mastery <école> <n>`, `/fmab grant <nœud>`, `/fmab karma [valeur]` (lire ou régler

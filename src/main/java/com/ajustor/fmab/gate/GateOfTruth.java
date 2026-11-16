@@ -8,6 +8,7 @@ import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.entity.GateHandEntity;
 import com.ajustor.fmab.entity.TruthEntity;
 import com.ajustor.fmab.network.CinematicPayload;
+import com.ajustor.fmab.promised.NationalCircle;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabEntities;
@@ -115,6 +116,10 @@ public final class GateOfTruth {
 		// Revenu en pleine visite : la cinématique reprend là où elle en était.
 		PlayerEvents.JOIN.register((player, server) -> {
 			GateState gate = FmabAttachments.GATE.get(player);
+			if (gate != null && gate.openings() > 0) {
+				// Ouverte avant que Père ne compte ses sacrifices : elle compte quand même.
+				NationalCircle.get(server).sacrifice(player.getUUID());
+			}
 			if (gate == null || gate.visit().isEmpty()) {
 				return;
 			}
@@ -325,6 +330,8 @@ public final class GateOfTruth {
 		space.playSound(null, BlockPos.containing(at(player, ARRIVAL)), SoundEvents.AMETHYST_BLOCK_RESONATE,
 				SoundSource.PLAYERS, 1, 0.5f);
 		CinematicPayload.play(player, CinematicPayload.GATE, RETURN + 2);
+		// Il a vu sa Porte : Père le compte parmi ses sacrifices.
+		NationalCircle.get(space.getServer()).sacrifice(player.getUUID());
 		return true;
 	}
 

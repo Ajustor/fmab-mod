@@ -87,6 +87,18 @@ public class ConfigScreen extends Screen {
 				.withTooltip(cost -> Tooltip.create(Component.translatable("config.fmab.gate_restoration_cost.tooltip")))
 				.create(x, y, BUTTON_WIDTH, 20, Component.translatable("config.fmab.gate_restoration_cost"),
 						(button, cost) -> world = world.withGateRestorationCost(cost)));
+		y += ROW;
+		List<Integer> sacrifices = new ArrayList<>(List.of(0, 1, 2, 3, 4, 5, 7, 10));
+		if (!sacrifices.contains(world.promisedDaySacrifices())) {
+			sacrifices.add(world.promisedDaySacrifices());
+			sacrifices.sort(null);
+		}
+		addRenderableWidget(CycleButton.<Integer>builder(count -> Component.literal(String.valueOf(count)),
+						world.promisedDaySacrifices())
+				.withValues(sacrifices)
+				.withTooltip(count -> Tooltip.create(Component.translatable("config.fmab.promised_day_sacrifices.tooltip")))
+				.create(x, y, BUTTON_WIDTH, 20, Component.translatable("config.fmab.promised_day_sacrifices"),
+						(button, count) -> world = world.withPromisedDaySacrifices(count)));
 
 		addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> onClose())
 				.bounds((width - 200) / 2, height - 28, 200, 20).build());
