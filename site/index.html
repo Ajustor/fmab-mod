@@ -41,6 +41,57 @@
     footer { color: var(--muted); font-size: 0.85rem; margin-top: 40px; }
     [data-lang] { display: none; }
     html[lang="fr"] [data-lang="fr"], html[lang="en"] [data-lang="en"] { display: block; }
+
+    /* Le pacte alchimique : le code Konami fait passer le site au sang et à la craie rouge. */
+    html.pact {
+      --paper: #110506; --ink: #f2dcc8; --muted: #b67c6c; --accent: #ff4a30; --card: #23090b;
+      --chalk: #ff5a3c;
+    }
+    html.pact { background: #070203; }
+    html.pact body {
+      min-height: 100vh;
+      background: radial-gradient(ellipse 90% 70% at 50% 0%, #4a110f 0%, #170607 60%, #070203 100%) no-repeat;
+    }
+    html.pact a:not(.button) { color: var(--accent); }
+    html.pact h1, html.pact h2 { letter-spacing: 0.02em; text-shadow: 0 0 12px rgba(255, 74, 48, 0.45); }
+    html.pact .card { box-shadow: inset 0 0 0 1px rgba(255, 90, 60, 0.25); }
+    .pact-section { display: none; text-align: center; margin: 28px 0 8px; }
+    html.pact .pact-section { display: block; }
+    .pact-section h2 { margin: 0; font-size: 1.6rem; }
+    .pact-section .pact-motto { color: var(--muted); font-style: italic; margin: 6px 0 0; }
+    .pact-circles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin: 24px 0; }
+    .pact-circles figure { margin: 0; }
+    .pact-circles svg {
+      width: 100%; max-width: 320px; aspect-ratio: 1; display: block; margin: 0 auto;
+      fill: none; stroke: var(--chalk); stroke-width: 0.16; stroke-linecap: round; stroke-linejoin: round;
+      filter: drop-shadow(0 0 4px rgba(255, 70, 40, 0.8)) drop-shadow(0 0 14px rgba(255, 40, 20, 0.35));
+      animation: pact-spin 140s linear infinite, pact-pulse 3.2s ease-in-out infinite;
+    }
+    .pact-circles svg * {
+      stroke-dasharray: 1; stroke-dashoffset: 1;
+      animation: pact-draw 1.1s ease-out forwards;
+      animation-delay: calc(var(--i, 0) * 55ms);
+    }
+    .pact-circles figcaption { font-weight: bold; margin-top: 12px; font-size: 1.1rem; }
+    .pact-circles .pact-note { color: var(--muted); font-size: 0.92rem; margin: 6px 0 0; }
+    .pact-leave {
+      background: none; border: 1px solid var(--muted); color: var(--ink); font: inherit; font-size: 0.9rem;
+      padding: 4px 14px; border-radius: 4px; cursor: pointer;
+    }
+    .pact-flash {
+      position: fixed; inset: 0; pointer-events: none; z-index: 10;
+      background: radial-gradient(circle at 50% 40%, #fff6e8 0%, #ff6a3c 35%, rgba(120, 10, 10, 0) 75%);
+      animation: pact-flash 1s ease-out forwards;
+    }
+    @keyframes pact-draw { to { stroke-dashoffset: 0; } }
+    @keyframes pact-spin { to { transform: rotate(360deg); } }
+    @keyframes pact-pulse { 50% { opacity: 0.78; } }
+    @keyframes pact-flash { from { opacity: 0.95; } to { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) {
+      .pact-circles svg, .pact-circles svg *, .pact-flash { animation: none; }
+      .pact-circles svg * { stroke-dashoffset: 0; }
+      .pact-flash { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -127,6 +178,75 @@
       });
     });
     apply(lang);
+  })();
+
+  // Le pacte alchimique : ↑ ↑ ↓ ↓ ← → ← → B A. Les deux cercles interdits du mod, tirés de
+  // ForbiddenCircles.java par site/build.py (vides tant que le site n'est pas assemblé).
+  (function () {
+    var CIRCLES = /*pact-circles*/{};
+    var KONAMI = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright",
+      "arrowleft", "arrowright", "b", "a"];
+    var typed = 0;
+    var section = null;
+
+    function figure(svg, fr, en, noteFr, noteEn) {
+      if (!svg) return "";
+      return "<figure>" + svg +
+        "<figcaption data-lang=\"fr\">" + fr + "</figcaption><figcaption data-lang=\"en\">" + en + "</figcaption>" +
+        "<p class=\"pact-note\" data-lang=\"fr\">" + noteFr + "</p><p class=\"pact-note\" data-lang=\"en\">" + noteEn + "</p>" +
+        "</figure>";
+    }
+
+    function build() {
+      var header = document.querySelector("main > header");
+      if (!header) return;
+      section = document.createElement("section");
+      section.className = "pact-section";
+      section.innerHTML =
+        "<h2 data-lang=\"fr\">Le pacte est scellé</h2><h2 data-lang=\"en\">The pact is sealed</h2>" +
+        "<p class=\"pact-motto\" data-lang=\"fr\">Pour obtenir, il faut donner en retour quelque chose de valeur égale.</p>" +
+        "<p class=\"pact-motto\" data-lang=\"en\">To obtain, something of equal value must be lost.</p>" +
+        "<div class=\"pact-circles\">" +
+        figure(CIRCLES.stone, "La Pierre philosophale", "The Philosopher's Stone",
+          "Humain et Décomposer au cœur d'un hexagramme. Il consume les vies de son aire et en condense les âmes.",
+          "Human and Decompose at the heart of a hexagram. It consumes the lives around it and condenses their souls.") +
+        figure(CIRCLES.human, "La transmutation humaine", "Human transmutation",
+          "Humain et Recomposer ; sur les six pointes, ce dont un corps est fait. Il en manque un, et la Vérité réclame son dû.",
+          "Human and Recompose; on the six points, what a body is made of. Miss one, and Truth claims its due.") +
+        "</div>" +
+        "<button type=\"button\" class=\"pact-leave\"><span data-lang=\"fr\">Rompre le pacte</span>" +
+        "<span data-lang=\"en\">Break the pact</span></button>";
+      header.insertAdjacentElement("afterend", section);
+      section.querySelector(".pact-leave").addEventListener("click", function () { seal(false); });
+    }
+
+    function seal(on, quiet) {
+      var root = document.documentElement;
+      if (on && !section) build();
+      root.classList.toggle("pact", on);
+      try { localStorage.setItem("fmab-pact", on ? "1" : "0"); } catch (e) {}
+      if (on && !quiet) {
+        var flash = document.createElement("div");
+        flash.className = "pact-flash";
+        document.body.appendChild(flash);
+        setTimeout(function () { flash.remove(); }, 1100);
+        if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    document.addEventListener("keydown", function (e) {
+      var key = (e.key || "").toLowerCase();
+      // Un ↑ de trop après « ↑ ↑ » laisse la séquence où elle en était.
+      typed = key === KONAMI[typed] ? typed + 1 : key === "arrowup" ? (typed === 2 ? 2 : 1) : 0;
+      if (typed === KONAMI.length) {
+        typed = 0;
+        seal(!document.documentElement.classList.contains("pact"));
+      }
+    });
+
+    var kept = null;
+    try { kept = localStorage.getItem("fmab-pact"); } catch (e) {}
+    if (kept === "1") seal(true, true);
   })();
 </script>
 </body>

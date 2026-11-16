@@ -162,19 +162,67 @@ INSTALL_EN = """
 """
 
 
+FORBIDDEN = os.path.join(ROOT, "src", "main", "java", "com", "ajustor", "fmab", "alchemy", "ForbiddenCircles.java")
+
+
+def svg(primitives):
+    """Un dessin du mod (coordonnées 0 à 32, y vers le bas) en SVG, un trait après l'autre."""
+    def n(v):
+        return f"{v:g}"
+
+    def points(pts):
+        return " ".join(f"{n(x)},{n(y)}" for x, y in pts)
+
+    parts = []
+    for i, p in enumerate(primitives):
+        kind = p["type"]
+        if kind == "circle":
+            (cx, cy), r = p["center"], p["radius"]
+            shape = f'<circle cx="{n(cx)}" cy="{n(cy)}" r="{n(r)}"'
+        elif kind in ("polygon", "polyline"):
+            shape = f'<{kind} points="{points(p["points"])}"'
+        elif kind == "line":
+            (x1, y1), (x2, y2) = p["from"], p["to"]
+            shape = f'<line x1="{n(x1)}" y1="{n(y1)}" x2="{n(x2)}" y2="{n(y2)}"'
+        else:
+            raise ValueError(f"trait inconnu dans les cercles interdits : {kind}")
+        parts.append(f'{shape} pathLength="1" style="--i:{i}"/>')
+    return '<svg viewBox="0 0 32 32" aria-hidden="true">' + "".join(parts) + "</svg>"
+
+
+def pact_circles():
+    """Les deux cercles interdits, tels que le jeu les dessine (ForbiddenCircles.java)."""
+    source = open(FORBIDDEN, encoding="utf-8").read()
+    circles = {}
+    for key, name in (("stone", "PHILOSOPHER_STONE"), ("human", "HUMAN_TRANSMUTATION")):
+        m = re.search(name + r' = parse\("""(.*?)"""\);', source, re.S)
+        if not m:
+            raise ValueError(f"cercle {name} introuvable dans {FORBIDDEN}")
+        circles[key] = svg(json.loads(m.group(1)))
+    # « </ » dans un script fermerait la balise : on l'échappe.
+    return json.dumps(circles).replace("</", "<\\/")
+
+
+def with_pact(text, circles):
+    return text.replace("/*pact-circles*/{}", circles, 1)
+
+
 def main(out, releases_json=None):
     if os.path.exists(out):
         shutil.rmtree(out)
     shutil.copytree(SITE, out, ignore=shutil.ignore_patterns("build.py", "__pycache__"))
     head, footer, tail = template()
+    # Le pacte alchimique (code Konami) montre les cercles interdits, sur toutes les pages.
+    circles = pact_circles()
+    tail = with_pact(tail, circles)
     # L'accueil reçoit le même menu que les autres pages.
     index = os.path.join(out, "index.html")
-    home = open(index, encoding="utf-8").read()
+    home = with_pact(open(index, encoding="utf-8").read(), circles)
     anchor = '    </div>\n    <div class="lang">'
     if anchor in home:
         home = home.replace(anchor, "      " + nav("index.html") + "\n" + anchor, 1)
         home = home.replace("</head>", NAV_STYLE + "</head>", 1)
-        open(index, "w", encoding="utf-8", newline="\n").write(home)
+    open(index, "w", encoding="utf-8", newline="\n").write(home)
     data = []
     if releases_json and os.path.exists(releases_json):
         data = json.load(open(releases_json, encoding="utf-8"))
