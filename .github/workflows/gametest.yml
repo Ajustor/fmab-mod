@@ -23,7 +23,9 @@ concurrency:
 jobs:
   gametest:
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    # Une passe complète prend un quart d'heure. Le chien de garde des scènes (Watchdog) arrête un jeu
+    # figé bien avant ce délai, qui ne reste qu'en dernier recours.
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:

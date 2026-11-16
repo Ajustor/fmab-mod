@@ -52,7 +52,12 @@ public class RenderShowcase implements FabricClientGameTest {
 	 */
 	static boolean selected(String name) {
 		String only = System.getProperty("fmab.gametest");
-		return only == null || only.isBlank() || java.util.Arrays.asList(only.split(",")).contains(name);
+		boolean selected = only == null || only.isBlank() || java.util.Arrays.asList(only.split(",")).contains(name);
+		if (selected) {
+			// Chaque scène qui tourne a son délai : un jeu figé s'arrête au lieu d'attendre la fin du job.
+			Watchdog.scene(name);
+		}
+		return selected;
 	}
 
 	@Override
