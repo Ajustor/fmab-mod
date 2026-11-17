@@ -25,6 +25,14 @@ class FmabConfigTest {
 	}
 
 	@Test
+	void fatherAwaitsFiveSacrificesByDefault() {
+		assertEquals(5, FmabConfig.DEFAULT.promisedDaySacrifices(), "cinq Portes ouvertes");
+		assertEquals(FmabConfig.DEFAULT.withPromisedDaySacrifices(2),
+				FmabConfig.fromJson(JsonParser.parseString("{\"promised_day_sacrifices\": 2}").getAsJsonObject()));
+		assertEquals(0, FmabConfig.DEFAULT.withPromisedDaySacrifices(-3).promisedDaySacrifices(), "jamais négatif");
+	}
+
+	@Test
 	void theCostStaysWithinWhatAStoneHolds() {
 		assertEquals(Restoration.STONE_SOULS, FmabConfig.DEFAULT.withGateRestorationCost(500).gateRestorationCost(),
 				"une Pierre n'en tient pas plus");

@@ -14,9 +14,9 @@ import net.minecraft.world.phys.AABB;
 import java.util.Collection;
 
 /**
- * Le Jour promis, quand l'éclipse vient et que le cercle national tient : le ciel rougit (voir le
- * client), des soldats immortels sortent de terre autour des joueurs, et l'alchimie faiblit partout,
- * sauf à l'abri des points de sang déjà scellés.
+ * Le Jour promis, quand l'éclipse vient et que le cercle national s'éveille (il tient, et assez de
+ * joueurs ont ouvert leur Porte, voir {@link NationalCircle#awake}) : des soldats immortels sortent de
+ * terre autour des joueurs, et l'alchimie faiblit partout, sauf à l'abri des points de sang déjà scellés.
  */
 public final class PromisedDay {
 	/** L'alchimie, hors d'un abri, ne donne que la moitié de sa force. */
@@ -35,8 +35,7 @@ public final class PromisedDay {
 		if (!Eclipse.now(level)) {
 			return false;
 		}
-		NationalCircle circle = NationalCircle.get(level.getServer());
-		return !circle.broken() && !circle.fatherFallen();
+		return NationalCircle.get(level.getServer()).awake();
 	}
 
 	/** Ce point est-il à l'abri d'un point de sang scellé ? */

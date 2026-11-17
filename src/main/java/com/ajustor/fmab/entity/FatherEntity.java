@@ -277,10 +277,10 @@ public class FatherEntity extends HomunculusEntity {
 		}
 	}
 
-	/** Le Jour promis : pendant l'éclipse, tant que le cercle national tient, il se régénère. */
+	/** Le Jour promis : pendant l'éclipse, tant que le cercle national est éveillé, il se régénère. */
 	private void promisedDay(ServerLevel level) {
 		NationalCircle circle = NationalCircle.get(level.getServer());
-		if (tickCount % 20 != 0 || !Eclipse.now(level) || circle.broken()) {
+		if (tickCount % 20 != 0 || !Eclipse.now(level) || !circle.awake()) {
 			return;
 		}
 		heal(0.6f * (NationalCircle.POINTS - circle.sealedCount()));

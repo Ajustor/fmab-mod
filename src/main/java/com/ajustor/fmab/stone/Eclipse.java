@@ -1,5 +1,6 @@
 package com.ajustor.fmab.stone;
 
+import com.ajustor.fmab.FmabConfig;
 import com.ajustor.fmab.network.CinematicPayload;
 import com.ajustor.fmab.promised.NationalCircle;
 import net.minecraft.ChatFormatting;
@@ -146,13 +147,19 @@ public final class Eclipse {
 			}
 			boolean starting = announcement == Announcement.BEGINS;
 			NationalCircle circle = NationalCircle.get(server);
+			int required = FmabConfig.get().promisedDaySacrifices();
+			boolean holds = !circle.broken() && !circle.fatherFallen();
 			for (ServerPlayer p : overworld.players()) {
 				p.sendSystemMessage(Component.translatable(starting ? "eclipse.fmab.begins" : "eclipse.fmab.ends"));
-				if (starting && !circle.broken() && !circle.fatherFallen()) {
+				if (starting && circle.awake(required)) {
 					// Le Jour promis : le cercle national s'éveille, et Père avec lui.
 					p.sendSystemMessage(Component.translatable("promised.fmab.day_begins",
 							NationalCircle.POINTS - circle.sealedCount()).withStyle(ChatFormatting.DARK_RED));
 					CinematicPayload.play(p, CinematicPayload.PROMISED_DAY, 120);
+				} else if (starting && holds) {
+					// Père attend encore ses sacrifices : le cercle dort.
+					p.sendSystemMessage(Component.translatable("promised.fmab.circle_sleeps",
+							circle.sacrifices(), required).withStyle(ChatFormatting.DARK_RED));
 				}
 			}
 		});

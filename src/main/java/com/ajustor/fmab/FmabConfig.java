@@ -24,27 +24,39 @@ import com.ajustor.fmab.platform.Platform;
  * @param gateRestorationCost         les âmes de Pierre que coûte de rendre sa Porte à un joueur qui
  *                                    l'a donnée (voir SoulGifts), de 1 à {@link Restoration#STONE_SOULS}
  *                                    (une Pierre n'en tient pas plus)
+ * @param promisedDaySacrifices       les joueurs qui doivent avoir ouvert leur Porte pour qu'une éclipse
+ *                                    éveille le cercle national (le Jour promis) : Père attend ses
+ *                                    sacrifices ; 0, et chaque éclipse l'éveille
  */
-public record FmabConfig(boolean restartWipesProgress, boolean soulBindingRequiresSacrifice, int gateRestorationCost) {
+public record FmabConfig(boolean restartWipesProgress, boolean soulBindingRequiresSacrifice, int gateRestorationCost,
+		int promisedDaySacrifices) {
 	/** Par défaut, rendre une Porte coûte une Pierre pleine : plus que tout le reste. */
 	public static final int GATE_RESTORATION_COST = Restoration.STONE_SOULS;
-	public static final FmabConfig DEFAULT = new FmabConfig(true, true, GATE_RESTORATION_COST);
+	/** Par défaut, cinq sacrifices, comme ceux que Père attendait pour le Jour promis. */
+	public static final int PROMISED_DAY_SACRIFICES = 5;
+	public static final FmabConfig DEFAULT = new FmabConfig(true, true, GATE_RESTORATION_COST, PROMISED_DAY_SACRIFICES);
 
 	public FmabConfig {
 		gateRestorationCost = Math.clamp(gateRestorationCost, 1, Restoration.STONE_SOULS);
+		promisedDaySacrifices = Math.max(0, promisedDaySacrifices);
 	}
 
 	public FmabConfig withRestartWipesProgress(boolean value) {
-		return new FmabConfig(value, soulBindingRequiresSacrifice, gateRestorationCost);
+		return new FmabConfig(value, soulBindingRequiresSacrifice, gateRestorationCost, promisedDaySacrifices);
 	}
 
 	public FmabConfig withSoulBindingRequiresSacrifice(boolean value) {
-		return new FmabConfig(restartWipesProgress, value, gateRestorationCost);
+		return new FmabConfig(restartWipesProgress, value, gateRestorationCost, promisedDaySacrifices);
 	}
 
 	public FmabConfig withGateRestorationCost(int value) {
-		return new FmabConfig(restartWipesProgress, soulBindingRequiresSacrifice, value);
+		return new FmabConfig(restartWipesProgress, soulBindingRequiresSacrifice, value, promisedDaySacrifices);
 	}
+
+	public FmabConfig withPromisedDaySacrifices(int value) {
+		return new FmabConfig(restartWipesProgress, soulBindingRequiresSacrifice, gateRestorationCost, value);
+	}
+
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static FmabConfig current = DEFAULT;
 
@@ -73,7 +85,9 @@ public record FmabConfig(boolean restartWipesProgress, boolean soulBindingRequir
 				json.has("soul_binding_requires_sacrifice")
 						? json.get("soul_binding_requires_sacrifice").getAsBoolean() : DEFAULT.soulBindingRequiresSacrifice(),
 				json.has("gate_restoration_cost")
-						? json.get("gate_restoration_cost").getAsInt() : DEFAULT.gateRestorationCost());
+						? json.get("gate_restoration_cost").getAsInt() : DEFAULT.gateRestorationCost(),
+				json.has("promised_day_sacrifices")
+						? json.get("promised_day_sacrifices").getAsInt() : DEFAULT.promisedDaySacrifices());
 	}
 
 	/**
@@ -88,6 +102,7 @@ public record FmabConfig(boolean restartWipesProgress, boolean soulBindingRequir
 			out.addProperty("restart_wipes_progress", config.restartWipesProgress());
 			out.addProperty("soul_binding_requires_sacrifice", config.soulBindingRequiresSacrifice());
 			out.addProperty("gate_restoration_cost", config.gateRestorationCost());
+			out.addProperty("promised_day_sacrifices", config.promisedDaySacrifices());
 			Files.createDirectories(file.getParent());
 			Files.writeString(file, GSON.toJson(out));
 		} catch (IOException e) {

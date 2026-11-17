@@ -572,7 +572,7 @@
   "treatise.fmab.ch11.p2": "Autour de Père, dans sa salle du trône, l'alchimie d'Amestris ne répond plus : il capte l'énergie tectonique dont elle se nourrit. Ni cercle, ni gant, ni Pierre. Il change trois fois de forme : le vieillard fait jaillir la pierre sous ses ennemis ; la forme sans visage forge un petit soleil, lent : abritez-vous derrière un pilier, ou renvoyez-le d'un coup ; la forme divine, instable, dévore les âmes alentour pour tenir, et se défait si on l'en prive. Il arrache leurs âmes aux Pierres vivantes.",
   "treatise.fmab.ch11.p3": "L'alkahestry de Xing, elle, puise au flux du dragon, qui court partout : Père ne l'arrête pas. Dans les jungles et les cerisaies, May Chang l'enseigne à qui a bon cœur. Lancez cinq kunaï autour d'une zone : ils y dessinent un cercle qui soigne les vôtres, ou qui piège et blesse vos ennemis (accroupi, clic droit, pour choisir).",
   "treatise.fmab.ch11.p4": "Au nord, dans les montagnes enneigées, Fort Briggs barre la passe face à Drachma, dont les soldats rôdent la nuit au pied du mur. La générale Olivier Armstrong y reconnaît ses alliés à leurs actes, et leur confie un sabre de Briggs : une lame lourde qui mord plus fort les homonculus, et qui ne doit rien à l'alchimie.",
-  "treatise.fmab.ch11.p5": "Le cercle national tient par ses points de sang, laissés par les massacres d'Amestris : des champs de ruines où le sang bat encore (les cartographes en vendent la carte). Plantez-y un kunaï d'alkahestry, ou gravez-y un contre-cercle au burin si vous êtes Alchimiste d'État. Tant que le cercle tient, chaque éclipse est un Jour promis : la zone de Père double, et il se régénère. Scellez sept points, et le cercle se brise : sa zone s'effondre.",
+  "treatise.fmab.ch11.p5": "Le cercle national tient par ses points de sang, laissés par les massacres d'Amestris : des champs de ruines où le sang bat encore (les cartographes en vendent la carte). Plantez-y un kunaï d'alkahestry, ou gravez-y un contre-cercle au burin si vous êtes Alchimiste d'État. Mais Père attend ses sacrifices : le cercle ne s'éveille qu'une fois que cinq alchimistes ont ouvert leur Porte (le serveur peut en fixer un autre nombre). Dès lors, tant que le cercle tient, chaque éclipse est un Jour promis : la zone de Père double, et il se régénère. Scellez sept points, et le cercle se brise : sa zone s'effondre.",
   "treatise.fmab.ch8.p5": "La première fois que la Vérité prend le corps entier, l'âme se retrouve aussitôt dans une armure de fer, fixée par un sceau de sang tracé dans le plastron. L'armure est vide : on ne voit qu'elle. L'âme n'a ni faim ni souffle et ne mange pas. Les coups usent les pièces : une pièce qui cède se refait (sans heaume on voit mal, sans jambières on avance mal). Accroupie, l'âme transmute dans son armure le matériau qu'elle tient (un lingot de fer pour du fer) et la répare.\n\nSi le plastron cède, le sceau est effacé : l'âme retourne errer devant sa Porte. Rouvrir la Porte n'est pas si grave : la Vérité arrache le sceau, mais l'âme le retrace en revenant, dans son armure, qui en sort cabossée.",
 
   "block.fmab.white_floor": "Sol de l'Espace blanc",
@@ -986,6 +986,7 @@
   "promised.fmab.crest_sealed": "%s a scellé un point de sang du cercle national (%s sur %s).",
   "promised.fmab.circle_broken": "%s a scellé le dernier point : le cercle national est brisé. La zone de Père s'effondre.",
   "promised.fmab.day_begins": "C'est le Jour promis : le cercle national s'éveille. Sous Central, Père se nourrit de ses %s points de sang encore actifs.",
+  "promised.fmab.circle_sleeps": "Le cercle national ne s'éveille pas : Père attend ses sacrifices. %s alchimistes sur %s ont ouvert leur Porte.",
   "filled_map.fmab.resembool": "Carte de Resembool",
   "filled_map.fmab.central": "Carte de Central City",
   "filled_map.fmab.rush_valley": "Carte de Rush Valley",
@@ -1479,6 +1480,8 @@
   "config.fmab.soul_binding_requires_sacrifice.tooltip": "Lier l'âme d'un autre joueur à une armure demande de sacrifier un membre (transmutation humaine sous l'armure, après avoir vu sa Porte). Sinon, le cercle d'âme l'appelle gratuitement.",
   "config.fmab.gate_restoration_cost": "Rendre une Porte coûte",
   "config.fmab.gate_restoration_cost.tooltip": "Les âmes de Pierre philosophale que coûte de rendre sa Porte à un joueur qui l'a donnée (transmutation humaine, l'allié dans le cercle). Une Pierre en tient 100 au plus. Le joueur repart de zéro : rang, glyphes, maîtrise, épreuves.",
+  "config.fmab.promised_day_sacrifices": "Sacrifices du Jour promis",
+  "config.fmab.promised_day_sacrifices.tooltip": "Combien de joueurs doivent avoir ouvert leur Porte pour qu'une éclipse éveille le cercle national (le Jour promis). À 0, chaque éclipse l'éveille.",
 
   "gate.fmab.gift.choose.title": "Rendre ce qui fut pris",
   "gate.fmab.gift.choose.text": "La Porte a pris ceci à %1$s. Que lui rendez-vous, et au prix de quoi ? Votre âme : la Vérité prendra tout votre corps et vous vous réveillerez dans une armure. Ou des âmes de votre Pierre (elle en garde %2$s).",

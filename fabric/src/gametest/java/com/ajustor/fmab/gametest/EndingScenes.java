@@ -1,6 +1,7 @@
 package com.ajustor.fmab.gametest;
 
 import com.ajustor.fmab.Fmab;
+import com.ajustor.fmab.FmabConfig;
 import com.ajustor.fmab.entity.ImmortalSoldierEntity;
 import com.ajustor.fmab.promised.NationalCircle;
 import com.ajustor.fmab.promised.PromisedDay;
@@ -16,11 +17,13 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.phys.AABB;
 
+import java.util.UUID;
+
 import static com.ajustor.fmab.gametest.GametestAsserts.check;
 
 /**
- * La fin du mod. Le Jour promis se ressent (l'alchimie faiblit, des soldats immortels sortent de
- * terre) ; puis, Père tombé, Hohenheim se repose : l'épilogue passe, le progrès « Fin » tombe et sa
+ * La fin du mod. Le Jour promis attend que des joueurs aient ouvert leur Porte ; puis il se ressent
+ * (l'alchimie faiblit, des soldats immortels sortent de terre) ; puis, Père tombé, Hohenheim se repose : l'épilogue passe, le progrès « Fin » tombe et sa
  * montre gravée reste au joueur. Lancer avec
  * {@code ./gradlew :fabric:26.2:runClientGameTest -PfmabGametest=ending}.
  */
@@ -37,9 +40,20 @@ public class EndingScenes implements FabricClientGameTest {
 			// Le jour de l'éclipse, en plein milieu.
 			sp.getServer().runCommand("time set " + (7 * 24000 + 6000));
 			context.waitTicks(5);
-			double alchemy = sp.getServer().computeOnServer(server -> {
+			// Seul, personne n'a encore ouvert sa Porte : l'éclipse n'éveille pas le cercle.
+			double asleep = sp.getServer().computeOnServer(server -> {
 				var p = server.getPlayerList().getPlayers().getFirst();
 				p.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 20 * 600, 4, false, false));
+				return PromisedDay.alchemy(p.level(), p.blockPosition());
+			});
+			check(asleep == 1, "sans sacrifices, l'éclipse ne devrait pas éveiller le cercle : " + asleep);
+			// Cinq alchimistes ont vu leur Porte : Père a ses sacrifices.
+			double alchemy = sp.getServer().computeOnServer(server -> {
+				var p = server.getPlayerList().getPlayers().getFirst();
+				NationalCircle circle = NationalCircle.get(server);
+				for (int i = 0; i < FmabConfig.get().promisedDaySacrifices(); i++) {
+					circle.sacrifice(UUID.nameUUIDFromBytes(("sacrifice" + i).getBytes()));
+				}
 				return PromisedDay.alchemy(p.level(), p.blockPosition());
 			});
 			check(alchemy == PromisedDay.WEAKENED, "le Jour promis devrait affaiblir l'alchimie : " + alchemy);
