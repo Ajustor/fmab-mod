@@ -23,6 +23,11 @@ footer = ""
 conventional_commits = true
 filter_unconventional = true
 split_commits = false
+# Un squash-merge garde le titre de la PR (pas conventionnel) : s'il porte des lignes
+# Changelog-*, on le lit comme une nouveauté au lieu de le perdre.
+commit_preprocessors = [
+  { pattern = '(?s)^([^\n:]+\(#\d+\)\n.*Changelog-)', replace = "feat: ${1}" },
+]
 commit_parsers = [
   { message = "^feat", group = "<!-- 0 -->Nouveautés" },
   { message = "^fix", group = "<!-- 1 -->Corrections" },
