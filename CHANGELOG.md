@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.21.0 — 2026-11-17
+
+### New features
+
+- The Promised Day awaits its sacrifices: an eclipse only awakens the national circle once 5 players have opened their Gate (configurable).
+- The website hides an alchemical pact behind the Konami code, with the Philosopher's Stone and human transmutation circles.
 ## 1.20.0 — 2026-10-28
 
 ### New features

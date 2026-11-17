@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 1.21.0 — 2026-11-17
+
+### Nouveautés
+
+- Le Jour promis attend ses sacrifices : une éclipse n'éveille le cercle national qu'une fois que 5 joueurs ont ouvert leur Porte (réglable).
+- Le site cache un pacte alchimique derrière le code Konami, avec les cercles de la Pierre philosophale et de la transmutation humaine.
 ## 1.20.0 — 2026-10-28
 
 ### Nouveautés
