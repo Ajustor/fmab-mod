@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.22.0 — 2026-11-18
+
+### Nouveautés
+
+- Les transmutations font jaillir de vrais éclairs, lumineux et ramifiés, à la place des zigzags de particules.
 ## 1.21.1 — 2026-11-18
 
 ### Corrections

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.22.0 — 2026-11-18
+
+### New features
+
+- Transmutations now unleash real lightning bolts, glowing and branching, instead of particle zigzags.
 ## 1.21.1 — 2026-11-18
 
 ### Fixes
