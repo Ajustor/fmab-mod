@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.21.1 — 2026-11-18
+
+### Corrections
+
+- Un clic sur un chapitre du sommaire du Traité l'ouvre de nouveau en 26.3.
 ## 1.21.0 — 2026-11-17
 
 ### Nouveautés

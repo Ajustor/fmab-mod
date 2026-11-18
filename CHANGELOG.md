@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.21.1 — 2026-11-18
+
+### Fixes
+
+- Clicking a chapter in the Treatise's table of contents opens it again on 26.3.
 ## 1.21.0 — 2026-11-17
 
 ### New features
