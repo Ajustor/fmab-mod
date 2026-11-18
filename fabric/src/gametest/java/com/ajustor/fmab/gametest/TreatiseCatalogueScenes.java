@@ -46,6 +46,14 @@ public class TreatiseCatalogueScenes implements FabricClientGameTest {
 			check(!contents(context, "treatise.fmab.stages.title"), "les étages devraient attendre le rang d'Alchimiste");
 			context.takeScreenshot("treatise_contents_apprentice");
 			context.setScreen(() -> null);
+			// Un clic gauche sur un titre du sommaire ouvre son chapitre (le bouton gauche n'a pas le même
+			// numéro en 26.2 et en 26.3).
+			context.setScreen(TreatiseScreen::new);
+			context.waitTick();
+			check(context.computeOnClient(client -> ((TreatiseScreen) client.gui.screen())
+					.clickContentsLink("treatise.fmab.design.title")), "un clic sur un chapitre du sommaire devrait l'ouvrir");
+			context.takeScreenshot("treatise_contents_clicked");
+			context.setScreen(() -> null);
 			sp.getServer().runOnServer(server -> {
 				var p = server.getPlayerList().getPlayers().getFirst();
 				FmabAttachments.ALCHEMIST.set(p, FmabAttachments.ALCHEMIST.getOrCreate(p).withRank(Rank.ALCHEMIST));

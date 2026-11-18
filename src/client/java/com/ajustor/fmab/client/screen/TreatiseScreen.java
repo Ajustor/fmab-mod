@@ -19,6 +19,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -210,7 +212,8 @@ public class TreatiseScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (index < 0 && event.button() == 0) {
+		// Jamais un numéro de bouton en dur : le clic gauche vaut 0 en 26.2, 1 en 26.3.
+		if (index < 0 && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 			for (Link link : links) {
 				if (link.open() && link.contains(event.x(), event.y())) {
 					minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
@@ -283,6 +286,22 @@ public class TreatiseScreen extends Screen {
 			case Treatise.SealPage seal -> seal.textKey();
 			case Treatise.GlyphCatalogue g -> "";
 		};
+	}
+
+	/**
+	 * Clique du bouton gauche, comme le joueur, au milieu du titre de ce chapitre dans le sommaire :
+	 * le Traité s'ouvre-t-il à la première page de ce chapitre ?
+	 */
+	public boolean clickContentsLink(String titleKey) {
+		for (Link link : links) {
+			if (treatise.chapters().get(link.chapter()).titleKey().equals(titleKey)) {
+				mouseClicked(new MouseButtonEvent(link.x() + link.width() / 2.0, link.y() + link.height() / 2.0,
+						new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
+				Entry e = current();
+				return e != null && treatise.chapters().get(e.chapter()).titleKey().equals(titleKey);
+			}
+		}
+		return false;
 	}
 
 	/** Ce chapitre est-il ouvert au lecteur (ses pages sont-elles dans le Traité) ? */
