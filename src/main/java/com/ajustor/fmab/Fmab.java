@@ -45,7 +45,6 @@ import com.ajustor.fmab.transmutation.GoldTransmutation;
 import com.ajustor.fmab.transmutation.ItemCompositions;
 import com.ajustor.fmab.transmutation.Passives;
 import com.ajustor.fmab.transmutation.Transmutation;
-import com.ajustor.fmab.transmutation.TransmutationLightning;
 import com.ajustor.fmab.util.PlayerMaps;
 import com.ajustor.fmab.world.FmabStructures;
 import com.ajustor.fmab.xing.Alkahestry;
@@ -86,7 +85,6 @@ public final class Fmab {
 		FmabCommands.register();
 		Concentration.register();
 		Passives.register();
-		TransmutationLightning.register();
 		HumanTransmutation.register();
 		com.ajustor.fmab.stone.StoneCircle.register();
 		com.ajustor.fmab.stone.StoneRite.register();

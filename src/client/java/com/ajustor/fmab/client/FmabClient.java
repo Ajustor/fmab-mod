@@ -1,6 +1,7 @@
 package com.ajustor.fmab.client;
 
 import com.ajustor.fmab.client.compat.IrisCompat;
+import com.ajustor.fmab.client.render.DischargeRenderer;
 import com.ajustor.fmab.client.render.EclipseSky;
 import com.ajustor.fmab.client.render.HandsLayer;
 import com.ajustor.fmab.client.render.Temper;
@@ -206,6 +207,7 @@ public final class FmabClient {
 		ClientPlatform.get().entityRenderer(FmabEntities.CHIMERA_BEAST, ChimeraBeastRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.CHIMERA_CRAWLER, ChimeraCrawlerRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.ALCHEMICAL_MINE, NoopRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.DISCHARGE, DischargeRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.THROWING_KNIFE, ThrowingKnifeRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.CORNELLO, CornelloRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.SCAR, ScarRenderer::new);
