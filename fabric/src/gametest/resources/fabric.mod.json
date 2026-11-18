@@ -59,7 +59,8 @@
 			"com.ajustor.fmab.gametest.OreScenes",
 			"com.ajustor.fmab.gametest.ClapAirScenes",
 			"com.ajustor.fmab.gametest.WornScenes",
-			"com.ajustor.fmab.gametest.GateReturnScenes"
+			"com.ajustor.fmab.gametest.GateReturnScenes",
+			"com.ajustor.fmab.gametest.LightningScenes"
 		]
 	},
 	"depends": {

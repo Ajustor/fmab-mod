@@ -1025,6 +1025,7 @@
   "treatise.fmab.ch12.p3": "Les soldats immortels, fabriqués sous Central, se régénèrent sans cesse et se relèvent une fois abattus. Le feu, le sabre de Briggs ou l'alkahestry les achèvent pour de bon.",
   "treatise.fmab.ch12.p4": "Les chimères sortent des laboratoires de l'armée et rôdent la nuit : la grande, lion, serpent et bouc, se dresse avant de frapper et empoisonne ; la rampante grimpe aux murs et sa morsure affaiblit.",
   "entity.fmab.alchemical_mine": "Mine alchimique",
+  "entity.fmab.discharge": "Décharge de transmutation",
   "entity.fmab.throwing_knife": "Couteau de lancer",
   "item.fmab.ishval_tattoo": "Notes du frère de Scar",
   "item.fmab.ishval_tattoo.tooltip": "Le tatouage qui unit l'alchimie et l'alkahestry. Clic droit : le graver sur votre bras droit.",

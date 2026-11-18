@@ -10,6 +10,7 @@ import com.ajustor.fmab.entity.character.StoryCharacterEntity;
 import com.ajustor.fmab.entity.character.StoryCharacter;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.entity.AlchemicalMineEntity;
+import com.ajustor.fmab.entity.DischargeEntity;
 import com.ajustor.fmab.entity.AmestrianSoldierEntity;
 import com.ajustor.fmab.entity.BarryEntity;
 import com.ajustor.fmab.entity.ChimeraBeastEntity;
@@ -418,7 +419,21 @@ public final class FmabEntities {
 					.clientTrackingRange(10)
 					.build(MARCOH_KEY));
 
-	private static final ResourceKey<EntityType<?>> FATHER_SUN_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("father_sun"));
+	private static final ResourceKey<EntityType<?>> DISCHARGE_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("discharge"));
+
+	/** Les éclairs d'une transmutation : quelques ticks, rien de sauvegardé, comme un éclair d'orage. */
+	public static final EntityType<DischargeEntity> DISCHARGE = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE,
+			DISCHARGE_KEY,
+			EntityType.Builder.<DischargeEntity>of(DischargeEntity::new, MobCategory.MISC)
+					.sized(0.5F, 0.5F)
+					.noSave()
+					.noSummon()
+					.fireImmune()
+					.clientTrackingRange(8)
+					.updateInterval(Integer.MAX_VALUE)
+					.build(DISCHARGE_KEY));
+
+	private static final ResourceKey<EntityType<?>> FATHER_SUN_KEY =ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("father_sun"));
 
 	/** Le petit soleil de Père, qu'on esquive ou qu'on renvoie d'un coup. */
 	public static final EntityType<FatherSunEntity> FATHER_SUN = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE, FATHER_SUN_KEY,
