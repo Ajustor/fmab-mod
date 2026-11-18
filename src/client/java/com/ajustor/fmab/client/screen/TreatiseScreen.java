@@ -290,9 +290,11 @@ public class TreatiseScreen extends Screen {
 
 	/**
 	 * Clique du bouton gauche, comme le joueur, au milieu du titre de ce chapitre dans le sommaire :
-	 * le Traité s'ouvre-t-il à la première page de ce chapitre ?
+	 * le Traité s'ouvre-t-il à la première page de ce chapitre ? Un nouveau venu ouvre le Traité à sa
+	 * première page : on revient d'abord au sommaire, comme lui avec « < ».
 	 */
 	public boolean clickContentsLink(String titleKey) {
+		go(-1);
 		for (Link link : links) {
 			if (treatise.chapters().get(link.chapter()).titleKey().equals(titleKey)) {
 				mouseClicked(new MouseButtonEvent(link.x() + link.width() / 2.0, link.y() + link.height() / 2.0,
