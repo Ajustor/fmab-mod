@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.23.0 — 2026-11-20
+
+### New features
+
+- Tattoos show the actual tattooed circle, on the palm, forearm, chest or back, and also on your own hand; as under real clothes, the skin's jacket or sleeves hide them where they are opaque.
 ## 1.22.0 — 2026-11-18
 
 ### New features

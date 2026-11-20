@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.23.0 — 2026-11-20
+
+### Nouveautés
+
+- Les tatouages montrent le vrai cercle tatoué, sur la paume, l'avant-bras, la poitrine ou le dos, et se voient aussi sur sa propre main ; comme sous un vrai vêtement, la veste ou les manches de la peau les cachent là où elles sont opaques.
 ## 1.22.0 — 2026-11-18
 
 ### Nouveautés
