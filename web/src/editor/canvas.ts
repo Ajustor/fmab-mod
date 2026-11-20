@@ -25,11 +25,11 @@ import type { Glyph } from "../alchemy/glyph";
 
 export type Tool = "line" | "circle" | "polygon" | "arc" | "dot" | "stamp";
 
-const PAPER = "#ede3c8";
+const PAPER = "#ece0c3";
 const GRID_LINE = "rgba(0,0,0,0.13)";
 const AXIS_LINE = "rgba(0,0,0,0.27)";
-const INK = "#2b2b40";
-const PREVIEW = "#3a6fd8";
+const INK = "#231d2b";
+const PREVIEW = "#9a6f24";
 const GLYPH_MARK = "#2e9e4f";
 const ISSUE_MARK = "#d03a2f";
 
