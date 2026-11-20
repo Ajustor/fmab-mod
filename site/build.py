@@ -326,6 +326,9 @@ def pact_circles():
         if not m:
             raise ValueError(f"cercle {name} introuvable dans {FORBIDDEN}")
         circles[key] = svg(json.loads(m.group(1)))
+        if key == "human":
+            # Le rituel du pacte (pact-ritual.js) trace ce cercle lui-même, trait par trait.
+            circles["ritual"] = json.loads(m.group(1))
     # « </ » dans un script fermerait la balise : on l'échappe.
     return json.dumps(circles).replace("</", "<\\/")
 

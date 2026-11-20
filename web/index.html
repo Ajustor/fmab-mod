@@ -5,17 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Éditeur de cercles — FMAB</title>
     <meta name="description" content="Concevoir des cercles de transmutation pour le mod FMAB et les importer dans le Carnet de cercles." />
+    <meta name="theme-color" content="#a8321e" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IM+Fell+English+SC&display=swap" />
   </head>
   <body>
-    <header>
-      <h1 data-i18n="editor.fmab.title">Éditeur de cercles</h1>
-      <span id="version" class="muted"></span>
+    <div class="page">
+    <!-- Le même bandeau que le site : l'éditeur est publié sous /editor/. -->
+    <header class="topbar">
+      <a class="brand" href="../index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14"/><polygon points="16,2 28,23 4,23"/><polygon points="13.5,9 18.5,9 16,13.5"/><circle cx="16" cy="20" r="2"/><line x1="14" y1="20" x2="18" y2="20"/></svg>FMAB</a>
+      <nav class="site-nav">
+        <a href="../index.html" data-i18n="editor.fmab.nav.home"></a>
+        <a href="../releases.html" data-i18n="editor.fmab.nav.releases"></a>
+        <a href="../changelog.html">Changelog</a>
+        <a href="../installation.html">Installation</a>
+        <a href="./" aria-current="page" data-i18n="editor.fmab.nav.editor"></a>
+      </nav>
       <nav class="langs">
         <button type="button" data-lang="fr_fr">FR</button>
         <button type="button" data-lang="en_us">EN</button>
       </nav>
     </header>
-    <p class="intro" data-i18n="editor.fmab.intro"></p>
+    <div class="masthead">
+      <div>
+        <p class="eyebrow" data-i18n="editor.fmab.eyebrow"></p>
+        <h1 data-i18n="editor.fmab.title">Éditeur de cercles</h1>
+        <p class="intro" data-i18n="editor.fmab.intro"></p>
+      </div>
+      <span id="version"></span>
+    </div>
     <main>
       <section class="board">
         <div class="tools">
@@ -70,6 +89,9 @@
       </aside>
     </main>
     <footer class="muted" data-i18n="editor.fmab.disclaimer"></footer>
+    </div>
     <script type="module" src="/src/main.ts"></script>
+    <!-- Le rituel du pacte : recopié depuis site/pact-ritual.js par scripts/sync-data.mjs. -->
+    <script src="pact-ritual.js" defer></script>
   </body>
 </html>

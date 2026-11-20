@@ -74,6 +74,8 @@ writeFileSync(join(web, "public", "data", "combinations.json"), JSON.stringify(c
 writeFileSync(join(web, "public", "data", "meta.json"), JSON.stringify(meta));
 writeFileSync(join(web, "public", "data", "examples.json"), JSON.stringify(examples));
 writeFileSync(join(web, "public", "data", "forbidden.json"), JSON.stringify(forbidden));
+// Le rituel du pacte alchimique, le même script que sur le site.
+writeFileSync(join(web, "public", "pact-ritual.js"), readFileSync(join(repo, "site", "pact-ritual.js"), "utf-8"));
 for (const lang of ["fr_fr", "en_us"]) {
   const source = join(resources, "assets", "fmab", "lang", `${lang}.json`);
   writeFileSync(join(web, "public", "lang", `${lang}.json`), readFileSync(source, "utf-8"));
