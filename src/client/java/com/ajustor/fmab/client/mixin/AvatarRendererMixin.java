@@ -95,13 +95,8 @@ public abstract class AvatarRendererMixin {
 		com.ajustor.fmab.data.Tattoos tattoos = FmabAttachments.TATTOOS.get(entity);
 		if (tattoos != null) {
 			for (com.ajustor.fmab.tattoo.TattooSlot slot : com.ajustor.fmab.tattoo.TattooSlot.values()) {
-				if (tattoos.get(slot).isPresent()) {
-					BodyPart part = switch (slot) {
-						case BACK, CHEST -> BodyPart.BODY;
-						default -> slot.isLeft() ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM;
-					};
-					out.add(new BodyHolder.Worn("tattoo_" + slot.id(), part));
-				}
+				tattoos.get(slot).filter(drawing -> !drawing.isEmpty())
+						.ifPresent(drawing -> out.add(HandsLayer.tattoo(slot, drawing)));
 			}
 		}
 		return out;
@@ -161,22 +156,24 @@ public abstract class AvatarRendererMixin {
 		fmab$glove(BodyPart.LEFT_ARM, poseStack, collector, light);
 	}
 
-	/** À la première personne, le gant porté à cette main, et le cercle qu'on y a inscrit. */
+	/**
+	 * À la première personne, ce que porte ce bras : le gant et le cercle qu'on y a inscrit, les cercles
+	 * tatoués dans la paume et sur l'avant-bras.
+	 */
 	@Unique
 	private void fmab$glove(BodyPart arm, PoseStack poseStack, SubmitNodeCollector collector, int light) {
 		Player player = Minecraft.getInstance().player;
 		if (!(player instanceof AbstractClientPlayer me) || BodyCache.of(player).lost().contains(arm)) {
 			return;
 		}
-		Gloves gloves = FmabAttachments.GLOVES.get(player);
-		boolean left = arm == BodyPart.LEFT_ARM;
-		BodyHolder.Worn glove = gloves == null ? null : HandsLayer.glove(gloves.get(left), left);
-		if (glove == null) {
-			return;
-		}
 		PlayerModel skeleton = (PlayerModel) ((LivingEntityRenderer<?, ?, ?>) (Object) this).getModel();
-		HandsLayer.submitHand(collector, poseStack, left ? skeleton.leftArm : skeleton.rightArm, glove,
-				me.getSkin().model() == PlayerModelType.SLIM, light);
+		ModelPart bone = arm == BodyPart.LEFT_ARM ? skeleton.leftArm : skeleton.rightArm;
+		boolean thin = me.getSkin().model() == PlayerModelType.SLIM;
+		for (BodyHolder.Worn worn : fmab$worn(me)) {
+			if (worn.part() == arm) {
+				HandsLayer.submitHand(collector, poseStack, bone, worn, thin, light);
+			}
+		}
 	}
 
 	@Unique
