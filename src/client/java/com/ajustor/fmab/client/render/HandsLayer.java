@@ -6,6 +6,8 @@ import com.ajustor.fmab.client.compat.RenderCompat;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.tattoo.BodySpot;
+import com.ajustor.fmab.tattoo.TattooSlot;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.HumanoidModel;
@@ -32,21 +34,20 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Ce qu'un joueur porte sur lui, vu de tous : ses gants, et ses cercles tatoués. Chaque pièce est un
- * calque au gabarit d'une peau de joueur ({@code textures/entity/worn/}, voir tools/skins), transparent
- * sauf là où elle se pose, dessiné sur un modèle qui ne montre que le membre qui la porte. Comme les
- * automails, ce modèle reprend la pose des bras et du buste du vrai modèle du joueur.
+ * Ce qu'un joueur porte sur lui, vu de tous : ses gants, et ses cercles tatoués. Un gant est un calque au
+ * gabarit d'une peau de joueur ({@code textures/entity/worn/}, voir tools/skins), transparent sauf là où
+ * il se pose, dessiné sur un modèle qui ne montre que le membre qui le porte. Comme les automails, ce
+ * modèle reprend la pose des bras et du buste du vrai modèle du joueur.
  *
  * <p>Un gant se pose aussi sur la couche des manches, pour qu'une peau aux manches longues ne le cache
- * pas, et le cercle qu'on y a inscrit se dessine au dos de la main, sur la face extérieure du bras. À la première personne, la main
- * ordinaire reçoit les mêmes ({@link #submitHand}).
+ * pas, et le vrai cercle qu'on y a inscrit se brode au dos de la main. Un tatouage n'a pas de calque :
+ * c'est le vrai cercle tatoué, à fleur de peau sous la couche des vêtements, qui le cache là où elle est
+ * opaque ({@link BodySpot}). À la première personne, la main ordinaire reçoit les mêmes
+ * ({@link #submitHand}).
  */
 public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
-	/** Le dos de la main, sur la face extérieure du bras : entre ses lignes 6 et 10, sur ses 4 pixels de profondeur. */
-	private static final float CIRCLE_Y = 8f / 16;
-	private static final float CIRCLE_HALF = 2f / 16;
-	/** De combien le cercle se tient au-dessus de la face : plus que la manche (un quart de pixel). */
-	private static final float LIFT = 0.3f / 16;
+	/** L'encre des tatouages : un noir violacé, qui se lit sur toutes les carnations. */
+	static final int TATTOO_INK = 0xFF1B1626;
 
 	private final Model wide;
 	private final Model slim;
@@ -78,28 +79,45 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 			if (holder.fmab$lostLimbs().contains(worn.part())) {
 				continue;
 			}
-			RenderCompat.submitModel(collector.order(1), new Shown(model, worn.part()), state, poseStack,
-					RenderTypes.entityCutout(texture(worn, thin)), light,
-					LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor);
-			ModelPart arm = worn.part() == BodyPart.RIGHT_ARM ? skeleton.rightArm
-					: worn.part() == BodyPart.LEFT_ARM ? skeleton.leftArm : null;
-			if (arm != null && worn.circle() != null) {
-				submitCircle(collector.order(2), poseStack, arm, worn, thin, light);
+			if (worn.texture() != null) {
+				RenderCompat.submitModel(collector.order(1), new Shown(model, worn.part()), state, poseStack,
+						RenderTypes.entityCutout(texture(worn, thin)), light,
+						LivingEntityRenderer.getOverlayCoords(state, 0.0F), state.outlineColor);
+			}
+			ModelPart bone = switch (worn.part()) {
+				case RIGHT_ARM -> skeleton.rightArm;
+				case LEFT_ARM -> skeleton.leftArm;
+				case BODY -> skeleton.body;
+				default -> null;
+			};
+			if (bone != null && worn.circle() != null) {
+				submitCircle(collector.order(2), poseStack, bone, worn, thin, light);
 			}
 		}
 	}
 
 	/**
-	 * La main vue de ses propres yeux, gantée : le calque du gant sur le bras que Minecraft vient de
-	 * soumettre, puis son cercle.
+	 * La main vue de ses propres yeux : le calque du gant sur le bras que Minecraft vient de soumettre,
+	 * puis le cercle qu'il porte, brodé ou tatoué.
 	 */
 	public static void submitHand(SubmitNodeCollector collector, PoseStack poseStack, ModelPart arm, BodyHolder.Worn worn,
 			boolean thin, int light) {
-		collector.order(1).submitModelPart(arm, poseStack, RenderTypes.entityCutout(texture(worn, thin)), light,
-				OverlayTexture.NO_OVERLAY, null);
+		if (worn.texture() != null) {
+			collector.order(1).submitModelPart(arm, poseStack, RenderTypes.entityCutout(texture(worn, thin)), light,
+					OverlayTexture.NO_OVERLAY, null);
+		}
 		if (worn.circle() != null) {
 			submitCircle(collector.order(2), poseStack, arm, worn, thin, light);
 		}
+	}
+
+	/** Le cercle tatoué à cet emplacement, à dessiner sur le membre qui le porte. */
+	public static BodyHolder.Worn tattoo(TattooSlot slot, Drawing drawing) {
+		BodyPart part = switch (slot) {
+			case BACK, CHEST -> BodyPart.BODY;
+			default -> slot.isLeft() ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM;
+		};
+		return new BodyHolder.Worn(null, part, drawing, TATTOO_INK, BodySpot.of(slot));
 	}
 
 	/** Le gant porté à cette main, à dessiner ; {@code null} si elle est nue. */
@@ -110,7 +128,7 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		Drawing circle = stack.get(FmabComponents.GLOVE_CIRCLE);
 		return new BodyHolder.Worn("glove_" + glove.kind().name().toLowerCase(Locale.ROOT),
 				left ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM, circle == null || circle.isEmpty() ? null : circle,
-				ink(glove.kind()));
+				ink(glove.kind()), BodySpot.HAND_BACK);
 	}
 
 	/** Le fil du cercle, choisi pour trancher sur le gant. */
@@ -130,43 +148,44 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		return Fmab.id("textures/entity/worn/" + worn.texture() + suffix + ".png");
 	}
 
-	/** Le cercle inscrit, posé sur le dos de la main dans le repère du bras. */
-	private static void submitCircle(OrderedSubmitNodeCollector collector, PoseStack poseStack, ModelPart arm,
+	/**
+	 * Le vrai cercle, dans le repère du membre qui le porte, au carré que lui donne son emplacement
+	 * ({@link BodySpot}) : brodé au dos de la main d'un gant, ou tatoué à fleur de peau.
+	 */
+	private static void submitCircle(OrderedSubmitNodeCollector collector, PoseStack poseStack, ModelPart bone,
 			BodyHolder.Worn worn, boolean thin, int light) {
-		// La face extérieure du bras : −X pour le bras droit, +X pour le gauche, à 3 pixels du pivot
-		// (2 pour les bras fins). C'est elle qu'on voit à droite de la main, à la première personne.
-		float side = worn.part() == BodyPart.RIGHT_ARM ? -1 : 1;
-		float x = side * ((thin ? 2f : 3f) / 16 + LIFT);
+		BodySpot.Placement at = worn.spot().place(worn.part() == BodyPart.LEFT_ARM, thin);
 		Identifier texture = CircleTextures.get(worn.circle(), worn.ink());
 		poseStack.pushPose();
-		arm.translateAndRotate(poseStack);
+		bone.translateAndRotate(poseStack);
 		collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, buffer) -> {
-			float y0 = CIRCLE_Y - CIRCLE_HALF, y1 = CIRCLE_Y + CIRCLE_HALF;
-			// Les coordonnées de texture suivent celles de la face sur une peau, qui se lit sans miroir vue
-			// de l'extérieur : u part de l'arrière du bras droit (+Z), de l'avant du bras gauche (−Z) ; le
-			// bas de la page suit +Y. Les deux faces : le dos du quadrilatère ne doit pas disparaître selon
-			// le sens où le bras est tourné.
-			float z0 = side * -CIRCLE_HALF, z1 = -z0;
-			vertex(buffer, pose, x, z0, y0, 0, 0, side, light);
-			vertex(buffer, pose, x, z1, y0, 1, 0, side, light);
-			vertex(buffer, pose, x, z1, y1, 1, 1, side, light);
-			vertex(buffer, pose, x, z0, y1, 0, 1, side, light);
-			vertex(buffer, pose, x, z0, y1, 0, 1, side, light);
-			vertex(buffer, pose, x, z1, y1, 1, 1, side, light);
-			vertex(buffer, pose, x, z1, y0, 1, 0, side, light);
-			vertex(buffer, pose, x, z0, y0, 0, 0, side, light);
+			// Les coins du carré : u suit l'axe horizontal de la page vu de l'extérieur, v le bas (+Y).
+			float h = at.half();
+			float x0 = at.x() - at.ux() * h, z0 = at.z() - at.uz() * h;
+			float x1 = at.x() + at.ux() * h, z1 = at.z() + at.uz() * h;
+			float y0 = at.y() - h, y1 = at.y() + h;
+			// Les deux faces : le dos du quadrilatère ne doit pas disparaître selon le sens où le membre
+			// est tourné.
+			vertex(buffer, pose, x0, y0, z0, 0, 0, at, light);
+			vertex(buffer, pose, x1, y0, z1, 1, 0, at, light);
+			vertex(buffer, pose, x1, y1, z1, 1, 1, at, light);
+			vertex(buffer, pose, x0, y1, z0, 0, 1, at, light);
+			vertex(buffer, pose, x0, y1, z0, 0, 1, at, light);
+			vertex(buffer, pose, x1, y1, z1, 1, 1, at, light);
+			vertex(buffer, pose, x1, y0, z1, 1, 0, at, light);
+			vertex(buffer, pose, x0, y0, z0, 0, 0, at, light);
 		});
 		poseStack.popPose();
 	}
 
-	private static void vertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float z, float y, float u, float v,
-			float side, int light) {
+	private static void vertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float z, float u, float v,
+			BodySpot.Placement at, int light) {
 		buffer.addVertex(pose, x, y, z)
 				.setColor(-1)
 				.setUv(u, v)
 				.setOverlay(OverlayTexture.NO_OVERLAY)
 				.setLight(light)
-				.setNormal(pose, side, 0, 0);
+				.setNormal(pose, at.nx(), 0, at.nz());
 	}
 
 	/** Le modèle du joueur, réduit au membre qui porte la pièce. */

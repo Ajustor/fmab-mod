@@ -2089,36 +2089,11 @@ def ink_ring(s, part, f, cx, cy, r, color):
                 s.px(part, f, x, y, color)
 
 
-TATTOO_INK = "#1b1626"
-TATTOO_PLACES = {
-    "palm_right": ("rarm", "front", 1.5, 9.5, 1.3),
-    "palm_left": ("larm", "front", 1.5, 9.5, 1.3),
-    "forearm_right": ("rarm", "right", 1.5, 5.5, 1.4),
-    "forearm_left": ("larm", "left", 1.5, 5.5, 1.4),
-    "back": ("body", "back", 3.5, 5.5, 3.0),
-    "chest": ("body", "front", 3.5, 4.5, 2.6),
-}
-
-
-def tattoo_layer(slot):
-    def draw(s):
-        part, f, cx, cy, r = TATTOO_PLACES[slot]
-        ink_ring(s, part, f, cx, cy, r, TATTOO_INK)
-        if r > 2:
-            # Sur le dos et la poitrine, un second anneau et le point du centre.
-            ink_ring(s, part, f, cx, cy, r - 1.5, TATTOO_INK)
-            s.px(part, f, int(cx + 0.5), int(cy + 0.5), TATTOO_INK)
-    return draw
-
-
 for _kind in GLOVE_COLORS:
     skin("worn/glove_" + _kind, volume=False)(glove_layer(_kind))
     # Les bras fins (Alex) n'ont pas le même gabarit : leur calque à part (voir HandsLayer).
     skin("worn/glove_" + _kind + "_slim", volume=False, slim=True)(glove_layer(_kind))
-for _slot in TATTOO_PLACES:
-    skin("worn/tattoo_" + _slot, volume=False)(tattoo_layer(_slot))
-    if TATTOO_PLACES[_slot][0] != "body":
-        skin("worn/tattoo_" + _slot + "_slim", volume=False, slim=True)(tattoo_layer(_slot))
+# Les tatouages n'ont plus de calque : le jeu dessine le vrai cercle tatoué (voir BodySpot).
 
 
 def build(names=None):
