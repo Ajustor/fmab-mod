@@ -6,6 +6,7 @@ import { CircleParser } from "./alchemy/parser";
 import { GlyphRecognizer } from "./alchemy/recognizer";
 import { CircleCanvas, type Tool } from "./editor/canvas";
 import { type Lang, detectLang, loadLang, rememberLang, t } from "./editor/i18n";
+import { isSealed, listenForPact, seal } from "./editor/pact";
 import {
   type Example,
   type PanelContext,
@@ -30,13 +31,19 @@ async function json<T>(path: string): Promise<T> {
 }
 
 async function main(): Promise<void> {
-  const [rawGlyphs, rawCombinations, meta, rawExamples] = await Promise.all([
+  const [rawGlyphs, rawCombinations, meta, rawExamples, rawForbidden] = await Promise.all([
     json<Record<string, unknown>[]>("data/glyphs.json"),
     json<(Record<string, unknown> & { id: string })[]>("data/combinations.json"),
     json<{ modVersion: string; minecraftVersion: string }>("data/meta.json"),
     json<{ textKey: string; primitives: Record<string, unknown>[] }[]>("data/examples.json"),
+    json<Record<"stone" | "human", Record<string, unknown>[]>>("data/forbidden.json"),
   ]);
   const examples: Example[] = rawExamples.map((e) => ({ textKey: e.textKey, primitives: e.primitives.map(primitiveFromJson) }));
+  // Les cercles interdits du pacte alchimique (code Konami).
+  const forbidden: Example[] = (["stone", "human"] as const).map((key) => ({
+    textKey: `editor.fmab.pact.${key}`,
+    primitives: rawForbidden[key].map(primitiveFromJson),
+  }));
   const glyphs: Glyph[] = rawGlyphs.map(parseGlyph);
   const combinations: Combination[] = rawCombinations.map((c) => parseCombination(c.id, c));
   const parser = new CircleParser(new GlyphRecognizer(glyphs));
@@ -112,6 +119,7 @@ async function main(): Promise<void> {
     $<HTMLButtonElement>("sides").textContent = t("notebook.fmab.sides", canvas.sides);
     $<HTMLButtonElement>("symmetry").textContent = t(canvas.symmetry ? "notebook.fmab.symmetry.on" : "notebook.fmab.symmetry.off");
     renderExamples($("examples"), examples, requiredRank, openExample);
+    renderExamples($("forbidden"), forbidden, requiredRank, openExample);
     note.hidden = true;
     renderPalette($("palette"), $("sheet"), ctx, (g) => {
       canvas.stampGlyph = g;
@@ -180,6 +188,13 @@ async function main(): Promise<void> {
       selectTool((["line", "circle", "polygon", "arc", "dot"] as Tool[])[Number(e.key) - 1]);
     }
   });
+
+  // Le pacte alchimique : le code Konami, comme sur le reste du site.
+  if (isSealed()) seal(true, true);
+  listenForPact((on) => {
+    if (on) $("pact").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  $("pact-leave").addEventListener("click", () => seal(false));
 
   // Un lien partagé porte le tracé dans l'adresse : #c=<code>.
   const shared = new URLSearchParams(window.location.hash.slice(1)).get("c");

@@ -27,7 +27,23 @@ const examples = treatise.chapters
   .filter((page) => page.example)
   .map((page) => ({ textKey: page.text, primitives: page.example }));
 
-const properties =readFileSync(join(repo, "gradle.properties"), "utf-8");
+// Les deux cercles interdits (pacte alchimique, code Konami), tels que le jeu les dessine.
+const forbiddenSource = readFileSync(
+  join(repo, "src", "main", "java", "com", "ajustor", "fmab", "alchemy", "ForbiddenCircles.java"),
+  "utf-8",
+);
+const forbidden = Object.fromEntries(
+  [
+    ["stone", "PHILOSOPHER_STONE"],
+    ["human", "HUMAN_TRANSMUTATION"],
+  ].map(([key, name]) => {
+    const m = forbiddenSource.match(new RegExp(`${name} = parse\\("""([\\s\\S]*?)"""\\);`));
+    if (!m) throw new Error(`cercle ${name} introuvable dans ForbiddenCircles.java`);
+    return [key, JSON.parse(m[1])];
+  }),
+);
+
+const properties = readFileSync(join(repo, "gradle.properties"), "utf-8");
 const field = (name) => properties.match(new RegExp(`^${name}=(.*)$`, "m"))?.[1]?.trim() ?? "?";
 const meta = {
   // En CI, le workflow de release passe la version du tag.
@@ -41,6 +57,7 @@ writeFileSync(join(web, "public", "data", "glyphs.json"), JSON.stringify(glyphs)
 writeFileSync(join(web, "public", "data", "combinations.json"), JSON.stringify(combinations));
 writeFileSync(join(web, "public", "data", "meta.json"), JSON.stringify(meta));
 writeFileSync(join(web, "public", "data", "examples.json"), JSON.stringify(examples));
+writeFileSync(join(web, "public", "data", "forbidden.json"), JSON.stringify(forbidden));
 for (const lang of ["fr_fr", "en_us"]) {
   const source = join(resources, "assets", "fmab", "lang", `${lang}.json`);
   writeFileSync(join(web, "public", "lang", `${lang}.json`), readFileSync(source, "utf-8"));

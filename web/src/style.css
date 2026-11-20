@@ -271,3 +271,81 @@ button.example .thumb {
   border-left: 3px solid var(--accent);
   background: var(--panel);
 }
+
+/* Le pacte alchimique : le code Konami fait passer l'éditeur au sang et à la craie rouge. */
+html.pact {
+  --bg: #110506;
+  --panel: #23090b;
+  --ink: #f2dcc8;
+  --muted: #b67c6c;
+  --edge: #7a2a1e;
+  --accent: #ff4a30;
+  background: #070203;
+}
+
+html.pact body {
+  min-height: 100vh;
+  background: radial-gradient(ellipse 90% 70% at 50% 0%, #4a110f 0%, #170607 60%, #070203 100%) no-repeat;
+}
+
+html.pact h1,
+html.pact h2 {
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 12px rgba(255, 74, 48, 0.45);
+}
+
+html.pact canvas#canvas {
+  border-color: #ff5a3c;
+  box-shadow: 0 0 6px rgba(255, 70, 40, 0.8), 0 0 22px rgba(255, 40, 20, 0.35);
+}
+
+.pact-section {
+  display: none;
+  margin-bottom: 12px;
+}
+
+html.pact .pact-section {
+  display: block;
+}
+
+.pact-section h2 {
+  margin-top: 0;
+}
+
+.pact-motto {
+  color: var(--muted);
+  font-style: italic;
+  margin: 0 0 8px;
+}
+
+.pact-section .examples {
+  grid-template-columns: repeat(2, minmax(96px, 1fr));
+}
+
+.pact-leave {
+  margin-top: 8px;
+}
+
+.pact-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: radial-gradient(circle at 50% 40%, #fff6e8 0%, #ff6a3c 35%, rgba(120, 10, 10, 0) 75%);
+  animation: pact-flash 1s ease-out forwards;
+}
+
+@keyframes pact-flash {
+  from {
+    opacity: 0.95;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pact-flash {
+    display: none;
+  }
+}
