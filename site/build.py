@@ -9,6 +9,7 @@ Bibliothèque standard uniquement.
 """
 import html
 import json
+import math
 import os
 import re
 import shutil
@@ -21,14 +22,6 @@ REPO = "https://github.com/Ajustor/fmab-mod"
 NAV = [("index.html", "Accueil", "Home"), ("releases.html", "Versions", "Releases"),
        ("changelog.html", "Changelog", "Changelog"), ("installation.html", "Installation", "Installation"),
        ("editor/", "Éditeur", "Editor")]
-
-
-NAV_STYLE = ("<style>.site-nav{margin:12px 0 0;font-size:.95rem}.site-nav a{color:var(--accent)}"
-             ".site-nav a[aria-current]{font-weight:bold;text-decoration:none;color:var(--ink)}"
-             "html[lang=fr] .site-nav [data-lang=en],html[lang=en] .site-nav [data-lang=fr]{display:none!important}"
-             ".release{border-bottom:1px solid var(--muted);padding:8px 0 16px}.badge{font-size:.8rem;"
-             "padding:1px 8px;border-radius:10px;background:var(--accent);color:#fff}.badge.pre{background:var(--muted)}"
-             "</style>")
 
 
 def template():
@@ -44,20 +37,26 @@ def nav(current):
     links = []
     for href, fr, en in NAV:
         mark = ' aria-current="page"' if href == current else ""
-        links.append(f'<a href="{href}"{mark}><span data-lang="fr" style="display:inline">{fr}</span>'
-                     f'<span data-lang="en" style="display:inline">{en}</span></a>')
-    return '<nav class="site-nav">' + " · ".join(links) + "</nav>"
+        links.append(f'<a href="{href}"{mark}><span data-lang="fr">{fr}</span><span data-lang="en">{en}</span></a>')
+    return '<nav class="site-nav">' + "".join(links) + "</nav>"
 
 
-def page(head, footer, tail, current, title_fr, title_en, body_fr, body_en):
-    lang_buttons = ('<div class="lang"><button data-set-lang="fr" aria-pressed="true">FR</button> '
-                    '<button data-set-lang="en" aria-pressed="false">EN</button></div>')
+def topbar(current, brand):
+    """Le bandeau commun : la marque (un petit cercle du mod), le menu et le choix de langue."""
+    lang_buttons = ('<div class="lang"><button type="button" data-set-lang="fr">FR</button>'
+                    '<button type="button" data-set-lang="en">EN</button></div>')
+    return (f'<header>\n<a class="brand" href="index.html">{brand}FMAB</a>\n{nav(current)}\n{lang_buttons}\n'
+            '</header>')
+
+
+def page(head, footer, tail, current, title_fr, title_en, body_fr, body_en, brand=""):
+    """Une page intérieure : le bandeau, le titre, puis le contenu sur une feuille du grimoire."""
     head = re.sub(r"<title>.*?</title>", f"<title>FMAB — {html.escape(title_en)}</title>", head, count=1)
-    style = NAV_STYLE
-    return (head.replace("</head>", style + "</head>") +
-            f"<main>\n<header><div><h1 data-lang=\"fr\">{html.escape(title_fr)}</h1>"
-            f"<h1 data-lang=\"en\">{html.escape(title_en)}</h1>{nav(current)}</div>{lang_buttons}</header>\n"
-            f"<section data-lang=\"fr\">{body_fr}</section>\n<section data-lang=\"en\">{body_en}</section>\n"
+    return (head + "<main>\n" + topbar(current, brand) + "\n"
+            f'<div class="page-title"><h1 data-lang="fr">{html.escape(title_fr)}</h1>'
+            f'<h1 data-lang="en">{html.escape(title_en)}</h1></div>\n'
+            f'<article class="sheet"><section data-lang="fr">{body_fr}</section>\n'
+            f'<section data-lang="en">{body_en}</section></article>\n'
             f"{footer}\n</main>\n{tail}")
 
 
@@ -119,8 +118,7 @@ def releases(data, fr):
         badge = ('<span class="badge pre">' + ("préversion" if fr else "pre-release") + "</span>") if pre \
             else ('<span class="badge">' + ("stable" if fr else "stable") + "</span>")
         # Un jar par version de Minecraft (fmab-fabric-1.7.0+26.3.jar ; fmab-1.6.0+26.2.jar avant).
-        jars = sorted((a for a in r.get("assets", []) if a.get("name", "").endswith(".jar")
-                       and not a["name"].endswith("-sources.jar")), key=lambda a: minecraft_of(a["name"]))
+        jars = mod_jars(r)
         link = " ".join(f'<a class="button" href="{html.escape(a["browser_download_url"])}">'
                         + ("Télécharger" if fr else "Download") + f" {html.escape(a['name'])}</a>" for a in jars) \
             or f'<a href="{html.escape(r.get("html_url", REPO))}">GitHub</a>'
@@ -165,10 +163,11 @@ INSTALL_EN = """
 FORBIDDEN = os.path.join(ROOT, "src", "main", "java", "com", "ajustor", "fmab", "alchemy", "ForbiddenCircles.java")
 
 
-def svg(primitives):
-    """Un dessin du mod (coordonnées 0 à 32, y vers le bas) en SVG, un trait après l'autre."""
+def svg(primitives, box="0 0 32 32", cls=None, dot=0.35):
+    """Un dessin du mod (y vers le bas) en SVG, un trait après l'autre : les cercles interdits et ceux
+    du Traité sur une grille de 0 à 32, les glyphes autour de l'origine (de -1 à 1)."""
     def n(v):
-        return f"{v:g}"
+        return f"{round(v, 3):g}"
 
     def points(pts):
         return " ".join(f"{n(x)},{n(y)}" for x, y in pts)
@@ -184,10 +183,138 @@ def svg(primitives):
         elif kind == "line":
             (x1, y1), (x2, y2) = p["from"], p["to"]
             shape = f'<line x1="{n(x1)}" y1="{n(y1)}" x2="{n(x2)}" y2="{n(y2)}"'
+        elif kind == "arc":
+            (cx, cy), r = p["center"], p["radius"]
+            start, sweep = p["start_deg"], p["sweep_deg"]
+            if abs(sweep) >= 360:
+                shape = f'<circle cx="{n(cx)}" cy="{n(cy)}" r="{n(r)}"'
+            else:
+                a0, a1 = math.radians(start), math.radians(start + sweep)
+                shape = (f'<path d="M{n(cx + r * math.cos(a0))} {n(cy + r * math.sin(a0))} '
+                         f'A{n(r)} {n(r)} 0 {1 if abs(sweep) > 180 else 0} {1 if sweep > 0 else 0} '
+                         f'{n(cx + r * math.cos(a1))} {n(cy + r * math.sin(a1))}"')
+        elif kind == "dot":
+            x, y = p["at"]
+            shape = f'<circle class="dot" cx="{n(x)}" cy="{n(y)}" r="{n(dot)}"'
         else:
-            raise ValueError(f"trait inconnu dans les cercles interdits : {kind}")
+            raise ValueError(f"trait inconnu : {kind}")
         parts.append(f'{shape} pathLength="1" style="--i:{i}"/>')
-    return '<svg viewBox="0 0 32 32" aria-hidden="true">' + "".join(parts) + "</svg>"
+    group = "".join(parts)
+    if cls:
+        group = f'<g class="{cls}">{group}</g>'
+    return f'<svg viewBox="{box}" aria-hidden="true">' + group + "</svg>"
+
+
+TREATISE = os.path.join(ROOT, "src", "main", "resources", "assets", "fmab", "treatise", "treatise.json")
+GLYPHS = os.path.join(ROOT, "src", "main", "resources", "data", "fmab", "fmab", "glyph")
+STONECUTTER = os.path.join(ROOT, "stonecutter.properties.toml")
+# Le cercle d'ouverture de l'accueil et celui de la marque, tirés du Traité.
+HERO_CIRCLE = "treatise.fmab.stages.bristling_rampart"
+BRAND_CIRCLE = "treatise.fmab.everyday.river"
+EDITOR_CIRCLE = "treatise.fmab.ch5.series_spikes"
+
+
+def treatise_circle(text_key):
+    treatise = json.load(open(TREATISE, encoding="utf-8"))
+    for chapter in treatise["chapters"]:
+        for p in chapter["pages"]:
+            if p.get("text") == text_key and p.get("example"):
+                return p["example"]
+    raise ValueError(f"cercle {text_key} introuvable dans le Traité")
+
+
+def glyph_svg(name):
+    glyph = json.load(open(os.path.join(GLYPHS, name + ".json"), encoding="utf-8"))
+    return svg(glyph["primitives"], box="-1.15 -1.15 2.3 2.3", cls="chalk", dot=0.07).replace(
+        "<svg ", '<svg class="glyph" ', 1)
+
+
+MONTHS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre",
+             "octobre", "novembre", "décembre"]
+MONTHS_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
+             "October", "November", "December"]
+
+
+def long_date(iso, fr):
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})", iso or "")
+    if not m:
+        return ""
+    y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    return f"{d} {MONTHS_FR[mo - 1]} {y}" if fr else f"{MONTHS_EN[mo - 1]} {d}, {y}"
+
+
+def minecraft_versions():
+    """Les versions de Minecraft prises en charge : une section par version dans Stonecutter."""
+    return re.findall(r'^\["([^"]+)"\]', open(STONECUTTER, encoding="utf-8").read(), re.M)
+
+
+def mod_jars(release):
+    """Les jars du mod d'une release, un par version de Minecraft, dans l'ordre des versions."""
+    return sorted((a for a in release.get("assets", []) if a.get("name", "").endswith(".jar")
+                   and not a["name"].endswith("-sources.jar")), key=lambda a: minecraft_of(a["name"]))
+
+
+def current_version(data):
+    """La version actuelle : la dernière release stable ; à défaut, le haut du changelog."""
+    for r in data or []:
+        if r.get("draft") or r.get("prerelease"):
+            continue
+        jars = [(minecraft_of(a["name"]), a["browser_download_url"]) for a in mod_jars(r)]
+        return {"version": r.get("tag_name", "").removeprefix("v"), "date": (r.get("published_at") or "")[:10],
+                "jars": jars, "minecraft": [mc for mc, _ in jars if mc] or minecraft_versions()}
+    path = os.path.join(ROOT, "CHANGELOG.fr.md")
+    if os.path.exists(path):
+        m = re.search(r"^## (\S+) — (\S+)", open(path, encoding="utf-8").read(), re.M)
+        if m:
+            return {"version": m.group(1), "date": m.group(2), "jars": [], "minecraft": minecraft_versions()}
+    return None
+
+
+EDITOR_BUTTON = ('<a class="button ghost" href="editor/"><span data-lang="fr">Ouvrir l\'éditeur</span>'
+                 '<span data-lang="en">Open the editor</span></a>')
+
+
+def version_html(current):
+    """Le sceau de la version actuelle, et un lien de téléchargement par version de Minecraft."""
+    if not current:
+        return ('<div class="actions"><a class="button" href="releases.html"><span data-lang="fr">Télécharger</span>'
+                '<span data-lang="en">Download</span></a>' + EDITOR_BUTTON + '</div>')
+    v = html.escape(current["version"])
+    mc = " · ".join(html.escape(x) for x in current["minecraft"])
+    seal = (f'<p class="seal"><span class="tag">v{v}</span><span class="meta">'
+            f'<span data-lang="fr">Publiée le {long_date(current["date"], True)}</span>'
+            f'<span data-lang="en">Released {long_date(current["date"], False)}</span>'
+            f' · Minecraft {mc}</span></p>')
+    actions = ('<div class="actions"><a class="button" href="releases.html">'
+               f'<span data-lang="fr">Télécharger la v{v}</span><span data-lang="en">Download v{v}</span></a>'
+               + EDITOR_BUTTON + '</div>')
+    direct = ""
+    if current["jars"]:
+        links = " · ".join(f'<a href="{html.escape(url)}">Minecraft {html.escape(mc)}</a>' for mc, url in current["jars"])
+        direct = (f'<p class="downloads"><span data-lang="fr">Jar direct :</span>'
+                  f'<span data-lang="en">Direct jar:</span> {links}</p>')
+    return seal + actions + direct
+
+
+def news_html(limit=5):
+    """Les dernières lignes du changelog, en français et en anglais, avec leur version."""
+    out = []
+    for name, lang in (("CHANGELOG.fr.md", "fr"), ("CHANGELOG.md", "en")):
+        path = os.path.join(ROOT, name)
+        if not os.path.exists(path):
+            continue
+        items, version = [], None
+        for line in open(path, encoding="utf-8").read().splitlines():
+            m = re.match(r"^## (\S+)", line)
+            if m:
+                version = m.group(1)
+            elif line.startswith("- ") and version:
+                items.append(f'<li><span class="v">v{html.escape(version)}</span>{inline(line[2:])}</li>')
+            if len(items) >= limit:
+                break
+        if items:
+            out.append(f'<ul class="news" data-lang="{lang}">' + "".join(items) + "</ul>")
+    return "".join(out)
 
 
 def pact_circles():
@@ -215,17 +342,20 @@ def main(out, releases_json=None):
     # Le pacte alchimique (code Konami) montre les cercles interdits, sur toutes les pages.
     circles = pact_circles()
     tail = with_pact(tail, circles)
-    # L'accueil reçoit le même menu que les autres pages.
-    index = os.path.join(out, "index.html")
-    home = with_pact(open(index, encoding="utf-8").read(), circles)
-    anchor = '    </div>\n    <div class="lang">'
-    if anchor in home:
-        home = home.replace(anchor, "      " + nav("index.html") + "\n" + anchor, 1)
-        home = home.replace("</head>", NAV_STYLE + "</head>", 1)
-    open(index, "w", encoding="utf-8", newline="\n").write(home)
     data = []
     if releases_json and os.path.exists(releases_json):
         data = json.load(open(releases_json, encoding="utf-8"))
+    brand = svg(treatise_circle(BRAND_CIRCLE), cls="chalk")
+    # L'accueil : le menu, le cercle d'ouverture, les glyphes, la version actuelle et les nouveautés.
+    index = os.path.join(out, "index.html")
+    home = with_pact(open(index, encoding="utf-8").read(), circles)
+    home = home.replace("<!--nav-->", nav("index.html"), 1).replace("<!--brand-circle-->", brand, 1)
+    home = home.replace("<!--hero-circle-->", svg(treatise_circle(HERO_CIRCLE), cls="chalk"), 1)
+    home = home.replace("<!--version-->", version_html(current_version(data)), 1)
+    home = home.replace("<!--news-->", news_html(), 1)
+    home = home.replace("<!--editor-circle-->", svg(treatise_circle(EDITOR_CIRCLE), cls="chalk"), 1)
+    home = re.sub(r"<!--glyph:(\w+)-->", lambda m: glyph_svg(m.group(1)), home)
+    open(index, "w", encoding="utf-8", newline="\n").write(home)
     pages = {
         "releases.html": ("Versions", "Releases", releases(data, True), releases(data, False)),
         "changelog.html": ("Journal des modifications", "Changelog",
@@ -235,7 +365,7 @@ def main(out, releases_json=None):
     }
     for name, (tfr, ten, bfr, ben) in pages.items():
         with open(os.path.join(out, name), "w", encoding="utf-8", newline="\n") as f:
-            f.write(page(head, footer, tail, name, tfr, ten, bfr, ben))
+            f.write(page(head, footer, tail, name, tfr, ten, bfr, ben, brand))
     print(f"site assemblé dans {out} ({len(data)} release(s))")
 
 
