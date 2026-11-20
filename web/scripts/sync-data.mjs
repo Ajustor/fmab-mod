@@ -2,6 +2,7 @@
 // exemples du Traité, fichiers de langue et version. L'éditeur affiche ainsi exactement ce que
 // le jeu connaît.
 
+import { execSync } from "node:child_process";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -45,10 +46,25 @@ const forbidden = Object.fromEntries(
 
 const properties = readFileSync(join(repo, "gradle.properties"), "utf-8");
 const field = (name) => properties.match(new RegExp(`^${name}=(.*)$`, "m"))?.[1]?.trim() ?? "?";
+// La dernière version publiée (tag vX.Y.Z), si le dépôt a ses tags ; sinon celle de gradle.properties.
+const lastTag = () => {
+  try {
+    return execSync("git describe --tags --abbrev=0 --match v*", { cwd: repo, stdio: ["ignore", "pipe", "ignore"] })
+      .toString()
+      .trim()
+      .replace(/^v/, "");
+  } catch {
+    return null;
+  }
+};
+// Les versions de Minecraft prises en charge : une section [« 26.2 »] par version dans Stonecutter.
+const minecraftVersions = [
+  ...readFileSync(join(repo, "stonecutter.properties.toml"), "utf-8").matchAll(/^\["([^"]+)"\]/gm),
+].map((m) => m[1]);
 const meta = {
   // En CI, le workflow de release passe la version du tag.
-  modVersion: process.env.FMAB_VERSION ?? field("mod_version"),
-  minecraftVersion: field("minecraft_version"),
+  modVersion: process.env.FMAB_VERSION ?? lastTag() ?? field("mod_version"),
+  minecraftVersion: minecraftVersions.join(", ") || "?",
 };
 
 mkdirSync(join(web, "public", "data"), { recursive: true });
