@@ -194,9 +194,12 @@ async function main(): Promise<void> {
 
   // Le pacte alchimique : le code Konami, comme sur le reste du site.
   if (isSealed()) seal(true, true);
-  listenForPact((on) => {
-    if (on) $("pact").scrollIntoView({ behavior: "smooth", block: "nearest" });
-  });
+  listenForPact(
+    (on) => {
+      if (on) $("pact").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    },
+    { primitives: rawForbidden.human, title: () => t("editor.fmab.pact.title"), motto: () => t("editor.fmab.pact.motto") },
+  );
   $("pact-leave").addEventListener("click", () => seal(false));
 
   // Un lien partagé porte le tracé dans l'adresse : #c=<code>.

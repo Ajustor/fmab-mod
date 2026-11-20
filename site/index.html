@@ -133,7 +133,7 @@
     .hero-circle svg { position: relative; width: 100%; height: 100%; overflow: visible; animation: spin 180s linear infinite; }
     .hero-circle .chalk { stroke-width: 0.2; filter: drop-shadow(0 0 3px color-mix(in srgb, var(--chalk) 55%, transparent)); }
     .hero-circle .chalk > * {
-      stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.6s cubic-bezier(.6, .05, .3, 1) forwards;
+      stroke-dasharray: 1.05; stroke-dashoffset: 1.05; animation: draw 1.6s cubic-bezier(.6, .05, .3, 1) forwards;
       animation-delay: calc(0.35s + var(--i, 0) * 90ms);
     }
     .hero-circle .chalk .dot { opacity: 0; animation: appear 0.4s forwards; animation-delay: calc(0.35s + var(--i, 0) * 90ms); }
@@ -270,7 +270,7 @@
       animation: spin 140s linear infinite, pact-pulse 3.2s ease-in-out infinite;
     }
     .pact-circles svg * {
-      stroke-dasharray: 1; stroke-dashoffset: 1;
+      stroke-dasharray: 1.05; stroke-dashoffset: 1.05;
       animation: draw 1.1s ease-out forwards;
       animation-delay: calc(var(--i, 0) * 55ms);
     }
@@ -450,18 +450,36 @@
       section.querySelector(".pact-leave").addEventListener("click", function () { seal(false); });
     }
 
-    function seal(on, quiet) {
-      var root = document.documentElement;
+    function apply(on) {
       if (on && !section) build();
-      root.classList.toggle("pact", on);
+      document.documentElement.classList.toggle("pact", on);
       try { localStorage.setItem("fmab-pact", on ? "1" : "0"); } catch (e) {}
-      if (on && !quiet) {
-        var flash = document.createElement("div");
-        flash.className = "pact-flash";
-        document.body.appendChild(flash);
-        setTimeout(function () { flash.remove(); }, 1100);
-        if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function seal(on, quiet) {
+      if (!on || quiet) return apply(on);
+      // Le rituel (pact-ritual.js) trace le cercle interdit et passe la page au rouge au plus fort
+      // de l'éclair ; sans lui, un simple éclair.
+      var reveal = function () {
+        apply(true);
+        if (section) section.scrollIntoView({ block: "start" });
+      };
+      if (window.fmabPactRitual && CIRCLES.ritual) {
+        var fr = document.documentElement.lang !== "en";
+        window.fmabPactRitual({
+          primitives: CIRCLES.ritual,
+          title: fr ? "Le pacte est scellé" : "The pact is sealed",
+          motto: fr ? "Pour obtenir, il faut donner en retour quelque chose de valeur égale."
+            : "To obtain, something of equal value must be lost.",
+          onSealed: reveal
+        });
+        return;
       }
+      reveal();
+      var flash = document.createElement("div");
+      flash.className = "pact-flash";
+      document.body.appendChild(flash);
+      setTimeout(function () { flash.remove(); }, 1100);
     }
 
     document.addEventListener("keydown", function (e) {
@@ -479,5 +497,6 @@
     if (kept === "1") seal(true, true);
   })();
 </script>
+<script src="pact-ritual.js" defer></script>
 </body>
 </html>
