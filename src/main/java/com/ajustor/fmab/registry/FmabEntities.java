@@ -1,6 +1,8 @@
 package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.entity.DrachmaGeneralEntity;
+import com.ajustor.fmab.entity.FailedTransmutationEntity;
+import com.ajustor.fmab.entity.GreatCircleEntity;
 import com.ajustor.fmab.entity.KimbleeEntity;
 import com.ajustor.fmab.entity.SlicerEntity;
 import java.util.Map;
@@ -433,6 +435,32 @@ public final class FmabEntities {
 					.updateInterval(Integer.MAX_VALUE)
 					.build(DISCHARGE_KEY));
 
+	private static final ResourceKey<EntityType<?>> GREAT_CIRCLE_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("great_circle"));
+
+	/** Un cercle géant qui s'allume d'un relais à l'autre : quelques secondes, rien de sauvegardé. */
+	public static final EntityType<GreatCircleEntity> GREAT_CIRCLE = Platform.get().content().register(BuiltInRegistries.ENTITY_TYPE,
+			GREAT_CIRCLE_KEY,
+			EntityType.Builder.<GreatCircleEntity>of(GreatCircleEntity::new, MobCategory.MISC)
+					.sized(0.5F, 0.5F)
+					.noSave()
+					.noSummon()
+					.fireImmune()
+					.clientTrackingRange(16)
+					.updateInterval(Integer.MAX_VALUE)
+					.build(GREAT_CIRCLE_KEY));
+
+	private static final ResourceKey<EntityType<?>> FAILED_TRANSMUTATION_KEY =
+			ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("failed_transmutation"));
+
+	/** Ce qui naît d'une transmutation humaine : rien qui ait forme humaine. */
+	public static final EntityType<FailedTransmutationEntity> FAILED_TRANSMUTATION = Platform.get().content().register(
+			BuiltInRegistries.ENTITY_TYPE, FAILED_TRANSMUTATION_KEY,
+			EntityType.Builder.<FailedTransmutationEntity>of(FailedTransmutationEntity::new, MobCategory.MONSTER)
+					.sized(1.5F, 1.0F)
+					.eyeHeight(0.7F)
+					.clientTrackingRange(10)
+					.build(FAILED_TRANSMUTATION_KEY));
+
 	private static final ResourceKey<EntityType<?>> FATHER_SUN_KEY =ResourceKey.create(Registries.ENTITY_TYPE, Fmab.id("father_sun"));
 
 	/** Le petit soleil de Père, qu'on esquive ou qu'on renvoie d'un coup. */
@@ -509,6 +537,7 @@ public final class FmabEntities {
 		content.attributes(KIMBLEE, KimbleeEntity.createAttributes());
 		content.attributes(CHIMERA_BEAST, ChimeraBeastEntity.createAttributes());
 		content.attributes(CHIMERA_CRAWLER, ChimeraCrawlerEntity.createAttributes());
+		content.attributes(FAILED_TRANSMUTATION, FailedTransmutationEntity.createAttributes());
 		content.attributes(CORNELLO, CornelloEntity.createAttributes());
 		content.attributes(SCAR, ScarEntity.createAttributes());
 		content.attributes(HOHENHEIM, HohenheimEntity.createAttributes());

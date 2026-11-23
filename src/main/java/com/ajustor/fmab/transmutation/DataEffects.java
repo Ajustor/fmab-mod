@@ -188,6 +188,12 @@ public final class DataEffects {
 		BlockPos o = ctx.origin();
 		int r = ctx.range();
 		List<BlockPos> out = new ArrayList<>();
+		if (ctx.great()) {
+			// Un cercle géant : toute sa zone à l'horizontale, la portée du cercle en hauteur.
+			out.addAll(greatZone(ctx, zone));
+			out.remove(ctx.circle());
+			return out;
+		}
 		switch (zone) {
 			case "cube" -> BlockPos.betweenClosed(o.offset(-r, -r, -r), o.offset(r, r, r)).forEach(p -> out.add(p.immutable()));
 			case "below" -> BlockPos.betweenClosed(o.below().offset(-r, -r, -r), o.below().offset(r, 0, r)).forEach(p -> out.add(p.immutable()));
@@ -220,6 +226,46 @@ public final class DataEffects {
 		}
 		// Le support est de la matière comme une autre : s'il cède, le cercle part avec lui.
 		out.remove(ctx.circle());
+		return out;
+	}
+
+	/**
+	 * La zone d'un cercle géant : un mur ou une colonne suivent son tour et ses relais ; le reste
+	 * s'étend sur tout le disque, aussi profond ou haut qu'un cercle ordinaire.
+	 */
+	private static List<BlockPos> greatZone(EffectContext ctx, String zone) {
+		BlockPos o = ctx.origin();
+		int r = ctx.range();
+		int reach = ctx.reach();
+		int height = ctx.grown(WALL_HEIGHT);
+		List<BlockPos> out = new ArrayList<>();
+		switch (zone) {
+			case "wall" -> {
+				List<BlockPos> ring = GreatCircle.circumference(ctx.circle(), ctx.ring().radius());
+				for (int h = 0; h < height; h++) {
+					for (BlockPos p : ring) {
+						out.add(p.above(h));
+					}
+				}
+			}
+			case "column" -> {
+				for (int h = 0; h < height; h++) {
+					for (BlockPos relay : ctx.ring().relays()) {
+						out.add(relay.above(h));
+					}
+				}
+			}
+			case "area" -> out.addAll(Effects.area(ctx, 0));
+			default -> {
+				int below = zone.equals("below") ? -r - 1 : -r;
+				int above = zone.equals("below") ? -1 : r;
+				for (BlockPos p : BlockPos.betweenClosed(o.offset(-reach, below, -reach), o.offset(reach, above, reach))) {
+					if (ctx.within(p)) {
+						out.add(p.immutable());
+					}
+				}
+			}
+		}
 		return out;
 	}
 
@@ -319,7 +365,7 @@ public final class DataEffects {
 	private static Effects.Result entities(EffectContext ctx, JsonObject s) {
 		ServerLevel level = ctx.level();
 		Vec3 center = Vec3.atCenterOf(ctx.origin());
-		double r = ctx.range();
+		double r = ctx.reach();
 		Predicate<Entity> filter = entityFilter(text(s, "filter", "living"));
 		String operation = text(s, "operation", "damage");
 		boolean friendly = operation.equals("heal") || operation.equals("grow_up");
@@ -388,8 +434,11 @@ public final class DataEffects {
 				// Les objets au sol à portée viennent sur le cercle.
 				Vec3 c = Vec3.atCenterOf(ctx.circle());
 				int moved = 0;
-				for (ItemEntity item : ctx.level().getEntitiesOfClass(ItemEntity.class, new AABB(ctx.origin()).inflate(ctx.range()))) {
-					if (!item.getBoundingBox().intersects(ctx.onCircle())) {
+				// Ceux d'un cercle géant viennent de toute sa zone sur le cercle central.
+				AABB onCenter = new AABB(ctx.circle()).inflate(1, 0.5, 1);
+				for (ItemEntity item : ctx.level().getEntitiesOfClass(ItemEntity.class,
+						new AABB(ctx.origin()).inflate(ctx.reach(), ctx.range(), ctx.reach()))) {
+					if (!item.getBoundingBox().intersects(onCenter)) {
 						item.teleportTo(c.x, c.y, c.z);
 						item.setDeltaMovement(Vec3.ZERO);
 						moved++;

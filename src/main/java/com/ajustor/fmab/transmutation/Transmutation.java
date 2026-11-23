@@ -1,5 +1,6 @@
 package com.ajustor.fmab.transmutation;
 
+import com.ajustor.fmab.alchemy.ForbiddenCircles;
 import com.ajustor.fmab.promised.PromisedDay;
 import com.ajustor.fmab.alchemy.circle.CircleIssue;
 import com.ajustor.fmab.alchemy.circle.LinkKind;
@@ -199,6 +200,9 @@ public final class Transmutation {
 			caster.sendOverlayMessage(Component.translatable("promised.fmab.weakened"));
 			fusion *= promised;
 		}
+		// Des relais tout autour : la transmutation porte sur tout le cercle géant. Ce sont les relais
+		// qui portent l'énergie jusque-là : elle ne coûte pas plus que le cercle central.
+		GreatCircle.Ring ring = inscribed ? GreatCircle.around(level, circle).orElse(null) : null;
 		int cost = amplified ? 0 : (int) Math.ceil(StateWatch.cost(analysis.concentration(), watch) * size.cost()
 				* (fused ? 0.5 : 1));
 		float concentration = Concentration.of(caster);
@@ -258,7 +262,7 @@ public final class Transmutation {
 			for (Analysis.StageEffect effect : effects) {
 				EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, flow, knowledge,
 						watch ? StateWatch.RANGE_BONUS : 0,
-						size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1) * fusion, 0);
+						size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1) * fusion, 0, ring);
 				Effects.Result result = Effects.run(effect.combination(), ctx);
 				flow.removeIf(ItemStack::isEmpty);
 				if (result == Effects.Result.DONE) {
@@ -285,6 +289,10 @@ public final class Transmutation {
 				CHANNELS.put(caster.getUUID(), new Channel(circle, level.getGameTime(), 0));
 			}
 			TransmutationLightning.discharge(level, circle, size.blocks() / 2.0, 1, amplified);
+			// Le cercle géant s'allume avec lui (la Pierre allume le sien elle-même, au sacrifice).
+			if (ring != null && !done.contains(ForbiddenCircles.PHILOSOPHER_STONE_EFFECT)) {
+				GreatCircle.flash(level, ring, amplified);
+			}
 			// Le souffle de l'alchimie, puis le son de ce qu'elle a fait de la matière.
 			level.playSound(null, circle, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 0.5f, 1.4f);
 			level.playSound(null, circle, schoolSound(practiced.getFirst()), SoundSource.PLAYERS, 1, 1);
@@ -401,6 +409,7 @@ public final class Transmutation {
 		Knowledge knowledge = rules.knowledge(alchemist);
 		boolean watch = StateWatch.empowers(caster);
 		boolean anything = false;
+		GreatCircle.Ring ring = GreatCircle.around(level, circle).orElse(null);
 		for (Analysis.StageEffect effect : analysis.effects()) {
 			Effects.Channel mode = Effects.channel(effect.combination());
 			if (mode == Effects.Channel.ONCE) {
@@ -409,7 +418,7 @@ public final class Transmutation {
 			EffectContext ctx = new EffectContext(level, circle, frame, caster, effect, new ArrayList<>(), knowledge,
 					watch ? StateWatch.RANGE_BONUS : 0,
 					size.power() * (amplified ? PhilosopherStones.AMPLIFICATION : 1),
-					mode == Effects.Channel.GROW ? growth(prolonged, living) : 0);
+					mode == Effects.Channel.GROW ? growth(prolonged, living) : 0, ring);
 			Effects.Result result = Effects.run(effect.combination(), ctx);
 			anything |= result == Effects.Result.DONE;
 		}

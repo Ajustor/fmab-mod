@@ -24,6 +24,8 @@ import java.util.UUID;
  */
 public class TransmutationCircleBlockEntity extends BlockEntity {
 	private Drawing drawing = Drawing.EMPTY;
+	/** Quand le tracé a été posé, en temps de jeu : le premier d'un cercle géant en est le centre. */
+	private long drawnAt;
 	private CircleSize size = CircleSize.NORMAL;
 	private CircleTrigger trigger = CircleTrigger.HAND;
 	/** Qui a armé le déclencheur : le cercle puise dans sa concentration. */
@@ -44,10 +46,17 @@ public class TransmutationCircleBlockEntity extends BlockEntity {
 
 	public void setDrawing(Drawing drawing) {
 		this.drawing = drawing;
+		if (level != null) {
+			drawnAt = level.getGameTime();
+		}
 		setChanged();
 		if (level != null) {
 			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
 		}
+	}
+
+	public long drawnAt() {
+		return drawnAt;
 	}
 
 	public CircleSize size() {
@@ -117,6 +126,7 @@ public class TransmutationCircleBlockEntity extends BlockEntity {
 			output.store("author", UUIDUtil.CODEC, author);
 		}
 		output.putBoolean("powered", powered);
+		output.putLong("drawn_at", drawnAt);
 	}
 
 	@Override
@@ -127,6 +137,7 @@ public class TransmutationCircleBlockEntity extends BlockEntity {
 		trigger = CircleTrigger.byOrdinal(input.getIntOr("trigger", 0));
 		author = input.read("author", UUIDUtil.CODEC).orElse(null);
 		powered = input.getBooleanOr("powered", false);
+		drawnAt = input.getLongOr("drawn_at", 0L);
 	}
 
 	@Override

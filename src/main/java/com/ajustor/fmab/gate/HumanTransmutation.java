@@ -1,7 +1,9 @@
 package com.ajustor.fmab.gate;
 
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.entity.FailedTransmutationEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.Karma;
 import com.ajustor.fmab.stone.LivingStone;
@@ -17,16 +19,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.zombie.Husk;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -241,16 +239,17 @@ public final class HumanTransmutation {
 		}
 	}
 
-	/** Ce qui naît du cercle n'a rien d'humain. */
+	/**
+	 * Ce qui naît du cercle n'a rien d'humain : une masse de chair sur six bras, qui respire mal et ne
+	 * tient pas (voir
+	 * {@link FailedTransmutationEntity}).
+	 */
 	private static void spawnCreature(ServerLevel level, BlockPos circle) {
-		Husk creature = EntityTypes.HUSK.create(level, EntitySpawnReason.MOB_SUMMONED);
+		FailedTransmutationEntity creature = FmabEntities.FAILED_TRANSMUTATION.create(level, EntitySpawnReason.MOB_SUMMONED);
 		if (creature == null) {
 			return;
 		}
 		creature.setPos(Vec3.atBottomCenterOf(circle));
-		creature.setCustomName(Component.translatable("entity.fmab.failed_transmutation"));
-		creature.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 20 * 60 * 10, 1));
-		creature.addEffect(new MobEffectInstance(MobEffects.WITHER, 20 * 60, 0));
 		level.addFreshEntity(creature);
 	}
 }

@@ -85,8 +85,13 @@ public final class Recomposition {
 		Set<String> aimed = ctx.stage().combination().elements();
 		BlockPos o = ctx.origin();
 		int r = ctx.range();
+		// Un cercle géant mine jusqu'à ses relais, aussi profond qu'un cercle ordinaire.
+		int reach = ctx.reach();
 		int broken = 0;
-		for (BlockPos p : BlockPos.betweenClosed(o.offset(-r, -r, -r), o.offset(r, r, r))) {
+		for (BlockPos p : BlockPos.betweenClosed(o.offset(-reach, -r, -reach), o.offset(reach, r, reach))) {
+			if (!ctx.within(p)) {
+				continue;
+			}
 			BlockState state = level.getBlockState(p);
 			if (!state.is(ORES) || state.hasBlockEntity() || state.getDestroySpeed(level, p) < 0
 					|| !minable(composition(level, state.getBlock().asItem()).map(Composition::principal), aimed)) {
