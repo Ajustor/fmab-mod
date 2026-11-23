@@ -67,7 +67,7 @@ public final class CopperCircuits {
 	/** Cuivre + Projeter : les circuits alentour se défont, et rendent leurs pièces. */
 	private static Effects.Result cut(EffectContext ctx) {
 		ServerLevel level = ctx.level();
-		int r = ctx.range() + 2;
+		int r = ctx.reach() + 2;
 		int cut = 0;
 		for (BlockPos p : BlockPos.betweenClosed(ctx.origin().offset(-r, -1, -r), ctx.origin().offset(r, 2, r))) {
 			if (conducts(level.getBlockState(p))) {

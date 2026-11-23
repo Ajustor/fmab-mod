@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import com.ajustor.fmab.compat.EntityCompat;
 
 /**
@@ -30,10 +31,21 @@ import com.ajustor.fmab.compat.EntityCompat;
  * @param power      multiplicateur de portée et de dégâts : la taille du cercle tracé
  * @param growth     combien de fois l'alchimiste a prolongé la transmutation en gardant la main sur
  *                   le cercle (0 au premier contact)
+ * @param ring       le cercle géant dont ce cercle est le centre (voir {@link GreatCircle}), ou null :
+ *                   l'effet agit alors sur toute sa zone, jusqu'aux relais
  */
 public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame frame, ServerPlayer caster,
 		Analysis.StageEffect stage, List<ItemStack> flow, Knowledge knowledge, int rangeBonus, double power,
-		int growth) {
+		int growth, GreatCircle.@Nullable Ring ring) {
+	/** Un cercle seul, sans relais. */
+	public EffectContext(ServerLevel level, BlockPos circle, CircleFrame frame, ServerPlayer caster,
+			Analysis.StageEffect stage, List<ItemStack> flow, Knowledge knowledge, int rangeBonus, double power,
+			int growth) {
+		this(level, circle, frame, caster, stage, flow, knowledge, rangeBonus, power, growth, null);
+	}
+
+	/** Au-dessus et au-dessous du centre, ce que la zone d'un cercle géant couvre encore. */
+	private static final int GREAT_HEIGHT = 4;
 	/** Un satellite agit à ce nombre de blocs du centre, du côté de son sommet. */
 	private static final int SATELLITE_OFFSET = 2;
 
@@ -44,15 +56,42 @@ public record EffectContext(ServerLevel level, BlockPos circle, CircleFrame fram
 
 	/** D'où part l'effet : le cercle, ou le côté de son satellite. */
 	public BlockPos origin() {
-		if (stage.satellite() < 0) {
+		// Un cercle géant agit depuis son centre : ses satellites sont à l'échelle d'un cercle ordinaire.
+		if (stage.satellite() < 0 || great()) {
 			return circle;
 		}
 		return circle.relative(frame.toWorld(stage.origin().angle()), SATELLITE_OFFSET);
 	}
 
-	/** Zone où l'on pose les objets à transmuter : le cercle et un peu autour. */
+	/**
+	 * Zone où l'on pose les objets à transmuter : le cercle et un peu autour ; tout le cercle géant,
+	 * quand il y en a un.
+	 */
 	public AABB onCircle() {
+		if (great()) {
+			return new AABB(circle).inflate(reach(), GREAT_HEIGHT, reach());
+		}
 		return new AABB(circle).inflate(1, 0.5, 1);
+	}
+
+	/** Le cercle est-il le centre d'un cercle géant ? Ses effets couvrent alors toute la zone. */
+	public boolean great() {
+		return ring != null;
+	}
+
+	/**
+	 * Jusqu'où l'effet s'étend à l'horizontale : sa portée, ou jusqu'aux relais d'un cercle géant.
+	 * La portée ({@link #range()}) reste celle du cercle pour la profondeur et la hauteur.
+	 */
+	public int reach() {
+		return great() ? (int) Math.ceil(ring.radius()) : range();
+	}
+
+	/** Ce point est-il dans la zone, à l'horizontale ? */
+	public boolean within(BlockPos p) {
+		double dx = p.getX() - origin().getX(), dz = p.getZ() - origin().getZ();
+		double r = reach() + 0.5;
+		return dx * dx + dz * dz <= r * r;
 	}
 
 	/**

@@ -399,6 +399,63 @@ def automail_blade(s):
     s.material("spine", "bottom", "#3a3e44", "metal")
 
 
+# --- transmutation humaine ----------------------------------------------------------------------
+@creature("failed_transmutation", (128, 64), {
+    "mass": (0, 0, 10, 6, 12), "hump": (44, 0, 6, 4, 6), "head": (68, 0, 6, 5, 6), "arm": (92, 0, 2, 8, 2),
+    "forearm": (100, 0, 2, 9, 2), "hand": (108, 0, 3, 1, 3), "gut": (20, 20, 2, 2, 6),
+    "vertebra": (40, 20, 2, 2, 2), "eye": (104, 20, 2, 2, 1), "jaw": (110, 20, 4, 2, 3)})
+def failed_transmutation(s):
+    """Ce qui sort d'une transmutation humaine : une masse de chair à vif sur six bras, rouge sombre et
+    grise par plaques, suintante de noir, une crête de vertèbres, un œil jaune unique, des entrailles
+    violacées."""
+    flesh, raw, grey, ichor = "#8a4a46", "#b0605a", "#6a5a58", "#1a0c0e"
+    bone, gut = "#d8cdb0", "#6a2a3e"
+    for part in ("mass", "hump", "head", "arm", "forearm", "hand", "jaw"):
+        s.fill(part, flesh, "skin")
+    # Des plaques : chair à vif, peau grise et morte, et l'encre noire qui suinte.
+    patches = [("mass", "top", 1, 2, 4, 5, raw), ("mass", "top", 6, 6, 3, 4, grey), ("mass", "right", 2, 1, 5, 3, raw),
+               ("mass", "left", 6, 2, 4, 2, grey), ("mass", "front", 1, 1, 3, 3, grey), ("hump", "top", 1, 1, 3, 3, raw),
+               ("head", "top", 1, 1, 3, 4, grey), ("head", "right", 1, 0, 3, 3, raw)]
+    for part, f, x, y, w, h, c in patches:
+        s.material(part, f, c, "skin", x=x, y=y, w=w, h=h)
+    for part, f, x, y, h in (("mass", "right", 8, 2, 4), ("mass", "left", 3, 3, 3), ("mass", "front", 6, 2, 4),
+                             ("hump", "right", 2, 1, 3),
+                             ("head", "front", 0, 2, 3)):
+        for n in range(h):
+            s.px(part, f, x, y + n, ichor)
+            if n % 2 == 0:
+                s.tint(part, f, x + 1, y + n, 1, 1, 0.7)
+    # Des veines sombres sur les membres, des ongles noirs.
+    for part in ("arm", "forearm"):
+        s.material(part, "front", grey, "skin", y=2, h=3)
+        for f in SIDES:
+            w, h = s.size(part, f)
+            s.seam(part, f, w // 2, 0, h, shade(flesh, 0.6))
+    s.material("hand", "bottom", shade(flesh, 0.75), "skin")
+    for f in SIDES:
+        w, h = s.size("hand", f)
+        for x in range(0, w, 2):
+            s.px("hand", f, x, h - 1, ichor)
+    # Les vertèbres jaunies, plus sombres au sommet.
+    s.fill("vertebra", bone, "stone")
+    s.material("vertebra", "top", shade(bone, 0.8), "stone")
+    s.fill("gut", gut, "skin")
+    for f in SIDES:
+        w, h = s.size("gut", f)
+        for x in range(0, w, 2):
+            s.tint("gut", f, x, 0, 1, h, 0.75)
+    # La tête : l'orbite creuse et noire, la mâchoire édentée sauf deux crocs.
+    s.rect("head", "front", 3, 1, 2, 2, ichor)
+    s.rect("head", "front", 1, 4, 4, 1, shade(flesh, 0.5))
+    s.fill("eye", "#e8d040", "flat")
+    s.material("eye", "front", "#e8d040", "flat")
+    s.px("eye", "front", 0, 0, "#f6ecb0")
+    s.px("eye", "front", 1, 1, "#120808")
+    s.material("jaw", "top", "#3a1418", "skin")
+    s.px("jaw", "front", 0, 0, bone)
+    s.px("jaw", "front", 3, 0, bone)
+
+
 def build(names=None):
     for name in names or CREATURES:
         fn, size, parts = CREATURES[name]

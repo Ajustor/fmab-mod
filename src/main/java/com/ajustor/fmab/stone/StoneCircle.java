@@ -7,6 +7,7 @@ import com.ajustor.fmab.network.StoneRadiusPayload;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.EffectContext;
 import com.ajustor.fmab.transmutation.Effects;
+import com.ajustor.fmab.transmutation.GreatCircle;
 import com.ajustor.fmab.util.PlayerMaps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -27,7 +28,8 @@ import java.util.UUID;
  * Le cercle de la Pierre philosophale ({@link ForbiddenCircles#PHILOSOPHER_STONE}). Avec du sang
  * cristallisé posé dessus, ou quelqu'un debout en son centre pour recevoir les âmes, il s'éveille et
  * demande à l'alchimiste jusqu'où il doit porter : quelques blocs, ou toute une ferme. Le sacrifice a
- * lieu à la réponse (voir {@link Sacrifice}).
+ * lieu à la réponse (voir {@link Sacrifice}). Tracé au centre d'un cercle géant (voir {@link GreatCircle}),
+ * il ne demande rien : son aire va jusqu'aux relais, et peut couvrir une ville.
  */
 public final class StoneCircle {
 	/** Le plus grand rayon qu'on puisse demander : une ferme entière. */
@@ -55,19 +57,40 @@ public final class StoneCircle {
 		return Math.clamp(asked, 1, MAX_RADIUS);
 	}
 
+	/** L'aire d'un rayon autour du cercle. */
+	private static AABB area(BlockPos circle, int r) {
+		return new AABB(circle).inflate(r, r, r);
+	}
+
+	/**
+	 * Le rayon d'un cercle géant : jusqu'à ses relais, qu'il dépasse d'un bloc pour qu'ils en soient,
+	 * et sans la limite du rayon qu'on demande (une ville entière).
+	 */
+	public static int greatRadius(GreatCircle.Ring ring) {
+		return (int) Math.ceil(ring.radius()) + 1;
+	}
+
 	private static Effects.Result apply(EffectContext ctx) {
 		ServerPlayer caster = ctx.caster();
 		if (caster == null) {
 			return Effects.Result.NO_TARGET;
 		}
 		// Le sang cristallisé, ou le sang de celui qui se tient au centre et recevra les âmes.
-		boolean blood = !ctx.level().getEntitiesOfClass(ItemEntity.class, ctx.onCircle(),
+		// Le sang se pose sur le cercle central, même au centre d'un cercle géant.
+		boolean blood = !ctx.level().getEntitiesOfClass(ItemEntity.class, new AABB(ctx.circle()).inflate(1, 0.5, 1),
 				e -> e.getItem().is(FmabItems.CRYSTALLIZED_BLOOD)).isEmpty();
 		if (!blood && Sacrifice.vessel(ctx.level(), ctx.circle()).isEmpty()) {
 			caster.sendOverlayMessage(Component.translatable("stone.fmab.circle_needs_blood"));
 			return Effects.Result.NO_MATERIAL;
 		}
 		ServerLevel level = ctx.level();
+		// Des relais tout autour : le cercle géant fixe lui-même son aire, jusqu'à ses relais.
+		if (ctx.great()) {
+			GreatCircle.flash(level, ctx.ring(), true);
+			return Sacrifice.perform(level, caster, ctx.circle(), area(ctx.circle(), greatRadius(ctx.ring())),
+					level.getEntitiesOfClass(ItemEntity.class, new AABB(ctx.circle()).inflate(1, 0.5, 1),
+							ItemEntity::isAlive));
+		}
 		PENDING.put(caster.getUUID(), new Pending(level.dimension(), ctx.circle().immutable(), level.getGameTime(),
 				level.getBlockEntity(ctx.circle()) instanceof TransmutationCircleBlockEntity));
 		FmabNetwork.send(caster, new StoneRadiusPayload(radius(ctx.range()), MAX_RADIUS));
@@ -94,8 +117,7 @@ public final class StoneCircle {
 			player.sendOverlayMessage(Component.translatable("stone.fmab.circle_declined"));
 			return Effects.Result.NO_TARGET;
 		}
-		int r = radius(asked);
-		AABB area = new AABB(pending.circle()).inflate(r, r, r);
+		AABB area = area(pending.circle(), radius(asked));
 		List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, new AABB(pending.circle()).inflate(1, 0.5, 1),
 				ItemEntity::isAlive);
 		if (items.stream().noneMatch(e -> e.getItem().is(FmabItems.CRYSTALLIZED_BLOOD))

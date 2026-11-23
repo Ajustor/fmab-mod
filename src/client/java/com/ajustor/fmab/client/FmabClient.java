@@ -17,6 +17,8 @@ import com.ajustor.fmab.network.ShellKeyPayload;
 import com.ajustor.fmab.client.render.BossModels;
 import com.ajustor.fmab.client.render.ChimeraBeastRenderer;
 import com.ajustor.fmab.client.render.ChimeraCrawlerRenderer;
+import com.ajustor.fmab.client.render.FailedTransmutationRenderer;
+import com.ajustor.fmab.client.render.GreatCircleRenderer;
 import com.ajustor.fmab.client.render.CornelloRenderer;
 import com.ajustor.fmab.client.render.DrachmaSoldierRenderer;
 import com.ajustor.fmab.client.render.EnvyRenderer;
@@ -208,6 +210,8 @@ public final class FmabClient {
 		ClientPlatform.get().entityRenderer(FmabEntities.CHIMERA_CRAWLER, ChimeraCrawlerRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.ALCHEMICAL_MINE, NoopRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.DISCHARGE, DischargeRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.GREAT_CIRCLE, GreatCircleRenderer::new);
+		ClientPlatform.get().entityRenderer(FmabEntities.FAILED_TRANSMUTATION, FailedTransmutationRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.THROWING_KNIFE, ThrowingKnifeRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.CORNELLO, CornelloRenderer::new);
 		ClientPlatform.get().entityRenderer(FmabEntities.SCAR, ScarRenderer::new);
@@ -230,6 +234,7 @@ public final class FmabClient {
 		});
 		ClientPlatform.get().receive(CinematicPayload.TYPE, (payload, client) -> Cinematics.start(payload));
 		ClientEvents.END_TICK.register(mc -> Cinematics.tick());
+		GreatCirclePlanner.register();
 		// Pendant une cinématique, le chat est caché sous les bandes noires : ce que dit la Vérité
 		// s'affiche aussi en sous-titre.
 		ClientEvents.GAME_MESSAGE.register((message, overlay) -> {

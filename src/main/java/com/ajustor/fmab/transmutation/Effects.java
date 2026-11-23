@@ -182,6 +182,9 @@ public final class Effects {
 	 * Le nœud « Mur épais » lui ajoute des couches.
 	 */
 	private static Result wall(EffectContext ctx) {
+		if (ctx.great()) {
+			return greatWall(ctx);
+		}
 		ServerLevel level = ctx.level();
 		Direction d = ctx.horizontalDirection();
 		Direction along = d.getClockWise();
@@ -207,6 +210,57 @@ public final class Effects {
 	}
 
 	/**
+	 * Le mur d'un cercle géant : il se lève tout autour, sur le tour du cercle, en passant par les
+	 * relais. La terre vient de juste dehors ; le nœud « Mur épais » l'épaissit vers l'extérieur.
+	 */
+	private static Result greatWall(EffectContext ctx) {
+		ServerLevel level = ctx.level();
+		TagKey<Block> earth = FmabTags.elementBlocks("earth");
+		int thickness = 1 + (int) ctx.perk("wall_thickness");
+		int moved = 0;
+		for (int layer = 0; layer < thickness; layer++) {
+			double radius = ctx.ring().radius() + layer;
+			for (BlockPos at : GreatCircle.circumference(ctx.circle(), radius)) {
+				BlockPos column = surface(level, at);
+				if (column == null) {
+					continue;
+				}
+				// La terre vient de dehors, juste derrière la dernière couche.
+				BlockPos outside = outward(ctx.circle(), column, thickness - layer);
+				List<BlockPos> quarry = new ArrayList<>();
+				for (int k = 1; k <= ctx.grown(WALL_HEIGHT); k++) {
+					quarry.add(outside.below(k));
+				}
+				moved += raise(ctx, quarry, column, Direction.UP, earth, ctx.grown(WALL_HEIGHT), 0);
+			}
+		}
+		return moved > 0 ? Result.DONE : Result.NO_MATERIAL;
+	}
+
+	/** Le point à {@code steps} blocs de {@code p}, en s'éloignant du centre. */
+	private static BlockPos outward(BlockPos center, BlockPos p, int steps) {
+		double dx = p.getX() - center.getX(), dz = p.getZ() - center.getZ();
+		double len = Math.max(1e-6, Math.sqrt(dx * dx + dz * dz));
+		return p.offset((int) Math.round(dx / len * steps), 0, (int) Math.round(dz / len * steps));
+	}
+
+	/**
+	 * Les créatures de la zone d'un cercle géant que l'effet n'épargne pas, les plus proches du centre
+	 * d'abord, au plus {@code max}.
+	 */
+	static List<LivingEntity> prey(EffectContext ctx, int max) {
+		BlockPos o = ctx.origin();
+		List<LivingEntity> prey = new ArrayList<>(ctx.level().getEntitiesOfClass(LivingEntity.class,
+				new AABB(o).inflate(ctx.reach(), ctx.range() + 4, ctx.reach()),
+				e -> e.isAlive() && !ctx.spares(e) && ctx.within(e.blockPosition())));
+		prey.sort(Comparator.comparingDouble(e -> e.distanceToSqr(Vec3.atCenterOf(o))));
+		return prey.subList(0, Math.min(max, prey.size()));
+	}
+
+	/** Au plus tant de piques ou de charges dans un cercle géant : une ville, pas un pays. */
+	private static final int GREAT_TARGETS = 24;
+
+	/**
 	 * Terre + Projeter : une pique jaillit à portée, dans la direction du cercle. La pierre vient
 	 * de l'étage précédent s'il en a décomposé, sinon du sol tout autour de sa base. Sur un mur ou
 	 * un plafond, la pique sort droit de la surface, faite de la pierre qui entoure le support.
@@ -228,6 +282,25 @@ public final class Effects {
 			}
 			int raised = raise(ctx, quarry, ctx.circle().relative(frame.normal()), frame.normal(), earth,
 					ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE));
+			return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
+		}
+		if (ctx.great()) {
+			// Un cercle géant : une pique sous chaque créature de la zone qu'il n'épargne pas.
+			List<LivingEntity> prey = prey(ctx, GREAT_TARGETS);
+			if (prey.isEmpty()) {
+				return Result.NO_TARGET;
+			}
+			int raised = 0;
+			for (LivingEntity target : prey) {
+				BlockPos under = surface(level, target.blockPosition());
+				if (under != null) {
+					List<BlockPos> around = new ArrayList<>();
+					for (Direction s : Direction.Plane.HORIZONTAL) {
+						around.add(under.relative(s).below());
+					}
+					raised += raise(ctx, around, under, Direction.UP, earth, ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE));
+				}
+			}
 			return raised > 0 ? Result.DONE : Result.NO_MATERIAL;
 		}
 		BlockPos column = surface(level, ctx.origin().relative(ctx.direction(), ctx.range()));
@@ -270,7 +343,9 @@ public final class Effects {
 		BlockPos o = ctx.origin();
 		int range = ctx.range();
 		List<BlockPos> out = new ArrayList<>();
-		if (ctx.stage().shape().equals("circle")) {
+		// Un cercle géant couvre toute sa zone, quelle que soit la forme de l'étage.
+		if (ctx.great() || ctx.stage().shape().equals("circle")) {
+			range = ctx.reach();
 			for (int dx = -range; dx <= range; dx++) {
 				for (int dz = -range; dz <= range; dz++) {
 					double r = Math.sqrt(dx * dx + dz * dz);
@@ -319,7 +394,7 @@ public final class Effects {
 	private static Result icePlatform(EffectContext ctx) {
 		ServerLevel level = ctx.level();
 		BlockPos origin = ctx.origin();
-		int r = ctx.range() + 1;
+		int r = ctx.reach() + 1;
 		int frozen = 0;
 		for (BlockPos p : BlockPos.betweenClosed(origin.offset(-r, -2, -r), origin.offset(r, 0, r))) {
 			double dx = p.getX() - origin.getX(), dz = p.getZ() - origin.getZ();
@@ -352,6 +427,10 @@ public final class Effects {
 			Result bored = Works.tunnel(ctx);
 			return dismantled > 0 ? Result.DONE : bored;
 		}
+		if (ctx.great()) {
+			int dug = moat(ctx);
+			return dug + dismantled > 0 ? Result.DONE : Result.NO_TARGET;
+		}
 		ServerLevel level = ctx.level();
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
 		BlockPos center = ctx.origin().below();
@@ -368,6 +447,32 @@ public final class Effects {
 			}
 		}
 		return broken + dismantled > 0 ? Result.DONE : Result.NO_TARGET;
+	}
+
+	/**
+	 * Le puits d'un cercle géant serait un gouffre : il creuse plutôt une douve sur son tour, aussi
+	 * profonde que le cercle porte. La terre passe à l'étage suivant, comme celle d'un puits.
+	 */
+	private static int moat(EffectContext ctx) {
+		ServerLevel level = ctx.level();
+		TagKey<Block> earth = FmabTags.elementBlocks("earth");
+		int broken = 0;
+		for (BlockPos at : GreatCircle.circumference(ctx.circle(), ctx.ring().radius())) {
+			BlockPos top = surface(level, at);
+			if (top == null) {
+				continue;
+			}
+			for (int k = 1; k <= ctx.range(); k++) {
+				BlockPos p = top.below(k);
+				BlockState state = level.getBlockState(p);
+				if (state.is(earth) && !state.hasBlockEntity() && state.getDestroySpeed(level, p) >= 0) {
+					ctx.flow().addAll(Block.getDrops(state, level, p, null));
+					level.destroyBlock(p, false, ctx.caster());
+					broken++;
+				}
+			}
+		}
+		return broken;
 	}
 
 	/**
@@ -447,8 +552,14 @@ public final class Effects {
 			return Result.NO_MATERIAL;
 		}
 		ServerLevel level = ctx.level();
-		for (BlockPos cell : area(ctx, halfWidth)) {
-			int i = (int) Math.round(Math.sqrt(cell.distSqr(ctx.origin())));
+		// Un cercle géant ne met pas le feu à toute une ville : un anneau de flammes court sur son tour.
+		List<BlockPos> cells = ctx.great() ? GreatCircle.circumference(ctx.circle(), ctx.ring().radius())
+				: area(ctx, halfWidth);
+		if (ctx.great() && !pool.consume(fuel * cells.size() / GREAT_FLAMES_PER_FUEL)) {
+			return Result.NO_MATERIAL;
+		}
+		for (BlockPos cell : cells) {
+			int i = ctx.great() ? Integer.MAX_VALUE : (int) Math.round(Math.sqrt(cell.distSqr(ctx.origin())));
 			BlockPos p = surface(level, cell);
 			if (p == null) {
 				continue;
@@ -469,21 +580,25 @@ public final class Effects {
 		return Result.DONE;
 	}
 
+	/** Un combustible de plus tous les tant de blocs de l'anneau de flammes d'un cercle géant. */
+	private static final int GREAT_FLAMES_PER_FUEL = 16;
+
 	/** Air + Projeter : une rafale qui repousse tout dans la direction du cercle et éteint les feux. */
 	private static Result gust(EffectContext ctx) {
 		ServerLevel level = ctx.level();
 		Direction d = ctx.direction();
 		BlockPos start = ctx.origin();
 		BlockPos end = start.relative(d, ctx.range());
-		String shape = ctx.stage().shape();
+		// Un cercle géant souffle depuis son centre, sur toute sa zone.
+		String shape = ctx.great() ? "circle" : ctx.stage().shape();
 		AABB area = shape.equals("circle")
-				? new AABB(start).inflate(ctx.range(), 1.5, ctx.range())
+				? new AABB(start).inflate(ctx.reach(), 1.5, ctx.reach())
 				: new AABB(Vec3.atCenterOf(start), Vec3.atCenterOf(end))
 						.inflate(shape.equals("cone") ? 1.5 + ctx.range() / 2.0 : 1.5, 1.5,
 								shape.equals("cone") ? 1.5 + ctx.range() / 2.0 : 1.5);
 		int pushed = 0;
 		for (Entity e : level.getEntities((Entity) null, area, Entity::isAlive)) {
-			if (e == ctx.caster() || ctx.spares(e)) {
+			if (e == ctx.caster() || ctx.spares(e) || ctx.great() && !ctx.within(e.blockPosition())) {
 				continue;
 			}
 			if (shape.equals("circle")) {
@@ -684,6 +799,21 @@ public final class Effects {
 	 */
 	private static Result iceSpike(EffectContext ctx) {
 		ServerLevel level = ctx.level();
+		if (ctx.great()) {
+			// Un cercle géant : une pique de glace sous chaque créature de la zone, de l'eau qui l'entoure.
+			List<LivingEntity> prey = prey(ctx, GREAT_TARGETS);
+			int raised = 0;
+			for (LivingEntity target : prey) {
+				BlockPos under = surface(level, target.blockPosition());
+				if (under != null && raise(ctx, waterAround(level, under, ICE_REACH), under, Direction.UP,
+						FmabTags.elementBlocks("water"), ctx.grown(SPIKE_HEIGHT), ctx.damage(SPIKE_DAMAGE),
+						Effects::frozen) > 0) {
+					target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100, 2));
+					raised++;
+				}
+			}
+			return prey.isEmpty() ? Result.NO_TARGET : raised > 0 ? Result.DONE : Result.NO_MATERIAL;
+		}
 		BlockPos column = surface(level, ctx.origin().relative(ctx.horizontalDirection(), ctx.range()));
 		if (column == null) {
 			return Result.NO_TARGET;
@@ -706,9 +836,10 @@ public final class Effects {
 	 */
 	private static Result mist(EffectContext ctx) {
 		ServerLevel level = ctx.level();
-		BlockPos at = ctx.origin().relative(ctx.horizontalDirection(), ctx.range() + 2);
+		// Un cercle géant noie toute sa zone dans la brume, depuis son centre.
+		BlockPos at = ctx.great() ? ctx.circle() : ctx.origin().relative(ctx.horizontalDirection(), ctx.range() + 2);
 		AreaEffectCloud cloud = new AreaEffectCloud(level, at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
-		cloud.setRadius(MIST_RADIUS + ctx.range());
+		cloud.setRadius(ctx.great() ? (float) ctx.ring().radius() : MIST_RADIUS + ctx.range());
 		cloud.setDuration(ctx.lasting(MIST_TICKS + 40 * ctx.range()));
 		cloud.setWaitTime(0);
 		cloud.setRadiusPerTick(0);
@@ -727,6 +858,9 @@ public final class Effects {
 	 */
 	private static Result detonate(EffectContext ctx) {
 		ServerLevel level = ctx.level();
+		if (ctx.great()) {
+			return greatDetonation(ctx);
+		}
 		BlockPos target = surface(level, ctx.origin().relative(ctx.horizontalDirection(), ctx.range()));
 		if (target == null) {
 			return Result.NO_TARGET;
@@ -745,6 +879,35 @@ public final class Effects {
 		Vec3 c = Vec3.atCenterOf(charge);
 		level.explode(ctx.caster(), c.x, c.y, c.z, power, Level.ExplosionInteraction.MOB);
 		return Result.DONE;
+	}
+
+	/**
+	 * Un cercle géant fait sauter le sol sous chaque créature de sa zone qu'il n'épargne pas : une
+	 * pincée de soufre par charge, tant qu'il y en a.
+	 */
+	private static Result greatDetonation(EffectContext ctx) {
+		ServerLevel level = ctx.level();
+		List<LivingEntity> prey = prey(ctx, GREAT_TARGETS);
+		if (prey.isEmpty()) {
+			return Result.NO_TARGET;
+		}
+		float power = ctx.damage(BLAST_POWER + (float) ctx.perk("blast_power"));
+		int blasts = 0;
+		for (LivingEntity target : prey) {
+			BlockPos charge = target.blockPosition().below();
+			BlockState state = level.getBlockState(charge);
+			if (state.isAir() || state.hasBlockEntity() || state.getDestroySpeed(level, charge) < 0) {
+				continue;
+			}
+			if (!takeOne(ctx, FmabTags.elementItems("sulfur"))) {
+				break;
+			}
+			level.removeBlock(charge, false);
+			Vec3 c = Vec3.atCenterOf(charge);
+			level.explode(ctx.caster(), c.x, c.y, c.z, power, Level.ExplosionInteraction.MOB);
+			blasts++;
+		}
+		return blasts > 0 ? Result.DONE : Result.NO_MATERIAL;
 	}
 
 	/**

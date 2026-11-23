@@ -79,13 +79,14 @@ public final class Works {
 		int dismantled = Recomposition.dismantle(ctx);
 		BlockPos center = ctx.origin();
 		int r = ctx.range();
-		Predicate<BlockPos> within = WorkShapes.felling(center, r + TREE_REACH);
+		int reach = ctx.reach();
+		Predicate<BlockPos> within = WorkShapes.felling(center, reach + TREE_REACH);
 		Predicate<BlockPos> log = q -> level.getBlockState(q).is(BlockTags.LOGS);
 		Set<BlockPos> felled = new HashSet<>();
 		boolean trunk = false;
 		// Le glyphe Objet seul : on recycle ce qui est posé, sans toucher aux arbres.
 		Iterable<BlockPos> zone = ctx.stage().aimsBlocks()
-				? BlockPos.betweenClosed(center.offset(-r, -1, -r), center.offset(r, r, r)) : List.of();
+				? BlockPos.betweenClosed(center.offset(-reach, -1, -reach), center.offset(reach, r, reach)) : List.of();
 		for (BlockPos p : zone) {
 			if (felled.contains(p) || !log.test(p)) {
 				continue;
@@ -119,7 +120,7 @@ public final class Works {
 		ServerLevel level = ctx.level();
 		int dismantled = Recomposition.dismantle(ctx);
 		BlockPos center = ctx.origin();
-		int r = ctx.range();
+		int r = ctx.reach();
 		int picked = 0;
 		List<BlockPos> field = new ArrayList<>();
 		if (!ctx.stage().aimsBlocks()) {
@@ -128,7 +129,10 @@ public final class Works {
 		// Du haut vers le bas : on coupe une canne à sucre par le haut avant de regarder son pied.
 		for (int dy = FIELD_ABOVE; dy >= -FIELD_BELOW; dy--) {
 			for (BlockPos p : BlockPos.betweenClosed(center.offset(-r, dy, -r), center.offset(r, dy, r))) {
-				field.add(p.immutable());
+				// Un cercle géant récolte son disque, pas le carré qui l'entoure.
+				if (!ctx.great() || ctx.within(p)) {
+					field.add(p.immutable());
+				}
 			}
 		}
 		for (BlockPos p : field) {
@@ -222,11 +226,12 @@ public final class Works {
 		}
 		ServerLevel level = ctx.level();
 		BlockPos center = ctx.origin();
-		int r = ctx.range();
+		int r = ctx.reach();
 		List<BlockPos> plants = new ArrayList<>();
 		for (BlockPos p : BlockPos.betweenClosed(center.offset(-r, -FIELD_BELOW, -r), center.offset(r, FIELD_ABOVE, r))) {
 			BlockState state = level.getBlockState(p);
-			if (growable(state) && !(state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state))) {
+			if (growable(state) && !(state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state))
+					&& (!ctx.great() || ctx.within(p))) {
 				plants.add(p.immutable());
 			}
 		}
@@ -344,7 +349,7 @@ public final class Works {
 		}
 		ServerLevel level = ctx.level();
 		TagKey<Block> earth = FmabTags.elementBlocks("earth");
-		WorkShapes.Leveling plan = WorkShapes.leveling(ctx.circle(), ctx.support().getY(), ctx.range(), LEVEL_ABOVE,
+		WorkShapes.Leveling plan = WorkShapes.leveling(ctx.circle(), ctx.support().getY(), ctx.reach(), LEVEL_ABOVE,
 				LEVEL_BELOW);
 		int changed = 0;
 		for (BlockPos p : plan.cut()) {
