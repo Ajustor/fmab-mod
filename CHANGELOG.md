@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.24.0 — 2026-11-23
+
+### New features
+
+- Relay circles, copies of a central circle drawn all around it, form a great circle whose effect covers the whole area, with a placement guide for the relays.
+- Human transmutation now brings forth a misshapen six-armed creature instead of a husk.
 ## 1.23.0 — 2026-11-20
 
 ### New features

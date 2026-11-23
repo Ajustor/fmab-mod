@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 1.24.0 — 2026-11-23
+
+### Nouveautés
+
+- Des cercles relais, copies du cercle central tracées tout autour, forment un cercle géant dont l'effet couvre toute la zone, avec une aide au placement des relais.
+- La transmutation humaine fait naître une créature difforme à six bras au lieu d'un husk.
 ## 1.23.0 — 2026-11-20
 
 ### Nouveautés
