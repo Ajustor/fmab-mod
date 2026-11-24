@@ -324,7 +324,7 @@ public class NotebookScreen extends Screen {
 	/** Le sommaire : chaque page, sa miniature et son nom ; la page ouverte est surlignée. */
 	private void drawContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		int size = cell * Drawing.GRID;
-		graphics.centeredText(font, Component.translatable("notebook.fmab.contents"), canvasX + size / 2, canvasY + 4,
+		inkCentered(graphics, Component.translatable("notebook.fmab.contents"), canvasX + size / 2, canvasY + 4,
 				INK);
 		contentsScroll = Math.clamp(contentsScroll, 0, maxContentsScroll());
 		int hovered = contentsEntryAt(mouseX, mouseY);
@@ -384,14 +384,14 @@ public class NotebookScreen extends Screen {
 				graphics.fill(x + 1, y, x + tabWidth - 1, y + 12, current ? CONTENTS_CURRENT : CONTENTS_HOVER);
 			}
 			String label = font.plainSubstrByWidth(layerLabel(PICKER_LAYERS[i]).getString(), tabWidth - 4);
-			graphics.centeredText(font, Component.literal(label), x + tabWidth / 2, y + 2, INK);
+			inkCentered(graphics, Component.literal(label), x + tabWidth / 2, y + 2, INK);
 		}
 		pickerScroll = Math.clamp(pickerScroll, 0, maxPickerScroll());
 		List<Glyph> glyphs = pickerGlyphs();
 		int hovered = pickerEntryAt(mouseX, mouseY);
 		pickerHovered = hovered >= 0 ? glyphs.get(hovered) : null;
 		if (glyphs.isEmpty()) {
-			graphics.centeredText(font, Component.translatable("notebook.fmab.picker.empty"), canvasX + size / 2,
+			inkCentered(graphics, Component.translatable("notebook.fmab.picker.empty"), canvasX + size / 2,
 					canvasY + PICKER_TOP + 8, INK);
 			return;
 		}
@@ -415,9 +415,17 @@ public class NotebookScreen extends Screen {
 					x + (columnWidth - PICKER_THUMB) / 2, y + 2, 0, 0, PICKER_THUMB, PICKER_THUMB,
 					CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE);
 			String name = font.plainSubstrByWidth(glyphName(g), columnWidth - 2);
-			graphics.centeredText(font, Component.literal(name), x + columnWidth / 2, y + PICKER_THUMB + 4, INK);
+			inkCentered(graphics, Component.literal(name), x + columnWidth / 2, y + PICKER_THUMB + 4, INK);
 		}
 		graphics.disableScissor();
+	}
+
+	/**
+	 * Un texte centré à l'encre, sur le papier : sans l'ombre portée de {@code centeredText}, qui sous
+	 * une encre foncée bave et rend le texte flou.
+	 */
+	private void inkCentered(GuiGraphicsExtractor graphics, Component text, int centerX, int y, int color) {
+		graphics.text(font, text, centerX - font.width(text) / 2, y, color, false);
 	}
 
 	private Component layerLabel(GlyphLayer layer) {
