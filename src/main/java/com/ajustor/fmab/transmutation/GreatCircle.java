@@ -1,6 +1,7 @@
 package com.ajustor.fmab.transmutation;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.entity.GreatCircleEntity;
 import net.minecraft.core.BlockPos;
@@ -21,7 +22,9 @@ import java.util.function.ToLongFunction;
  * relais : la transmutation porte jusqu'à eux. C'est ainsi qu'on trace un cercle trop grand pour être
  * dessiné d'un trait, comme le cercle de Xerxès ou celui qui couvre un pays entier.
  *
- * <p>Un relais est un cercle inscrit qui porte exactement le même tracé que le cercle central. Il en
+ * <p>Un cercle géant se trace à la taille {@link CircleSize#GREAT}, la plus grande de la craie : le
+ * centre comme ses relais. Un relais est un cercle inscrit à cette taille qui porte exactement le même
+ * tracé que le cercle central. Il en
  * faut au moins {@link #MIN_RELAYS}, à peu près à la même distance du centre (le cercle géant passe
  * par eux), et répartis tout autour : un arc ne referme pas un cercle.
  */
@@ -85,7 +88,8 @@ public final class GreatCircle {
 
 	/** Le cercle géant dont ce cercle inscrit est le centre, s'il en est un. */
 	public static Optional<Ring> around(ServerLevel level, BlockPos center) {
-		if (!(level.getBlockEntity(center) instanceof TransmutationCircleBlockEntity core) || core.drawing().isEmpty()) {
+		if (!(level.getBlockEntity(center) instanceof TransmutationCircleBlockEntity core) || core.drawing().isEmpty()
+				|| !core.size().great()) {
 			return Optional.empty();
 		}
 		return of(center, relays(level, center, core.drawing()));
@@ -99,7 +103,7 @@ public final class GreatCircle {
 	}
 
 	/**
-	 * Les cercles inscrits, dans les tronçons chargés, qui portent exactement ce tracé, à moins de
+	 * Les cercles géants inscrits, dans les tronçons chargés, qui portent exactement ce tracé, à moins de
 	 * {@code reach} blocs (à l'horizontale) d'un point. Côté serveur, les relais d'un centre ; côté
 	 * client, ceux que le joueur a déjà tracés, pour l'aider à placer les suivants.
 	 */
@@ -114,7 +118,8 @@ public final class GreatCircle {
 					continue;
 				}
 				for (BlockEntity be : chunk.getBlockEntities().values()) {
-					if (be instanceof TransmutationCircleBlockEntity circle && circle.drawing().equals(drawing)
+					if (be instanceof TransmutationCircleBlockEntity circle && circle.size().great()
+							&& circle.drawing().equals(drawing)
 							&& distance(center, be.getBlockPos()) <= reach) {
 						out.add(be.getBlockPos().immutable());
 					}

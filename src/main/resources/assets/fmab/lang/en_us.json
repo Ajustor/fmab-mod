@@ -4,6 +4,8 @@
   "item.fmab.chalk.no_circle": "No circle selected: open your notebook (%s) and pick one.",
   "item.fmab.circle_size": "Circle size: %s blocks",
   "item.fmab.circle_size.tooltip": "%s-block circles (crouch + click in the air to change)",
+  "item.fmab.circle_size.great": "Circle size: great (center and relays of a great circle)",
+  "item.fmab.circle_size.great.tooltip": "Great circles: the center and its relays (crouch + click in the air to change)",
   "item.fmab.alchemical_paint": "Alchemical Paint",
   "item.fmab.alchemist_chisel": "Alchemist's Chisel",
   "item.fmab.alchemist_chisel.not_engravable": "The chisel only engraves stone and metal.",

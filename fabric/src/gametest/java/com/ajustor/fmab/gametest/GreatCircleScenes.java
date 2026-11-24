@@ -15,6 +15,7 @@ import com.ajustor.fmab.entity.FailedTransmutationEntity;
 import com.ajustor.fmab.entity.GreatCircleEntity;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabBlocks;
+import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabEntities;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.stone.StoneRite;
@@ -89,6 +90,14 @@ public class GreatCircleScenes implements FabricClientGameTest {
 			}
 			// Un cercle qui n'a pas le même tracé n'est pas un relais.
 			inscribe(sp, CENTER.offset(0, 0, -12), ForbiddenCircles.HUMAN_TRANSMUTATION);
+			// Les mêmes cercles à une autre taille que la géante ne se répondent pas.
+			BlockPos small = new BlockPos(0, -60, -110);
+			inscribe(sp, small, drawing, CircleSize.HUGE);
+			for (BlockPos relay : relays(small, RADIUS, RELAYS)) {
+				inscribe(sp, relay, drawing, CircleSize.HUGE);
+			}
+			check(onServer(sp, p -> GreatCircle.around(p.level(), small)).isEmpty(),
+					"des cercles de 7 blocs ne forment pas de cercle géant : seule la taille géante le fait");
 			Optional<GreatCircle.Ring> ring = onServer(sp, p -> GreatCircle.around(p.level(), CENTER));
 			check(ring.isPresent(), "six relais au même tracé, tout autour, devraient former un cercle géant");
 			check(ring.get().relays().size() == RELAYS, "six relais : " + ring.get().relays().size());
@@ -143,7 +152,9 @@ public class GreatCircleScenes implements FabricClientGameTest {
 						.flatMap(rules::simpleCircle).orElseThrow();
 				Notebooks.add(p, "mur", d);
 				Notebooks.select(p, Notebooks.of(p).indexOf(d));
-				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FmabItems.CHALK));
+				ItemStack chalk = new ItemStack(FmabItems.CHALK);
+				chalk.set(FmabComponents.CIRCLE_SIZE, CircleSize.GREAT.blocks());
+				p.setItemInHand(InteractionHand.MAIN_HAND, chalk);
 				return d;
 			});
 			List<BlockPos> wallRelays = relays(WALL_CENTER, WALL_RADIUS, RELAYS);
@@ -238,11 +249,16 @@ public class GreatCircleScenes implements FabricClientGameTest {
 			Drawing drawing) {
 		return onServer(sp, p -> {
 			Concentration.set(p, Concentration.max(p));
-			return Transmutation.activate(p.level(), circle, state, drawing, p, CircleSize.NORMAL);
+			return Transmutation.activate(p.level(), circle, state, drawing, p, CircleSize.GREAT);
 		});
 	}
 
+	/** Un cercle tracé à la taille des cercles géants. */
 	private static BlockState inscribe(TestSingleplayerContext sp, BlockPos pos, Drawing drawing) {
+		return inscribe(sp, pos, drawing, CircleSize.GREAT);
+	}
+
+	private static BlockState inscribe(TestSingleplayerContext sp, BlockPos pos, Drawing drawing, CircleSize size) {
 		return onServer(sp, p -> {
 			ServerLevel level = p.level();
 			BlockState state = ((TransmutationCircleBlock) FmabBlocks.TRANSMUTATION_CIRCLE)
@@ -250,6 +266,7 @@ public class GreatCircleScenes implements FabricClientGameTest {
 			level.setBlockAndUpdate(pos, state);
 			if (level.getBlockEntity(pos) instanceof TransmutationCircleBlockEntity be) {
 				be.setDrawing(drawing);
+				be.setSize(size);
 			}
 			return state;
 		});

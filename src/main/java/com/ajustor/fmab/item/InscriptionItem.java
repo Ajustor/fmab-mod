@@ -90,7 +90,8 @@ public class InscriptionItem extends Item {
 		CircleSize next = size(stack).next();
 		stack.set(FmabComponents.CIRCLE_SIZE, next.blocks());
 		if (!level.isClientSide()) {
-			player.sendOverlayMessage(Component.translatable("item.fmab.circle_size", next.blocks()));
+			player.sendOverlayMessage(next.great() ? Component.translatable("item.fmab.circle_size.great")
+					: Component.translatable("item.fmab.circle_size", next.blocks()));
 		}
 		return InteractionResult.SUCCESS;
 	}
@@ -102,8 +103,9 @@ public class InscriptionItem extends Item {
 	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
 			Consumer<Component> tooltip, TooltipFlag flag) {
-		tooltip.accept(Component.translatable("item.fmab.circle_size.tooltip", size(stack).blocks())
-				.withStyle(ChatFormatting.GRAY));
+		CircleSize size = size(stack);
+		tooltip.accept((size.great() ? Component.translatable("item.fmab.circle_size.great.tooltip")
+				: Component.translatable("item.fmab.circle_size.tooltip", size.blocks())).withStyle(ChatFormatting.GRAY));
 	}
 
 	private SoundEvent sound() {
