@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.25.0 — 2026-11-24
+
+### New features
+
+- Great circles are drawn with the chalk set to its new largest size, "great": only a center and relays drawn at that size answer each other, and the placement guide only shows at that size.
 ## 1.24.1 — 2026-11-24
 
 ### Fixes

@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.25.0 — 2026-11-24
+
+### Nouveautés
+
+- Le cercle géant se trace avec la craie réglée sur sa nouvelle taille, « géant » (la plus grande) : seuls le centre et les relais tracés à cette taille se répondent, et l'aide au placement n'apparaît qu'à cette taille.
 ## 1.24.1 — 2026-11-24
 
 ### Corrections
