@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 1.24.1 — 2026-11-24
+
+### Corrections
+
+- Les noms des glyphes du sélecteur de tampon, ses onglets et le titre du sommaire du carnet s'affichent nets au lieu d'être flous.
 ## 1.24.0 — 2026-11-23
 
 ### Nouveautés

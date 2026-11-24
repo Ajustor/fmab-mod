@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.24.1 — 2026-11-24
+
+### Fixes
+
+- The glyph names in the stamp picker, its tabs and the notebook's contents title are now crisp instead of blurry.
 ## 1.24.0 — 2026-11-23
 
 ### New features
