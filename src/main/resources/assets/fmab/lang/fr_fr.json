@@ -4,6 +4,8 @@
   "item.fmab.chalk.no_circle": "Aucun cercle sélectionné : ouvrez votre carnet (%s) et choisissez-en un.",
   "item.fmab.circle_size": "Taille des cercles : %s blocs",
   "item.fmab.circle_size.tooltip": "Cercles de %s blocs (accroupi + clic dans le vide pour changer)",
+  "item.fmab.circle_size.great": "Taille des cercles : géant (centre et relais d'un cercle géant)",
+  "item.fmab.circle_size.great.tooltip": "Cercles géants : le centre et ses relais (accroupi + clic dans le vide pour changer)",
   "item.fmab.alchemical_paint": "Peinture alchimique",
   "item.fmab.alchemist_chisel": "Burin d'alchimiste",
   "item.fmab.alchemist_chisel.not_engravable": "Le burin ne grave que la pierre et le métal.",

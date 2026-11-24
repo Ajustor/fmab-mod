@@ -31,6 +31,21 @@ class GreatCircleTest {
 	}
 
 	@Test
+	void theGreatSizeIsTheLargestOfTheChalk() {
+		var sizes = com.ajustor.fmab.block.CircleSize.values();
+		var great = com.ajustor.fmab.block.CircleSize.GREAT;
+		assertEquals(great, sizes[sizes.length - 1]);
+		assertTrue(great.great());
+		for (var size : sizes) {
+			assertTrue(size == great || !size.great() && size.blocks() < great.blocks());
+		}
+		// La craie y passe après le plus grand cercle ordinaire, puis revient au plus petit.
+		assertEquals(great, com.ajustor.fmab.block.CircleSize.HUGE.next());
+		assertEquals(sizes[0], great.next());
+		assertEquals(great, com.ajustor.fmab.block.CircleSize.ofBlocks(great.blocks()));
+	}
+
+	@Test
 	void aTriangleIsEnough() {
 		assertTrue(GreatCircle.of(CENTER, around(3, 30, 0, 2 * Math.PI)).isPresent());
 	}

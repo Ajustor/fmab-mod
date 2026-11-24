@@ -10,6 +10,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -17,7 +18,8 @@ import java.util.Optional;
 
 /**
  * L'aide au placement d'un cercle géant. Tant que le joueur tient de quoi tracer (craie, peinture,
- * burin) et que le cercle choisi dans son carnet est déjà tracé à proximité, le plan du cercle géant
+ * burin) réglé sur la taille géante, et que le cercle choisi dans son carnet est déjà tracé à cette
+ * taille à proximité, le plan du cercle géant
  * s'affiche : le tour prévu, les emplacements des relais (ceux qui restent à tracer luisent et lancent
  * une colonne de lumière pour qu'on les trouve de loin), et, au-dessus de la barre d'action, combien
  * il en reste et où est le plus proche.
@@ -52,8 +54,8 @@ public final class GreatCirclePlanner {
 			}
 			return;
 		}
-		boolean drawing = player.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof InscriptionItem
-				|| player.getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof InscriptionItem;
+		boolean drawing = drawsGreat(player.getItemInHand(InteractionHand.MAIN_HAND))
+				|| drawsGreat(player.getItemInHand(InteractionHand.OFF_HAND));
 		Drawing selected = drawing ? Notebooks.selected(player) : Drawing.EMPTY;
 		if (selected.isEmpty()) {
 			current = null;
@@ -66,6 +68,11 @@ public final class GreatCirclePlanner {
 				.filter(p -> p.radius() > 0);
 		current = plan.orElse(null);
 		plan.ifPresent(p -> player.sendOverlayMessage(message(p, player.blockPosition())));
+	}
+
+	/** Un outil de tracé réglé sur la taille des cercles géants. */
+	private static boolean drawsGreat(ItemStack stack) {
+		return stack.getItem() instanceof InscriptionItem && InscriptionItem.size(stack).great();
 	}
 
 	/** Où en est le cercle géant, et où tracer le prochain relais. */
