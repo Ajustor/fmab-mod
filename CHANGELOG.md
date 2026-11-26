@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.26.0 — 2026-11-26
+
+### New features
+
+- An automail arm is not tattooed but engraved. The engraving follows the piece when removed and breaks if it gives out; a lost arm without automail no longer carries any circle.
+- An automail arm is engraved with the alchemist's chisel, used on a traced circle; alchemical ink stays for skin.
+- Right-click in the air with alchemical ink or a chisel: an editor to draw your tattoos and engrave your automail, in any color, decorative or alchemical (a notebook circle placed as a stamp).
+- The tattoo editor's buttons no longer overlap at large GUI scales.
 ## 1.25.0 — 2026-11-24
 
 ### New features

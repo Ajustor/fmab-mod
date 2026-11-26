@@ -1,5 +1,13 @@
 # Journal des modifications
 
+## 1.26.0 — 2026-11-26
+
+### Nouveautés
+
+- Un bras d'automail ne se tatoue pas : il se grave. La gravure suit la pièce quand on la retire et se brise si elle lâche ; un bras perdu sans automail ne porte plus aucun cercle.
+- Un bras d'automail se grave au burin d'alchimiste, utilisé sur un cercle tracé ; l'encre alchimique reste pour la peau.
+- Clic droit dans le vide avec l'encre alchimique ou le burin : un éditeur pour dessiner ses tatouages et graver ses automails, en couleurs libres, décoratifs ou alchimiques (un cercle du carnet posé en tampon).
+- Les boutons de l'éditeur de tatouages ne se chevauchent plus avec une grande échelle d'interface.
 ## 1.25.0 — 2026-11-24
 
 ### Nouveautés
