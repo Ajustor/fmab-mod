@@ -82,6 +82,8 @@ public final class FmabNetwork {
 		network.serverbound(SelectCirclePayload.TYPE, SelectCirclePayload.CODEC);
 		network.serverbound(OpenBodyPayload.TYPE, OpenBodyPayload.CODEC);
 		network.clientbound(OpenTattooPayload.TYPE, OpenTattooPayload.CODEC);
+		network.clientbound(OpenTattooEditorPayload.TYPE, OpenTattooEditorPayload.CODEC);
+		network.serverbound(TattooArtPayload.TYPE, TattooArtPayload.CODEC, TattooArtPayload.MAX_SIZE);
 		network.serverbound(RequestDesignsPayload.TYPE, RequestDesignsPayload.CODEC);
 		network.serverbound(ChooseDesignPayload.TYPE, ChooseDesignPayload.CODEC);
 		network.clientbound(OpenDesignsPayload.TYPE, OpenDesignsPayload.CODEC, 1 << 20);
@@ -139,6 +141,8 @@ public final class FmabNetwork {
 						TattooRitual.tattoo(player, payload.circle(), slot);
 					}
 				}));
+		network.receive(TattooArtPayload.TYPE, (payload, player) ->
+				TattooSlot.byId(payload.slot()).ifPresent(slot -> TattooRitual.applyArt(player, slot, payload.art())));
 	}
 
 	/** Le candidat doit être face à l'examinateur. */

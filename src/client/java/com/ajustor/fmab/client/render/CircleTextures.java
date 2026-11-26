@@ -3,6 +3,7 @@ package com.ajustor.fmab.client.render;
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.Raster;
+import com.ajustor.fmab.tattoo.BodyArt;
 import com.ajustor.fmab.util.PinnedLru;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
@@ -40,17 +41,20 @@ public final class CircleTextures {
 	private static final int KEY_INDEX_LIMIT = 512;
 
 	private static final PinnedLru<Key, Identifier> TEXTURES = new PinnedLru<>(MAX_TEXTURES);
-	private static final Map<Drawing, Map<Integer, Key>> KEYS = new IdentityHashMap<>();
+	private static final Map<Object, Map<Integer, Key>> KEYS = new IdentityHashMap<>();
 	private static final List<Identifier> RELEASE_NEXT_FRAME = new ArrayList<>();
 	private static int counter;
 	private static long frame = Long.MIN_VALUE;
 	private static int rastersThisFrame;
 	private static Identifier pending;
 
-	/** Un tracé et sa couleur, avec son empreinte calculée une fois. */
-	private record Key(Drawing drawing, int color, int hash) {
-		static Key of(Drawing drawing, int color) {
-			return new Key(drawing, color, 31 * drawing.hashCode() + color);
+	/**
+	 * Un tracé ({@link Drawing}, d'une couleur) ou un dessin sur le corps ({@link BodyArt}, qui porte ses
+	 * couleurs), avec son empreinte calculée une fois.
+	 */
+	private record Key(Object source, int color, int hash) {
+		static Key of(Object source, int color) {
+			return new Key(source, color, 31 * source.hashCode() + color);
 		}
 
 		@Override
@@ -60,7 +64,7 @@ public final class CircleTextures {
 
 		@Override
 		public boolean equals(Object o) {
-			return o instanceof Key k && k.hash == hash && k.color == color && k.drawing.equals(drawing);
+			return o instanceof Key k && k.hash == hash && k.color == color && k.source.equals(source);
 		}
 	}
 
@@ -72,8 +76,17 @@ public final class CircleTextures {
 	 * @return la texture du tracé, ou une texture vide si le budget de l'image est épuisé
 	 */
 	public static Identifier get(Drawing drawing, int color) {
+		return get((Object) drawing, color);
+	}
+
+	/** La texture d'un dessin sur le corps, en ses couleurs ; même budget que les tracés. */
+	public static Identifier get(BodyArt art) {
+		return get(art, 0);
+	}
+
+	private static Identifier get(Object source, int color) {
 		newFrame();
-		Key key = key(drawing, color);
+		Key key = key(source, color);
 		Identifier id = TEXTURES.get(key);
 		if (id != null) {
 			return id;
@@ -104,11 +117,11 @@ public final class CircleTextures {
 		RELEASE_NEXT_FRAME.addAll(TEXTURES.unpin(key(drawing, color)));
 	}
 
-	private static Key key(Drawing drawing, int color) {
+	private static Key key(Object source, int color) {
 		if (KEYS.size() > KEY_INDEX_LIMIT) {
 			KEYS.clear();
 		}
-		return KEYS.computeIfAbsent(drawing, d -> new HashMap<>()).computeIfAbsent(color, c -> Key.of(drawing, c));
+		return KEYS.computeIfAbsent(source, d -> new HashMap<>()).computeIfAbsent(color, c -> Key.of(source, c));
 	}
 
 	/** Une nouvelle image : on libère ce que la précédente a évincé, et le budget repart. */
@@ -126,12 +139,23 @@ public final class CircleTextures {
 	}
 
 	private static Identifier create(Key key) {
-		boolean[] mask = Raster.rasterize(key.drawing(), SIZE, 4.4);
 		NativeImage image = new NativeImage(SIZE, SIZE, true);
-		for (int y = 0; y < SIZE; y++) {
-			for (int x = 0; x < SIZE; x++) {
-				if (mask[y * SIZE + x]) {
-					image.setPixel(x, y, key.color());
+		if (key.source() instanceof BodyArt art) {
+			int[] pixels = art.paint(SIZE);
+			for (int y = 0; y < SIZE; y++) {
+				for (int x = 0; x < SIZE; x++) {
+					if (pixels[y * SIZE + x] != 0) {
+						image.setPixel(x, y, pixels[y * SIZE + x]);
+					}
+				}
+			}
+		} else {
+			boolean[] mask = Raster.rasterize((Drawing) key.source(), SIZE, BodyArt.THICKNESS);
+			for (int y = 0; y < SIZE; y++) {
+				for (int x = 0; x < SIZE; x++) {
+					if (mask[y * SIZE + x]) {
+						image.setPixel(x, y, key.color());
+					}
 				}
 			}
 		}

@@ -5,6 +5,7 @@ import com.ajustor.fmab.client.render.BodyCache;
 import com.ajustor.fmab.client.render.BodyHolder;
 import com.ajustor.fmab.client.render.HandsLayer;
 import com.ajustor.fmab.client.render.PoseHolder;
+import com.ajustor.fmab.client.render.TattooPreview;
 import com.ajustor.fmab.client.render.WheelchairPose;
 import com.ajustor.fmab.data.Gloves;
 import com.ajustor.fmab.data.TransmutationPose;
@@ -93,10 +94,17 @@ public abstract class AvatarRendererMixin {
 				}
 			}
 		}
+		boolean me = entity == Minecraft.getInstance().player;
 		for (com.ajustor.fmab.tattoo.TattooSlot slot : com.ajustor.fmab.tattoo.TattooSlot.values()) {
+			// Le dessin en cours dans l'éditeur se montre à la place de celui que porte l'emplacement.
+			if (me && slot == TattooPreview.slot()) {
+				if (!TattooPreview.art().isEmpty()) {
+					out.add(HandsLayer.tattoo(slot, TattooPreview.art(), TattooPreview.engraved()));
+				}
+				continue;
+			}
 			boolean engraved = BodyCircles.surface(entity, slot) == BodyCircles.Surface.STEEL;
-			BodyCircles.circle(entity, slot).filter(drawing -> !drawing.isEmpty())
-					.ifPresent(drawing -> out.add(HandsLayer.tattoo(slot, drawing, engraved)));
+			BodyCircles.art(entity, slot).ifPresent(art -> out.add(HandsLayer.tattoo(slot, art, engraved)));
 		}
 		return out;
 	}

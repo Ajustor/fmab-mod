@@ -3,6 +3,7 @@ package com.ajustor.fmab.client.render;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.item.AutomailItem;
+import com.ajustor.fmab.tattoo.BodyArt;
 import com.ajustor.fmab.tattoo.BodySpot;
 import net.minecraft.client.model.geom.PartPose;
 import org.jspecify.annotations.Nullable;
@@ -39,13 +40,19 @@ public interface BodyHolder {
 	/**
 	 * Une pièce portée sur le corps : son calque ({@code textures/entity/worn/}, aucun pour un tatouage),
 	 * le membre qui la porte et, s'il y en a un, le vrai cercle qu'on y a inscrit, la couleur de son
-	 * trait et l'endroit du membre où il se pose. {@code engraved} : le cercle est gravé dans l'automail
-	 * qui remplace ce membre perdu, il se dessine donc sur l'automail et non sur la peau.
+	 * trait et l'endroit du membre où il se pose. Un tatouage ou une gravure porte plutôt son dessin
+	 * ({@code art}, en ses couleurs). {@code engraved} : gravé dans l'automail qui remplace ce membre
+	 * perdu, il se dessine donc sur l'automail et non sur la peau.
 	 */
 	record Worn(@Nullable String texture, BodyPart part, @Nullable Drawing circle, int ink, BodySpot spot,
-			boolean engraved) {
+			@Nullable BodyArt art, boolean engraved) {
 		public Worn(String texture, BodyPart part) {
-			this(texture, part, null, 0, BodySpot.HAND_BACK, false);
+			this(texture, part, null, 0, BodySpot.HAND_BACK, null, false);
+		}
+
+		/** Porte-t-il un cercle ou un dessin à poser sur le membre ? */
+		public boolean drawn() {
+			return circle != null || art != null;
 		}
 	}
 

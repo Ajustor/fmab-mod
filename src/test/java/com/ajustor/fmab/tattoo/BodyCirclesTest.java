@@ -1,7 +1,7 @@
 package com.ajustor.fmab.tattoo;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
-import com.ajustor.fmab.data.Engraving;
+import com.ajustor.fmab.alchemy.drawing.Primitive;
 import com.ajustor.fmab.data.Engravings;
 import com.ajustor.fmab.gate.BodyPart;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * à l'autre.
  */
 class BodyCirclesTest {
-	private static final Drawing CIRCLE = new Drawing(List.of());
+	private static final Drawing CIRCLE = new Drawing(List.of(new Primitive.Circle(Drawing.CENTER_POINT, 10)));
 
 	@Test
 	void skinIsTattooedSteelIsEngravedNothingElse() {
@@ -48,8 +48,8 @@ class BodyCirclesTest {
 
 	@Test
 	void engravingFollowsThePieceFromOneArmToTheOther() {
-		Engravings engraved = Engravings.NONE.with(TattooSlot.PALM_LEFT, Engraving.of(CIRCLE));
-		assertSame(CIRCLE, engraved.get(TattooSlot.PALM_RIGHT).orElseThrow().circle());
+		Engravings engraved = Engravings.NONE.with(TattooSlot.PALM_LEFT, BodyArt.ofCircle(CIRCLE, BodyArt.STEEL_INK));
+		assertSame(CIRCLE, engraved.get(TattooSlot.PALM_RIGHT).orElseThrow().stamp().orElseThrow().circle());
 		assertTrue(engraved.get(TattooSlot.FOREARM_LEFT).isEmpty());
 		assertTrue(engraved.without(TattooSlot.PALM_RIGHT).isEmpty());
 		assertFalse(engraved.isEmpty());
@@ -57,7 +57,7 @@ class BodyCirclesTest {
 
 	@Test
 	void theTorsoIsNeverEngraved() {
-		assertThrows(IllegalArgumentException.class, () -> Engravings.NONE.with(TattooSlot.BACK, Engraving.of(CIRCLE)));
+		assertThrows(IllegalArgumentException.class, () -> Engravings.NONE.with(TattooSlot.BACK, BodyArt.ofCircle(CIRCLE, BodyArt.STEEL_INK)));
 		assertTrue(Engravings.NONE.get(TattooSlot.CHEST).isEmpty());
 	}
 }

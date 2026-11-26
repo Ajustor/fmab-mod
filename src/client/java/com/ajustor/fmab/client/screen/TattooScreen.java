@@ -1,9 +1,9 @@
 package com.ajustor.fmab.client.screen;
 
-import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.network.TattooPayload;
+import com.ajustor.fmab.tattoo.BodyArt;
 import com.ajustor.fmab.tattoo.BodyCircles;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -77,10 +77,10 @@ public class TattooScreen extends Screen {
 		}
 		y = top + 44;
 		for (TattooSlot slot : TattooSlot.values()) {
-			Drawing drawing = minecraft == null || minecraft.player == null ? null
-					: BodyCircles.circle(minecraft.player, slot).orElse(null);
-			if (drawing != null) {
-				graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(drawing, INK), left + 10, y + 2, 0, 0,
+			BodyArt art = minecraft == null || minecraft.player == null ? null
+					: BodyCircles.art(minecraft.player, slot).orElse(null);
+			if (art != null) {
+				graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(art), left + 10, y + 2, 0, 0,
 						THUMB, THUMB, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE);
 			} else {
 				graphics.outline(left + 10, y + 2, THUMB, THUMB, FADED);
