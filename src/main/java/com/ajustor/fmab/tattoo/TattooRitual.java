@@ -2,13 +2,12 @@ package com.ajustor.fmab.tattoo;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
-import com.ajustor.fmab.data.Engraving;
-import com.ajustor.fmab.data.Engravings;
 import com.ajustor.fmab.data.GateState;
+import com.ajustor.fmab.data.Notebooks;
 import com.ajustor.fmab.data.Tattoos;
-import com.ajustor.fmab.gate.BodyPart;
+import com.ajustor.fmab.network.FmabNetwork;
+import com.ajustor.fmab.network.OpenTattooEditorPayload;
 import com.ajustor.fmab.registry.FmabAttachments;
-import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.ajustor.fmab.transmutation.TransmutationLightning;
@@ -20,7 +19,11 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Optional;
 
 /**
  * Le rituel du tatouage : le cercle tracé au sol passe dans la peau. Il faut de l'encre
@@ -31,6 +34,8 @@ import net.minecraft.world.phys.Vec3;
 public final class TattooRitual {
 	private static final float PAIN = 6;
 	private static final float ERASE_PAIN = 8;
+	/** Un dessin sans cercle nouveau : l'aiguille pique, sans plus. */
+	private static final float ART_PAIN = 2;
 	private static final int ERASE_INK = 2;
 	/** L'usure du burin pour graver ou effacer une gravure : celle d'un gantelet gravé à la table. */
 	private static final int CHISEL_WEAR = 4;
@@ -83,41 +88,45 @@ public final class TattooRitual {
 					? "tattoo.fmab.engraved_occupied" : "tattoo.fmab.occupied"));
 			return;
 		}
-		if (!player.isCreative()) {
-			if (surface == BodyCircles.Surface.STEEL) {
-				tool.hurtAndBreak(CHISEL_WEAR, player, InteractionHand.MAIN_HAND);
-			} else {
-				tool.shrink(1);
-			}
-		}
+		spend(player, tool, surface);
 		level.removeBlock(circle, false);
 		TransmutationLightning.discharge(level, player.blockPosition(), 1.5, 1);
-		if (surface == BodyCircles.Surface.STEEL) {
+		// Le cercle se pose en tampon sur toute la grille, par-dessus les dessins de l'emplacement.
+		boolean steel = surface == BodyCircles.Surface.STEEL;
+		BodyArt stamped = BodyArt.ofCircle(drawing, steel ? BodyArt.STEEL_INK : BodyArt.SKIN_INK);
+		BodyCircles.setArt(player, slot, BodyCircles.art(player, slot).orElse(BodyArt.EMPTY)
+				.withStamp(stamped.stamp().orElseThrow()));
+		if (steel) {
 			// L'acier ne sent rien : la gravure ne fait pas mal.
-			BodyPart arm = slot.arm().orElseThrow();
-			ItemStack piece = BodyCircles.piece(player, arm).copy();
-			piece.set(FmabComponents.AUTOMAIL_ENGRAVINGS,
-					BodyCircles.engravings(piece).with(slot, Engraving.of(drawing)));
-			FmabAttachments.AUTOMAIL.set(player, FmabAttachments.AUTOMAIL.getOrCreate(player).with(arm, piece));
 			level.playSound(null, player.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.PLAYERS, 1, 1.2f);
 			player.sendSystemMessage(Component.translatable("tattoo.fmab.engraved",
 					Component.translatable(slot.translationKey())));
 			return;
 		}
-		Tattoos tattoos = FmabAttachments.TATTOOS.getOrCreate(player);
-		FmabAttachments.TATTOOS.set(player, tattoos.with(slot, drawing));
 		player.hurtServer(level, level.damageSources().magic(), PAIN);
 		level.playSound(null, player.blockPosition(), SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1, 0.6f);
 		player.sendSystemMessage(Component.translatable("tattoo.fmab.done", Component.translatable(slot.translationKey())));
 	}
 
+	/** L'outil paie : une encre se vide, le burin s'use. */
+	private static void spend(ServerPlayer player, ItemStack tool, BodyCircles.Surface surface) {
+		if (player.isCreative()) {
+			return;
+		}
+		if (surface == BodyCircles.Surface.STEEL) {
+			tool.hurtAndBreak(CHISEL_WEAR, player, InteractionHand.MAIN_HAND);
+		} else {
+			tool.shrink(1);
+		}
+	}
+
 	/**
-	 * Effacer un tatouage (deux encres, et plus mal encore qu'à l'encrer), ou une gravure d'automail
-	 * (le burin la lime ; l'acier ne sent rien).
+	 * Effacer ce que porte un emplacement : un tatouage (deux encres, et plus mal encore qu'à l'encrer),
+	 * ou une gravure d'automail (le burin la lime ; l'acier ne sent rien).
 	 */
 	public static void erase(ServerPlayer player, TattooSlot slot) {
 		BodyCircles.Surface surface = BodyCircles.surface(player, slot);
-		if (BodyCircles.circle(player, slot).isEmpty()) {
+		if (BodyCircles.art(player, slot).isEmpty()) {
 			return;
 		}
 		ItemStack tool = player.getItemInHand(InteractionHand.MAIN_HAND);
@@ -129,9 +138,7 @@ public final class TattooRitual {
 				}
 				tool.hurtAndBreak(CHISEL_WEAR, player, InteractionHand.MAIN_HAND);
 			}
-			BodyPart arm = slot.arm().orElseThrow();
-			FmabAttachments.AUTOMAIL.set(player, FmabAttachments.AUTOMAIL.getOrCreate(player)
-					.with(arm, unengraved(BodyCircles.piece(player, arm), slot)));
+			BodyCircles.setArt(player, slot, BodyArt.EMPTY);
 			player.sendSystemMessage(Component.translatable("tattoo.fmab.engraving_erased",
 					Component.translatable(slot.translationKey())));
 			return;
@@ -143,21 +150,110 @@ public final class TattooRitual {
 			}
 			tool.shrink(ERASE_INK);
 		}
-		FmabAttachments.TATTOOS.set(player, FmabAttachments.TATTOOS.getOrCreate(player).without(slot));
+		BodyCircles.setArt(player, slot, BodyArt.EMPTY);
 		player.hurtServer(player.level(), player.level().damageSources().magic(), ERASE_PAIN);
 		player.sendSystemMessage(Component.translatable("tattoo.fmab.erased", Component.translatable(slot.translationKey())));
 	}
 
-	/** La pièce sans la gravure de cet emplacement. */
-	private static ItemStack unengraved(ItemStack piece, TattooSlot slot) {
-		ItemStack out = piece.copy();
-		Engravings left = BodyCircles.engravings(out).without(slot);
-		if (left.isEmpty()) {
-			out.remove(FmabComponents.AUTOMAIL_ENGRAVINGS);
-		} else {
-			out.set(FmabComponents.AUTOMAIL_ENGRAVINGS, left);
+	/**
+	 * Un clic droit dans le vide, l'encre ou le burin en main : l'éditeur de dessins s'ouvre, s'il y a
+	 * de quoi dessiner (de la peau pour l'encre, un bras d'automail en état pour le burin). Renvoie vrai
+	 * si le clic est pris : visé sur un bloc à portée, il ne l'est pas.
+	 */
+	public static boolean openEditor(Player player, boolean engrave) {
+		if (player.pick(player.blockInteractionRange(), 1, false).getType() == HitResult.Type.BLOCK) {
+			return false;
 		}
-		return out;
+		if (!(player instanceof ServerPlayer server)) {
+			return true;
+		}
+		BodyCircles.Surface wanted = engrave ? BodyCircles.Surface.STEEL : BodyCircles.Surface.SKIN;
+		boolean any = false;
+		for (TattooSlot slot : TattooSlot.values()) {
+			any |= BodyCircles.surface(server, slot) == wanted;
+		}
+		if (!any) {
+			server.sendOverlayMessage(Component.translatable("tattoo.fmab.nothing_to_engrave"));
+			return true;
+		}
+		FmabNetwork.send(server, new OpenTattooEditorPayload(engrave));
+		return true;
+	}
+
+	/** Pourquoi le dessin envoyé par l'éditeur est refusé, ou {@code null} s'il est accepté. */
+	public enum Refusal {
+		WRONG_SURFACE, WRONG_TOOL, INVALID, NOT_IN_NOTEBOOK, TOO_SMALL
+	}
+
+	/**
+	 * Le dessin de l'éditeur passe dans la peau (à l'encre) ou dans l'acier (au burin). Il remplace ce
+	 * que l'emplacement portait ; vide, il l'efface (au prix d'un effacement). Un tampon nouveau doit
+	 * venir du carnet du joueur et tenir sur l'emplacement, comme un cercle tatoué au sol. Une encre
+	 * ou quatre points de burin par passage ; la peau a mal, plus fort quand un cercle y entre.
+	 */
+	public static void applyArt(ServerPlayer player, TattooSlot slot, BodyArt art) {
+		BodyCircles.Surface surface = BodyCircles.surface(player, slot);
+		BodyArt before = BodyCircles.art(player, slot).orElse(BodyArt.EMPTY);
+		if (art.equals(before)) {
+			return;
+		}
+		if (art.isEmpty()) {
+			erase(player, slot);
+			return;
+		}
+		ItemStack tool = player.getItemInHand(InteractionHand.MAIN_HAND);
+		Refusal refusal = check(player, slot, surface, tool, art, before);
+		if (refusal != null) {
+			player.sendOverlayMessage(Component.translatable(switch (refusal) {
+				case WRONG_SURFACE -> surface == BodyCircles.Surface.BROKEN ? "tattoo.fmab.automail_broken"
+						: "tattoo.fmab.no_limb";
+				case WRONG_TOOL -> surface == BodyCircles.Surface.STEEL ? "tattoo.fmab.needs_chisel"
+						: "tattoo.fmab.needs_ink";
+				case INVALID -> "tattoo.fmab.art_invalid";
+				case NOT_IN_NOTEBOOK -> "tattoo.fmab.stamp_not_in_notebook";
+				case TOO_SMALL -> "tattoo.fmab.stamp_too_big";
+			}, slot.stages()));
+			return;
+		}
+		spend(player, tool, surface);
+		BodyCircles.setArt(player, slot, art);
+		ServerLevel level = player.level();
+		boolean newCircle = art.circle().isPresent() && !art.circle().equals(before.circle());
+		if (surface == BodyCircles.Surface.STEEL) {
+			level.playSound(null, player.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.PLAYERS, 1, 1.2f);
+			player.sendSystemMessage(Component.translatable("tattoo.fmab.art_engraved",
+					Component.translatable(slot.translationKey())));
+			return;
+		}
+		player.hurtServer(level, level.damageSources().magic(), newCircle ? PAIN : ART_PAIN);
+		level.playSound(null, player.blockPosition(), newCircle ? SoundEvents.ILLUSIONER_CAST_SPELL
+				: SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1, 0.6f);
+		player.sendSystemMessage(Component.translatable("tattoo.fmab.art_tattooed",
+				Component.translatable(slot.translationKey())));
+	}
+
+	private static Refusal check(ServerPlayer player, TattooSlot slot, BodyCircles.Surface surface, ItemStack tool,
+			BodyArt art, BodyArt before) {
+		if (surface != BodyCircles.Surface.SKIN && surface != BodyCircles.Surface.STEEL) {
+			return Refusal.WRONG_SURFACE;
+		}
+		if (!rightTool(tool, surface)) {
+			return Refusal.WRONG_TOOL;
+		}
+		if (!art.valid()) {
+			return Refusal.INVALID;
+		}
+		Optional<Drawing> circle = art.circle();
+		// Un cercle déjà porté peut rester, même effacé du carnet depuis ; un nouveau vient du carnet.
+		if (circle.isEmpty() || circle.equals(before.circle())) {
+			return null;
+		}
+		if (!Notebooks.contains(player, circle.get())) {
+			return Refusal.NOT_IN_NOTEBOOK;
+		}
+		int stages = AlchemyRules.of(player.level().registryAccess())
+				.analyze(circle.get(), FmabAttachments.ALCHEMIST.getOrCreate(player)).parsed().stages().size();
+		return stages == 0 || stages > slot.stages() ? Refusal.TOO_SMALL : null;
 	}
 
 	/**

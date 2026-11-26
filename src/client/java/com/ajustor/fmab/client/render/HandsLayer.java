@@ -6,6 +6,7 @@ import com.ajustor.fmab.client.compat.RenderCompat;
 import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.tattoo.BodyArt;
 import com.ajustor.fmab.tattoo.BodySpot;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -46,10 +47,6 @@ import java.util.Map;
  * ({@link #submitHand}).
  */
 public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
-	/** L'encre des tatouages : un noir violacé, qui se lit sur toutes les carnations. */
-	static final int TATTOO_INK = 0xFF1B1626;
-	/** Le trait d'une gravure : l'acier creusé, plus sombre que la pièce. */
-	static final int ENGRAVING_INK = 0xFF23272C;
 
 	private final Model wide;
 	private final Model slim;
@@ -93,7 +90,7 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 				case BODY -> skeleton.body;
 				default -> null;
 			};
-			if (bone != null && worn.circle() != null) {
+			if (bone != null && worn.drawn()) {
 				// L'automail a le gabarit large, quelle que soit la peau.
 				submitCircle(collector.order(2), poseStack, bone, worn, thin && !worn.engraved(), light);
 			}
@@ -110,19 +107,18 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 			collector.order(1).submitModelPart(arm, poseStack, RenderTypes.entityCutout(texture(worn, thin)), light,
 					OverlayTexture.NO_OVERLAY, null);
 		}
-		if (worn.circle() != null) {
+		if (worn.drawn()) {
 			submitCircle(collector.order(2), poseStack, arm, worn, thin, light);
 		}
 	}
 
 	/**
-	 * Le cercle tatoué à cet emplacement, ou gravé dans l'automail qui remplace le bras, à dessiner sur
+	 * Le dessin tatoué à cet emplacement, ou gravé dans l'automail qui remplace le bras, à dessiner sur
 	 * le membre qui le porte.
 	 */
-	public static BodyHolder.Worn tattoo(TattooSlot slot, Drawing drawing, boolean engraved) {
+	public static BodyHolder.Worn tattoo(TattooSlot slot, BodyArt art, boolean engraved) {
 		BodyPart part = slot.arm().orElse(BodyPart.BODY);
-		return new BodyHolder.Worn(null, part, drawing, engraved ? ENGRAVING_INK : TATTOO_INK, BodySpot.of(slot),
-				engraved);
+		return new BodyHolder.Worn(null, part, null, 0, BodySpot.of(slot), art, engraved);
 	}
 
 	/** Le gant porté à cette main, à dessiner ; {@code null} si elle est nue. */
@@ -133,7 +129,7 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		Drawing circle = stack.get(FmabComponents.GLOVE_CIRCLE);
 		return new BodyHolder.Worn("glove_" + glove.kind().name().toLowerCase(Locale.ROOT),
 				left ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM, circle == null || circle.isEmpty() ? null : circle,
-				ink(glove.kind()), BodySpot.HAND_BACK, false);
+				ink(glove.kind()), BodySpot.HAND_BACK, null, false);
 	}
 
 	/** Le fil du cercle, choisi pour trancher sur le gant. */
@@ -163,7 +159,8 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		boolean left = worn.part() == BodyPart.LEFT_ARM;
 		BodySpot.Placement at = worn.engraved() ? worn.spot().place(left, thin, BodySpot.GLOVE_LIFT)
 				: worn.spot().place(left, thin);
-		Identifier texture = CircleTextures.get(worn.circle(), worn.ink());
+		Identifier texture = worn.art() != null ? CircleTextures.get(worn.art())
+				: CircleTextures.get(worn.circle(), worn.ink());
 		poseStack.pushPose();
 		bone.translateAndRotate(poseStack);
 		collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, buffer) -> {

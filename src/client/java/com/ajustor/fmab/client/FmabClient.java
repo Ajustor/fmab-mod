@@ -58,6 +58,7 @@ import com.ajustor.fmab.client.screen.InventoryTabs;
 import com.ajustor.fmab.client.screen.IzumiScreen;
 import com.ajustor.fmab.client.screen.NotebookScreen;
 import com.ajustor.fmab.client.screen.TattooScreen;
+import com.ajustor.fmab.client.screen.TattooEditorScreen;
 import com.ajustor.fmab.client.screen.TreatiseScreen;
 import com.ajustor.fmab.client.screen.SoulGiftScreen;
 import com.ajustor.fmab.client.screen.SoulOfferScreen;
@@ -74,6 +75,7 @@ import com.ajustor.fmab.network.BargainPayload;
 import com.ajustor.fmab.network.OpenDesignsPayload;
 import com.ajustor.fmab.network.OpenExamPayload;
 import com.ajustor.fmab.network.OpenIzumiPayload;
+import com.ajustor.fmab.network.OpenTattooEditorPayload;
 import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.network.OpenTruthPayload;
 import com.ajustor.fmab.network.SoulGiftPayload;
@@ -271,6 +273,8 @@ public final class FmabClient {
 				(payload, client) -> client.gui.setScreen(new DesignScreen(payload)));
 		ClientPlatform.get().receive(OpenTattooPayload.TYPE,
 				(payload, client) -> client.gui.setScreen(new TattooScreen(payload)));
+		ClientPlatform.get().receive(OpenTattooEditorPayload.TYPE,
+				(payload, client) -> client.gui.setScreen(new TattooEditorScreen(payload.engrave())));
 		ClientEvents.ITEM_TOOLTIP.register((stack, context, flag, lines) -> {
 			ItemHints.append(stack, lines);
 			if (stack.has(FmabComponents.EMBROIDERY)) {

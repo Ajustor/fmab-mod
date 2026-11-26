@@ -11,6 +11,7 @@ import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabTags;
+import com.ajustor.fmab.tattoo.TattooRitual;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -93,11 +94,15 @@ public class InscriptionItem extends Item {
 		return InteractionResult.SUCCESS;
 	}
 
-	/** Accroupi, un clic dans le vide change la taille des cercles que l'outil trace. */
+	/**
+	 * Accroupi, un clic dans le vide change la taille des cercles que l'outil trace. Debout, le burin
+	 * ouvre l'éditeur des gravures d'automail.
+	 */
 	@Override
 	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		if (!player.isShiftKeyDown()) {
-			return InteractionResult.PASS;
+			return medium == CircleMedium.ENGRAVING && TattooRitual.openEditor(player, true)
+					? InteractionResult.SUCCESS : InteractionResult.PASS;
 		}
 		ItemStack stack = player.getItemInHand(hand);
 		CircleSize next = size(stack).next();
