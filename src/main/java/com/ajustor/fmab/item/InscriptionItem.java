@@ -6,12 +6,15 @@ import com.ajustor.fmab.block.CircleSize;
 import com.ajustor.fmab.block.TransmutationCircleBlock;
 import com.ajustor.fmab.block.TransmutationCircleBlockEntity;
 import com.ajustor.fmab.data.Notebooks;
+import com.ajustor.fmab.network.FmabNetwork;
+import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.registry.FmabBlocks;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabTags;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -30,7 +33,8 @@ import java.util.function.Consumer;
 
 /**
  * Craie, peinture alchimique ou burin : inscrit sur la face cliquée (sol, mur ou plafond) le cercle
- * sélectionné dans le Carnet de cercles du joueur.
+ * sélectionné dans le Carnet de cercles du joueur. Le burin, sur un cercle déjà tracé, ouvre le rituel
+ * de gravure d'un bras d'automail.
  */
 public class InscriptionItem extends Item {
 	private final CircleMedium medium;
@@ -48,6 +52,15 @@ public class InscriptionItem extends Item {
 			return InteractionResult.PASS;
 		}
 		BlockPos support = context.getClickedPos();
+		// Le burin sur un cercle tracé : le rituel de gravure, pour un bras d'automail.
+		if (medium == CircleMedium.ENGRAVING
+				&& level.getBlockEntity(support) instanceof TransmutationCircleBlockEntity traced
+				&& !traced.drawing().isEmpty()) {
+			if (player instanceof ServerPlayer server) {
+				FmabNetwork.send(server, OpenTattooPayload.of(server, support, true));
+			}
+			return InteractionResult.SUCCESS;
+		}
 		BlockPos pos = support.relative(context.getClickedFace());
 		if (medium == CircleMedium.ENGRAVING && !level.getBlockState(support).is(FmabTags.ENGRAVABLE)) {
 			if (!level.isClientSide()) {

@@ -24,7 +24,7 @@ public class AlchemicalInkItem extends Item {
 			return InteractionResult.PASS;
 		}
 		if (context.getPlayer() instanceof ServerPlayer player) {
-			FmabNetwork.send(player, OpenTattooPayload.of(player, context.getClickedPos()));
+			FmabNetwork.send(player, OpenTattooPayload.of(player, context.getClickedPos(), false));
 		}
 		return InteractionResult.SUCCESS;
 	}

@@ -33,7 +33,7 @@ public class TattooScreen extends Screen {
 	private int panelHeight;
 
 	public TattooScreen(OpenTattooPayload state) {
-		super(Component.translatable("tattoo.fmab.title"));
+		super(Component.translatable(state.engrave() ? "tattoo.fmab.engrave_title" : "tattoo.fmab.title"));
 		this.state = state;
 	}
 
@@ -46,9 +46,12 @@ public class TattooScreen extends Screen {
 		for (TattooSlot slot : TattooSlot.values()) {
 			boolean taken = state.occupied().contains(slot.id());
 			BodyCircles.Surface surface = surface(slot);
+			// L'encre tatoue la peau, le burin grave l'acier : l'autre surface attend l'autre outil.
+			boolean usable = surface == (state.engrave() ? BodyCircles.Surface.STEEL : BodyCircles.Surface.SKIN);
 			String label = switch (surface) {
-				case SKIN -> taken ? "tattoo.fmab.erase" : "tattoo.fmab.here";
-				case STEEL -> taken ? "tattoo.fmab.erase" : "tattoo.fmab.engrave_here";
+				case SKIN -> !usable ? "tattoo.fmab.slot_needs_ink" : taken ? "tattoo.fmab.erase" : "tattoo.fmab.here";
+				case STEEL -> !usable ? "tattoo.fmab.slot_needs_chisel"
+						: taken ? "tattoo.fmab.erase" : "tattoo.fmab.engrave_here";
 				case BROKEN -> "tattoo.fmab.slot_broken";
 				case NONE -> "tattoo.fmab.slot_lost";
 			};
@@ -56,7 +59,7 @@ public class TattooScreen extends Screen {
 						ClientPlatform.get().send(new TattooPayload(state.circle(), slot.id(), taken));
 						onClose();
 					}).bounds(left + WIDTH - 96, y + 4, 86, 18).build());
-			b.active = surface == BodyCircles.Surface.SKIN || surface == BodyCircles.Surface.STEEL;
+			b.active = usable;
 			y += ROW;
 		}
 	}
@@ -67,7 +70,8 @@ public class TattooScreen extends Screen {
 		graphics.fill(left, top, left + WIDTH, top + panelHeight, PAPER);
 		graphics.centeredText(font, title, left + WIDTH / 2, top + 6, INK);
 		int y = top + 20;
-		for (FormattedCharSequence line : font.split(Component.translatable("tattoo.fmab.intro"), WIDTH - 20)) {
+		Component intro = Component.translatable(state.engrave() ? "tattoo.fmab.engrave_intro" : "tattoo.fmab.intro");
+		for (FormattedCharSequence line : font.split(intro, WIDTH - 20)) {
 			graphics.text(font, line, left + 10, y, FADED, false);
 			y += 10;
 		}

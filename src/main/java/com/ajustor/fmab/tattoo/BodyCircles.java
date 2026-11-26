@@ -2,6 +2,7 @@ package com.ajustor.fmab.tattoo;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.data.Automail;
+import com.ajustor.fmab.data.Engraving;
 import com.ajustor.fmab.data.Engravings;
 import com.ajustor.fmab.data.GateState;
 import com.ajustor.fmab.data.Tattoos;
@@ -17,8 +18,8 @@ import java.util.Optional;
 
 /**
  * Ce qui porte le cercle d'un emplacement du corps. La peau se tatoue ; un bras perdu ne porte plus
- * rien, sauf l'automail qui le remplace : on ne le tatoue pas, on le grave. La gravure appartient à la
- * pièce (elle la suit quand on la retire) et disparaît quand la pièce lâche.
+ * rien, sauf l'automail qui le remplace : on ne le tatoue pas, on le grave au burin. La gravure
+ * appartient à la pièce (elle la suit quand on la retire) et disparaît quand la pièce lâche.
  */
 public final class BodyCircles {
 	/** Ce qu'on trouve à un emplacement. */
@@ -81,7 +82,7 @@ public final class BodyCircles {
 				Tattoos tattoos = FmabAttachments.TATTOOS.get(entity);
 				yield tattoos == null ? Optional.empty() : tattoos.get(slot);
 			}
-			case STEEL -> engravings(piece(entity, slot.arm().orElseThrow())).get(slot);
+			case STEEL -> engravings(piece(entity, slot.arm().orElseThrow())).get(slot).map(Engraving::circle);
 			case BROKEN, NONE -> Optional.empty();
 		};
 	}
