@@ -119,6 +119,9 @@ public class TattooEditorScreen extends Screen {
 	private Button applyButton;
 	private EditBox hexBox;
 	private int swatchY;
+	/** Haut des lignes d'information (étages du tampon, coût). */
+	private int infoY;
+	private static final int INFO_LINES = 2;
 
 	public TattooEditorScreen(boolean engrave) {
 		super(Component.translatable(engrave ? "tattoo.fmab.editor.engrave_title" : "tattoo.fmab.editor.title"));
@@ -198,14 +201,18 @@ public class TattooEditorScreen extends Screen {
 		addRenderableWidget(Button.builder(Component.translatable("tattoo.fmab.editor.clear"), b -> change(BodyArt.EMPTY))
 				.bounds(panelX + 76, y - 1, 74, 18).build());
 
-		int bottom = canvasY + canvas;
+		// Sous le champ de couleur : deux lignes sur le tampon et le coût, puis les boutons. La colonne
+		// s'empile de haut en bas, quelle que soit la hauteur de la grille.
+		y += 20;
+		infoY = y;
+		y += INFO_LINES * 10 + 4;
 		addRenderableWidget(Button.builder(Component.translatable("tattoo.fmab.editor.close"), b -> onClose())
-				.bounds(panelX, bottom - 18, 60, 18).build());
+				.bounds(panelX, y, 60, 18).build());
 		applyButton = addRenderableWidget(Button.builder(Component.translatable(engrave
 						? "tattoo.fmab.editor.engrave" : "tattoo.fmab.editor.ink"), b -> apply())
 				.tooltip(Tooltip.create(Component.translatable(engrave
 						? "tattoo.fmab.editor.engrave.tooltip" : "tattoo.fmab.editor.ink.tooltip")))
-				.bounds(panelX + 62, bottom - 18, 88, 18).build());
+				.bounds(panelX + 62, y, 88, 18).build());
 		refreshLabels();
 		showPreview();
 	}
@@ -275,21 +282,21 @@ public class TattooEditorScreen extends Screen {
 
 		// Les couleurs, la courante cerclée de blanc.
 		for (int i = 0; i < PALETTE.length; i++) {
-			int x = panelX + (i % 8) * (SWATCH + 5), y = swatchY + (i / 8) * (SWATCH + 2);
+			int x = panelX + (i % 8) * (SWATCH + 4), y = swatchY + (i / 8) * (SWATCH + 2);
 			graphics.fill(x, y, x + SWATCH, y + SWATCH, 0xFF000000 | PALETTE[i]);
 			if (PALETTE[i] == color) {
 				graphics.outline(x - 1, y - 1, SWATCH + 2, SWATCH + 2, SELECTED);
 			}
 		}
 		// Ce que dit le tampon : ses étages, et ce que l'emplacement en porte.
-		int infoY = hexBox.getY() + 22;
+		int lineY = infoY;
 		for (Component line : stampInfo()) {
-			graphics.text(font, line, panelX, infoY, line.getStyle().getColor() == null ? DIM
+			graphics.text(font, line, panelX, lineY, line.getStyle().getColor() == null ? DIM
 					: line.getStyle().getColor().getValue() | 0xFF000000, false);
-			infoY += 10;
+			lineY += 10;
 		}
 		graphics.text(font, Component.translatable(engrave ? "tattoo.fmab.editor.cost.engrave"
-				: "tattoo.fmab.editor.cost.ink"), panelX, infoY + 2, DIM, false);
+				: "tattoo.fmab.editor.cost.ink"), panelX, lineY, DIM, false);
 	}
 
 	/** Le joueur dans l'aperçu, à l'angle choisi, comme l'inventaire le montre. */
@@ -378,7 +385,7 @@ public class TattooEditorScreen extends Screen {
 			return true;
 		}
 		for (int i = 0; i < PALETTE.length; i++) {
-			int x = panelX + (i % 8) * (SWATCH + 5), y = swatchY + (i / 8) * (SWATCH + 2);
+			int x = panelX + (i % 8) * (SWATCH + 4), y = swatchY + (i / 8) * (SWATCH + 2);
 			if (mx >= x && mx < x + SWATCH && my >= y && my < y + SWATCH) {
 				setColor(PALETTE[i]);
 				return true;
