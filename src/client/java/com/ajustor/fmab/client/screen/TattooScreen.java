@@ -2,10 +2,9 @@ package com.ajustor.fmab.client.screen;
 
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.client.render.CircleTextures;
-import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.network.TattooPayload;
-import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.tattoo.BodyCircles;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -16,8 +15,8 @@ import net.minecraft.util.FormattedCharSequence;
 import com.ajustor.fmab.platform.client.ClientPlatform;
 
 /**
- * Le rituel du tatouage : choisir où le cercle du sol passera dans la peau, ou effacer un
- * tatouage existant.
+ * Le rituel du tatouage : choisir où le cercle du sol passera dans la peau (ou se gravera dans
+ * l'automail d'un bras perdu), ou effacer un tatouage existant.
  */
 public class TattooScreen extends Screen {
 	private static final int WIDTH = 320;
@@ -34,7 +33,7 @@ public class TattooScreen extends Screen {
 	private int panelHeight;
 
 	public TattooScreen(OpenTattooPayload state) {
-		super(Component.translatable("tattoo.fmab.title"));
+		super(Component.translatable(state.engrave() ? "tattoo.fmab.engrave_title" : "tattoo.fmab.title"));
 		this.state = state;
 	}
 
@@ -46,12 +45,21 @@ public class TattooScreen extends Screen {
 		int y = top + 44;
 		for (TattooSlot slot : TattooSlot.values()) {
 			boolean taken = state.occupied().contains(slot.id());
-			Button b = addRenderableWidget(Button.builder(
-					Component.translatable(taken ? "tattoo.fmab.erase" : "tattoo.fmab.here"), btn -> {
+			BodyCircles.Surface surface = surface(slot);
+			// L'encre tatoue la peau, le burin grave l'acier : l'autre surface attend l'autre outil.
+			boolean usable = surface == (state.engrave() ? BodyCircles.Surface.STEEL : BodyCircles.Surface.SKIN);
+			String label = switch (surface) {
+				case SKIN -> !usable ? "tattoo.fmab.slot_needs_ink" : taken ? "tattoo.fmab.erase" : "tattoo.fmab.here";
+				case STEEL -> !usable ? "tattoo.fmab.slot_needs_chisel"
+						: taken ? "tattoo.fmab.erase" : "tattoo.fmab.engrave_here";
+				case BROKEN -> "tattoo.fmab.slot_broken";
+				case NONE -> "tattoo.fmab.slot_lost";
+			};
+			Button b = addRenderableWidget(Button.builder(Component.translatable(label), btn -> {
 						ClientPlatform.get().send(new TattooPayload(state.circle(), slot.id(), taken));
 						onClose();
 					}).bounds(left + WIDTH - 96, y + 4, 86, 18).build());
-			b.active = true;
+			b.active = usable;
 			y += ROW;
 		}
 	}
@@ -62,15 +70,15 @@ public class TattooScreen extends Screen {
 		graphics.fill(left, top, left + WIDTH, top + panelHeight, PAPER);
 		graphics.centeredText(font, title, left + WIDTH / 2, top + 6, INK);
 		int y = top + 20;
-		for (FormattedCharSequence line : font.split(Component.translatable("tattoo.fmab.intro"), WIDTH - 20)) {
+		Component intro = Component.translatable(state.engrave() ? "tattoo.fmab.engrave_intro" : "tattoo.fmab.intro");
+		for (FormattedCharSequence line : font.split(intro, WIDTH - 20)) {
 			graphics.text(font, line, left + 10, y, FADED, false);
 			y += 10;
 		}
-		Tattoos tattoos = minecraft == null || minecraft.player == null ? null
-				: FmabAttachments.TATTOOS.get(minecraft.player);
 		y = top + 44;
 		for (TattooSlot slot : TattooSlot.values()) {
-			Drawing drawing = tattoos == null ? null : tattoos.get(slot).orElse(null);
+			Drawing drawing = minecraft == null || minecraft.player == null ? null
+					: BodyCircles.circle(minecraft.player, slot).orElse(null);
 			if (drawing != null) {
 				graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(drawing, INK), left + 10, y + 2, 0, 0,
 						THUMB, THUMB, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE);
@@ -78,11 +86,21 @@ public class TattooScreen extends Screen {
 				graphics.outline(left + 10, y + 2, THUMB, THUMB, FADED);
 			}
 			graphics.text(font, Component.translatable(slot.translationKey()), left + 42, y + 4, INK, false);
-			graphics.text(font, Component.translatable(slot.active() ? "tattoo.fmab.active" : "tattoo.fmab.passive",
-					slot.stages()), left + 42, y + 15, FADED, false);
+			Component kind = Component.translatable(slot.active() ? "tattoo.fmab.active" : "tattoo.fmab.passive",
+					slot.stages());
+			if (surface(slot) == BodyCircles.Surface.STEEL) {
+				kind = Component.translatable("tattoo.fmab.on_automail", kind);
+			}
+			graphics.text(font, kind, left + 42, y + 15, FADED, false);
 			y += ROW;
 		}
 		super.extractRenderState(graphics, mouseX, mouseY, a);
+	}
+
+	/** Ce qui porte cet emplacement chez le joueur : sa peau, son automail, ou rien. */
+	private BodyCircles.Surface surface(TattooSlot slot) {
+		return minecraft == null || minecraft.player == null ? BodyCircles.Surface.SKIN
+				: BodyCircles.surface(minecraft.player, slot);
 	}
 
 	@Override

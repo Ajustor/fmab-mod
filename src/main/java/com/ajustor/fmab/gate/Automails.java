@@ -39,7 +39,8 @@ import com.ajustor.fmab.compat.EntityCompat;
 /**
  * Les règles de l'automail : on ne le pose que sur un membre perdu ; il s'use (un coup ou un bloc
  * cassé pour un bras, la marche pour une jambe) ; usé jusqu'au bout, il ne répond plus jusqu'à ce
- * que Winry le répare. Un alchimiste peut transmuter son bras en lame, et l'en défaire.
+ * que Winry le répare. Un alchimiste peut transmuter son bras en lame, et l'en défaire. Les cercles
+ * gravés dans un bras le suivent quand on le retire, mais se brisent quand il lâche.
  */
 public final class Automails {
 	private static final List<BodyPart> LIMBS = List.of(BodyPart.RIGHT_ARM, BodyPart.LEFT_ARM, BodyPart.RIGHT_LEG,
@@ -196,7 +197,7 @@ public final class Automails {
 		return true;
 	}
 
-	/** Retire la pièce d'un membre ; elle revient dans l'inventaire, sa lame rentrée. */
+	/** Retire la pièce d'un membre ; elle revient dans l'inventaire, sa lame rentrée, ses gravures intactes. */
 	public static void remove(ServerPlayer player, BodyPart part) {
 		Automail automail = FmabAttachments.AUTOMAIL.getOrCreate(player);
 		ItemStack stack = automail.get(part).copy();
@@ -264,11 +265,19 @@ public final class Automails {
 		}
 		ItemStack worn = stack.copy();
 		worn.setDamageValue(worn(worn.getDamageValue(), worn.getMaxDamage(), amount));
+		boolean engraved = broken(worn) && worn.has(FmabComponents.AUTOMAIL_ENGRAVINGS);
+		if (engraved) {
+			// La pièce lâche : ses gravures se brisent avec elle, la réparation ne les rend pas.
+			worn.remove(FmabComponents.AUTOMAIL_ENGRAVINGS);
+		}
 		FmabAttachments.AUTOMAIL.set(player, automail.with(part, worn));
 		if (broken(worn)) {
 			player.level().playSound(null, player.blockPosition(), SoundEvents.ITEM_BREAK.value(), SoundSource.PLAYERS, 1, 0.8f);
 			player.sendSystemMessage(Component.translatable("automail.fmab.broke",
 					Component.translatable(part.translationKey())));
+			if (engraved) {
+				player.sendSystemMessage(Component.translatable("automail.fmab.engravings_lost"));
+			}
 		}
 	}
 

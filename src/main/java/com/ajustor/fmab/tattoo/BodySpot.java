@@ -47,7 +47,14 @@ public enum BodySpot {
 	 * (l'épaule) à 10 (le bout des doigts), de z = −2 à 2. Le buste : de x = −4 à 4, de y = 0 à 12.
 	 */
 	public Placement place(boolean leftArm, boolean thin) {
-		float lift = tattoo() ? SKIN_LIFT : GLOVE_LIFT;
+		return place(leftArm, thin, tattoo() ? SKIN_LIFT : GLOVE_LIFT);
+	}
+
+	/**
+	 * Le même carré, à {@code lift} de la face : un cercle gravé dans un automail se pose au-dessus de
+	 * l'acier ({@link #GLOVE_LIFT}), pas sous des vêtements qu'un automail n'a pas.
+	 */
+	public Placement place(boolean leftArm, boolean thin, float lift) {
 		float outer = (thin ? 2 : 3) * PX;
 		// La face extérieure du bras : −X pour le droit, +X pour le gauche. Vue de l'extérieur, la page
 		// part de l'arrière du bras droit (+Z), de l'avant du bras gauche (−Z).

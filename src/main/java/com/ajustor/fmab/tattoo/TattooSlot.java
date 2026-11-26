@@ -1,5 +1,7 @@
 package com.ajustor.fmab.tattoo;
 
+import com.ajustor.fmab.gate.BodyPart;
+
 import java.util.Locale;
 import java.util.Optional;
 
@@ -52,6 +54,24 @@ public enum TattooSlot {
 
 	public boolean isLeft() {
 		return left;
+	}
+
+	/** Le bras qui porte cet emplacement ; aucun pour le dos et le torse. */
+	public Optional<BodyPart> arm() {
+		return switch (this) {
+			case PALM_LEFT, FOREARM_LEFT -> Optional.of(BodyPart.LEFT_ARM);
+			case PALM_RIGHT, FOREARM_RIGHT -> Optional.of(BodyPart.RIGHT_ARM);
+			case BACK, CHEST -> Optional.empty();
+		};
+	}
+
+	/** L'endroit du bras, sans son côté ({@code palm}, {@code forearm}) : là où se grave un automail. */
+	public Optional<String> spot() {
+		return switch (this) {
+			case PALM_LEFT, PALM_RIGHT -> Optional.of("palm");
+			case FOREARM_LEFT, FOREARM_RIGHT -> Optional.of("forearm");
+			case BACK, CHEST -> Optional.empty();
+		};
 	}
 
 	public static Optional<TattooSlot> byId(String id) {
