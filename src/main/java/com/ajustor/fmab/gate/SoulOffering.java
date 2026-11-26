@@ -22,6 +22,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
+import com.ajustor.fmab.tattoo.TattooRitual;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -235,6 +236,7 @@ public final class SoulOffering {
 			return;
 		}
 		FmabAttachments.GATE.set(donor, gate.pay(part));
+		TattooRitual.forgetLostArms(donor);
 		SoulBinding.bind(soul, level, pending.circle(), armor.get());
 		Vec3 at = Vec3.atCenterOf(pending.circle());
 		level.sendParticles(ParticleTypes.SQUID_INK, at.x, at.y, at.z, 60, 1.2, 0.3, 1.2, 0.05);

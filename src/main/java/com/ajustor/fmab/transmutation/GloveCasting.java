@@ -14,6 +14,7 @@ import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.registry.FmabItems;
 import com.ajustor.fmab.registry.FmabSounds;
 import com.ajustor.fmab.stone.LivingStone;
+import com.ajustor.fmab.tattoo.BodyCircles;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.training.Trainings;
 import com.ajustor.fmab.training.Trial;
@@ -162,13 +163,16 @@ public final class GloveCasting {
 		return held.isEmpty() || held.is(FmabItems.PHILOSOPHER_STONE) || held.is(FmabItems.RED_STONE_SHARD);
 	}
 
-	/** Une main porte-t-elle un cercle : celui de son gant, ou, paume nue, celui de son tatouage ? */
+	/**
+	 * Une main porte-t-elle un cercle : celui de son gant, ou, paume nue, celui de son tatouage (ou de sa
+	 * gravure, sur un bras d'automail) ?
+	 */
 	private static boolean hasCircle(ServerPlayer player, boolean left) {
 		ItemStack glove = FmabAttachments.GLOVES.getOrCreate(player).get(left);
 		if (!glove.isEmpty()) {
 			return inscribed(glove);
 		}
-		return FmabAttachments.TATTOOS.getOrCreate(player).get(TattooSlot.palm(left)).isPresent();
+		return BodyCircles.circle(player, TattooSlot.palm(left)).isPresent();
 	}
 
 	private static boolean castHand(ServerPlayer player, boolean left, BlockPos target, Direction face) {
@@ -176,9 +180,9 @@ public final class GloveCasting {
 		if (!gloves.get(left).isEmpty()) {
 			return castWith(player, gloves, left, target, face);
 		}
-		// Paume nue tatouée : le cercle fait partie du corps, il ne s'use pas.
+		// Paume nue tatouée, ou gravée dans l'automail : le cercle fait partie du corps, il ne s'use pas.
 		TattooSlot palm = TattooSlot.palm(left);
-		Drawing drawing = FmabAttachments.TATTOOS.getOrCreate(player).get(palm).orElse(null);
+		Drawing drawing = BodyCircles.circle(player, palm).orElse(null);
 		if (drawing == null) {
 			return false;
 		}

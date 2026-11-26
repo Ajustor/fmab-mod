@@ -37,6 +37,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import com.ajustor.fmab.tattoo.TattooRitual;
 
 import java.util.Optional;
 import com.ajustor.fmab.platform.event.PlayerEvents;
@@ -536,6 +537,7 @@ public final class GateOfTruth {
 			}
 		}
 		FmabAttachments.GATE.set(player, paid);
+		TattooRitual.forgetLostArms(player);
 		truth(space, player).ifPresent(t -> t.setStolen(paid.lost()));
 		space.playSound(null, player.blockPosition(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1, 0.5f);
 		Tolls.dropFromLostHands(player, paid);

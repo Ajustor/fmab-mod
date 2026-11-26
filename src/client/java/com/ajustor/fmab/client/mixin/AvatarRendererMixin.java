@@ -13,6 +13,7 @@ import com.ajustor.fmab.gate.BodyPart;
 import com.ajustor.fmab.gate.Wheelchairs;
 import com.ajustor.fmab.item.AutomailItem;
 import com.ajustor.fmab.registry.FmabAttachments;
+import com.ajustor.fmab.tattoo.BodyCircles;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -79,7 +80,7 @@ public abstract class AvatarRendererMixin {
 		holder.fmab$setWorn(fmab$worn(entity));
 	}
 
-	/** Ses gants (une sorte par main) et ses tatouages, à dessiner sur son corps. */
+	/** Ses gants (une sorte par main), ses tatouages et les gravures de ses automails, à dessiner sur son corps. */
 	@Unique
 	private static java.util.List<BodyHolder.Worn> fmab$worn(Avatar entity) {
 		java.util.List<BodyHolder.Worn> out = new java.util.ArrayList<>();
@@ -92,12 +93,10 @@ public abstract class AvatarRendererMixin {
 				}
 			}
 		}
-		com.ajustor.fmab.data.Tattoos tattoos = FmabAttachments.TATTOOS.get(entity);
-		if (tattoos != null) {
-			for (com.ajustor.fmab.tattoo.TattooSlot slot : com.ajustor.fmab.tattoo.TattooSlot.values()) {
-				tattoos.get(slot).filter(drawing -> !drawing.isEmpty())
-						.ifPresent(drawing -> out.add(HandsLayer.tattoo(slot, drawing)));
-			}
+		for (com.ajustor.fmab.tattoo.TattooSlot slot : com.ajustor.fmab.tattoo.TattooSlot.values()) {
+			boolean engraved = BodyCircles.surface(entity, slot) == BodyCircles.Surface.STEEL;
+			BodyCircles.circle(entity, slot).filter(drawing -> !drawing.isEmpty())
+					.ifPresent(drawing -> out.add(HandsLayer.tattoo(slot, drawing, engraved)));
 		}
 		return out;
 	}
@@ -158,19 +157,21 @@ public abstract class AvatarRendererMixin {
 
 	/**
 	 * À la première personne, ce que porte ce bras : le gant et le cercle qu'on y a inscrit, les cercles
-	 * tatoués dans la paume et sur l'avant-bras.
+	 * tatoués dans la paume et sur l'avant-bras, ou gravés dans l'automail qui le remplace.
 	 */
 	@Unique
 	private void fmab$glove(BodyPart arm, PoseStack poseStack, SubmitNodeCollector collector, int light) {
 		Player player = Minecraft.getInstance().player;
-		if (!(player instanceof AbstractClientPlayer me) || BodyCache.of(player).lost().contains(arm)) {
+		if (!(player instanceof AbstractClientPlayer me)) {
 			return;
 		}
+		// Un bras perdu ne porte plus que ce qui est gravé dans son automail.
+		boolean lost = BodyCache.of(player).lost().contains(arm);
 		PlayerModel skeleton = (PlayerModel) ((LivingEntityRenderer<?, ?, ?>) (Object) this).getModel();
 		ModelPart bone = arm == BodyPart.LEFT_ARM ? skeleton.leftArm : skeleton.rightArm;
 		boolean thin = me.getSkin().model() == PlayerModelType.SLIM;
 		for (BodyHolder.Worn worn : fmab$worn(me)) {
-			if (worn.part() == arm) {
+			if (worn.part() == arm && (!lost || worn.engraved())) {
 				HandsLayer.submitHand(collector, poseStack, bone, worn, thin, light);
 			}
 		}

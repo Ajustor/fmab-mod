@@ -39,11 +39,13 @@ public interface BodyHolder {
 	/**
 	 * Une pièce portée sur le corps : son calque ({@code textures/entity/worn/}, aucun pour un tatouage),
 	 * le membre qui la porte et, s'il y en a un, le vrai cercle qu'on y a inscrit, la couleur de son
-	 * trait et l'endroit du membre où il se pose.
+	 * trait et l'endroit du membre où il se pose. {@code engraved} : le cercle est gravé dans l'automail
+	 * qui remplace ce membre perdu, il se dessine donc sur l'automail et non sur la peau.
 	 */
-	record Worn(@Nullable String texture, BodyPart part, @Nullable Drawing circle, int ink, BodySpot spot) {
+	record Worn(@Nullable String texture, BodyPart part, @Nullable Drawing circle, int ink, BodySpot spot,
+			boolean engraved) {
 		public Worn(String texture, BodyPart part) {
-			this(texture, part, null, 0, BodySpot.HAND_BACK);
+			this(texture, part, null, 0, BodySpot.HAND_BACK, false);
 		}
 	}
 

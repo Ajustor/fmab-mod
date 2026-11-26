@@ -48,6 +48,8 @@ import java.util.Map;
 public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 	/** L'encre des tatouages : un noir violacé, qui se lit sur toutes les carnations. */
 	static final int TATTOO_INK = 0xFF1B1626;
+	/** Le trait d'une gravure : l'acier creusé, plus sombre que la pièce. */
+	static final int ENGRAVING_INK = 0xFF23272C;
 
 	private final Model wide;
 	private final Model slim;
@@ -76,7 +78,8 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		boolean thin = state.skin != null && state.skin.model() == PlayerModelType.SLIM;
 		Model model = thin ? slim : wide;
 		for (BodyHolder.Worn worn : holder.fmab$worn()) {
-			if (holder.fmab$lostLimbs().contains(worn.part())) {
+			// Un bras perdu ne porte plus que ce qui est gravé dans son automail.
+			if (holder.fmab$lostLimbs().contains(worn.part()) && !worn.engraved()) {
 				continue;
 			}
 			if (worn.texture() != null) {
@@ -91,7 +94,8 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 				default -> null;
 			};
 			if (bone != null && worn.circle() != null) {
-				submitCircle(collector.order(2), poseStack, bone, worn, thin, light);
+				// L'automail a le gabarit large, quelle que soit la peau.
+				submitCircle(collector.order(2), poseStack, bone, worn, thin && !worn.engraved(), light);
 			}
 		}
 	}
@@ -111,13 +115,14 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		}
 	}
 
-	/** Le cercle tatoué à cet emplacement, à dessiner sur le membre qui le porte. */
-	public static BodyHolder.Worn tattoo(TattooSlot slot, Drawing drawing) {
-		BodyPart part = switch (slot) {
-			case BACK, CHEST -> BodyPart.BODY;
-			default -> slot.isLeft() ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM;
-		};
-		return new BodyHolder.Worn(null, part, drawing, TATTOO_INK, BodySpot.of(slot));
+	/**
+	 * Le cercle tatoué à cet emplacement, ou gravé dans l'automail qui remplace le bras, à dessiner sur
+	 * le membre qui le porte.
+	 */
+	public static BodyHolder.Worn tattoo(TattooSlot slot, Drawing drawing, boolean engraved) {
+		BodyPart part = slot.arm().orElse(BodyPart.BODY);
+		return new BodyHolder.Worn(null, part, drawing, engraved ? ENGRAVING_INK : TATTOO_INK, BodySpot.of(slot),
+				engraved);
 	}
 
 	/** Le gant porté à cette main, à dessiner ; {@code null} si elle est nue. */
@@ -128,7 +133,7 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		Drawing circle = stack.get(FmabComponents.GLOVE_CIRCLE);
 		return new BodyHolder.Worn("glove_" + glove.kind().name().toLowerCase(Locale.ROOT),
 				left ? BodyPart.LEFT_ARM : BodyPart.RIGHT_ARM, circle == null || circle.isEmpty() ? null : circle,
-				ink(glove.kind()), BodySpot.HAND_BACK);
+				ink(glove.kind()), BodySpot.HAND_BACK, false);
 	}
 
 	/** Le fil du cercle, choisi pour trancher sur le gant. */
@@ -154,7 +159,10 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 	 */
 	private static void submitCircle(OrderedSubmitNodeCollector collector, PoseStack poseStack, ModelPart bone,
 			BodyHolder.Worn worn, boolean thin, int light) {
-		BodySpot.Placement at = worn.spot().place(worn.part() == BodyPart.LEFT_ARM, thin);
+		// Une gravure est à la surface de l'acier, qu'aucun vêtement ne couvre.
+		boolean left = worn.part() == BodyPart.LEFT_ARM;
+		BodySpot.Placement at = worn.engraved() ? worn.spot().place(left, thin, BodySpot.GLOVE_LIFT)
+				: worn.spot().place(left, thin);
 		Identifier texture = CircleTextures.get(worn.circle(), worn.ink());
 		poseStack.pushPose();
 		bone.translateAndRotate(poseStack);

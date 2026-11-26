@@ -2,6 +2,7 @@ package com.ajustor.fmab.registry;
 
 import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
+import com.ajustor.fmab.data.Engravings;
 import com.ajustor.fmab.data.FmabCodecs;
 import com.ajustor.fmab.data.Tome;
 import com.mojang.serialization.Codec;
@@ -47,6 +48,15 @@ public final class FmabComponents {
 			DataComponentType.<Boolean>builder()
 					.persistent(Codec.BOOL)
 					.networkSynchronized(ByteBufCodecs.BOOL)
+					.build());
+
+	/** Les cercles gravés dans un bras d'automail : ils restent dans l'acier, et partent si la pièce lâche. */
+	public static final DataComponentType<Engravings> AUTOMAIL_ENGRAVINGS = Platform.get().content().register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Fmab.id("automail_engravings"),
+			DataComponentType.<Engravings>builder()
+					.persistent(Engravings.CODEC)
+					.networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(Engravings.CODEC))
 					.build());
 
 	/** Le tome que cachent des notes chiffrées de Marcoh. */

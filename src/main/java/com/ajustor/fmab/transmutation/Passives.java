@@ -4,10 +4,10 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.rules.Analysis;
 import com.ajustor.fmab.data.AlchemistData;
-import com.ajustor.fmab.data.Tattoos;
 import com.ajustor.fmab.homunculus.AntiAlchemy;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.registry.FmabComponents;
+import com.ajustor.fmab.tattoo.BodyCircles;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.util.Modifiers;
 import com.ajustor.fmab.util.PlayerMaps;
@@ -110,10 +110,9 @@ public final class Passives {
 				worn.add(d);
 			}
 		}
-		Tattoos tattoos = FmabAttachments.TATTOOS.getOrCreate(player);
 		for (TattooSlot slot : TattooSlot.values()) {
 			if (!slot.active()) {
-				tattoos.get(slot).ifPresent(worn::add);
+				BodyCircles.circle(player, slot).ifPresent(worn::add);
 			}
 		}
 		Map<String, Integer> out = new HashMap<>();

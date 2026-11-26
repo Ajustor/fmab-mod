@@ -1,7 +1,9 @@
 package com.ajustor.fmab.item;
 
+import com.ajustor.fmab.data.Engravings;
 import com.ajustor.fmab.gate.Automails;
 import com.ajustor.fmab.gate.BodyPart;
+import com.ajustor.fmab.registry.FmabComponents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -14,7 +16,8 @@ import java.util.function.Consumer;
 
 /**
  * Bras ou jambe d'automail. Il se pose sur un membre perdu (chez Winry ou à l'établi d'automail),
- * s'use à l'usage et se répare chez Winry.
+ * s'use à l'usage et se répare chez Winry. Un bras d'automail se grave de cercles comme une peau se
+ * tatoue ; la gravure le suit, et se brise s'il lâche.
  */
 public class AutomailItem extends Item {
 	/** Les modèles d'automail : le fer standard, l'acier léger de Rush Valley, le modèle d'hiver de Briggs. */
@@ -60,6 +63,15 @@ public class AutomailItem extends Item {
 		tooltip.accept(Component.translatable("item.fmab.automail.fit").withStyle(ChatFormatting.DARK_GRAY));
 		if (Automails.bladed(stack)) {
 			tooltip.accept(Component.translatable("item.fmab.automail.bladed").withStyle(ChatFormatting.AQUA));
+		}
+		Engravings engravings = stack.get(FmabComponents.AUTOMAIL_ENGRAVINGS);
+		if (engravings != null) {
+			for (String spot : new String[]{"palm", "forearm"}) {
+				if (engravings.spots().containsKey(spot)) {
+					tooltip.accept(Component.translatable("item.fmab.automail.engraved." + spot)
+							.withStyle(ChatFormatting.DARK_AQUA));
+				}
+			}
 		}
 		if (Automails.broken(stack)) {
 			tooltip.accept(Component.translatable("item.fmab.automail.broken").withStyle(ChatFormatting.RED));
