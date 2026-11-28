@@ -106,6 +106,8 @@ public class TattooEditorScreen extends Screen {
 	private int color;
 	private int stampPage;
 	private double stampHalf = 10;
+	/** Le tampon se déroule autour du bras plutôt que de se poser à plat (tour du bras seulement). */
+	private boolean unroll;
 	/** Le geste en cours (coordonnées de grille) : départ, ou points du trait libre. */
 	private @Nullable Vec2 anchor;
 	private @Nullable Vec2 arcStart;
@@ -134,6 +136,7 @@ public class TattooEditorScreen extends Screen {
 	private Button sidesButton;
 	private Button stampButton;
 	private Button stampSizeButton;
+	private Button layoutButton;
 	private Button applyButton;
 	private EditBox hexBox;
 	private int swatchY;
@@ -210,6 +213,13 @@ public class TattooEditorScreen extends Screen {
 		}).bounds(panelX, y, 74, 18).build());
 		addRenderableWidget(Button.builder(Component.translatable("tattoo.fmab.editor.unstamp"),
 				b -> change(draft().withStamp(null))).bounds(panelX + 76, y, 74, 18).build());
+		y += 20;
+		layoutButton = addRenderableWidget(Button.builder(Component.empty(), b -> {
+			unroll = !unroll;
+			tool = Tool.STAMP;
+			refreshLabels();
+		}).tooltip(Tooltip.create(Component.translatable("tattoo.fmab.editor.layout.tooltip")))
+				.bounds(panelX, y, 150, 18).build());
 		y += 24;
 		swatchY = y;
 		y += 2 * (SWATCH + 2) + 2;
@@ -251,6 +261,9 @@ public class TattooEditorScreen extends Screen {
 		stampButton.setMessage(tool == Tool.STAMP ? Component.literal("» ").append(stamp) : stamp);
 		stampButton.active = !pages.isEmpty();
 		stampSizeButton.setMessage(Component.translatable("tattoo.fmab.editor.stamp.size", (int) (stampHalf * 2)));
+		layoutButton.active = slot.sleeve();
+		layoutButton.setMessage(Component.translatable(unrolled() ? "tattoo.fmab.editor.layout.unrolled"
+				: "tattoo.fmab.editor.layout.whole"));
 		if (applyButton != null) {
 			applyButton.active = !slots.isEmpty() && !draft().equals(current(slot));
 		}
@@ -414,7 +427,7 @@ public class TattooEditorScreen extends Screen {
 	private List<Primitive> gesture() {
 		if (tool == Tool.STAMP) {
 			Drawing circle = stampCircle();
-			return circle == null ? List.of() : stampAt(circle, cursor).placed();
+			return circle == null ? List.of() : stampAt(circle, cursor).placed(page().width());
 		}
 		if (tool == Tool.FREEHAND) {
 			return freehand.size() < 2 ? List.of() : List.of(new Primitive.Polyline(freehand));
@@ -634,7 +647,12 @@ public class TattooEditorScreen extends Screen {
 
 	/** Le tampon posé en {@code at}, à la taille choisie, gardé dans la grille. */
 	private BodyArt.Stamp stampAt(Drawing circle, Vec2 at) {
-		return new BodyArt.Stamp(circle, clamp(at), Math.min(stampHalf, page().maxStampHalf()), color);
+		return new BodyArt.Stamp(circle, clamp(at), Math.min(stampHalf, page().maxStampHalf()), color, unrolled());
+	}
+
+	/** Le prochain tampon se déroule-t-il ? Seulement autour d'un bras. */
+	private boolean unrolled() {
+		return unroll && slot.sleeve();
 	}
 
 	/**
@@ -691,7 +709,7 @@ public class TattooEditorScreen extends Screen {
 		}
 		for (int i = art.stamps().size() - 1; i >= 0; i--) {
 			BodyArt.Stamp st = art.stamps().get(i);
-			if (st.center().distance(at) <= st.half()) {
+			if (st.covers(at)) {
 				change(art.withoutStamp(i));
 				return;
 			}
