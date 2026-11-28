@@ -23,7 +23,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Le rituel du tatouage : le cercle tracé au sol passe dans la peau. Il faut de l'encre
@@ -83,7 +84,7 @@ public final class TattooRitual {
 			player.sendOverlayMessage(Component.translatable("transmutation.fmab.support_too_small", slot.stages()));
 			return;
 		}
-		if (BodyCircles.circle(player, slot).isPresent()) {
+		if (BodyCircles.full(player, slot)) {
 			player.sendOverlayMessage(Component.translatable(surface == BodyCircles.Surface.STEEL
 					? "tattoo.fmab.engraved_occupied" : "tattoo.fmab.occupied"));
 			return;
@@ -91,11 +92,11 @@ public final class TattooRitual {
 		spend(player, tool, surface);
 		level.removeBlock(circle, false);
 		TransmutationLightning.discharge(level, player.blockPosition(), 1.5, 1);
-		// Le cercle se pose en tampon sur toute la grille, par-dessus les dessins de l'emplacement.
+		// Le cercle se pose en tampon par-dessus les dessins de l'emplacement : toute la page, ou une
+		// face libre du tour du bras.
 		boolean steel = surface == BodyCircles.Surface.STEEL;
-		BodyArt stamped = BodyArt.ofCircle(drawing, steel ? BodyArt.STEEL_INK : BodyArt.SKIN_INK);
-		BodyCircles.setArt(player, slot, BodyCircles.art(player, slot).orElse(BodyArt.EMPTY)
-				.withStamp(stamped.stamp().orElseThrow()));
+		BodyCircles.setArt(player, slot, slot.stamp(BodyCircles.art(player, slot).orElse(BodyArt.EMPTY), drawing,
+				steel ? BodyArt.STEEL_INK : BodyArt.SKIN_INK));
 		if (steel) {
 			// L'acier ne sent rien : la gravure ne fait pas mal.
 			level.playSound(null, player.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.PLAYERS, 1, 1.2f);
@@ -218,7 +219,7 @@ public final class TattooRitual {
 		spend(player, tool, surface);
 		BodyCircles.setArt(player, slot, art);
 		ServerLevel level = player.level();
-		boolean newCircle = art.circle().isPresent() && !art.circle().equals(before.circle());
+		boolean newCircle = !added(art, before).isEmpty();
 		if (surface == BodyCircles.Surface.STEEL) {
 			level.playSound(null, player.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.PLAYERS, 1, 1.2f);
 			player.sendSystemMessage(Component.translatable("tattoo.fmab.art_engraved",
@@ -240,20 +241,33 @@ public final class TattooRitual {
 		if (!rightTool(tool, surface)) {
 			return Refusal.WRONG_TOOL;
 		}
-		if (!art.valid()) {
+		if (!art.valid(slot.canvas()) || art.stamps().size() > slot.maxStamps()) {
 			return Refusal.INVALID;
 		}
-		Optional<Drawing> circle = art.circle();
 		// Un cercle déjà porté peut rester, même effacé du carnet depuis ; un nouveau vient du carnet.
-		if (circle.isEmpty() || circle.equals(before.circle())) {
-			return null;
+		for (Drawing circle : added(art, before)) {
+			if (!Notebooks.contains(player, circle)) {
+				return Refusal.NOT_IN_NOTEBOOK;
+			}
+			int stages = AlchemyRules.of(player.level().registryAccess())
+					.analyze(circle, FmabAttachments.ALCHEMIST.getOrCreate(player)).parsed().stages().size();
+			if (stages == 0 || stages > slot.stages()) {
+				return Refusal.TOO_SMALL;
+			}
 		}
-		if (!Notebooks.contains(player, circle.get())) {
-			return Refusal.NOT_IN_NOTEBOOK;
+		return null;
+	}
+
+	/** Les cercles du nouveau dessin que l'emplacement ne portait pas encore. */
+	static List<Drawing> added(BodyArt art, BodyArt before) {
+		List<Drawing> left = new ArrayList<>(before.circles());
+		List<Drawing> out = new ArrayList<>();
+		for (Drawing circle : art.circles()) {
+			if (!left.remove(circle)) {
+				out.add(circle);
+			}
 		}
-		int stages = AlchemyRules.of(player.level().registryAccess())
-				.analyze(circle.get(), FmabAttachments.ALCHEMIST.getOrCreate(player)).parsed().stages().size();
-		return stages == 0 || stages > slot.stages() ? Refusal.TOO_SMALL : null;
+		return out;
 	}
 
 	/**

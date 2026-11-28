@@ -8,6 +8,8 @@ import com.ajustor.fmab.item.GloveItem;
 import com.ajustor.fmab.registry.FmabComponents;
 import com.ajustor.fmab.tattoo.BodyArt;
 import com.ajustor.fmab.tattoo.BodySpot;
+import com.ajustor.fmab.tattoo.Canvas;
+import com.ajustor.fmab.tattoo.Sleeve;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -31,6 +33,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -157,6 +160,10 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 			BodyHolder.Worn worn, boolean thin, int light) {
 		// Une gravure est à la surface de l'acier, qu'aucun vêtement ne couvre.
 		boolean left = worn.part() == BodyPart.LEFT_ARM;
+		if (worn.spot() == BodySpot.ARM && worn.art() != null) {
+			submitSleeve(collector, poseStack, bone, worn, left, thin, light);
+			return;
+		}
 		BodySpot.Placement at = worn.engraved() ? worn.spot().place(left, thin, BodySpot.GLOVE_LIFT)
 				: worn.spot().place(left, thin);
 		Identifier texture = worn.art() != null ? CircleTextures.get(worn.art())
@@ -183,14 +190,47 @@ public class HandsLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		poseStack.popPose();
 	}
 
+	/**
+	 * Le tour du bras : la page dépliée ({@link Sleeve}) s'enroule autour du membre, un morceau par face,
+	 * de l'épaule au poignet. Tatouée sous la couche des vêtements, ou gravée au-dessus de l'acier.
+	 */
+	private static void submitSleeve(OrderedSubmitNodeCollector collector, PoseStack poseStack, ModelPart bone,
+			BodyHolder.Worn worn, boolean left, boolean thin, int light) {
+		float lift = worn.engraved() ? BodySpot.GLOVE_LIFT : BodySpot.SKIN_LIFT;
+		List<Sleeve.Piece> pieces = Sleeve.pieces(left, thin, lift);
+		Identifier texture = CircleTextures.get(worn.art(), Canvas.SLEEVE);
+		poseStack.pushPose();
+		bone.translateAndRotate(poseStack);
+		collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, buffer) -> {
+			float y0 = Sleeve.TOP, y1 = Sleeve.BOTTOM;
+			for (Sleeve.Piece p : pieces) {
+				// Les deux faces, comme un carré : le dos ne doit pas disparaître selon le sens du membre.
+				vertex(buffer, pose, p.x0(), y0, p.z0(), p.u0(), 0, p.nx(), p.nz(), light);
+				vertex(buffer, pose, p.x1(), y0, p.z1(), p.u1(), 0, p.nx(), p.nz(), light);
+				vertex(buffer, pose, p.x1(), y1, p.z1(), p.u1(), 1, p.nx(), p.nz(), light);
+				vertex(buffer, pose, p.x0(), y1, p.z0(), p.u0(), 1, p.nx(), p.nz(), light);
+				vertex(buffer, pose, p.x0(), y1, p.z0(), p.u0(), 1, p.nx(), p.nz(), light);
+				vertex(buffer, pose, p.x1(), y1, p.z1(), p.u1(), 1, p.nx(), p.nz(), light);
+				vertex(buffer, pose, p.x1(), y0, p.z1(), p.u1(), 0, p.nx(), p.nz(), light);
+				vertex(buffer, pose, p.x0(), y0, p.z0(), p.u0(), 0, p.nx(), p.nz(), light);
+			}
+		});
+		poseStack.popPose();
+	}
+
 	private static void vertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float z, float u, float v,
 			BodySpot.Placement at, int light) {
+		vertex(buffer, pose, x, y, z, u, v, at.nx(), at.nz(), light);
+	}
+
+	private static void vertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float z, float u, float v,
+			float nx, float nz, int light) {
 		buffer.addVertex(pose, x, y, z)
 				.setColor(-1)
 				.setUv(u, v)
 				.setOverlay(OverlayTexture.NO_OVERLAY)
 				.setLight(light)
-				.setNormal(pose, at.nx(), 0, at.nz());
+				.setNormal(pose, nx, 0, nz);
 	}
 
 	/** Le modèle du joueur, réduit au membre qui porte la pièce. */

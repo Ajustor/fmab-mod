@@ -16,8 +16,11 @@ public enum BodySpot {
 	HAND_BACK,
 	/** La paume, tatouée : la face avant du bras, au niveau de la main. */
 	PALM,
-	/** L'avant-bras, tatoué : la face extérieure du bras, au-dessus de la main et du gant. */
-	FOREARM,
+	/**
+	 * Le tour du bras, tatoué de l'épaule au poignet : il ne tient pas dans un carré, sa page se
+	 * déplie autour du bras ({@link Sleeve}). Son carré est celui de la face extérieure.
+	 */
+	ARM,
 	/** La poitrine, tatouée : la face avant du buste, sous les clavicules. */
 	CHEST,
 	/** Le dos, tatoué : la face arrière du buste, entre les omoplates. */
@@ -61,7 +64,7 @@ public enum BodySpot {
 		float side = leftArm ? 1 : -1;
 		return switch (this) {
 			case HAND_BACK -> new Placement(side * (outer + lift), 8 * PX, 0, 0, side, side, 0, 2 * PX);
-			case FOREARM -> new Placement(side * (outer + lift), 3.5f * PX, 0, 0, side, side, 0, 1.6f * PX);
+			case ARM -> new Placement(side * (outer + lift), 2 * PX, 0, 0, side, side, 0, 2 * PX);
 			// La face avant du bras, vue de devant : la page suit +X. Son milieu dépend de la largeur du bras.
 			case PALM -> new Placement(side * (thin ? 0.5f : 1f) * PX, 8 * PX, -2 * PX - lift, 1, 0, 0, -1,
 					(thin ? 1.5f : 2f) * PX);
@@ -75,7 +78,7 @@ public enum BodySpot {
 	public static BodySpot of(TattooSlot slot) {
 		return switch (slot) {
 			case PALM_LEFT, PALM_RIGHT -> PALM;
-			case FOREARM_LEFT, FOREARM_RIGHT -> FOREARM;
+			case ARM_LEFT, ARM_RIGHT -> ARM;
 			case CHEST -> CHEST;
 			case BACK -> BACK;
 		};

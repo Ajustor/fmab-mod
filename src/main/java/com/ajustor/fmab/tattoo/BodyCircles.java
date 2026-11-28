@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -87,9 +88,19 @@ public final class BodyCircles {
 		};
 	}
 
-	/** Le cercle alchimique que porte cet emplacement : le tampon de son dessin. */
+	/** Le premier cercle alchimique que porte cet emplacement : le tampon de son dessin. */
 	public static Optional<Drawing> circle(Entity entity, TattooSlot slot) {
 		return art(entity, slot).flatMap(BodyArt::circle);
+	}
+
+	/** Tous les cercles alchimiques que porte cet emplacement (plusieurs autour d'un bras). */
+	public static List<Drawing> circles(Entity entity, TattooSlot slot) {
+		return art(entity, slot).map(BodyArt::circles).orElse(List.of());
+	}
+
+	/** L'emplacement porte-t-il déjà tous les cercles qu'il peut porter ? */
+	public static boolean full(Entity entity, TattooSlot slot) {
+		return circles(entity, slot).size() >= slot.maxStamps();
 	}
 
 	/**

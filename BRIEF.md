@@ -164,7 +164,7 @@ Les armes se divisent en armes conventionnelles (militaires), armes alchimiques 
 | Lance de pierre / piques | Alchimique, temporaire | Arme créée depuis le sol, se dégrade vite |
 | Gant de Mustang | Alchimique | Clic pour déclencher une explosion de feu à distance ; désactivé s'il est mouillé |
 | Gantelets d'Armstrong | Alchimique | Coup de poing qui projette des blocs de pierre |
-| Bras de Scar | Alchimique | Désintègre les blocs ou les mobs touchés |
+| Bras de Scar | Alchimique | Motif d'Ishval tatoué autour d'un bras : désintègre les blocs ou les mobs touchés ; avec l'alkahestry, recompose l'objet pensé |
 | Cercles de Kimblee | Alchimique | Transforme un bloc en explosif |
 | Kunaï d'alkahestry | Alkahestry | Lancer 5 kunaï forme un cercle : soin ou piège à distance |
 | Sabre militaire / de Briggs | Conventionnel | Épée lourde, bonus contre les homonculus |
@@ -253,7 +253,7 @@ Les noms et descriptions passent par les clés de traduction (fr\_fr et en\_us).
 | Surfaces (sol, murs, plafonds, tout bloc) | Craie (temporaire), peinture alchimique (durable), gravure au burin (permanente, pierre et métal) | Cercle fixe, idéal pour les grands cercles et les pièges | Craie effacée par la pluie et le passage |
 | Gants (nouvel emplacement d'équipement) | Brodés ou gravés à la table d'alchimiste | Un cercle par gant ; joindre les mains combine les deux | Usure ; main libre requise |
 | Vêtements | Brodés sur manteau, veste, brassards | Cercles passifs (renfort, résistance au feu) ou à activation | Taille limitée par la pièce |
-| Corps (tatouages) | PNJ tatoueur ou rituel ; paumes, avant-bras, dos, torse | Permanent, conservé à la mort, impossible à voler | Retrait coûteux ; emplacements limités |
+| Corps (tatouages) | PNJ tatoueur ou rituel ; paumes, tour des bras (plusieurs cercles), dos, torse | Permanent, conservé à la mort, impossible à voler | Retrait coûteux ; emplacements limités |
 | Armes, outils, automail | Gravure | Effet au coup ou à l'usage (lame d'automail) | Consomme la durabilité |
 
 **Gants proposés.** Gants de tissu (1 étage), gants de cuir (2 étages), gants ignifugés avec silex intégré (déclencheur étincelle, style Mustang), gantelets métalliques (cercles de frappe, style Armstrong), gants d'Alchimiste d'État (5 étages, rang État requis). Craftables et teintables.

@@ -4,6 +4,7 @@ import com.ajustor.fmab.Fmab;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.Raster;
 import com.ajustor.fmab.tattoo.BodyArt;
+import com.ajustor.fmab.tattoo.Canvas;
 import com.ajustor.fmab.util.PinnedLru;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
@@ -79,9 +80,22 @@ public final class CircleTextures {
 		return get((Object) drawing, color);
 	}
 
-	/** La texture d'un dessin sur le corps, en ses couleurs ; même budget que les tracés. */
+	/** La texture d'un dessin sur une page carrée, en ses couleurs ; même budget que les tracés. */
 	public static Identifier get(BodyArt art) {
-		return get(art, 0);
+		return get(art, Canvas.SQUARE);
+	}
+
+	/**
+	 * La texture d'un dessin sur le corps, à la taille de sa page ({@link Canvas#textureWidth()} sur
+	 * {@link Canvas#textureHeight()}), en ses couleurs.
+	 */
+	public static Identifier get(BodyArt art, Canvas canvas) {
+		return get(art, pageCode(canvas));
+	}
+
+	/** Les dimensions d'une page, rangées à la place de la couleur dans la clé d'un dessin. */
+	private static int pageCode(Canvas canvas) {
+		return canvas.width() << 16 | canvas.height();
 	}
 
 	private static Identifier get(Object source, int color) {
@@ -139,17 +153,21 @@ public final class CircleTextures {
 	}
 
 	private static Identifier create(Key key) {
-		NativeImage image = new NativeImage(SIZE, SIZE, true);
+		NativeImage image;
 		if (key.source() instanceof BodyArt art) {
-			int[] pixels = art.paint(SIZE);
-			for (int y = 0; y < SIZE; y++) {
-				for (int x = 0; x < SIZE; x++) {
-					if (pixels[y * SIZE + x] != 0) {
-						image.setPixel(x, y, pixels[y * SIZE + x]);
+			Canvas canvas = new Canvas(key.color() >>> 16, key.color() & 0xFFFF);
+			int w = canvas.textureWidth(), h = canvas.textureHeight();
+			image = new NativeImage(w, h, true);
+			int[] pixels = art.paint(canvas);
+			for (int y = 0; y < h; y++) {
+				for (int x = 0; x < w; x++) {
+					if (pixels[y * w + x] != 0) {
+						image.setPixel(x, y, pixels[y * w + x]);
 					}
 				}
 			}
 		} else {
+			image = new NativeImage(SIZE, SIZE, true);
 			boolean[] mask = Raster.rasterize((Drawing) key.source(), SIZE, BodyArt.THICKNESS);
 			for (int y = 0; y < SIZE; y++) {
 				for (int x = 0; x < SIZE; x++) {

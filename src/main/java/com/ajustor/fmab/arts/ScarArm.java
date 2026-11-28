@@ -27,12 +27,15 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import com.ajustor.fmab.platform.event.InteractionEvents;
+import com.ajustor.fmab.platform.event.PlayerEvents;
 
 /**
- * Le bras droit de Scar : un tatouage qui unit l'alchimie d'Amestris et l'alkahestry de Xing, mais
- * dont on n'a gardé que la décomposition. Main nue, frapper un bloc le réduit en poussière (il
- * tombe en ressources) ; frapper une créature la déchire de l'intérieur. Il ne craint pas la zone
- * de Père : il puise aussi au flux du dragon.
+ * Le bras de Scar : le motif d'Ishval tatoué autour d'un bras ({@link IshvalArm}), qui unit l'alchimie
+ * d'Amestris et l'alkahestry de Xing. Sa moitié de décomposition : main nue, frapper un bloc le réduit
+ * en poussière (il tombe en ressources) ; frapper une créature la déchire de l'intérieur. C'est le bras
+ * de la main principale qui frappe. Sa moitié de recomposition : main nue, accroupi, toucher un bloc en
+ * fait l'objet auquel on pense ({@link ArmRecomposition}), avec le bras de cette main. Il ne craint pas
+ * la zone de Père : il puise aussi au flux du dragon.
  */
 public final class ScarArm {
 	/** L'école de savoir que le bras fait progresser. */
@@ -45,17 +48,50 @@ public final class ScarArm {
 	private static final Map<UUID, Integer> USES = PlayerMaps.track(new HashMap<>());
 	private static final float ENTITY_COST = 2;
 	private static final float ENTITY_DAMAGE = 7;
+	/** Recomposer coûte plus que défaire : il faut tenir la forme de l'objet. */
+	private static final float RECOMPOSE_COST = 3;
 	private static final Throttle READY = new Throttle(8);
 
 	private ScarArm() {
 	}
 
-	/** Le joueur porte-t-il le bras de Scar, main droite nue ? Valable des deux côtés. */
+	/**
+	 * Le joueur frappe-t-il du bras de Scar : main principale nue, son bras tatoué de la moitié de
+	 * décomposition ? Valable des deux côtés.
+	 */
 	public static boolean armed(Player player) {
-		return Boolean.TRUE.equals(FmabAttachments.SCAR_ARM.get(player)) && player.getMainHandItem().isEmpty();
+		return player.getMainHandItem().isEmpty()
+				&& IshvalArm.has(player, IshvalArm.mainArmLeft(player), IshvalArm.Half.DECOMPOSE);
+	}
+
+	/**
+	 * Cette main recompose-t-elle : nue, le joueur accroupi, son bras tatoué de la moitié de
+	 * recomposition ? Côté serveur seulement (l'alkahestry ne se lit que là).
+	 */
+	static boolean recomposes(Player player, InteractionHand hand) {
+		if (!player.isShiftKeyDown() || !player.getItemInHand(hand).isEmpty()) {
+			return false;
+		}
+		boolean left = IshvalArm.mainArmLeft(player) == (hand == InteractionHand.MAIN_HAND);
+		return IshvalArm.has(player, left, IshvalArm.Half.RECOMPOSE);
 	}
 
 	public static void register() {
+		PlayerEvents.JOIN.register((player, server) -> IshvalArm.migrate(player));
+		InteractionEvents.USE_BLOCK.register((player, level, hand, hit) -> {
+			if (!(player instanceof ServerPlayer p) || !(level instanceof ServerLevel server) || player.isSpectator()
+					|| !recomposes(p, hand)) {
+				return InteractionResult.PASS;
+			}
+			BlockPos pos = hit.getBlockPos();
+			if (!p.isWithinBlockInteractionRange(pos, 1)) {
+				return InteractionResult.PASS;
+			}
+			if (ready(p, server)) {
+				ArmRecomposition.recompose(p, server, pos, hit.getDirection(), () -> pay(p, RECOMPOSE_COST));
+			}
+			return InteractionResult.SUCCESS;
+		});
 		InteractionEvents.ATTACK_BLOCK.register((player, level, hand, pos, direction) -> {
 			// Un gantelet gravé frappe avec son propre cercle : il passe avant le bras.
 			if (hand != InteractionHand.MAIN_HAND || !armed(player) || player.isSpectator()

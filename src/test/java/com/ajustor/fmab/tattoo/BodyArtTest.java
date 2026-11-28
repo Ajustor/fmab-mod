@@ -6,6 +6,7 @@ import com.ajustor.fmab.alchemy.drawing.Vec2;
 import com.ajustor.fmab.data.FmabCodecs;
 import com.ajustor.fmab.data.Tattoos;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ class BodyArtTest {
 	@Test
 	void drawingAndStampSurviveTheCodec() {
 		BodyArt art = new BodyArt(List.of(RED_LINE),
-				Optional.of(new BodyArt.Stamp(CIRCLE, new Vec2(10, 12), 6, 0x2C5CC8)));
+				List.of(new BodyArt.Stamp(CIRCLE, new Vec2(10, 12), 6, 0x2C5CC8)));
 		JsonElement json = BodyArt.CODEC.encodeStart(JsonOps.INSTANCE, art).getOrThrow();
 		assertEquals(art, BodyArt.CODEC_OR_CIRCLE.parse(JsonOps.INSTANCE, json).getOrThrow());
 	}
@@ -39,7 +40,7 @@ class BodyArtTest {
 		JsonElement old = FmabCodecs.DRAWING.encodeStart(JsonOps.INSTANCE, CIRCLE).getOrThrow();
 		BodyArt art = BodyArt.CODEC_OR_CIRCLE.parse(JsonOps.INSTANCE, old).getOrThrow();
 		assertEquals(Optional.of(CIRCLE), art.circle());
-		BodyArt.Stamp stamp = art.stamp().orElseThrow();
+		BodyArt.Stamp stamp = art.stamps().getFirst();
 		assertEquals(Drawing.CENTER_POINT, stamp.center());
 		assertEquals(BodyArt.FULL_STAMP_HALF, stamp.half());
 		assertEquals(BodyArt.SKIN_INK, stamp.color());
@@ -48,7 +49,7 @@ class BodyArtTest {
 
 	@Test
 	void theRitualStampsOverTheDrawingsAlreadyThere() {
-		Tattoos drawn = Tattoos.NONE.withArt(TattooSlot.CHEST, new BodyArt(List.of(RED_LINE), Optional.empty()));
+		Tattoos drawn = Tattoos.NONE.withArt(TattooSlot.CHEST, new BodyArt(List.of(RED_LINE), List.of()));
 		assertTrue(drawn.get(TattooSlot.CHEST).isEmpty(), "un dessin seul n'est pas un cercle");
 		Tattoos stamped = drawn.with(TattooSlot.CHEST, CIRCLE);
 		assertEquals(Optional.of(CIRCLE), stamped.get(TattooSlot.CHEST));
@@ -74,12 +75,12 @@ class BodyArtTest {
 
 	@Test
 	void theServerRefusesWhatLeavesTheGridOrWeighsTooMuch() {
-		assertTrue(new BodyArt(List.of(RED_LINE), Optional.empty()).valid());
+		assertTrue(new BodyArt(List.of(RED_LINE), List.of()).valid());
 		BodyArt outside = new BodyArt(List.of(new BodyArt.Stroke(
-				new Primitive.Line(new Vec2(-1, 2), new Vec2(3, 4)), 0)), Optional.empty());
+				new Primitive.Line(new Vec2(-1, 2), new Vec2(3, 4)), 0)), List.of());
 		assertFalse(outside.valid());
 		BodyArt nan = new BodyArt(List.of(new BodyArt.Stroke(new Primitive.Dot(new Vec2(Double.NaN, 2)), 0)),
-				Optional.empty());
+				List.of());
 		assertFalse(nan.valid());
 		BodyArt tinyStamp = BodyArt.EMPTY.withStamp(new BodyArt.Stamp(CIRCLE, Drawing.CENTER_POINT, 1, 0));
 		assertFalse(tinyStamp.valid(), "un tampon trop petit ne se lit plus");
@@ -91,14 +92,14 @@ class BodyArtTest {
 		for (int i = 0; i < 30; i++) {
 			heavy.add(new BodyArt.Stroke(new Primitive.Polyline(points), 0));
 		}
-		assertFalse(new BodyArt(heavy, Optional.empty()).valid(), "plus de points qu'un paquet n'en porte");
+		assertFalse(new BodyArt(heavy, List.of()).valid(), "plus de points qu'un paquet n'en porte");
 	}
 
 	@Test
 	void strokesArePaintedOverTheStampInTheirOwnColors() {
 		int size = 64;
 		BodyArt art = new BodyArt(List.of(RED_LINE),
-				Optional.of(new BodyArt.Stamp(new Drawing(List.of(new Primitive.Line(new Vec2(2, 30), new Vec2(30, 2)))),
+				List.of(new BodyArt.Stamp(new Drawing(List.of(new Primitive.Line(new Vec2(2, 30), new Vec2(30, 2)))),
 						Drawing.CENTER_POINT, BodyArt.FULL_STAMP_HALF, 0x2C5CC8)));
 		int[] pixels = art.paint(size);
 		// Les deux diagonales se croisent au centre : le trait, tracé après le tampon, passe dessus.
@@ -107,5 +108,50 @@ class BodyArtTest {
 		int x = size * 3 / 4, y = size / 4;
 		assertEquals(0xFF2C5CC8, pixels[y * size + x]);
 		assertEquals(0, pixels[0]);
+	}
+
+	@Test
+	void aSavedSingleStampReadsAsTheFirstOfTheList() {
+		BodyArt.Stamp stamp = new BodyArt.Stamp(CIRCLE, new Vec2(10, 12), 6, 0x2C5CC8);
+		JsonObject old = new JsonObject();
+		old.add("stamp", BodyArt.Stamp.CODEC.encodeStart(JsonOps.INSTANCE, stamp).getOrThrow());
+		BodyArt art = BodyArt.CODEC_OR_CIRCLE.parse(JsonOps.INSTANCE, old).getOrThrow();
+		assertEquals(List.of(stamp), art.stamps());
+		JsonElement saved = BodyArt.CODEC.encodeStart(JsonOps.INSTANCE, art).getOrThrow();
+		assertFalse(saved.getAsJsonObject().has("stamp"), "on n'écrit plus que la liste");
+		assertEquals(art, BodyArt.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow());
+	}
+
+	@Test
+	void aSpotHoldsAtMostThreeStamps() {
+		BodyArt.Stamp stamp = new BodyArt.Stamp(CIRCLE, new Vec2(16, 16), 8, 0);
+		BodyArt three = BodyArt.EMPTY.plusStamp(stamp).plusStamp(stamp).plusStamp(stamp);
+		assertTrue(three.valid(Canvas.SLEEVE));
+		assertFalse(three.plusStamp(stamp).valid(Canvas.SLEEVE));
+		assertEquals(2, three.withoutStamp(0).stamps().size());
+	}
+
+	@Test
+	void theArmPageIsTwiceAsWideAsASquare() {
+		BodyArt wide = new BodyArt(List.of(new BodyArt.Stroke(new Primitive.Line(new Vec2(40, 2), new Vec2(60, 30)), 0)),
+				List.of());
+		assertTrue(wide.valid(Canvas.SLEEVE));
+		assertFalse(wide.valid(), "hors d'une page carrée");
+		BodyArt big = BodyArt.EMPTY.withStamp(new BodyArt.Stamp(CIRCLE, new Vec2(32, 16), 17, 0));
+		assertFalse(big.valid(Canvas.SLEEVE), "un tampon tient dans la hauteur de la page");
+		assertEquals(Canvas.SLEEVE.textureWidth() * Canvas.SLEEVE.textureHeight(), wide.paint(Canvas.SLEEVE).length);
+		assertEquals(2 * Canvas.SLEEVE.textureHeight(), Canvas.SLEEVE.textureWidth());
+	}
+
+	@Test
+	void onlyNewCirclesAreCheckedAgainstTheNotebook() {
+		Drawing other = new Drawing(List.of(new Primitive.Circle(Drawing.CENTER_POINT, 6)));
+		BodyArt.Stamp kept = new BodyArt.Stamp(CIRCLE, new Vec2(16, 16), 8, 0);
+		BodyArt.Stamp added = new BodyArt.Stamp(other, new Vec2(48, 16), 8, 0);
+		BodyArt before = BodyArt.EMPTY.plusStamp(kept);
+		assertEquals(List.of(other), TattooRitual.added(before.plusStamp(added), before));
+		assertEquals(List.of(), TattooRitual.added(before, before));
+		// Le même cercle posé deux fois : le second est nouveau.
+		assertEquals(List.of(CIRCLE), TattooRitual.added(before.plusStamp(kept), before));
 	}
 }

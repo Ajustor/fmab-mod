@@ -3,6 +3,8 @@ package com.ajustor.fmab.client.screen;
 import com.ajustor.fmab.alchemy.drawing.Drawing;
 import com.ajustor.fmab.alchemy.drawing.Primitive;
 import com.ajustor.fmab.alchemy.drawing.Vec2;
+import com.ajustor.fmab.alchemy.rules.Analysis;
+import com.ajustor.fmab.arts.IshvalArm;
 import com.ajustor.fmab.client.render.CircleTextures;
 import com.ajustor.fmab.client.render.TattooPreview;
 import com.ajustor.fmab.data.AlchemistData;
@@ -13,6 +15,8 @@ import com.ajustor.fmab.platform.client.ClientPlatform;
 import com.ajustor.fmab.registry.FmabAttachments;
 import com.ajustor.fmab.tattoo.BodyArt;
 import com.ajustor.fmab.tattoo.BodyCircles;
+import com.ajustor.fmab.tattoo.Canvas;
+import com.ajustor.fmab.tattoo.Sleeve;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.ajustor.fmab.transmutation.AlchemyRules;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -38,16 +42,20 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * L'éditeur des dessins sur le corps, ouvert d'un clic droit dans le vide : l'encre dessine sur la
  * peau, le burin grave l'acier des bras d'automail. À gauche, le joueur, qu'on fait tourner en le
  * tirant, porte déjà le dessin en cours ; au milieu, la grille de l'emplacement choisi ; à droite, les
  * outils du carnet, un trait à main levée, les couleurs, et le tampon : un cercle du carnet, posé où
- * l'on veut, qui fait de l'emplacement un cercle alchimique.
+ * l'on veut, qui fait de l'emplacement un cercle alchimique. Le tour d'un bras se dessine sur une page
+ * dépliée ({@link Sleeve}), deux fois plus large que haute, où l'on pose plusieurs tampons ; l'aperçu se
+ * tourne vers la face que survole la souris.
  *
  * <p>Chaque emplacement garde son brouillon tant que l'éditeur est ouvert ; « Encrer » (ou « Graver »)
  * envoie celui de l'emplacement montré au serveur, qui vérifie l'outil et le tampon et prélève son dû.
@@ -72,6 +80,9 @@ public class TattooEditorScreen extends Screen {
 	private static final int FRAME = 0xFF6B4F2A;
 	private static final int GRID_LINE = 0x22000000;
 	private static final int AXIS_LINE = 0x44000000;
+	/** Les arêtes du bras, sur la page du tour du bras. */
+	private static final int EDGE_LINE = 0x88000000;
+	private static final int FACE_LABEL = 0x99000000;
 	private static final int TEXT = 0xFFE0E0E0;
 	private static final int DIM = 0xFFA8A8A8;
 	private static final int BAD = 0xFFFF7A6A;
@@ -95,6 +106,8 @@ public class TattooEditorScreen extends Screen {
 	private int color;
 	private int stampPage;
 	private double stampHalf = 10;
+	/** Le tampon se déroule autour du bras plutôt que de se poser à plat (tour du bras seulement). */
+	private boolean unroll;
 	/** Le geste en cours (coordonnées de grille) : départ, ou points du trait libre. */
 	private @Nullable Vec2 anchor;
 	private @Nullable Vec2 arcStart;
@@ -103,8 +116,15 @@ public class TattooEditorScreen extends Screen {
 	/** L'angle du joueur dans l'aperçu, en degrés : 0 de face. */
 	private float yaw;
 	private boolean turning;
-	private @Nullable Drawing analyzed;
-	private int analyzedStages;
+	/** La face du bras que la souris survolait : l'aperçu ne se tourne que quand elle change. */
+	private Sleeve.@Nullable Face hovered;
+	/** Les cercles déjà analysés, pour ne pas les relire à chaque image. */
+	private final Map<Drawing, Analysis> analyses = new LinkedHashMap<>(16, 0.75f, true) {
+		@Override
+		protected boolean removeEldestEntry(Map.Entry<Drawing, Analysis> eldest) {
+			return size() > 16;
+		}
+	};
 
 	private int cell;
 	private int canvasX;
@@ -116,12 +136,13 @@ public class TattooEditorScreen extends Screen {
 	private Button sidesButton;
 	private Button stampButton;
 	private Button stampSizeButton;
+	private Button layoutButton;
 	private Button applyButton;
 	private EditBox hexBox;
 	private int swatchY;
 	/** Haut des lignes d'information (étages du tampon, coût). */
 	private int infoY;
-	private static final int INFO_LINES = 2;
+	private static final int INFO_LINES = 4;
 
 	public TattooEditorScreen(boolean engrave) {
 		super(Component.translatable(engrave ? "tattoo.fmab.editor.engrave_title" : "tattoo.fmab.editor.title"));
@@ -144,14 +165,15 @@ public class TattooEditorScreen extends Screen {
 	@Override
 	protected void init() {
 		int top = 26;
-		cell = Math.max(3, Math.min(7, Math.min((height - top - 22) / Drawing.GRID,
-				(width - PREVIEW_W - PANEL_W - 24) / Drawing.GRID)));
-		int canvas = cell * Drawing.GRID;
-		int total = PREVIEW_W + 8 + canvas + 8 + PANEL_W;
+		Canvas page = page();
+		// Le tour du bras est large : il accepte des cases plus petites pour tenir à l'écran.
+		cell = Math.max(page.width() > page.height() ? 2 : 3, Math.min(7, Math.min((height - top - 22) / page.height(),
+				(width - PREVIEW_W - PANEL_W - 24) / page.width())));
+		int total = PREVIEW_W + 8 + canvasW() + 8 + PANEL_W;
 		previewX = Math.max(4, (width - total) / 2);
 		canvasX = previewX + PREVIEW_W + 8;
 		canvasY = top;
-		panelX = canvasX + canvas + 8;
+		panelX = canvasX + canvasW() + 8;
 
 		slotButtons.clear();
 		int tabW = Math.min(70, (width - 8) / Math.max(1, slots.size()) - 2);
@@ -186,11 +208,18 @@ public class TattooEditorScreen extends Screen {
 		addRenderableWidget(Button.builder(Component.literal(">"), b -> cycleStamp(1)).bounds(panelX + 134, y, 16, 18).build());
 		y += 20;
 		stampSizeButton = addRenderableWidget(Button.builder(Component.empty(), b -> {
-			stampHalf = stampHalf >= BodyArt.FULL_STAMP_HALF ? BodyArt.MIN_STAMP_HALF : stampHalf + 2;
+			stampHalf = stampHalf >= page().maxStampHalf() ? BodyArt.MIN_STAMP_HALF : stampHalf + 2;
 			refreshLabels();
 		}).bounds(panelX, y, 74, 18).build());
 		addRenderableWidget(Button.builder(Component.translatable("tattoo.fmab.editor.unstamp"),
 				b -> change(draft().withStamp(null))).bounds(panelX + 76, y, 74, 18).build());
+		y += 20;
+		layoutButton = addRenderableWidget(Button.builder(Component.empty(), b -> {
+			unroll = !unroll;
+			tool = Tool.STAMP;
+			refreshLabels();
+		}).tooltip(Tooltip.create(Component.translatable("tattoo.fmab.editor.layout.tooltip")))
+				.bounds(panelX, y, 150, 18).build());
 		y += 24;
 		swatchY = y;
 		y += 2 * (SWATCH + 2) + 2;
@@ -232,6 +261,9 @@ public class TattooEditorScreen extends Screen {
 		stampButton.setMessage(tool == Tool.STAMP ? Component.literal("» ").append(stamp) : stamp);
 		stampButton.active = !pages.isEmpty();
 		stampSizeButton.setMessage(Component.translatable("tattoo.fmab.editor.stamp.size", (int) (stampHalf * 2)));
+		layoutButton.active = slot.sleeve();
+		layoutButton.setMessage(Component.translatable(unrolled() ? "tattoo.fmab.editor.layout.unrolled"
+				: "tattoo.fmab.editor.layout.whole"));
 		if (applyButton != null) {
 			applyButton.active = !slots.isEmpty() && !draft().equals(current(slot));
 		}
@@ -243,33 +275,42 @@ public class TattooEditorScreen extends Screen {
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		super.extractRenderState(graphics, mouseX, mouseY, a);
 		refreshLabels();
-		int canvas = cell * Drawing.GRID;
-		graphics.centeredText(font, title, width / 2, canvasY + canvas + 6, TEXT);
+		Canvas page = page();
+		int cw = canvasW(), ch = canvasH();
+		// L'aperçu, aussi haut que la page, et au moins aussi haut qu'une page carrée : on y voit le joueur.
+		int previewH = Math.max(ch, cell * Drawing.GRID);
+		graphics.centeredText(font, title, width / 2, canvasY + Math.max(ch, previewH) + 6, TEXT);
 		// L'aperçu : le joueur, tourné à la main, porte le brouillon de l'emplacement.
-		graphics.fill(previewX - 1, canvasY - 1, previewX + PREVIEW_W + 1, canvasY + canvas + 1, FRAME);
-		graphics.fill(previewX, canvasY, previewX + PREVIEW_W, canvasY + canvas, 0xFF101014);
+		graphics.fill(previewX - 1, canvasY - 1, previewX + PREVIEW_W + 1, canvasY + previewH + 1, FRAME);
+		graphics.fill(previewX, canvasY, previewX + PREVIEW_W, canvasY + previewH, 0xFF101014);
 		if (minecraft != null && minecraft.player != null) {
-			player(graphics, previewX, canvasY, previewX + PREVIEW_W, canvasY + canvas, minecraft.player);
+			player(graphics, previewX, canvasY, previewX + PREVIEW_W, canvasY + previewH, minecraft.player);
 		}
-		graphics.text(font, Component.translatable("tattoo.fmab.editor.turn"), previewX + 3, canvasY + canvas - 10,
+		graphics.text(font, Component.translatable("tattoo.fmab.editor.turn"), previewX + 3, canvasY + previewH - 10,
 				DIM, false);
 
-		graphics.fill(canvasX - 2, canvasY - 2, canvasX + canvas + 2, canvasY + canvas + 2, FRAME);
-		graphics.fill(canvasX, canvasY, canvasX + canvas, canvasY + canvas, engrave ? STEEL : PAPER);
+		graphics.fill(canvasX - 2, canvasY - 2, canvasX + cw + 2, canvasY + ch + 2, FRAME);
+		graphics.fill(canvasX, canvasY, canvasX + cw, canvasY + ch, engrave ? STEEL : PAPER);
 		if (slots.isEmpty()) {
 			graphics.centeredText(font, Component.translatable("tattoo.fmab.nothing_to_engrave"),
-					canvasX + canvas / 2, canvasY + canvas / 2, BAD);
+					canvasX + cw / 2, canvasY + ch / 2, BAD);
 			return;
 		}
-		for (int i = 0; i <= Drawing.GRID; i += 2) {
-			int line = i == Drawing.GRID / 2 ? AXIS_LINE : GRID_LINE;
-			graphics.fill(canvasX + i * cell, canvasY, canvasX + i * cell + 1, canvasY + canvas, line);
-			graphics.fill(canvasX, canvasY + i * cell, canvasX + canvas, canvasY + i * cell + 1, line);
+		for (int i = 0; i <= page.width(); i += 2) {
+			int line = i * 2 == page.width() ? AXIS_LINE : GRID_LINE;
+			graphics.fill(canvasX + i * cell, canvasY, canvasX + i * cell + 1, canvasY + ch, line);
+		}
+		for (int i = 0; i <= page.height(); i += 2) {
+			int line = i * 2 == page.height() ? AXIS_LINE : GRID_LINE;
+			graphics.fill(canvasX, canvasY + i * cell, canvasX + cw, canvasY + i * cell + 1, line);
+		}
+		if (slot.sleeve()) {
+			faces(graphics);
 		}
 		BodyArt art = draft();
 		if (!art.isEmpty()) {
-			graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(art), canvasX, canvasY, 0, 0, canvas, canvas,
-					CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(art, page), canvasX, canvasY, 0, 0, cw, ch,
+					page.textureWidth(), page.textureHeight(), page.textureWidth(), page.textureHeight());
 		}
 		int ghost = 0xC0000000 | color;
 		for (Primitive p : gesture()) {
@@ -322,37 +363,71 @@ public class TattooEditorScreen extends Screen {
 
 	private List<Component> stampInfo() {
 		List<Component> out = new ArrayList<>();
-		Drawing circle = tool == Tool.STAMP ? stampCircle() : draft().circle().orElse(null);
+		BodyArt art = draft();
+		Drawing circle = tool == Tool.STAMP ? stampCircle() : art.circle().orElse(null);
 		if (circle == null) {
 			out.add(Component.translatable("tattoo.fmab.editor.cosmetic"));
-			return out;
+		} else {
+			int stages = stages(circle);
+			boolean fits = stages > 0 && stages <= slot.stages();
+			out.add(Component.translatable("tattoo.fmab.editor.stages", stages, slot.stages())
+					.withColor((fits ? GOOD : BAD) & 0xFFFFFF));
 		}
-		int stages = stages(circle);
-		boolean fits = stages > 0 && stages <= slot.stages();
-		out.add(Component.translatable("tattoo.fmab.editor.stages", stages, slot.stages())
-				.withColor((fits ? GOOD : BAD) & 0xFFFFFF));
+		if (slot.maxStamps() > 1) {
+			out.add(Component.translatable("tattoo.fmab.editor.stamps", art.circles().size(), slot.maxStamps()));
+		}
+		Player player = minecraft == null ? null : minecraft.player;
+		if (slot.sleeve() && player != null && IshvalArm.knows(player)) {
+			// Le client ne sait pas si le joueur connaît l'alkahestry : la recomposition se montre telle
+			// qu'elle est tracée, le serveur la lira ou non.
+			List<Analysis> drawn = art.circles().stream().map(this::analysis).filter(a -> a != null).toList();
+			Set<IshvalArm.Half> halves = IshvalArm.halves(drawn, true);
+			String key = halves.size() == 2 ? "both" : halves.contains(IshvalArm.Half.DECOMPOSE) ? "decompose"
+					: halves.contains(IshvalArm.Half.RECOMPOSE) ? "recompose" : "none";
+			out.add(Component.translatable("tattoo.fmab.editor.ishval",
+					Component.translatable("tattoo.fmab.editor.ishval." + key))
+					.withColor((halves.isEmpty() ? DIM : GOOD) & 0xFFFFFF));
+		}
 		return out;
 	}
 
-	/** Les étages du cercle, analysés une fois par cercle et non à chaque image. */
+	/** Les étages du cercle. */
 	private int stages(Drawing circle) {
+		Analysis a = analysis(circle);
+		return a == null ? 0 : a.parsed().stages().size();
+	}
+
+	/** Le cercle analysé, une fois par cercle et non à chaque image ; null hors d'un monde. */
+	private @Nullable Analysis analysis(Drawing circle) {
 		if (minecraft == null || minecraft.level == null || minecraft.player == null) {
-			return 0;
+			return null;
 		}
-		if (!circle.equals(analyzed)) {
-			AlchemistData me = FmabAttachments.ALCHEMIST.get(minecraft.player);
-			analyzedStages = AlchemyRules.of(minecraft.level.registryAccess())
-					.analyze(circle, me == null ? AlchemistData.NEW : me).parsed().stages().size();
-			analyzed = circle;
+		AlchemistData me = FmabAttachments.ALCHEMIST.get(minecraft.player);
+		AlchemyRules rules = AlchemyRules.of(minecraft.level.registryAccess());
+		return analyses.computeIfAbsent(circle, c -> rules.analyze(c, me == null ? AlchemistData.NEW : me));
+	}
+
+	/** Les arêtes du bras sur la page dépliée, et le nom de chaque face. */
+	private void faces(GuiGraphicsExtractor graphics) {
+		int ch = canvasH();
+		for (int i = 0; i < 4; i++) {
+			int x = canvasX + (Sleeve.FACE / 2 + i * Sleeve.FACE) * cell;
+			graphics.fill(x, canvasY, x + 1, canvasY + ch, EDGE_LINE);
 		}
-		return analyzedStages;
+		List<Sleeve.Face> order = Sleeve.order(slot.isLeft());
+		for (int i = 1; i < 4; i++) {
+			int middle = canvasX + i * Sleeve.FACE * cell;
+			Component name = Component.translatable("tattoo.fmab.editor.face."
+					+ order.get(i).name().toLowerCase(Locale.ROOT));
+			graphics.text(font, name, middle - font.width(name) / 2, canvasY + 2, FACE_LABEL, false);
+		}
 	}
 
 	/** Les traits du geste en cours, et le tampon sous la souris. */
 	private List<Primitive> gesture() {
 		if (tool == Tool.STAMP) {
 			Drawing circle = stampCircle();
-			return circle == null ? List.of() : stampAt(circle, cursor).placed();
+			return circle == null ? List.of() : stampAt(circle, cursor).placed(page().width());
 		}
 		if (tool == Tool.FREEHAND) {
 			return freehand.size() < 2 ? List.of() : List.of(new Primitive.Polyline(freehand));
@@ -379,8 +454,8 @@ public class TattooEditorScreen extends Screen {
 			return true;
 		}
 		double mx = event.x(), my = event.y();
-		int canvas = cell * Drawing.GRID;
-		if (mx >= previewX && mx < previewX + PREVIEW_W && my >= canvasY && my < canvasY + canvas) {
+		int previewH = Math.max(canvasH(), cell * Drawing.GRID);
+		if (mx >= previewX && mx < previewX + PREVIEW_W && my >= canvasY && my < canvasY + previewH) {
 			turning = true;
 			return true;
 		}
@@ -409,7 +484,7 @@ public class TattooEditorScreen extends Screen {
 			case STAMP -> {
 				Drawing circle = stampCircle();
 				if (circle != null) {
-					change(draft().withStamp(stampAt(circle, p)));
+					change(stamped(draft(), stampAt(circle, p)));
 				}
 			}
 			case FREEHAND -> {
@@ -458,6 +533,14 @@ public class TattooEditorScreen extends Screen {
 	@Override
 	public void mouseMoved(double x, double y) {
 		cursor = toGrid(x, y);
+		if (slot.sleeve() && !turning && insideCanvas(x, y)) {
+			// L'aperçu se tourne vers la face du bras qu'on survole.
+			Sleeve.Face face = Sleeve.faceAt(slot.isLeft(), cursor.x());
+			if (face != hovered) {
+				hovered = face;
+				yaw = facing(slot, face);
+			}
+		}
 		super.mouseMoved(x, y);
 	}
 
@@ -564,7 +647,33 @@ public class TattooEditorScreen extends Screen {
 
 	/** Le tampon posé en {@code at}, à la taille choisie, gardé dans la grille. */
 	private BodyArt.Stamp stampAt(Drawing circle, Vec2 at) {
-		return new BodyArt.Stamp(circle, clamp(at), stampHalf, color);
+		return new BodyArt.Stamp(circle, clamp(at), Math.min(stampHalf, page().maxStampHalf()), color, unrolled());
+	}
+
+	/** Le prochain tampon se déroule-t-il ? Seulement autour d'un bras. */
+	private boolean unrolled() {
+		return unroll && slot.sleeve();
+	}
+
+	/**
+	 * Le dessin avec ce tampon : il remplace le tampon d'un emplacement qui n'en porte qu'un ; autour
+	 * d'un bras, il s'ajoute aux autres, ou, la place prise, remplace le plus proche.
+	 */
+	private BodyArt stamped(BodyArt art, BodyArt.Stamp stamp) {
+		if (slot.maxStamps() <= 1) {
+			return art.withStamp(stamp);
+		}
+		if (art.stamps().size() < slot.maxStamps()) {
+			return art.plusStamp(stamp);
+		}
+		int nearest = 0;
+		for (int i = 1; i < art.stamps().size(); i++) {
+			if (art.stamps().get(i).center().distance(stamp.center())
+					< art.stamps().get(nearest).center().distance(stamp.center())) {
+				nearest = i;
+			}
+		}
+		return art.withoutStamp(nearest).plusStamp(stamp);
 	}
 
 	private void add(Primitive p) {
@@ -574,13 +683,13 @@ public class TattooEditorScreen extends Screen {
 		}
 		List<BodyArt.Stroke> strokes = new ArrayList<>(art.strokes());
 		strokes.add(new BodyArt.Stroke(p, color));
-		BodyArt next = new BodyArt(strokes, art.stamp());
-		if (next.valid()) {
+		BodyArt next = new BodyArt(strokes, art.stamps());
+		if (next.valid(page())) {
 			change(next);
 		}
 	}
 
-	/** Le trait le plus proche du clic droit s'efface. */
+	/** Le trait le plus proche du clic droit s'efface ; sans trait tout près, le tampon sous le clic. */
 	private void erase(Vec2 at) {
 		BodyArt art = draft();
 		int best = -1;
@@ -596,6 +705,14 @@ public class TattooEditorScreen extends Screen {
 		}
 		if (best >= 0) {
 			change(art.withoutStroke(best));
+			return;
+		}
+		for (int i = art.stamps().size() - 1; i >= 0; i--) {
+			BodyArt.Stamp st = art.stamps().get(i);
+			if (st.covers(at)) {
+				change(art.withoutStamp(i));
+				return;
+			}
 		}
 	}
 
@@ -626,10 +743,16 @@ public class TattooEditorScreen extends Screen {
 
 	private void selectSlot(TattooSlot value) {
 		resetGesture();
+		boolean newPage = !value.canvas().equals(slot.canvas());
 		slot = value;
 		history.clear();
+		hovered = null;
 		yaw = facing(value);
 		showPreview();
+		if (newPage) {
+			// La page change de forme : la grille et les outils se replacent autour d'elle.
+			rebuildWidgets();
+		}
 	}
 
 	private void selectTool(Tool value) {
@@ -706,38 +829,60 @@ public class TattooEditorScreen extends Screen {
 
 	/**
 	 * L'angle d'où l'on voit l'emplacement : de face pour la paume et le torse, de dos pour le dos, de
-	 * côté pour les avant-bras. On le corrige en tirant sur le joueur.
+	 * côté pour les bras. On le corrige en tirant sur le joueur.
 	 */
 	private static float facing(TattooSlot s) {
 		return switch (s) {
 			case BACK -> 180;
-			case FOREARM_LEFT -> -70;
-			case FOREARM_RIGHT -> 70;
+			case ARM_LEFT, ARM_RIGHT -> facing(s, Sleeve.Face.OUTER);
 			default -> 0;
+		};
+	}
+
+	/** L'angle d'où l'on voit cette face du bras. */
+	private static float facing(TattooSlot arm, Sleeve.Face face) {
+		float side = arm.isLeft() ? -1 : 1;
+		return switch (face) {
+			case OUTER -> 70 * side;
+			case INNER -> -110 * side;
+			case FRONT -> 20 * side;
+			case BACK -> 180 - 20 * side;
 		};
 	}
 
 	// ---- Coordonnées -----------------------------------------------------------------------------
 
+	/** La page de l'emplacement montré. */
+	private Canvas page() {
+		return slot.canvas();
+	}
+
+	private int canvasW() {
+		return cell * page().width();
+	}
+
+	private int canvasH() {
+		return cell * page().height();
+	}
+
 	private boolean insideCanvas(double x, double y) {
-		int size = cell * Drawing.GRID;
-		return x >= canvasX && y >= canvasY && x <= canvasX + size && y <= canvasY + size;
+		return x >= canvasX && y >= canvasY && x <= canvasX + canvasW() && y <= canvasY + canvasH();
 	}
 
 	/** Position de grille, accrochée à la demi-case. */
 	private Vec2 toGrid(double x, double y) {
-		return new Vec2(snap(Math.clamp((x - canvasX) / cell, 0, Drawing.GRID)),
-				snap(Math.clamp((y - canvasY) / cell, 0, Drawing.GRID)));
+		return new Vec2(snap(Math.clamp((x - canvasX) / cell, 0, page().width())),
+				snap(Math.clamp((y - canvasY) / cell, 0, page().height())));
 	}
 
 	/** Position de grille plus fine, pour le trait libre : au quart de case. */
 	private Vec2 fine(double x, double y) {
-		return new Vec2(Math.round(Math.clamp((x - canvasX) / cell, 0, Drawing.GRID) * 4) / 4.0,
-				Math.round(Math.clamp((y - canvasY) / cell, 0, Drawing.GRID) * 4) / 4.0);
+		return new Vec2(Math.round(Math.clamp((x - canvasX) / cell, 0, page().width()) * 4) / 4.0,
+				Math.round(Math.clamp((y - canvasY) / cell, 0, page().height()) * 4) / 4.0);
 	}
 
-	private static Vec2 clamp(Vec2 v) {
-		return new Vec2(Math.clamp(v.x(), 0, Drawing.GRID), Math.clamp(v.y(), 0, Drawing.GRID));
+	private Vec2 clamp(Vec2 v) {
+		return page().clamp(v);
 	}
 
 	private static double snap(double v) {

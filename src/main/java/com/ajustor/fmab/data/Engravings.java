@@ -1,6 +1,7 @@
 package com.ajustor.fmab.data;
 
 import com.ajustor.fmab.tattoo.BodyArt;
+import com.ajustor.fmab.tattoo.Sleeve;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import com.mojang.serialization.Codec;
 
@@ -10,11 +11,14 @@ import java.util.Optional;
 
 /**
  * Les gravures d'un bras d'automail (dessins et cercles), par endroit du bras
- * ({@link TattooSlot#spot()} : {@code palm}, {@code forearm}). La gravure est dans l'acier : elle suit
- * la pièce quand on la retire, d'un bras à l'autre, et ne disparaît que si la pièce lâche.
+ * ({@link TattooSlot#spot()} : {@code palm}, {@code arm}). La gravure est dans l'acier : elle suit
+ * la pièce quand on la retire, d'un bras à l'autre, et ne disparaît que si la pièce lâche. Une pièce
+ * gravée avant le tour des bras ({@code forearm}) se relit gravée au même endroit du tour du bras.
  */
 public record Engravings(Map<String, BodyArt> spots) {
 	public static final Engravings NONE = new Engravings(Map.of());
+	private static final String LEGACY_FOREARM = "forearm";
+	private static final String ARM = "arm";
 
 	public static final Codec<Engravings> CODEC = Codec.unboundedMap(Codec.STRING, BodyArt.CODEC)
 			.xmap(Engravings::new, Engravings::spots);
@@ -26,6 +30,10 @@ public record Engravings(Map<String, BodyArt> spots) {
 				kept.put(spot, art);
 			}
 		});
+		BodyArt forearm = kept.remove(LEGACY_FOREARM);
+		if (forearm != null) {
+			kept.putIfAbsent(ARM, Sleeve.fromForearm(forearm));
+		}
 		spots = Map.copyOf(kept);
 	}
 
