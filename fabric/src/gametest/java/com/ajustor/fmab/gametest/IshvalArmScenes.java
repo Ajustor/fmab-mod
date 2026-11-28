@@ -114,6 +114,20 @@ public class IshvalArmScenes implements FabricClientGameTest {
 			look(context, 180, "ishval_00d_back");
 			look(context, -150, "ishval_00e_back_three_quarter");
 
+			// 2 bis. Le même cercle déroulé autour du bras, comme le tatouage de Scar : il arme toujours.
+			boolean unrolled = server(context, sp, (level, p) -> {
+				Drawing decompose = IshvalArm.motif(AlchemyRules.of(level.registryAccess())).getFirst();
+				BodyCircles.setArt(p, TattooSlot.ARM_RIGHT, BodyArt.EMPTY.withStamp(
+						new BodyArt.Stamp(decompose, new com.ajustor.fmab.alchemy.drawing.Vec2(32, 16), 14,
+								BodyArt.SKIN_INK, true)));
+				return ScarArm.armed(p);
+			});
+			check(unrolled, "le cercle déroulé autour du bras devrait armer la main comme le cercle entier");
+			context.waitTicks(5);
+			look(context, -90, "ishval_02_unrolled_outer");
+			look(context, -45, "ishval_02b_unrolled_three_quarter");
+			look(context, 180, "ishval_02c_unrolled_back");
+
 			// 3. La Vérité prend le bras droit : le tatouage part avec lui, et le pouvoir aussi.
 			boolean afterLoss = server(context, sp, (level, p) -> {
 				FmabAttachments.GATE.set(p, new GateState(0, Set.of(BodyPart.RIGHT_ARM), false, Optional.empty()));

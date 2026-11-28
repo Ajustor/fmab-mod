@@ -60,13 +60,18 @@ public record BodyArt(List<Stroke> strokes, List<Stamp> stamps) {
 	}
 
 	/**
-	 * Un cercle du carnet posé comme un tampon.
+	 * Un cercle du carnet posé comme un tampon : entier, ou déroulé autour du bras comme le tatouage de
+	 * Scar. Déroulé, son tour devient le tour du bras ({@link #placed(double)}) ; l'alchimie lit
+	 * toujours le cercle d'origine.
 	 *
-	 * @param circle le tracé d'origine, centré sur la grille comme dans le carnet
-	 * @param center où son centre se pose, sur la page de l'emplacement
-	 * @param half   sa demi-largeur une fois posé ({@link #FULL_STAMP_HALF} : sa taille dans le carnet)
+	 * @param circle   le tracé d'origine, centré sur la grille comme dans le carnet
+	 * @param center   où son centre se pose, sur la page de l'emplacement ; déroulé, la colonne où
+	 *                 tombe le haut du cercle, et le milieu de la bande en hauteur
+	 * @param half     sa demi-largeur une fois posé ({@link #FULL_STAMP_HALF} : sa taille dans le
+	 *                 carnet) ; déroulé, la demi-hauteur de la bande
+	 * @param unrolled déroulé autour du bras plutôt que posé à plat
 	 */
-	public record Stamp(Drawing circle, Vec2 center, double half, int color) {
+	public record Stamp(Drawing circle, Vec2 center, double half, int color, boolean unrolled) {
 		private static final Codec<Vec2> POINT = Codec.DOUBLE.listOf(2, 2)
 				.xmap(l -> new Vec2(l.get(0), l.get(1)), v -> List.of(v.x(), v.y()));
 
@@ -74,19 +79,85 @@ public record BodyArt(List<Stroke> strokes, List<Stamp> stamps) {
 				FmabCodecs.DRAWING.fieldOf("circle").forGetter(Stamp::circle),
 				POINT.fieldOf("center").forGetter(Stamp::center),
 				Codec.DOUBLE.fieldOf("half").forGetter(Stamp::half),
-				Codec.INT.fieldOf("color").forGetter(Stamp::color)
+				Codec.INT.fieldOf("color").forGetter(Stamp::color),
+				Codec.BOOL.optionalFieldOf("unrolled", false).forGetter(Stamp::unrolled)
 		).apply(i, Stamp::new));
+
+		/** Le pas d'échantillonnage d'un tracé déroulé, en cases du carnet. */
+		private static final double UNROLL_STEP = 0.4;
 
 		public Stamp {
 			color &= 0xFFFFFF;
 		}
 
-		/** Le cercle tel qu'il se pose : ramené à sa taille et à sa place. */
+		/** Un tampon posé à plat. */
+		public Stamp(Drawing circle, Vec2 center, double half, int color) {
+			this(circle, center, half, color, false);
+		}
+
+		/** Le cercle tel qu'il se pose à plat : ramené à sa taille et à sa place. */
 		public List<Primitive> placed() {
 			double k = half / FULL_STAMP_HALF;
 			return circle.primitives().stream()
 					.map(p -> p.map(v -> center.add(v.sub(Drawing.CENTER_POINT).scale(k))))
 					.toList();
+		}
+
+		/**
+		 * Le cercle tel qu'il se pose sur une page de {@code pageWidth} cases de large. À plat, comme
+		 * {@link #placed()}. Déroulé, chaque point passe en coordonnées polaires autour du centre du
+		 * cercle : son angle (le haut du cercle à la colonne de {@link #center}, puis dans le sens des
+		 * aiguilles) fait le tour de la page, qui fait le tour du bras ; son éloignement du centre monte
+		 * vers l'épaule. L'anneau extérieur ceinture le haut de la bande, le centre du cercle en est le
+		 * bas. Un trait qui passe la couture de la page est coupé en deux.
+		 */
+		public List<Primitive> placed(double pageWidth) {
+			if (!unrolled) {
+				return placed();
+			}
+			List<Primitive> out = new ArrayList<>();
+			for (Primitive p : circle.primitives()) {
+				if (p instanceof Primitive.Dot dot) {
+					out.add(new Primitive.Dot(unroll(dot.at(), pageWidth)));
+					continue;
+				}
+				List<Vec2> run = new ArrayList<>();
+				for (Vec2 v : p.sample(UNROLL_STEP)) {
+					Vec2 at = unroll(v, pageWidth);
+					if (!run.isEmpty() && Math.abs(at.x() - run.getLast().x()) > pageWidth / 2) {
+						flush(run, out);
+					}
+					run.add(at);
+				}
+				flush(run, out);
+			}
+			return out;
+		}
+
+		private Vec2 unroll(Vec2 v, double pageWidth) {
+			Vec2 d = v.sub(Drawing.CENTER_POINT);
+			double turn = Math.atan2(d.x(), -d.y()) / (2 * Math.PI);
+			double x = center.x() + turn * pageWidth;
+			x = ((x % pageWidth) + pageWidth) % pageWidth;
+			double r = Math.min(Math.hypot(d.x(), d.y()) / FULL_STAMP_HALF, 1);
+			return new Vec2(x, center.y() + half - 2 * half * r);
+		}
+
+		private static void flush(List<Vec2> run, List<Primitive> out) {
+			if (run.size() == 1) {
+				out.add(new Primitive.Dot(run.getFirst()));
+			} else if (run.size() > 1) {
+				out.add(new Primitive.Polyline(run));
+			}
+			run.clear();
+		}
+
+		/** Ce point de la page est-il sur le tampon (pour l'effacer d'un clic) ? */
+		public boolean covers(Vec2 at) {
+			if (unrolled) {
+				return Math.abs(at.y() - center.y()) <= half;
+			}
+			return center.distance(at) <= half;
 		}
 	}
 
@@ -203,6 +274,10 @@ public record BodyArt(List<Stroke> strokes, List<Stamp> stamps) {
 					|| st.circle().primitives().size() > Drawing.MAX_PRIMITIVES) {
 				return false;
 			}
+			// Un cercle ne se déroule qu'autour d'un bras : une page qui fait le tour du membre.
+			if (st.unrolled() && canvas.width() <= canvas.height()) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -238,7 +313,7 @@ public record BodyArt(List<Stroke> strokes, List<Stamp> stamps) {
 		int[] pixels = new int[width * height];
 		for (Stamp st : stamps) {
 			int argb = 0xFF000000 | st.color();
-			Raster.trace(st.placed(), width, height, scale, thickness, i -> pixels[i] = argb);
+			Raster.trace(st.placed(width / scale), width, height, scale, thickness, i -> pixels[i] = argb);
 		}
 		for (Stroke s : strokes) {
 			int argb = 0xFF000000 | s.color();
@@ -261,7 +336,7 @@ public record BodyArt(List<Stroke> strokes, List<Stamp> stamps) {
 	public BodyArt moved(UnaryOperator<Vec2> f, double k) {
 		List<Stroke> movedStrokes = strokes.stream().map(s -> new Stroke(s.shape().map(f), s.color())).toList();
 		List<Stamp> movedStamps = stamps.stream()
-				.map(st -> new Stamp(st.circle(), f.apply(st.center()), st.half() * k, st.color()))
+				.map(st -> new Stamp(st.circle(), f.apply(st.center()), st.half() * k, st.color(), st.unrolled()))
 				.toList();
 		return new BodyArt(movedStrokes, movedStamps);
 	}

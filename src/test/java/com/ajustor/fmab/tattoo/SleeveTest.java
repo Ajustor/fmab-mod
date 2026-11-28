@@ -159,4 +159,50 @@ class SleeveTest {
 			assertEquals(slot.sleeve() ? Canvas.SLEEVE : Canvas.SQUARE, slot.canvas(), slot.id());
 		}
 	}
+
+	@Test
+	void anUnrolledRingWrapsTheWholeArmAtOneHeight() {
+		BodyArt.Stamp stamp = new BodyArt.Stamp(CIRCLE, new Vec2(32, 16), 8, 0, true);
+		List<Primitive> placed = stamp.placed(Canvas.SLEEVE.width());
+		double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE;
+		for (Primitive p : placed) {
+			List<Vec2> points = p.sample(0.5);
+			for (int i = 0; i < points.size(); i++) {
+				Vec2 v = points.get(i);
+				// Rayon 12 sur 16 : aux trois quarts de la bande, en partant du bas (16 + 8 − 16 × 0,75).
+				assertEquals(12, v.y(), 1e-6);
+				minX = Math.min(minX, v.x());
+				maxX = Math.max(maxX, v.x());
+				if (i > 0) {
+					assertTrue(Math.abs(v.x() - points.get(i - 1).x()) < Canvas.SLEEVE.width() / 2.0,
+							"un trait ne traverse pas la page à la couture");
+				}
+			}
+		}
+		assertTrue(minX < 1 && maxX > Canvas.SLEEVE.width() - 1, "l'anneau fait tout le tour du bras");
+	}
+
+	@Test
+	void theTopOfTheCircleFallsOnItsColumnAndTheRestTurnsClockwise() {
+		Drawing marks = new Drawing(List.of(new Primitive.Dot(new Vec2(16, 4)), new Primitive.Dot(new Vec2(28, 16)),
+				new Primitive.Dot(Drawing.CENTER_POINT)));
+		List<Primitive> placed = new BodyArt.Stamp(marks, new Vec2(32, 16), 8, 0, true).placed(64);
+		assertEquals(new Vec2(32, 12), ((Primitive.Dot) placed.get(0)).at(), "le haut du cercle");
+		assertEquals(48, ((Primitive.Dot) placed.get(1)).at().x(), 1e-6, "un quart de tour : un quart de la page");
+		assertEquals(24, ((Primitive.Dot) placed.get(2)).at().y(), 1e-6, "le centre du cercle : le bas de la bande");
+	}
+
+	@Test
+	void aCircleOnlyUnrollsAroundAnArm() {
+		BodyArt unrolled = BodyArt.EMPTY.withStamp(new BodyArt.Stamp(CIRCLE, new Vec2(16, 16), 8, 0, true));
+		assertTrue(unrolled.valid(Canvas.SLEEVE));
+		assertFalse(unrolled.valid(Canvas.SQUARE));
+		assertEquals(Optional.of(CIRCLE), unrolled.circle(), "l'alchimie lit le cercle d'origine");
+		BodyArt read = BodyArt.CODEC.parse(JsonOps.INSTANCE,
+				BodyArt.CODEC.encodeStart(JsonOps.INSTANCE, unrolled).getOrThrow()).getOrThrow();
+		assertEquals(unrolled, read);
+		// On l'efface d'un clic n'importe où sur sa bande ; un tampon à plat, seulement dans son carré.
+		assertTrue(unrolled.stamps().getFirst().covers(new Vec2(60, 20)));
+		assertFalse(new BodyArt.Stamp(CIRCLE, new Vec2(16, 16), 8, 0).covers(new Vec2(60, 20)));
+	}
 }
