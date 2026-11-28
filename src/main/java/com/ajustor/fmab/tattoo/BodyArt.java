@@ -221,25 +221,21 @@ public record BodyArt(List<Stroke> strokes, List<Stamp> stamps) {
 
 	/**
 	 * L'image du dessin sur une page carrée de {@code size} pixels de côté, en ARGB ligne par ligne
-	 * ({@code pixels[y * size + x]}), fond transparent.
+	 * ({@code pixels[y * size + x]}), fond transparent. Le trait garde son épaisseur en pixels
+	 * ({@link #THICKNESS}), quelle que soit la taille de l'image.
 	 */
 	public int[] paint(int size) {
-		return paint(size, size, size / (double) Drawing.GRID);
+		return paint(size, size, size / (double) Drawing.GRID, THICKNESS);
 	}
 
 	/** L'image du dessin sur cette page, à {@link Canvas#TEXELS_PER_CELL} pixels par case. */
 	public int[] paint(Canvas canvas) {
-		return paint(canvas.textureWidth(), canvas.textureHeight(), Canvas.TEXELS_PER_CELL);
+		return paint(canvas.textureWidth(), canvas.textureHeight(), Canvas.TEXELS_PER_CELL, THICKNESS);
 	}
 
-	/**
-	 * Les tampons d'abord, puis les traits dans l'ordre où on les a tracés, chacun par-dessus les autres.
-	 * L'épaisseur du trait suit l'échelle : à {@link Canvas#TEXELS_PER_CELL} pixels par case, celle
-	 * de {@link #THICKNESS}.
-	 */
-	private int[] paint(int width, int height, double scale) {
+	/** Les tampons d'abord, puis les traits dans l'ordre où on les a tracés, chacun par-dessus les autres. */
+	private int[] paint(int width, int height, double scale, double thickness) {
 		int[] pixels = new int[width * height];
-		double thickness = THICKNESS * scale / Canvas.TEXELS_PER_CELL;
 		for (Stamp st : stamps) {
 			int argb = 0xFF000000 | st.color();
 			Raster.trace(st.placed(), width, height, scale, thickness, i -> pixels[i] = argb);
