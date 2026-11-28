@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 1.27.0 — 2026-11-28
+
+### Nouveautés
+
+- Le bras de Scar se tatoue : les Notes d'Ishval enseignent le motif, à tatouer autour d'un bras (ou à graver dans un automail) ; il décompose ce qu'il frappe et, avec l'alkahestry, recompose l'objet auquel on pense à partir de la matière touchée. On tatoue désormais tout le tour du bras, jusqu'à trois cercles.
+- Dans l'éditeur de tatouages, un cercle peut se dérouler autour du bras, comme le tatouage de Scar : il agit comme le cercle entier.
 ## 1.26.0 — 2026-11-26
 
 ### Nouveautés

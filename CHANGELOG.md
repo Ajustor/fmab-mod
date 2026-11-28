@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.27.0 — 2026-11-28
+
+### New features
+
+- Scar's arm is now tattooed: the Ishvalan notes teach the motif, to tattoo around an arm (or engrave into an automail); it decomposes what it strikes and, with alkahestry, recomposes the object you have in mind from the matter it touches. Tattoos now wrap the whole arm, up to three circles.
+- In the tattoo editor, a circle can be unrolled around the arm, like Scar's tattoo: it works like the whole circle.
 ## 1.26.0 — 2026-11-26
 
 ### New features
