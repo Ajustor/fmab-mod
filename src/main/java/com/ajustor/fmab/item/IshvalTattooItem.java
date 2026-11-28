@@ -1,7 +1,7 @@
 package com.ajustor.fmab.item;
 
 import com.ajustor.fmab.alchemy.glyph.Rank;
-import com.ajustor.fmab.progress.Milestones;
+import com.ajustor.fmab.arts.IshvalArm;
 import com.ajustor.fmab.registry.FmabAttachments;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -20,9 +20,9 @@ import net.minecraft.world.level.Level;
 import java.util.function.Consumer;
 
 /**
- * Les notes du frère de Scar : le motif du tatouage qui unit l'alchimie et l'alkahestry. S'en
- * servir le grave sur le bras droit (voir {@code ScarArm}) ; il faut être au moins Alchimiste pour
- * en comprendre le tracé.
+ * Les notes du frère de Scar : le motif du tatouage qui unit l'alchimie et l'alkahestry. Les lire
+ * fait comprendre le motif et en recopie les deux cercles dans le carnet ; reste à les tatouer autour
+ * d'un bras (voir {@link IshvalArm}). Il faut être au moins Alchimiste pour en comprendre le tracé.
  */
 public class IshvalTattooItem extends Item {
 	public IshvalTattooItem(Properties properties) {
@@ -34,7 +34,7 @@ public class IshvalTattooItem extends Item {
 		if (!(player instanceof ServerPlayer p)) {
 			return InteractionResult.SUCCESS;
 		}
-		if (Boolean.TRUE.equals(FmabAttachments.SCAR_ARM.get(p))) {
+		if (IshvalArm.knows(p)) {
 			p.sendOverlayMessage(Component.translatable("item.fmab.ishval_tattoo.already"));
 			return InteractionResult.SUCCESS;
 		}
@@ -42,12 +42,10 @@ public class IshvalTattooItem extends Item {
 			p.sendOverlayMessage(Component.translatable("item.fmab.ishval_tattoo.too_soon"));
 			return InteractionResult.SUCCESS;
 		}
-		FmabAttachments.SCAR_ARM.set(p, true);
-		Milestones.reach(p, "scar_tattoo");
+		IshvalArm.learn(p);
 		p.getItemInHand(hand).consume(1, p);
-		p.hurtServer(p.level(), p.level().damageSources().magic(), 4);
-		p.level().playSound(null, p.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, 1, 0.7f);
-		p.sendSystemMessage(Component.translatable("item.fmab.ishval_tattoo.engraved").withStyle(ChatFormatting.DARK_RED));
+		p.level().playSound(null, p.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1, 0.7f);
+		p.sendSystemMessage(Component.translatable("item.fmab.ishval_tattoo.learned").withStyle(ChatFormatting.DARK_RED));
 		return InteractionResult.SUCCESS;
 	}
 

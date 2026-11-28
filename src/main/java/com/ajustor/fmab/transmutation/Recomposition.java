@@ -261,7 +261,7 @@ public final class Recomposition {
 	}
 
 	/** On porte ou l'on est une Pierre philosophale : la matière se crée de toutes pièces. */
-	private static boolean fromNothing(ServerPlayer caster) {
+	public static boolean fromNothing(ServerPlayer caster) {
 		return PhilosopherStones.held(caster).isPresent() || LivingStone.fuels(caster);
 	}
 
@@ -281,6 +281,34 @@ public final class Recomposition {
 		}
 		int max = made.getMaxDamage();
 		made.set(DataComponents.MAX_DAMAGE, max + (int) Math.round(max * (double) added / paid));
+	}
+
+	/** Un objet à recomposer, et ce dont il est fait. */
+	public record Blueprint(Item item, Composition composition) {
+	}
+
+	/**
+	 * L'objet auquel l'alchimiste pense (sa conception), s'il peut le recomposer : il l'a compris, il
+	 * n'est pas d'or. Sinon il le lui est dit, et rien. Sert au bras de Scar, qui recompose sans cercle.
+	 */
+	public static Optional<Blueprint> blueprint(ServerPlayer caster) {
+		Optional<Item> designed = design(caster);
+		Optional<Composition> found = designed.flatMap(item -> composition(caster.level(), item));
+		if (designed.isEmpty() || found.isEmpty()) {
+			caster.sendOverlayMessage(Component.translatable("scar_arm.fmab.no_design"));
+			return Optional.empty();
+		}
+		ItemStack shown = new ItemStack(designed.get());
+		if (found.get().masses().containsKey("gold")) {
+			caster.sendSystemMessage(Component.translatable("transmutation.fmab.copy.gold", shown.getHoverName()));
+			return Optional.empty();
+		}
+		if (!understands(caster, designed.get())) {
+			caster.sendSystemMessage(Component.translatable("transmutation.fmab.copy.not_understood",
+					shown.getHoverName()));
+			return Optional.empty();
+		}
+		return Optional.of(new Blueprint(designed.get(), found.get()));
 	}
 
 	/** L'objet auquel l'alchimiste pense, s'il en a choisi un. */
@@ -348,14 +376,14 @@ public final class Recomposition {
 	 * La composition d'un objet qu'on peut défaire ou recomposer : tout ce qui a une matière, sauf
 	 * les objets du mod. Une matière de base se recompose aussi (un diamant à partir de charbon).
 	 */
-	static Optional<Composition> composition(ServerLevel level, Item item) {
+	public static Optional<Composition> composition(ServerLevel level, Item item) {
 		if (BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("fmab")) {
 			return Optional.empty();
 		}
 		return ItemCompositions.of(level, item);
 	}
 
-	private static Component element(String element) {
+	public static Component element(String element) {
 		return Component.translatable("material.fmab." + element);
 	}
 }

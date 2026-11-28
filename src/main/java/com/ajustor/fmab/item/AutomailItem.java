@@ -66,7 +66,7 @@ public class AutomailItem extends Item {
 		}
 		Engravings engravings = stack.get(FmabComponents.AUTOMAIL_ENGRAVINGS);
 		if (engravings != null) {
-			for (String spot : new String[]{"palm", "forearm"}) {
+			for (String spot : new String[]{"palm", "arm"}) {
 				if (engravings.spots().containsKey(spot)) {
 					tooltip.accept(Component.translatable("item.fmab.automail.engraved." + spot)
 							.withStyle(ChatFormatting.DARK_AQUA));

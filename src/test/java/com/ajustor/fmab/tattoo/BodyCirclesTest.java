@@ -36,7 +36,7 @@ class BodyCirclesTest {
 	@Test
 	void armSlotsKnowTheirArmAndSpot() {
 		assertEquals(Optional.of(BodyPart.LEFT_ARM), TattooSlot.PALM_LEFT.arm());
-		assertEquals(Optional.of(BodyPart.RIGHT_ARM), TattooSlot.FOREARM_RIGHT.arm());
+		assertEquals(Optional.of(BodyPart.RIGHT_ARM), TattooSlot.ARM_RIGHT.arm());
 		assertEquals(Optional.empty(), TattooSlot.BACK.arm());
 		assertEquals(Optional.empty(), TattooSlot.CHEST.spot());
 		for (TattooSlot slot : TattooSlot.values()) {
@@ -49,8 +49,8 @@ class BodyCirclesTest {
 	@Test
 	void engravingFollowsThePieceFromOneArmToTheOther() {
 		Engravings engraved = Engravings.NONE.with(TattooSlot.PALM_LEFT, BodyArt.ofCircle(CIRCLE, BodyArt.STEEL_INK));
-		assertSame(CIRCLE, engraved.get(TattooSlot.PALM_RIGHT).orElseThrow().stamp().orElseThrow().circle());
-		assertTrue(engraved.get(TattooSlot.FOREARM_LEFT).isEmpty());
+		assertSame(CIRCLE, engraved.get(TattooSlot.PALM_RIGHT).orElseThrow().stamps().getFirst().circle());
+		assertTrue(engraved.get(TattooSlot.ARM_LEFT).isEmpty());
 		assertTrue(engraved.without(TattooSlot.PALM_RIGHT).isEmpty());
 		assertFalse(engraved.isEmpty());
 	}

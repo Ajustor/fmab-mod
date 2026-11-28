@@ -112,7 +112,7 @@ public final class Passives {
 		}
 		for (TattooSlot slot : TattooSlot.values()) {
 			if (!slot.active()) {
-				BodyCircles.circle(player, slot).ifPresent(worn::add);
+				worn.addAll(BodyCircles.circles(player, slot));
 			}
 		}
 		Map<String, Integer> out = new HashMap<>();

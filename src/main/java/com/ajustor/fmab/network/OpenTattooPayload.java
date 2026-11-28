@@ -35,7 +35,7 @@ public record OpenTattooPayload(BlockPos circle, List<String> occupied, boolean 
 	 */
 	public static OpenTattooPayload of(ServerPlayer player, BlockPos circle, boolean engrave) {
 		return new OpenTattooPayload(circle, Arrays.stream(TattooSlot.values())
-				.filter(slot -> BodyCircles.circle(player, slot).isPresent())
+				.filter(slot -> BodyCircles.full(player, slot))
 				.map(TattooSlot::id)
 				.toList(), engrave);
 	}

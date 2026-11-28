@@ -49,7 +49,7 @@ public class MidgameScenes implements FabricClientGameTest {
 				ItemStack glove = new ItemStack(FmabItems.CLOTH_GLOVES);
 				glove.set(FmabComponents.GLOVE_CIRCLE, ForbiddenCircles.HUMAN_TRANSMUTATION);
 				FmabAttachments.GLOVES.set(p, Gloves.NONE.with(false, glove));
-				FmabAttachments.TATTOOS.set(p, Tattoos.NONE.with(TattooSlot.FOREARM_LEFT, ForbiddenCircles.HUMAN_TRANSMUTATION));
+				FmabAttachments.TATTOOS.set(p, Tattoos.NONE.with(TattooSlot.ARM_LEFT, ForbiddenCircles.HUMAN_TRANSMUTATION));
 				p.getInventory().add(new ItemStack(FmabItems.STATE_WATCH));
 				return FmabAttachments.ALCHEMIST.getOrCreate(p).rank();
 			});

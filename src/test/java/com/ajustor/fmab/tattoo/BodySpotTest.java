@@ -63,25 +63,26 @@ class BodySpotTest {
 	void armCirclesFaceOutwardAndPalmsForward() {
 		assertTrue(BodySpot.HAND_BACK.place(false, false).nx() < 0, "dos de la main droite : vers −X");
 		assertTrue(BodySpot.HAND_BACK.place(true, false).nx() > 0, "dos de la main gauche : vers +X");
-		assertTrue(BodySpot.FOREARM.place(true, true).nx() > 0, "avant-bras gauche : vers +X");
+		assertTrue(BodySpot.ARM.place(true, true).nx() > 0, "bras gauche : vers +X");
 		assertTrue(BodySpot.PALM.place(false, false).nz() < 0, "paume : vers l'avant (−Z)");
 		assertTrue(BodySpot.CHEST.place(false, false).nz() < 0, "poitrine : vers l'avant (−Z)");
 		assertTrue(BodySpot.BACK.place(false, false).nz() > 0, "dos : vers l'arrière (+Z)");
 	}
 
 	@Test
-	void theForearmStaysAboveTheGlove() {
-		// Un gant couvre les quatre dernières lignes du bras (y de 6 à 10) : l'avant-bras tatoué s'arrête avant.
-		BodySpot.Placement forearm = BodySpot.FOREARM.place(false, false);
-		assertTrue(forearm.y() + forearm.half() <= 6 * PX + EPS);
+	void theSleeveStaysAboveTheGlove() {
+		// Un gant couvre les quatre dernières lignes du bras (y de 6 à 10) : le tour du bras tatoué s'arrête avant.
+		assertTrue(Sleeve.BOTTOM <= 6 * PX + EPS);
+		BodySpot.Placement outer = BodySpot.ARM.place(false, false);
+		assertTrue(outer.y() + outer.half() <= 6 * PX + EPS);
 	}
 
 	@Test
 	void everyTattooSlotHasItsSpot() {
 		assertEquals(BodySpot.PALM, BodySpot.of(TattooSlot.PALM_LEFT));
 		assertEquals(BodySpot.PALM, BodySpot.of(TattooSlot.PALM_RIGHT));
-		assertEquals(BodySpot.FOREARM, BodySpot.of(TattooSlot.FOREARM_LEFT));
-		assertEquals(BodySpot.FOREARM, BodySpot.of(TattooSlot.FOREARM_RIGHT));
+		assertEquals(BodySpot.ARM, BodySpot.of(TattooSlot.ARM_LEFT));
+		assertEquals(BodySpot.ARM, BodySpot.of(TattooSlot.ARM_RIGHT));
 		assertEquals(BodySpot.CHEST, BodySpot.of(TattooSlot.CHEST));
 		assertEquals(BodySpot.BACK, BodySpot.of(TattooSlot.BACK));
 	}

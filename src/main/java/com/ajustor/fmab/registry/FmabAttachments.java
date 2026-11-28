@@ -167,12 +167,25 @@ public final class FmabAttachments {
 			.copyOnDeath()
 			.register(Fmab.id("wanted"));
 
-	/** Le bras droit de Scar, tatoué : gardé à la mort, connu du client (il ne mine plus à mains nues). */
+	/**
+	 * L'ancien bras de Scar, accordé d'un coup par les Notes d'Ishval avant qu'on le tatoue soi-même :
+	 * lu une fois à la connexion, puis reporté en motif tatoué sur le bras droit ({@code IshvalArm}).
+	 */
 	public static final DataSlot<Boolean> SCAR_ARM = DataSlot.<Boolean>builder()
 			.persistent(Codec.BOOL)
 			.copyOnDeath()
-			.syncWith(ByteBufCodecs.BOOL, DataSlot.Sync.OWNER)
 			.register(Fmab.id("scar_arm"));
+
+	/**
+	 * Le motif d'Ishval compris, dans les notes du frère de Scar : sans lui, les cercles tatoués autour
+	 * d'un bras ne font pas le bras de Scar. Gardé à la mort, connu du client (le bras ne mine plus à
+	 * mains nues).
+	 */
+	public static final DataSlot<Boolean> ISHVAL_MOTIF = DataSlot.<Boolean>builder()
+			.persistent(Codec.BOOL)
+			.copyOnDeath()
+			.syncWith(ByteBufCodecs.BOOL, DataSlot.Sync.OWNER)
+			.register(Fmab.id("ishval_motif"));
 
 	/** Le temps passé d'affilée sur l'île de Yock, en ticks (l'épreuve d'Izumi). */
 	public static final DataSlot<Integer> ISLAND_TIME = DataSlot.<Integer>builder()

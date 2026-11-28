@@ -5,6 +5,7 @@ import com.ajustor.fmab.network.OpenTattooPayload;
 import com.ajustor.fmab.network.TattooPayload;
 import com.ajustor.fmab.tattoo.BodyArt;
 import com.ajustor.fmab.tattoo.BodyCircles;
+import com.ajustor.fmab.tattoo.Canvas;
 import com.ajustor.fmab.tattoo.TattooSlot;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -80,8 +81,12 @@ public class TattooScreen extends Screen {
 			BodyArt art = minecraft == null || minecraft.player == null ? null
 					: BodyCircles.art(minecraft.player, slot).orElse(null);
 			if (art != null) {
-				graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(art), left + 10, y + 2, 0, 0,
-						THUMB, THUMB, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE, CircleTextures.SIZE);
+				// Le tour d'un bras, deux fois plus large que haut, se montre en bandeau dans la vignette.
+				Canvas canvas = slot.canvas();
+				int w = canvas.textureWidth(), h = canvas.textureHeight();
+				int thumbH = THUMB * h / w;
+				graphics.blit(RenderPipelines.GUI_TEXTURED, CircleTextures.get(art, canvas), left + 10,
+						y + 2 + (THUMB - thumbH) / 2, 0, 0, THUMB, thumbH, w, h, w, h);
 			} else {
 				graphics.outline(left + 10, y + 2, THUMB, THUMB, FADED);
 			}

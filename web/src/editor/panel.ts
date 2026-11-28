@@ -17,7 +17,7 @@ export const SUPPORTS: { id: string; stages: number }[] = [
   { id: "state_gloves", stages: 5 },
   { id: "clothes", stages: 1 },
   { id: "palm", stages: 2 },
-  { id: "forearm", stages: 1 },
+  { id: "arm", stages: 2 },
   { id: "back", stages: 5 },
   { id: "chest", stages: 3 },
 ];
@@ -30,7 +30,7 @@ export function supportName(id: string): string {
     case "clothes":
       return t("editor.fmab.support.clothes");
     case "palm":
-    case "forearm":
+    case "arm":
       return t("editor.fmab.support.tattoo", t(`tattoo.fmab.slot.${id}_right`));
     case "back":
     case "chest":

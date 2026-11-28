@@ -38,7 +38,7 @@ public class WornScenes implements FabricClientGameTest {
 				FmabAttachments.GLOVES.set(p, Gloves.NONE.with(false, spark)
 						.with(true, new ItemStack(FmabItems.IRON_GAUNTLETS)));
 				FmabAttachments.TATTOOS.set(p, Tattoos.NONE.with(TattooSlot.CHEST, ForbiddenCircles.HUMAN_TRANSMUTATION)
-						.with(TattooSlot.FOREARM_LEFT, ForbiddenCircles.HUMAN_TRANSMUTATION));
+						.with(TattooSlot.ARM_LEFT, ForbiddenCircles.HUMAN_TRANSMUTATION));
 			});
 			sp.getConnection().waitForClientboundPackets();
 			context.waitTicks(5);

@@ -118,7 +118,7 @@ public final class Milestones {
 		if (greedPact) {
 			reach(p, "greed_pact");
 		}
-		if (Boolean.TRUE.equals(FmabAttachments.SCAR_ARM.get(p))) {
+		if (com.ajustor.fmab.arts.IshvalArm.worn(p)) {
 			reach(p, "scar_tattoo");
 		}
 		Set<String> slain = FmabAttachments.SLAIN.getOrCreate(p);
